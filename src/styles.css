@@ -202,6 +202,15 @@
 @utility chart-column { width: 100%; min-height: 10px; border-radius: 6px 6px 3px 3px; animation: grow .7s cubic-bezier(.32,.72,0,1) both; transform-origin: bottom; }
 @utility score-ring { display: grid; width: 112px; height: 112px; place-items: center; border-radius: 999px; background: conic-gradient(var(--rest) 0 var(--score), var(--secondary) var(--score)); & > div { display: grid; width: 90px; height: 90px; place-content: center; border-radius: 999px; background: var(--background); text-align: center; } & strong { font-family: var(--font-display); font-size: 27px; line-height: 1; } & span { margin-top: 5px; font-size: 10px; color: var(--muted-foreground); } }
 @utility no-scrollbar { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+@utility avatar-ring { display: grid; place-items: center; width: 48px; height: 48px; flex-shrink: 0; border-radius: 999px; padding: 3px; background: conic-gradient(var(--calm), var(--mind), var(--rest), var(--calm)); }
+@utility hero-card { position: relative; overflow: hidden; border-radius: 24px; padding: 20px; background: linear-gradient(150deg, oklch(0.24 0.012 255), oklch(0.16 0.012 255)); color: var(--background); }
+@utility hero-chip { display: inline-flex; border-radius: 999px; background: oklch(1 0 0 / 0.12); padding: 5px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+@utility hero-ring { display: grid; width: 62px; height: 62px; place-items: center; border-radius: 999px; background: conic-gradient(var(--background) 0 29%, oklch(1 0 0 / 0.14) 29%); & span { display: grid; width: 50px; height: 50px; place-items: center; border-radius: 999px; background: oklch(0.2 0.012 255); font-family: var(--font-display); font-size: 14px; font-weight: 700; } }
+@utility hero-track { height: 6px; border-radius: 999px; background: oklch(1 0 0 / 0.14); & i { display: block; height: 100%; border-radius: 999px; background: var(--background); } }
+@utility metric-pill { border-radius: 12px; background: var(--secondary); padding: 8px 10px; & span { font-size: 10px; font-weight: 700; color: var(--muted-foreground); } }
+@utility metric-track { margin-top: 6px; height: 4px; border-radius: 999px; background: var(--background); & i { display: block; height: 100%; border-radius: 999px; } }
+@utility activity-dial { display: grid; width: 42px; height: 42px; flex-shrink: 0; place-items: center; border-radius: 999px; background: conic-gradient(var(--calm) 0 var(--p), var(--secondary) var(--p)); & span { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 999px; background: var(--card); font-family: var(--font-display); font-size: 9px; font-weight: 700; } }
+
 
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes grow { from { transform: scaleY(.1); opacity: .3; } to { transform: scaleY(1); opacity: 1; } }
