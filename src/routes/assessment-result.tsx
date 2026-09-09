@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download, Phone, Play, ShieldCheck, TrendingDown } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { Button } from "@/components/ui/button";
+import type { CSSProperties } from "react";
 
 export const Route = createFileRoute("/assessment-result")({
   head: () => ({
@@ -33,7 +34,7 @@ function AssessmentResultPage() {
         <div className="surface overflow-hidden p-5">
           <div className="flex items-center justify-between"><span className="semantic-chip bg-rest-soft text-rest-strong">Moderately severe</span><span className="text-xs text-muted-foreground">Sep 8, 2026</span></div>
           <div className="mt-6 grid grid-cols-[112px_minmax(0,1fr)] items-center gap-5">
-            <div className="score-ring" style={{ "--score": "62%" } as React.CSSProperties}><div><strong>62%</strong><span>13 / 21</span></div></div>
+            <div className="score-ring" style={{ "--score": "62%" } as CSSProperties}><div><strong>62%</strong><span>13 / 21</span></div></div>
             <div><p className="font-display text-xl font-semibold leading-tight">You're improving, and support could still help.</p><p className="mt-2 text-sm leading-6 text-muted-foreground">Your score is 4 points lower than your first check-in. The biggest change is fewer restless evenings.</p></div>
           </div>
           <div className="mt-6 grid grid-cols-3 divide-x divide-border rounded-2xl bg-secondary/55 py-3 text-center">
