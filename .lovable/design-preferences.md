@@ -1,0 +1,1 @@
+Redesign requirements: mobile mental-health self-help product; black, white, and layered grey foundation; light multi-color accents only where they communicate mood, severity, progress, or support; Sora headings with Manrope body; focus on dashboard and assessment-result/archive experiences.
