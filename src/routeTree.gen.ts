@@ -18,11 +18,9 @@ import { Route as AssessmentIndexRouteImport } from './routes/assessment.index'
 import { Route as AssessmentSlugRouteImport } from './routes/assessment.$slug'
 import { Route as ProgramIndexRouteImport } from './routes/program.index'
 import { Route as ResultSlugRouteImport } from './routes/result.$slug'
-import { Route as ProgramSleepTightIndexRouteImport } from './routes/program.sleep-tight.index'
-import { Route as ProgramSleepTightInstrumentsRouteImport } from './routes/program.sleep-tight.instruments'
-import { Route as ProgramSleepTightStartRouteImport } from './routes/program.sleep-tight.start'
-import { Route as ProgramSleepTightUnitsRouteImport } from './routes/program.sleep-tight.units'
-import { Route as ProgramSleepTightUnitUnitRouteImport } from './routes/program.sleep-tight.unit.$unit'
+import { Route as ProgramSlugIndexRouteImport } from './routes/program.$slug.index'
+import { Route as ProgramSlugJournalRouteImport } from './routes/program.$slug.journal'
+import { Route as ProgramSlugDayDayRouteImport } from './routes/program.$slug.day.$day'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -69,33 +67,21 @@ const ResultSlugRoute = ResultSlugRouteImport.update({
   path: '/result/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramSleepTightIndexRoute = ProgramSleepTightIndexRouteImport.update({
-  id: '/program/sleep-tight/',
-  path: '/program/sleep-tight/',
+const ProgramSlugIndexRoute = ProgramSlugIndexRouteImport.update({
+  id: '/program/$slug/',
+  path: '/program/$slug/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramSleepTightInstrumentsRoute =
-  ProgramSleepTightInstrumentsRouteImport.update({
-    id: '/program/sleep-tight/instruments',
-    path: '/program/sleep-tight/instruments',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProgramSleepTightStartRoute = ProgramSleepTightStartRouteImport.update({
-  id: '/program/sleep-tight/start',
-  path: '/program/sleep-tight/start',
+const ProgramSlugJournalRoute = ProgramSlugJournalRouteImport.update({
+  id: '/program/$slug/journal',
+  path: '/program/$slug/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramSleepTightUnitsRoute = ProgramSleepTightUnitsRouteImport.update({
-  id: '/program/sleep-tight/units',
-  path: '/program/sleep-tight/units',
+const ProgramSlugDayDayRoute = ProgramSlugDayDayRouteImport.update({
+  id: '/program/$slug/day/$day',
+  path: '/program/$slug/day/$day',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramSleepTightUnitUnitRoute =
-  ProgramSleepTightUnitUnitRouteImport.update({
-    id: '/program/sleep-tight/unit/$unit',
-    path: '/program/sleep-tight/unit/$unit',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -107,11 +93,9 @@ export interface FileRoutesByFullPath {
   '/result/$slug': typeof ResultSlugRoute
   '/assessment/': typeof AssessmentIndexRoute
   '/program/': typeof ProgramIndexRoute
-  '/program/sleep-tight/instruments': typeof ProgramSleepTightInstrumentsRoute
-  '/program/sleep-tight/start': typeof ProgramSleepTightStartRoute
-  '/program/sleep-tight/units': typeof ProgramSleepTightUnitsRoute
-  '/program/sleep-tight/': typeof ProgramSleepTightIndexRoute
-  '/program/sleep-tight/unit/$unit': typeof ProgramSleepTightUnitUnitRoute
+  '/program/$slug/journal': typeof ProgramSlugJournalRoute
+  '/program/$slug/': typeof ProgramSlugIndexRoute
+  '/program/$slug/day/$day': typeof ProgramSlugDayDayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -123,11 +107,9 @@ export interface FileRoutesByTo {
   '/result/$slug': typeof ResultSlugRoute
   '/assessment': typeof AssessmentIndexRoute
   '/program': typeof ProgramIndexRoute
-  '/program/sleep-tight/instruments': typeof ProgramSleepTightInstrumentsRoute
-  '/program/sleep-tight/start': typeof ProgramSleepTightStartRoute
-  '/program/sleep-tight/units': typeof ProgramSleepTightUnitsRoute
-  '/program/sleep-tight': typeof ProgramSleepTightIndexRoute
-  '/program/sleep-tight/unit/$unit': typeof ProgramSleepTightUnitUnitRoute
+  '/program/$slug/journal': typeof ProgramSlugJournalRoute
+  '/program/$slug': typeof ProgramSlugIndexRoute
+  '/program/$slug/day/$day': typeof ProgramSlugDayDayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,11 +122,9 @@ export interface FileRoutesById {
   '/result/$slug': typeof ResultSlugRoute
   '/assessment/': typeof AssessmentIndexRoute
   '/program/': typeof ProgramIndexRoute
-  '/program/sleep-tight/instruments': typeof ProgramSleepTightInstrumentsRoute
-  '/program/sleep-tight/start': typeof ProgramSleepTightStartRoute
-  '/program/sleep-tight/units': typeof ProgramSleepTightUnitsRoute
-  '/program/sleep-tight/': typeof ProgramSleepTightIndexRoute
-  '/program/sleep-tight/unit/$unit': typeof ProgramSleepTightUnitUnitRoute
+  '/program/$slug/journal': typeof ProgramSlugJournalRoute
+  '/program/$slug/': typeof ProgramSlugIndexRoute
+  '/program/$slug/day/$day': typeof ProgramSlugDayDayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -158,11 +138,9 @@ export interface FileRouteTypes {
     | '/result/$slug'
     | '/assessment/'
     | '/program/'
-    | '/program/sleep-tight/instruments'
-    | '/program/sleep-tight/start'
-    | '/program/sleep-tight/units'
-    | '/program/sleep-tight/'
-    | '/program/sleep-tight/unit/$unit'
+    | '/program/$slug/journal'
+    | '/program/$slug/'
+    | '/program/$slug/day/$day'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -174,11 +152,9 @@ export interface FileRouteTypes {
     | '/result/$slug'
     | '/assessment'
     | '/program'
-    | '/program/sleep-tight/instruments'
-    | '/program/sleep-tight/start'
-    | '/program/sleep-tight/units'
-    | '/program/sleep-tight'
-    | '/program/sleep-tight/unit/$unit'
+    | '/program/$slug/journal'
+    | '/program/$slug'
+    | '/program/$slug/day/$day'
   id:
     | '__root__'
     | '/'
@@ -190,11 +166,9 @@ export interface FileRouteTypes {
     | '/result/$slug'
     | '/assessment/'
     | '/program/'
-    | '/program/sleep-tight/instruments'
-    | '/program/sleep-tight/start'
-    | '/program/sleep-tight/units'
-    | '/program/sleep-tight/'
-    | '/program/sleep-tight/unit/$unit'
+    | '/program/$slug/journal'
+    | '/program/$slug/'
+    | '/program/$slug/day/$day'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -207,11 +181,9 @@ export interface RootRouteChildren {
   ResultSlugRoute: typeof ResultSlugRoute
   AssessmentIndexRoute: typeof AssessmentIndexRoute
   ProgramIndexRoute: typeof ProgramIndexRoute
-  ProgramSleepTightInstrumentsRoute: typeof ProgramSleepTightInstrumentsRoute
-  ProgramSleepTightStartRoute: typeof ProgramSleepTightStartRoute
-  ProgramSleepTightUnitsRoute: typeof ProgramSleepTightUnitsRoute
-  ProgramSleepTightIndexRoute: typeof ProgramSleepTightIndexRoute
-  ProgramSleepTightUnitUnitRoute: typeof ProgramSleepTightUnitUnitRoute
+  ProgramSlugJournalRoute: typeof ProgramSlugJournalRoute
+  ProgramSlugIndexRoute: typeof ProgramSlugIndexRoute
+  ProgramSlugDayDayRoute: typeof ProgramSlugDayDayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -279,39 +251,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/program/sleep-tight/': {
-      id: '/program/sleep-tight/'
-      path: '/program/sleep-tight'
-      fullPath: '/program/sleep-tight/'
-      preLoaderRoute: typeof ProgramSleepTightIndexRouteImport
+    '/program/$slug/': {
+      id: '/program/$slug/'
+      path: '/program/$slug'
+      fullPath: '/program/$slug/'
+      preLoaderRoute: typeof ProgramSlugIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/program/sleep-tight/instruments': {
-      id: '/program/sleep-tight/instruments'
-      path: '/program/sleep-tight/instruments'
-      fullPath: '/program/sleep-tight/instruments'
-      preLoaderRoute: typeof ProgramSleepTightInstrumentsRouteImport
+    '/program/$slug/journal': {
+      id: '/program/$slug/journal'
+      path: '/program/$slug/journal'
+      fullPath: '/program/$slug/journal'
+      preLoaderRoute: typeof ProgramSlugJournalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/program/sleep-tight/start': {
-      id: '/program/sleep-tight/start'
-      path: '/program/sleep-tight/start'
-      fullPath: '/program/sleep-tight/start'
-      preLoaderRoute: typeof ProgramSleepTightStartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/program/sleep-tight/units': {
-      id: '/program/sleep-tight/units'
-      path: '/program/sleep-tight/units'
-      fullPath: '/program/sleep-tight/units'
-      preLoaderRoute: typeof ProgramSleepTightUnitsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/program/sleep-tight/unit/$unit': {
-      id: '/program/sleep-tight/unit/$unit'
-      path: '/program/sleep-tight/unit/$unit'
-      fullPath: '/program/sleep-tight/unit/$unit'
-      preLoaderRoute: typeof ProgramSleepTightUnitUnitRouteImport
+    '/program/$slug/day/$day': {
+      id: '/program/$slug/day/$day'
+      path: '/program/$slug/day/$day'
+      fullPath: '/program/$slug/day/$day'
+      preLoaderRoute: typeof ProgramSlugDayDayRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -327,11 +285,9 @@ const rootRouteChildren: RootRouteChildren = {
   ResultSlugRoute: ResultSlugRoute,
   AssessmentIndexRoute: AssessmentIndexRoute,
   ProgramIndexRoute: ProgramIndexRoute,
-  ProgramSleepTightInstrumentsRoute: ProgramSleepTightInstrumentsRoute,
-  ProgramSleepTightStartRoute: ProgramSleepTightStartRoute,
-  ProgramSleepTightUnitsRoute: ProgramSleepTightUnitsRoute,
-  ProgramSleepTightIndexRoute: ProgramSleepTightIndexRoute,
-  ProgramSleepTightUnitUnitRoute: ProgramSleepTightUnitUnitRoute,
+  ProgramSlugJournalRoute: ProgramSlugJournalRoute,
+  ProgramSlugIndexRoute: ProgramSlugIndexRoute,
+  ProgramSlugDayDayRoute: ProgramSlugDayDayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

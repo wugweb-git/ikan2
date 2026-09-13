@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Phone, ShieldAlert } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { ProgramHeader, pageMeta } from "@/components/equip/program-header";
+import { BackLink, ProgramHeader, pageMeta } from "@/components/equip/program-header";
 
 export const Route = createFileRoute("/support")({
   head: () =>
@@ -36,7 +36,7 @@ const lines = [
 function SupportPage() {
   return (
     <IkanShell>
-      <ProgramHeader back="/" eyebrow="You are not alone" title="Get support now" />
+      <ProgramHeader back={<BackLink to="/" />} title="Get support now" />
 
       <section className="px-5">
         <a

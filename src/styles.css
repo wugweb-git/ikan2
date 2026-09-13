@@ -235,6 +235,9 @@
 @utility reveal-in { opacity: 1; transform: none; }
 
 
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+/* opacity only: no transform, so fixed children (step footers) stay anchored to the viewport */
+@utility animate-fade { animation: fade .35s ease both; }
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes grow { from { transform: scaleY(.1); opacity: .3; } to { transform: scaleY(1); opacity: 1; } }
 @utility animate-fade-in { animation: rise .55s cubic-bezier(.32,.72,0,1) both; }

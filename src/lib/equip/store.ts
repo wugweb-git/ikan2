@@ -1,79 +1,65 @@
-import { useCallback, useSyncExternalStore } from "react";
-import { instruments } from "./program";
-import type { Row } from "./types";
+import { useSyncExternalStore } from "react";
+import type { DiaryEntry } from "./metrics";
+import type { EntryValues } from "./types";
 
-/* ------------------------------------------------------------------ *
- * Per-user progress for Equip, kept in localStorage (no accounts yet).
- * Hydration-safe: the server and first client render see EMPTY.
- * ------------------------------------------------------------------ */
+/* Per-programme progress, kept in localStorage (no accounts yet).
+ * Hydration-safe: the server and first client render see EMPTY. */
 
-export type EquipState = {
-  startedAt: string | null;
-  intake: Record<string, string>;
+export type Entry = { id: string; day: number; createdAt: string; values: EntryValues };
+
+export type ProgrammeState = {
   completed: number[];
-  /** instrument key → user rows (seeds are never stored, they come from the model) */
-  entries: Record<string, Row[]>;
-  /** option_pool instrument key → picked labels */
-  pools: Record<string, string[]>;
-  /** mood log: unit number → rating 1–5 */
-  mood: Record<string, number>;
+  /** choice, scale and reflect answers, keyed by step key (reflections are per day: `${key}@${day}`) */
+  answers: Record<string, string | string[] | number>;
+  collections: Record<string, Entry[]>;
+  /** sleep diary per programme day */
+  diary: Record<string, DiaryEntry>;
+  /** habit tracker: day → entry id → done */
+  tracker: Record<string, Record<string, boolean>>;
 };
 
-const KEY = "ikan.equip.sleep-tight.v1";
-
-const EMPTY: EquipState = {
-  startedAt: null,
-  intake: {},
+const EMPTY: ProgrammeState = {
   completed: [],
-  entries: {},
-  pools: {},
-  mood: {},
+  answers: {},
+  collections: {},
+  diary: {},
+  tracker: {},
 };
 
-let cache: EquipState | null = null;
+const keyFor = (slug: string) => `ikan.equip.${slug}.v2`;
+const cache = new Map<string, ProgrammeState>();
 const listeners = new Set<() => void>();
 
-function purgeExpired(state: EquipState): EquipState {
-  const now = Date.now();
-  const entries = { ...state.entries };
-  for (const [key, rows] of Object.entries(entries)) {
-    const hours = instruments[key]?.retentionHours;
-    if (!hours) continue;
-    entries[key] = rows.filter((row) => {
-      const created = typeof row["createdAt"] === "string" ? Date.parse(row["createdAt"]) : now;
-      return now - created < hours * 3_600_000;
-    });
-  }
-  return { ...state, entries };
-}
-
-function read(): EquipState {
-  if (cache) return cache;
+function read(slug: string): ProgrammeState {
+  const hit = cache.get(slug);
+  if (hit) return hit;
   if (typeof window === "undefined") return EMPTY;
+  let state = EMPTY;
   try {
-    const raw = window.localStorage.getItem(KEY);
-    cache = raw ? purgeExpired({ ...EMPTY, ...(JSON.parse(raw) as Partial<EquipState>) }) : EMPTY;
+    const raw = window.localStorage.getItem(keyFor(slug));
+    if (raw) state = { ...EMPTY, ...(JSON.parse(raw) as Partial<ProgrammeState>) };
   } catch {
-    cache = EMPTY;
+    /* unreadable storage — start fresh */
   }
-  return cache;
+  cache.set(slug, state);
+  return state;
 }
 
-function write(next: EquipState) {
-  cache = next;
+function write(slug: string, next: ProgrammeState) {
+  cache.set(slug, next);
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(next));
+    window.localStorage.setItem(keyFor(slug), JSON.stringify(next));
   } catch {
     /* storage unavailable — keep in memory for this session */
   }
-  listeners.forEach((listener) => listener());
+  listeners.forEach((l) => l());
 }
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
-  const onStorage = (event: StorageEvent) => {
-    if (event.key === KEY) {
-      cache = null;
+  const onStorage = (e: StorageEvent) => {
+    if (e.key?.startsWith("ikan.equip.")) {
+      cache.clear();
       listener();
     }
   };
@@ -84,95 +70,68 @@ function subscribe(listener: () => void) {
   };
 }
 
-const newId = () => `r-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+const newId = () => `e-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
-/** Rows dedupe on the instrument's identity columns (case-insensitive). */
-function identityOf(instrument: string, row: Row) {
-  const identity = instruments[instrument]?.identity;
-  if (!identity?.length) return null;
-  return identity
-    .map((key) =>
-      String(row[key] ?? "")
-        .trim()
-        .toLowerCase(),
-    )
-    .join("|");
-}
-
-export const equipActions = {
-  start(intake: Record<string, string>) {
-    const state = read();
-    write({ ...state, intake, startedAt: state.startedAt ?? new Date().toISOString() });
-  },
-  complete(unit: number) {
-    const state = read();
-    if (state.completed.includes(unit)) return;
-    write({ ...state, completed: [...state.completed, unit].sort((a, b) => a - b) });
-  },
-  addRow(instrument: string, values: Record<string, string | boolean | null>, unit: number) {
-    const state = read();
-    const row = {
-      ...values,
-      id: newId(),
-      unit: String(unit),
-      createdAt: new Date().toISOString(),
-    } as Row;
-    const rows = state.entries[instrument] ?? [];
-    const key = identityOf(instrument, row);
-    const next = key
-      ? [...rows.filter((r) => identityOf(instrument, r) !== key), row]
-      : [...rows, row];
-    write({ ...state, entries: { ...state.entries, [instrument]: next } });
-  },
-  /** Fill fields on an existing row. Seed rows are copied (still marked seed) on first edit. */
-  updateRow(instrument: string, row: Row, patch: Record<string, string | boolean | null>) {
-    const state = read();
-    const rows = state.entries[instrument] ?? [];
-    const exists = rows.some((r) => r.id === row.id);
-    const next = exists
-      ? rows.map((r) => (r.id === row.id ? ({ ...r, ...patch } as Row) : r))
-      : [...rows, { ...row, ...patch, seedOf: row.id, id: newId() } as Row];
-    write({ ...state, entries: { ...state.entries, [instrument]: next } });
-  },
-  removeRow(instrument: string, id: string) {
-    const state = read();
-    const rows = (state.entries[instrument] ?? []).filter((r) => r.id !== id);
-    write({ ...state, entries: { ...state.entries, [instrument]: rows } });
-  },
-  setPool(instrument: string, picks: string[]) {
-    const state = read();
-    write({ ...state, pools: { ...state.pools, [instrument]: picks } });
-  },
-  setMood(unit: number, rating: number) {
-    const state = read();
-    write({ ...state, mood: { ...state.mood, [String(unit)]: rating } });
-  },
-  reset() {
-    write(EMPTY);
-  },
-};
-
-export function useEquipProgress() {
-  const state = useSyncExternalStore(subscribe, read, () => EMPTY);
-
-  /** Seed rows (not yet overridden by the user) followed by the user's own rows. */
-  const rowsFor = useCallback(
-    (instrument: string, withSeeds = true): Row[] => {
-      const own = state.entries[instrument] ?? [];
-      if (!withSeeds) return own;
-      const copies = new Map(own.filter((r) => r["seedOf"]).map((r) => [r["seedOf"], r]));
-      const seeds = (instruments[instrument]?.seeds ?? []).map((s) => copies.get(s.id) ?? s);
-      return [...seeds, ...own.filter((r) => !r["seedOf"])];
-    },
-    [state],
+export function useProgramme(slug: string) {
+  const state = useSyncExternalStore(
+    subscribe,
+    () => read(slug),
+    () => EMPTY,
   );
+  const update = (fn: (s: ProgrammeState) => ProgrammeState) => write(slug, fn(read(slug)));
 
-  /** The next unit the user may open — every earlier one is complete. */
-  const nextUnit = (() => {
-    let n = 0;
-    while (state.completed.includes(n)) n += 1;
-    return n;
-  })();
+  let next = 0;
+  while (state.completed.includes(next)) next += 1;
 
-  return { state, rowsFor, nextUnit, ...equipActions };
+  return {
+    state,
+    /** the next day the user can open; every earlier day is complete */
+    nextDay: next,
+    entries: (collection: string) => state.collections[collection] ?? [],
+    setAnswer: (key: string, value: string | string[] | number) =>
+      update((s) => ({ ...s, answers: { ...s.answers, [key]: value } })),
+    addEntry: (collection: string, values: EntryValues, day: number) => {
+      const entry: Entry = { id: newId(), day, createdAt: new Date().toISOString(), values };
+      update((s) => ({
+        ...s,
+        collections: {
+          ...s.collections,
+          [collection]: [...(s.collections[collection] ?? []), entry],
+        },
+      }));
+      return entry;
+    },
+    patchEntry: (collection: string, id: string, patch: EntryValues) =>
+      update((s) => ({
+        ...s,
+        collections: {
+          ...s.collections,
+          [collection]: (s.collections[collection] ?? []).map((e) =>
+            e.id === id ? { ...e, values: { ...e.values, ...patch } } : e,
+          ),
+        },
+      })),
+    removeEntry: (collection: string, id: string) =>
+      update((s) => ({
+        ...s,
+        collections: {
+          ...s.collections,
+          [collection]: (s.collections[collection] ?? []).filter((e) => e.id !== id),
+        },
+      })),
+    saveDiary: (day: number, entry: DiaryEntry) =>
+      update((s) => ({ ...s, diary: { ...s.diary, [String(day)]: entry } })),
+    setTracked: (day: number, id: string, done: boolean) =>
+      update((s) => ({
+        ...s,
+        tracker: { ...s.tracker, [String(day)]: { ...s.tracker[String(day)], [id]: done } },
+      })),
+    complete: (day: number) =>
+      update((s) =>
+        s.completed.includes(day)
+          ? s
+          : { ...s, completed: [...s.completed, day].sort((a, b) => a - b) },
+      ),
+    reset: () => write(slug, EMPTY),
+  };
 }

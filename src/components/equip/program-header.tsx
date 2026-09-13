@@ -1,35 +1,47 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
-import { Button } from "@/components/ui/button";
 
-type Back = "/" | "/program" | "/program/sleep-tight" | "/program/sleep-tight/units";
+const backClass =
+  "grid h-11 w-11 place-items-center rounded-full bg-secondary/70 text-foreground transition-transform active:scale-95";
+
+/** Back to a fixed route, or to a programme page when `slug` is given. */
+export function BackLink(props: { to: "/" | "/program" } | { to: "/program/$slug"; slug: string }) {
+  if (props.to === "/program/$slug") {
+    return (
+      <Link
+        to="/program/$slug"
+        params={{ slug: props.slug }}
+        aria-label="Back"
+        className={backClass}
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </Link>
+    );
+  }
+  return (
+    <Link to={props.to} aria-label="Back" className={backClass}>
+      <ArrowLeft className="h-5 w-5" />
+    </Link>
+  );
+}
 
 export function ProgramHeader({
   back,
-  eyebrow,
   title,
   action,
 }: {
-  back: Back;
-  eyebrow: string;
-  title: string;
+  back: ReactNode;
+  title?: string;
   action?: ReactNode;
 }) {
   return (
-    <header className="px-5 pb-4 pt-6">
-      <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-3">
-        <Button asChild variant="ghost" size="icon" className="h-11 w-11 rounded-full">
-          <Link to={back} aria-label="Back">
-            <ArrowLeft />
-          </Link>
-        </Button>
-        <div className="min-w-0 text-center">
-          <p className="eyebrow">{eyebrow}</p>
-          <h1 className="truncate font-display text-xl font-semibold">{title}</h1>
-        </div>
-        {action ?? <span />}
-      </div>
+    <header className="flex items-center justify-between gap-3 px-5 pb-2 pt-5">
+      {back}
+      {title ? (
+        <p className="min-w-0 truncate font-display text-[15px] font-semibold">{title}</p>
+      ) : null}
+      {action ?? <span className="h-11 w-11" />}
     </header>
   );
 }

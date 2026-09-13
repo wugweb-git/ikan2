@@ -1,110 +1,86 @@
-export type Beat = "teach" | "rehearse" | "work" | "close";
+/* ------------------------------------------------------------------ *
+ * Equip programme model — mirrors the Notion programme docs:
+ * programme → units (day ranges) → days → steps (the Notion "blocks").
+ * ------------------------------------------------------------------ */
 
-export type ProjectionMode = "collect" | "extend" | "review" | "summarise";
+export type FieldType = "text" | "longtext" | "time" | "date" | "yesno";
 
-export type ColumnType = "text" | "time" | "bool" | "enum";
+export type Field = { key: string; label: string; type: FieldType; placeholder?: string };
 
-export type Column = {
-  key: string;
-  label: string;
-  type: ColumnType;
-  options?: string[];
-  /** added by a later revision — null on earlier rows, retroactively fillable */
-  revision?: number;
-};
+export type EntryValues = Record<string, string | boolean | null>;
 
-export type Row = Record<string, string | boolean | null> & { id: string; seed?: boolean };
+export type Step =
+  | { kind: "lesson"; title: string; body: string[]; bullets?: string[]; example?: string }
+  /** quiz (single) and checklist (multi) blocks */
+  | {
+      kind: "choice";
+      key: string;
+      title: string;
+      prompt: string;
+      options: { label: string; glyph?: string }[];
+      multi?: boolean;
+      /** adds a free-text "Other" option */
+      other?: boolean;
+    }
+  | {
+      kind: "scale";
+      key: string;
+      title: string;
+      prompt: string;
+      min: number;
+      max: number;
+      unit: string;
+    }
+  | { kind: "reflect"; key: string; title: string; prompt: string; optional?: boolean }
+  /** the Day 1 sleep diary, one question per screen */
+  | { kind: "diary"; title: string }
+  /** comparison matrix: label each line as a thought or a feeling */
+  | {
+      kind: "sort";
+      title: string;
+      prompt: string;
+      worked: { situation: string; lines: { text: string; answer: "Thought" | "Feeling" }[] };
+      items: { situation: string; lines: string[] }[];
+    }
+  /** input table as swipeable cards; the user adds as many as they like */
+  | {
+      kind: "entries";
+      collection: string;
+      title: string;
+      prompt: string;
+      fields: Field[];
+      example?: EntryValues;
+      limit?: number;
+      timerSeconds?: number;
+    }
+  /** pull earlier cards back up and answer one more question on each */
+  | {
+      kind: "review";
+      collection: string;
+      title: string;
+      prompt: string;
+      fields: Field[];
+      /** checklist answers to seed as cards before reviewing them */
+      seedFrom?: { choiceKey: string; field: string };
+      /** lets the user add a fresh card, prompted with these fields plus the review fields */
+      addFields?: Field[];
+    }
+  /** daily habit tracker over the user's habit list */
+  | { kind: "tracker"; collection: string; field: string; title: string; prompt: string }
+  | { kind: "conclude"; line: string; reflectKey?: string; prompt?: string };
 
-export type InstrumentType =
-  | "record"
-  | "nested_record"
-  | "join"
-  | "option_pool"
-  | "drill"
-  | "scale"
-  | "form";
+export type Day = { day: number; title: string; subtitle?: string; steps: Step[] };
 
-export type Instrument = {
-  key: string;
+export type Unit = { n: number; title: string; focus: string; days: Day[] };
+
+export type Programme = {
+  slug: string;
   name: string;
-  type: InstrumentType;
-  columns?: Column[];
-  /** columns that identify a row for dedupe */
-  identity?: string[];
-  seeds?: Row[];
-  childCap?: number;
-  retentionHours?: number;
+  tagline: string;
+  description: string;
+  level: string;
+  cover: string;
+  units: Unit[];
+  /** things the programme wants the user to know before starting */
+  notes: string[];
 };
-
-export type DrillItem = {
-  prompt: string;
-  question: string;
-  choices: string[];
-  reveal?: string;
-};
-
-export type PoolOption = { label: string; glyph?: string };
-
-export type Block =
-  | { kind: "teach"; id: string; beat: Beat; title: string; body?: string[]; bullets?: string[]; image?: boolean }
-  | { kind: "drill"; id: string; beat: Beat; title: string; note?: string; items: DrillItem[] }
-  | {
-      kind: "pool";
-      id: string;
-      beat: Beat;
-      instrument: string;
-      title: string;
-      note?: string;
-      options: PoolOption[];
-      allowOther?: boolean;
-      refusal?: boolean;
-    }
-  | {
-      kind: "record";
-      id: string;
-      beat: Beat;
-      instrument: string;
-      mode: ProjectionMode;
-      title: string;
-      note?: string;
-      /** only these columns are editable in this projection (defaults to all) */
-      fields?: string[];
-    }
-  | {
-      kind: "nested";
-      id: string;
-      beat: Beat;
-      instrument: string;
-      mode: ProjectionMode;
-      title: string;
-      note?: string;
-      evaluationAllowed?: boolean;
-      timeBoxSeconds?: number;
-    }
-  | {
-      kind: "timed";
-      id: string;
-      beat: Beat;
-      instrument: string;
-      title: string;
-      note?: string;
-      seconds: number;
-      retentionNote?: string;
-    }
-  | { kind: "scale"; id: string; beat: Beat; instrument: string; title: string; note?: string }
-  | { kind: "diary"; id: string; beat: Beat; title: string; note?: string }
-  | { kind: "summarise"; id: string; beat: Beat; instrument: string; title: string; note?: string }
-  | { kind: "close"; id: string; beat: Beat; line: string };
-
-export type Unit = {
-  n: number;
-  title: string;
-  component: string;
-  minutes: number;
-  blocks: Block[];
-  /** rehearsal units have no spine — the standing set is the unit */
-  rehearsal?: boolean;
-  needsClinicalCall?: boolean;
-};
-
-export type StandingEntry = { instrument: string; from: number };
