@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Clock3, Moon, Wind } from "lucide-react";
+import { ArrowRight, Clock3, Flame, Moon, Timer, Wind } from "lucide-react";
 import cover from "@/assets/equip-sleep-tight.jpg";
 import { IkanShell } from "@/components/ikan-shell";
 import { Reveal } from "@/components/reveal";
@@ -16,11 +16,18 @@ export const Route = createFileRoute("/program/")({
   component: ProgramsPage,
 });
 
+// The other Equip programmes named in the Equip model doc; their unit content is not authored in this app yet.
 const comingSoon = [
   {
     name: "Equip : Stressbuster",
     body: "Skills for when stress is what keeps you up.",
     icon: Wind,
+  },
+  { name: "Equip : Unburn", body: "A steady way back from burnout.", icon: Flame },
+  {
+    name: "Equip : Productivity Reset",
+    body: "Reset focus and routine, one sitting at a time.",
+    icon: Timer,
   },
 ];
 
