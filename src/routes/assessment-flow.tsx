@@ -105,6 +105,34 @@ function AssessmentFlowPage() {
   const firstUnanswered = a.questions.findIndex((qq) => answers[qq.id] === undefined);
   const exit = () => navigate({ to: "/assessment/$slug", params: { slug: a.slug } });
 
+  // keyboard: 1–6 picks an answer, ← goes back, → or Enter moves on once answered
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (leaving || e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+      if (e.key === "Enter" && target?.closest("button, a")) return;
+      const n = Number(e.key);
+      const options = a.scales[question.scale]!.options;
+      if (Number.isInteger(n) && n >= 1 && n <= options.length) {
+        e.preventDefault();
+        choose(options[n - 1]!.value);
+      } else if (e.key === "ArrowLeft" && index > 0) {
+        window.clearTimeout(advance.current);
+        setIndex((i) => Math.max(0, i - 1));
+      } else if (
+        (e.key === "ArrowRight" || e.key === "Enter") &&
+        answers[question.id] !== undefined
+      ) {
+        e.preventDefault();
+        if (!isLast) setIndex((i) => Math.min(i + 1, total - 1));
+        else if (firstUnanswered === -1) finish(answers);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
   return (
     <div className="min-h-screen bg-canvas" style={accentStyle("mind")}>
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-background shadow-app">

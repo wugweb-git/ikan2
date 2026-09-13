@@ -256,3 +256,11 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
 }
+/* the in-app "Reduce motion" setting mirrors the system preference */
+html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after {
+  animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+}
+/* one visible focus ring for keyboard users on every interactive element */
+:where(a, button, input, textarea, select, summary, [role="button"], [role="radio"], [role="checkbox"], [role="switch"], [role="tab"]):focus-visible {
+  outline: 2px solid var(--foreground); outline-offset: 2px;
+}

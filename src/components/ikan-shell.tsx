@@ -25,6 +25,7 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
 import { useEverything } from "@/lib/activity";
 import { useNotifications } from "@/lib/notifications";
+import { useSettings } from "@/lib/profile";
 import { resources } from "@/lib/resources";
 import { consultants } from "@/lib/consultants";
 import { cn } from "@/lib/utils";
@@ -47,6 +48,10 @@ export function IkanShell({ children }: { children: ReactNode }) {
   const { unreadCount } = useNotifications();
 
   useEffect(() => setMoreOpen(false), [pathname]);
+  const { settings } = useSettings();
+  useEffect(() => {
+    document.documentElement.classList.toggle("reduce-motion", hydrated && settings.reduceMotion);
+  }, [hydrated, settings.reduceMotion]);
 
   const moreActive = moreOpen || moreRoutes.test(pathname);
 

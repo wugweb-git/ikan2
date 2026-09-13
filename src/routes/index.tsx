@@ -1,492 +1,928 @@
-import { createFileRoute, Link, linkOptions } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState, type ReactNode } from "react";
 import {
-  Activity,
   Bell,
-  ArrowUpRight,
-  BookOpen,
   CalendarCheck,
-  CalendarDays,
-  ChartNoAxesColumn,
   ChevronRight,
-  CloudSun,
-  Heart,
-  MapPin,
+  ClipboardList,
+  Flame,
+  LifeBuoy,
   Play,
-  Plus,
-  Smile,
-  Sparkles,
   Watch,
 } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { Reveal } from "@/components/reveal";
-import { Button } from "@/components/ui/button";
-import { moodScale } from "@/lib/journal";
-import { saveSnapshot, useEverything, wellnessBand } from "@/lib/activity";
-import { defaultProfile, firstName, profileInitials, useProfile } from "@/lib/profile";
-import { getResource } from "@/lib/resources";
-import { useNotifications } from "@/lib/notifications";
+import { Illustration } from "@/components/art";
+import { accentStyle, stateLayer } from "@/components/equip/m3";
+import { pageMeta } from "@/components/equip/program-header";
+import { BandChip, toneColors } from "@/components/assessment/ui";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { useEffect } from "react";
-import { usePersonalContext, useScrollY } from "@/hooks/use-personal-context";
-import programCover from "@/assets/program-cover.jpg";
+import { useScrollY } from "@/hooks/use-personal-context";
+import { cn } from "@/lib/utils";
+import { saveSnapshot, useEverything, useWellnessSnapshots, wellnessBand } from "@/lib/activity";
+import { getAssessment } from "@/lib/assessment/instruments";
+import { headlineOf, recommendationsFor, riskEndorsed, scoreAll } from "@/lib/assessment/scoring";
+import { getProgramme, programmes } from "@/lib/equip/programs";
+import { addDays, dayKey, moodScale } from "@/lib/journal";
+import { useNotifications } from "@/lib/notifications";
+import { firstName, profileInitials, useProfile, useSettings } from "@/lib/profile";
+import { resources, type Resource } from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
 import resBurnout from "@/assets/res-burnout.jpg";
 import resSleep from "@/assets/res-sleep.jpg";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Your Personalized Wellness Dashboard — iKAN" },
-      {
-        name: "description",
-        content:
-          "Your wellness score, current program, assessments, mood journal, support and resources in one place.",
-      },
-      { property: "og:title", content: "Your Personalized Wellness Dashboard — iKAN" },
-      {
-        property: "og:description",
-        content:
-          "Your wellness score, current program, assessments, mood journal, support and resources in one place.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: Index,
+  head: () =>
+    pageMeta("Home", "What to do today, your iKAN Score, programs, mood and reading in one place."),
+  component: Home,
 });
 
-const offerings = [
-  {
-    label: "Programs",
-    meta: "1 active",
-    icon: Sparkles,
-    to: "/program" as const,
-    tone: "score-calm",
-  },
-  {
-    label: "Assessments",
-    meta: "7 available",
-    icon: ChartNoAxesColumn,
-    to: "/assessment" as const,
-    tone: "score-mind",
-  },
-  {
-    label: "Mood journal",
-    meta: "Daily check-in",
-    icon: Smile,
-    to: "/journal" as const,
-    tone: "score-rest",
-  },
-  {
-    label: "Consult",
-    meta: "5 consultants",
-    icon: Heart,
-    to: "/consult" as const,
-    tone: "score-alert",
-  },
-];
+type Data = ReturnType<typeof useEverything>;
 
-const activity = [
-  {
-    title: "Unburn · Day 9 session",
-    meta: "6 of 10 min listened",
-    progress: 60,
-    link: linkOptions({ to: "/program/$slug", params: { slug: "unburn" } }),
-  },
-  {
-    title: "Sleep assessment",
-    meta: "Struggling with quality sleep · 8 questions",
-    progress: 0,
-    link: linkOptions({
-      to: "/assessment/$slug",
-      params: { slug: "struggling-with-quality-sleep" },
-    }),
-  },
-  {
-    title: "Mood check-in",
-    meta: "How are you feeling today?",
-    progress: 0,
-    link: linkOptions({ to: "/journal" }),
-  },
-];
+/* ---------- time of day ---------- */
 
-const readForWeek = [
-  { id: "98d536d4-938b-4fbf-bc2c-f37e6d0b9409", tag: "Burnout", img: resBurnout },
-  { id: "c775a1e1-a938-4aac-8519-e5ad9f8dda1f", tag: "Sleep", img: resSleep },
-  { id: "resource-1766237270444", tag: "Anxiety", img: resAnxiety },
-].map((r) => ({ ...r, resource: getResource(r.id)! }));
+type Part = "dawn" | "morning" | "afternoon" | "evening" | "night";
+const partOf = (h: number): Part =>
+  h >= 5 && h < 8
+    ? "dawn"
+    : h >= 8 && h < 12
+      ? "morning"
+      : h >= 12 && h < 17
+        ? "afternoon"
+        : h >= 17 && h < 20
+          ? "evening"
+          : "night";
 
-function Index() {
+/* The prototype's time-of-day tokens. */
+const sky: Record<
+  Part,
+  { from: string; via: string; to: string; ink: string; muted: string; greet: string }
+> = {
+  dawn: {
+    from: "#FFE4C9",
+    via: "#FFD0A0",
+    to: "#FFC085",
+    ink: "#3A2210",
+    muted: "#6E4A2E",
+    greet: "Good morning",
+  },
+  morning: {
+    from: "#E8F4FD",
+    via: "#D4ECFB",
+    to: "#B8DFF7",
+    ink: "#12263A",
+    muted: "#44607A",
+    greet: "Good morning",
+  },
+  afternoon: {
+    from: "#FFF8E1",
+    via: "#FFE9B0",
+    to: "#FFD97A",
+    ink: "#3A2A05",
+    muted: "#6E5820",
+    greet: "Good afternoon",
+  },
+  evening: {
+    from: "#E8D5F5",
+    via: "#D4B8EA",
+    to: "#C09FDE",
+    ink: "#2A1740",
+    muted: "#58446F",
+    greet: "Good evening",
+  },
+  night: {
+    from: "#2A2A3E",
+    via: "#1E1E30",
+    to: "#151525",
+    ink: "#E8E8F0",
+    muted: "#A0A0C0",
+    greet: "Winding down",
+  },
+};
+
+function useNow() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+    const t = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(t);
+  }, []);
+  return now;
+}
+
+const covers: Record<string, string> = {
+  "98d536d4-938b-4fbf-bc2c-f37e6d0b9409": resBurnout,
+  "c775a1e1-a938-4aac-8519-e5ad9f8dda1f": resSleep,
+  "resource-1766237270444": resAnxiety,
+};
+
+function Home() {
   const hydrated = useHydrated();
+  const now = useNow();
+  const scrollY = useScrollY();
   const { profile } = useProfile();
   const data = useEverything();
   const { unreadCount } = useNotifications();
-  const who = hydrated ? profile : defaultProfile;
-  const ctx = usePersonalContext(firstName(who), who.city || "Pune");
   const score = hydrated ? data.score : null;
-  const band = score !== null ? wellnessBand(score) : null;
-  const part = (k: string) => data.parts.find((x) => x.key === k)?.value ?? null;
-  const rings = [
-    { label: "Assess", value: hydrated ? part("assessments") : null, color: "var(--mind)" },
-    { label: "Mood", value: hydrated ? part("mood") : null, color: "var(--rest)" },
-    { label: "Programs", value: hydrated ? part("programs") : null, color: "var(--calm)" },
-  ];
+
   useEffect(() => {
     if (score !== null) saveSnapshot(score);
   }, [score]);
-  const scrollY = useScrollY();
-  const collapsed = scrollY > 64;
+
+  const part = now ? partOf(now.getHours()) : "morning";
+  const name = hydrated ? firstName(profile) : "";
+  const greeting = `${sky[part].greet}${name && name !== "there" ? `, ${name}` : ""}`;
 
   return (
     <IkanShell>
-      {/* Ambient canvas tinted by time of day */}
-      <div className={`ambient ambient-${ctx.dayPart}`} aria-hidden="true" />
-
-      <div className={collapsed ? "sticky-bar sticky-bar-on" : "sticky-bar"}>
-        <span className="avatar avatar-sm">{profileInitials(who)}</span>
-        <span className="truncate font-display text-sm font-semibold">{ctx.greeting}</span>
-        <span className="ml-auto text-xs font-semibold text-muted-foreground">{score ?? ""}</span>
+      <div
+        className={cn("sticky-bar", scrollY > 150 && "sticky-bar-on")}
+        aria-hidden={scrollY <= 150}
+      >
+        <span className="avatar avatar-sm">{hydrated ? profileInitials(profile) : ""}</span>
+        <span className="truncate font-display text-sm font-semibold">{greeting}</span>
+        {score !== null ? (
+          <Link to="/wellness" className="ml-auto text-xs font-semibold text-muted-foreground">
+            iKAN Score {score}
+          </Link>
+        ) : null}
       </div>
 
-      <header className="relative px-5 pt-7">
-        <div
-          className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4"
+      <SkyHeader
+        now={now}
+        part={part}
+        greeting={greeting}
+        city={hydrated ? profile.city : ""}
+        unread={hydrated ? unreadCount : 0}
+        initials={hydrated ? profileInitials(profile) : ""}
+        data={data}
+        hydrated={hydrated}
+      />
+
+      <div className="relative z-10 -mt-6 space-y-8 rounded-t-[28px] bg-background pb-4 pt-5">
+        <TodayCard data={data} hydrated={hydrated} />
+        <ScoreCard score={score} data={data} hydrated={hydrated} />
+        <Recommended data={data} hydrated={hydrated} />
+        <YourPrograms data={data} hydrated={hydrated} />
+        <ThisWeek data={data} hydrated={hydrated} />
+        <Library />
+        <RecentResults data={data} hydrated={hydrated} />
+        <HealthCard />
+      </div>
+    </IkanShell>
+  );
+}
+
+/* ---------- sky header ---------- */
+
+function SkyHeader({
+  now,
+  part,
+  greeting,
+  city,
+  unread,
+  initials,
+  data,
+  hydrated,
+}: {
+  now: Date | null;
+  part: Part;
+  greeting: string;
+  city: string;
+  unread: number;
+  initials: string;
+  data: Data;
+  hydrated: boolean;
+}) {
+  const s = sky[part];
+  const hour = now ? now.getHours() + now.getMinutes() / 60 : 9;
+  const isDay = hour >= 6 && hour < 18;
+  // where the sun (06:00–18:00) or moon (18:00–06:00) sits on its arc right now
+  const t = isDay ? (hour - 6) / 12 : ((hour + 24 - 18) % 24) / 12;
+  const angle = Math.PI * (1 - t);
+  const cx = 160 + 130 * Math.cos(angle);
+  const cy = 118 - 92 * Math.sin(angle);
+  const night = part === "night";
+
+  const loggedToday =
+    hydrated && now ? data.journal.entries.some((e) => e.date === dayKey(now)) : false;
+  const weekCount = hydrated
+    ? data.events.filter((e) => new Date(e.at) >= addDays(new Date(), -6)).length
+    : 0;
+  const subline = !hydrated
+    ? ""
+    : data.events.length === 0
+      ? "Let’s find a good place to start."
+      : loggedToday
+        ? `${weekCount} ${weekCount === 1 ? "thing" : "things"} done this week.`
+        : "You haven’t checked in today yet.";
+
+  return (
+    <header
+      className="relative overflow-hidden px-5 pb-14 pt-6 transition-colors duration-1000"
+      style={{
+        background: `linear-gradient(160deg, ${s.from}, ${s.via} 50%, ${s.to})`,
+        color: s.ink,
+      }}
+    >
+      <svg
+        viewBox="0 0 320 140"
+        preserveAspectRatio="xMidYMax slice"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[150px] w-full"
+        aria-hidden="true"
+      >
+        <path
+          d="M30 118 A130 92 0 0 1 290 118"
+          fill="none"
+          stroke={s.ink}
+          strokeOpacity="0.16"
+          strokeDasharray="2 5"
+        />
+        {night
+          ? [
+              [40, 30],
+              [80, 58],
+              [120, 22],
+              [210, 40],
+              [262, 24],
+              [290, 66],
+              [180, 70],
+            ].map(([x, y], i) => (
+              <circle key={i} cx={x} cy={y} r={i % 3 ? 1.2 : 1.8} fill="#FBBF24" opacity="0.85" />
+            ))
+          : null}
+        {now ? (
+          isDay ? (
+            <g className="motion-safe:transition-transform">
+              <circle
+                cx={cx}
+                cy={cy}
+                r="24"
+                fill={part === "evening" ? "#FF8C42" : "#FFB347"}
+                opacity="0.22"
+              />
+              <circle
+                cx={cx}
+                cy={cy}
+                r="13"
+                fill={part === "evening" ? "#FF8C42" : part === "dawn" ? "#FFB347" : "#FFC83D"}
+              />
+            </g>
+          ) : (
+            <g>
+              <circle cx={cx} cy={cy} r="13" fill="#E8E4D4" />
+              <circle cx={cx + 5} cy={cy - 4} r="11" fill={s.via} />
+            </g>
+          )
+        ) : null}
+        <path
+          d="M0 140 L0 124 C 70 112, 140 132, 210 120 S 300 112, 320 118 L320 140 Z"
+          fill={s.ink}
+          fillOpacity="0.06"
+        />
+      </svg>
+
+      <div className="relative flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="min-h-5 text-[13px] font-medium" style={{ color: s.muted }}>
+            {now
+              ? now.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })
+              : ""}
+            {city ? `, ${city}` : ""}
+          </p>
+          <h1 className="mt-1 font-display text-[30px] font-semibold leading-9 tracking-[-0.01em]">
+            {greeting}
+          </h1>
+          <p className="mt-1 min-h-5 text-[14px]" style={{ color: s.muted }}>
+            {subline}
+          </p>
+        </div>
+        <Link
+          to="/notifications"
+          aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}
+          className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full transition-transform active:scale-95"
+          style={{ background: night ? "rgba(255,255,255,.12)" : "rgba(255,255,255,.65)" }}
+        >
+          <Bell className="h-5 w-5" />
+          {unread ? (
+            <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#B3261E] px-1 text-[10px] font-bold text-white">
+              {unread}
+            </span>
+          ) : null}
+        </Link>
+        <Link
+          to="/profile"
+          aria-label="Profile"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full font-display text-[14px] font-semibold transition-transform active:scale-95"
           style={{
-            opacity: Math.max(0, 1 - scrollY / 140),
-            transform: `translateY(${Math.min(scrollY * 0.25, 24)}px)`,
+            background: night ? "rgba(255,255,255,.18)" : "#FFFFFF",
+            color: night ? s.ink : "#151515",
           }}
         >
-          <div className="min-w-0">
-            <p className="eyebrow flex flex-wrap items-center gap-1">
-              <MapPin className="h-3 w-3" /> {ctx.city}
-              {ctx.dateLabel ? <> · {ctx.dateLabel}</> : null} · <CloudSun className="h-3 w-3" />{" "}
-              26°
-            </p>
-            <h1 className="mt-1 font-display text-[30px] font-bold leading-[1.1] tracking-[-0.02em]">
-              {ctx.greeting}
-            </h1>
-            <p className="mt-1.5 text-sm text-muted-foreground">{ctx.subline}</p>
-          </div>
-          <div className="flex items-center gap-2">
+          {initials}
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+/* ---------- today: one next step ---------- */
+
+function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  if (!hydrated) return <div className="mx-4 h-[176px] rounded-[28px] bg-secondary" />;
+
+  const latest = [...data.results].sort((a, b) => b.completedAt.localeCompare(a.completedAt))[0];
+  const latestA = latest ? getAssessment(latest.slug) : undefined;
+  const risk = latest && latestA ? riskEndorsed(latestA, latest.answers) : false;
+  const today = dayKey(new Date());
+  const loggedToday = data.journal.entries.some((e) => e.date === today);
+  const draft = data.drafts[0];
+  const active = programmes
+    .map((p) => {
+      const s = data.programmeStates[p.slug]!;
+      let next = 0;
+      while (s.completed.includes(next)) next += 1;
+      const doneToday = Object.values(s.completedAt ?? {}).some(
+        (at) => dayKey(new Date(at)) === today,
+      );
+      return { p, s, next, day: p.days.find((d) => d.day === next), doneToday };
+    })
+    .filter((x) => x.s.completed.length > 0 && x.day)
+    .sort((a, b) => b.s.completed.length - a.s.completed.length)[0];
+
+  if (risk) {
+    return (
+      <Link
+        to="/support"
+        className={cn(
+          "mx-4 flex items-center gap-4 rounded-[28px] bg-[#F9DEDC] p-5 text-[#5A1410]",
+          stateLayer,
+        )}
+      >
+        <LifeBuoy className="h-8 w-8 shrink-0" />
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-[19px] font-semibold leading-6">
+            You don’t have to carry this alone
+          </span>
+          <span className="mt-1 block text-[14px] leading-5">
+            Free, confidential helplines are open right now.
+          </span>
+        </span>
+        <ChevronRight className="h-5 w-5" />
+      </Link>
+    );
+  }
+
+  if (draft?.assessment) {
+    const a = draft.assessment;
+    return (
+      <NextStep
+        label="Pick up where you left off"
+        title={`Finish your ${a.name.toLowerCase()} assessment`}
+        meta={`${draft.answered} of ${a.questions.length} answered`}
+        progress={(draft.answered / a.questions.length) * 100}
+        art="checkup"
+        cta="Continue"
+        link={{ to: "/assessment-flow", search: { id: a.slug } }}
+      />
+    );
+  }
+
+  if (!loggedToday) {
+    return (
+      <section className="mx-4 rounded-[28px] bg-foreground p-5 text-background">
+        <p className="text-[13px] opacity-70">Today’s check-in</p>
+        <p className="mt-1 font-display text-[22px] font-semibold leading-7">
+          How are you feeling?
+        </p>
+        <div className="mt-4 grid grid-cols-5 gap-2">
+          {moodScale.map((m) => (
             <Link
-              to="/notifications"
-              aria-label={
-                hydrated && unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"
-              }
-              className="relative grid h-11 w-11 place-items-center rounded-full bg-background/70 backdrop-blur transition-transform active:scale-95"
+              key={m.value}
+              to="/journal"
+              search={{ mood: m.value }}
+              aria-label={`Log mood: ${m.label}`}
+              className="group flex flex-col items-center gap-1.5 rounded-[18px] bg-white/10 py-3 transition-[transform,background-color] hover:bg-white/20 active:scale-95"
             >
-              <Bell className="h-5 w-5" />
-              {hydrated && unreadCount ? (
-                <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#B3261E] px-1 text-[10px] font-bold text-white">
-                  {unreadCount}
-                </span>
-              ) : null}
-            </Link>
-            <Link to="/profile" aria-label="Profile" className="avatar-ring">
-              <span className="avatar">{profileInitials(who)}</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* iKAN wellness score — Google Health style rings */}
-      <Reveal className="mt-5 px-5">
-        <div className="surface overflow-hidden">
-          <div className="grid grid-cols-[92px_minmax(0,1fr)] items-center gap-4 p-4">
-            <div
-              className="score-orb"
-              style={{
-                background: `conic-gradient(from 210deg, var(--calm) 0 ${score ?? 0}%, var(--secondary) ${score ?? 0}%)`,
-              }}
-            >
-              <span>
-                <strong>{score ?? "—"}</strong>
-                <small>score</small>
-              </span>
-            </div>
-            <div className="min-w-0">
-              <p className="eyebrow">iKAN wellness score</p>
-              <h2 className="mt-1 font-display text-base font-semibold leading-snug">
-                {band ? band.label : "Your score starts with one check-in"}
-              </h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {score !== null
-                  ? `Built from ${data.parts.filter((x) => x.value !== null).length} of 4 parts`
-                  : "Log your mood or take an assessment"}
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-3 px-4 pb-4">
-            {rings.map((r) => (
-              <div key={r.label} className="ring-stat">
-                <span
-                  className="ring-dial"
-                  style={{ ["--p" as string]: `${r.value ?? 0}%`, ["--c" as string]: r.color }}
-                >
-                  <i>{r.value === null ? "—" : Math.round(r.value)}</i>
-                </span>
-                <span className="ring-label">{r.label}</span>
-              </div>
-            ))}
-          </div>
-          <Link to="/wellness" className="row-link">
-            See iKAN Wellness <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </Reveal>
-
-      {/* Current program — image hero */}
-      <Reveal className="mt-5 px-5">
-        <p className="eyebrow mb-2">Your program</p>
-        <div className="hero-card">
-          <img
-            src={programCover}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            width={1024}
-            height={768}
-            className="hero-media"
-            style={{
-              transform: `translate3d(0, ${Math.min(scrollY * 0.06, 26)}px, 0) scale(1.12)`,
-            }}
-          />
-          <div className="hero-veil" />
-          <div className="relative">
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-              <div className="min-w-0">
-                <span className="hero-chip">Current program</span>
-                <h2 className="mt-2 font-display text-[26px] font-bold tracking-[-0.02em]">
-                  Unburn
-                </h2>
-                <p className="mt-1 text-[11px] uppercase tracking-[.14em] opacity-70">
-                  Day 9 · 31 days total
-                </p>
-              </div>
-              <div className="hero-ring">
-                <span>29%</span>
-              </div>
-            </div>
-            <div className="hero-track mt-4">
-              <i style={{ width: "29%" }} />
-            </div>
-            <p className="mt-3 text-sm opacity-85">
-              Ready for your next session? Takes about 10 minutes.
-            </p>
-            <div className="mt-4 flex gap-2">
-              <Button
-                asChild
-                className="flex-1 rounded-full bg-background text-foreground transition-transform hover:bg-background/90 active:scale-[.97]"
-              >
-                <Link to="/program/$slug" params={{ slug: "unburn" }}>
-                  <Play /> Start session
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="ghost"
-                className="rounded-full border border-white/25 text-background hover:bg-white/10 hover:text-background"
-              >
-                <Link to="/program/$slug/journal" params={{ slug: "unburn" }}>
-                  <CalendarCheck /> Progress
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Reveal>
-
-      {/* Activity */}
-      <Reveal className="mt-6 px-5">
-        <div className="mb-3 flex items-end justify-between">
-          <div>
-            <p className="eyebrow">Pick up again</p>
-            <h2 className="mt-1 font-display text-lg font-semibold tracking-[-0.01em]">
-              Your activity
-            </h2>
-          </div>
-          <span className="text-xs text-muted-foreground">3 open</span>
-        </div>
-        <div className="surface divide-y divide-border">
-          {activity.map((a) => (
-            <Link
-              key={a.title}
-              {...a.link}
-              className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-4 transition-colors hover:bg-secondary/50"
-            >
-              <span className="activity-dial" style={{ ["--p" as string]: `${a.progress}%` }}>
-                <span>{a.progress ? `${a.progress}%` : "New"}</span>
-              </span>
-              <div className="min-w-0">
-                <p className="truncate font-display text-sm font-semibold">{a.title}</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">{a.meta}</p>
-              </div>
               <span
+                className="text-[28px] leading-none transition-transform group-hover:scale-110 motion-reduce:transform-none"
                 aria-hidden="true"
-                className="grid h-9 w-9 place-items-center rounded-full bg-foreground text-background [&_svg]:h-4 [&_svg]:w-4"
               >
-                {a.progress > 0 ? <Play /> : <ArrowUpRight />}
+                {m.emoji}
               </span>
+              <span className="text-[11px] font-medium opacity-80">{m.label}</span>
             </Link>
           ))}
         </div>
-      </Reveal>
+        <p className="mt-3 text-[12px] opacity-60">Tap one to start. It takes about 30 seconds.</p>
+      </section>
+    );
+  }
 
-      {/* Offerings */}
-      <Reveal className="mt-6 px-5">
-        <p className="eyebrow mb-3">Everything in iKAN</p>
-        <div className="grid grid-cols-2 gap-3">
-          {offerings.map((o, i) => {
-            const Icon = o.icon;
+  if (active && !active.doneToday) {
+    const done = Math.min(new Set(active.s.completed).size, active.p.days.length);
+    return (
+      <NextStep
+        label={active.p.name}
+        title={`Day ${active.next}: ${active.day!.title}`}
+        meta={`${done} of ${active.p.days.length} days done`}
+        progress={(done / active.p.days.length) * 100}
+        image={active.p.cover}
+        cta="Start today’s session"
+        link={{
+          to: "/program/$slug/day/$day",
+          params: { slug: active.p.slug, day: String(active.next) },
+        }}
+      />
+    );
+  }
+
+  if (data.results.length === 0) {
+    const g = getAssessment("unsure-or-general-concern")!;
+    return (
+      <NextStep
+        label="A good first step"
+        title="See where you stand today"
+        meta={`${g.questions.length} short questions, about ${g.minutes} min`}
+        art="measure"
+        cta="Take a short check"
+        link={{ to: "/assessment/$slug", params: { slug: g.slug } }}
+      />
+    );
+  }
+
+  return (
+    <section className="mx-4 flex items-center gap-4 rounded-[28px] bg-[#DFF0E8] p-5 text-[#173D2F]">
+      <span className="text-[34px] leading-none" aria-hidden="true">
+        🌿
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-display text-[19px] font-semibold">You’re done for today</span>
+        <span className="mt-0.5 block text-[14px]">Check-in logged. See you tomorrow.</span>
+      </span>
+    </section>
+  );
+}
+
+function NextStep({
+  label,
+  title,
+  meta,
+  progress,
+  image,
+  art,
+  cta,
+  link,
+}: {
+  label: string;
+  title: string;
+  meta: string;
+  progress?: number;
+  image?: string;
+  art?: "checkup" | "measure";
+  cta: string;
+  link:
+    | { to: "/assessment-flow"; search: { id: string } }
+    | { to: "/program/$slug/day/$day"; params: { slug: string; day: string } }
+    | { to: "/assessment/$slug"; params: { slug: string } };
+}) {
+  return (
+    <Link
+      {...link}
+      className={cn(
+        "mx-4 block overflow-hidden rounded-[28px] bg-foreground text-background",
+        stateLayer,
+      )}
+    >
+      <div className="relative h-28 overflow-hidden">
+        {image ? (
+          <img src={image} alt="" className="h-full w-full object-cover opacity-80" />
+        ) : art ? (
+          <Illustration art={art} />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground to-transparent" />
+        <span className="absolute left-5 top-4 rounded-full bg-black/45 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur">
+          {label}
+        </span>
+      </div>
+      <div className="px-5 pb-5">
+        <p className="font-display text-[21px] font-semibold leading-7">{title}</p>
+        <p className="mt-1 text-[13px] opacity-70">{meta}</p>
+        {progress !== undefined ? (
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/15">
+            <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
+          </div>
+        ) : null}
+        <span className="mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-background px-5 text-[15px] font-semibold text-foreground">
+          <Play className="h-4 w-4" /> {cta}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+/* ---------- sections ---------- */
+
+function Section({
+  title,
+  note,
+  action,
+  children,
+}: {
+  title: string;
+  note?: string;
+  action?: { label: string; to: "/program" | "/resources" | "/assessments" | "/journal" };
+  children: ReactNode;
+}) {
+  return (
+    <section>
+      <div className="mb-3 px-4">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="font-display text-[18px] font-semibold">{title}</h2>
+          {action ? (
+            <Link
+              to={action.to}
+              className="shrink-0 text-[14px] font-semibold text-muted-foreground hover:text-foreground"
+            >
+              {action.label}
+            </Link>
+          ) : null}
+        </div>
+        {note ? <p className="mt-0.5 text-[13px] text-muted-foreground">{note}</p> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function ScoreCard({
+  score,
+  data,
+  hydrated,
+}: {
+  score: number | null;
+  data: Data;
+  hydrated: boolean;
+}) {
+  const snapshots = useWellnessSnapshots();
+  const weekAgo = Object.entries(snapshots)
+    .filter(([k]) => k <= dayKey(addDays(new Date(), -7)))
+    .sort(([a], [b]) => b.localeCompare(a))[0]?.[1];
+  const band = score !== null ? wellnessBand(score) : null;
+  const change = score !== null && weekAgo !== undefined ? score - weekAgo : null;
+  const r = 30;
+  const c = 2 * Math.PI * r;
+  const sources = data.parts.filter((p) => p.value !== null).length;
+
+  return (
+    <Link
+      to="/wellness"
+      className={cn(
+        "mx-4 flex items-center gap-4 rounded-[24px] border border-foreground/10 p-4",
+        stateLayer,
+      )}
+    >
+      <span className="relative h-[76px] w-[76px] shrink-0">
+        <svg viewBox="0 0 76 76" className="h-full w-full -rotate-90" aria-hidden="true">
+          <circle
+            cx="38"
+            cy="38"
+            r={r}
+            fill="none"
+            stroke="currentColor"
+            strokeOpacity="0.08"
+            strokeWidth="8"
+          />
+          {score !== null && band ? (
+            <circle
+              cx="38"
+              cy="38"
+              r={r}
+              fill="none"
+              stroke={toneColors[band.tone].bar}
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeDasharray={c}
+              strokeDashoffset={c * (1 - score / 100)}
+              className="transition-[stroke-dashoffset] duration-700 ease-out motion-reduce:transition-none"
+            />
+          ) : null}
+        </svg>
+        <span className="absolute inset-0 grid place-items-center font-display text-[22px] font-bold tabular-nums">
+          {score ?? "—"}
+        </span>
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13px] text-muted-foreground">iKAN Score</span>
+        <span className="block font-display text-[19px] font-semibold leading-6">
+          {band ? band.label : hydrated ? "Starts with your first check-in" : ""}
+        </span>
+        <span className="mt-0.5 block text-[13px] text-muted-foreground">
+          {score === null
+            ? "Mood, assessments and programs all count"
+            : change === null
+              ? `From ${sources} of 4 sources`
+              : change === 0
+                ? "Same as last week"
+                : `${change > 0 ? "Up" : "Down"} ${Math.abs(change)} since last week`}
+        </span>
+      </span>
+      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+    </Link>
+  );
+}
+
+function Recommended({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  if (!hydrated) return null;
+  const latest = [...data.results].sort((a, b) => b.completedAt.localeCompare(a.completedAt))[0];
+  const a = latest ? getAssessment(latest.slug) : undefined;
+  if (!latest || !a) return null;
+  const scores = scoreAll(a, latest.answers);
+  const head = headlineOf(a, scores);
+  const recs = recommendationsFor(a, scores)
+    .map(getProgramme)
+    .filter((p) => p !== undefined)
+    .slice(0, 2);
+  const serious = scores.some((s) => s.band?.tone === "error");
+  if (!recs.length && !serious) return null;
+
+  return (
+    <Section
+      title="Recommended for you"
+      note={`Based on your ${a.name.toLowerCase()} result${head?.band ? `: ${head.band.label}` : ""}`}
+    >
+      <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1">
+        {serious ? (
+          <Link
+            to="/consult"
+            className="flex w-[230px] shrink-0 snap-start flex-col justify-between rounded-[24px] bg-[#E3ECF8] p-4 text-[#1C3553]"
+          >
+            <CalendarCheck className="h-7 w-7" />
+            <span className="mt-8">
+              <span className="block font-display text-[17px] font-semibold leading-6">
+                Talk to a professional
+              </span>
+              <span className="mt-1 block text-[13px] leading-5 opacity-80">
+                Therapists and counselors you can book this week.
+              </span>
+            </span>
+          </Link>
+        ) : null}
+        {recs.map((p) => (
+          <Link
+            key={p.slug}
+            to="/program/$slug"
+            params={{ slug: p.slug }}
+            className="relative block h-[180px] w-[264px] shrink-0 snap-start overflow-hidden rounded-[24px] text-white"
+          >
+            <img src={p.cover} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+            <span className="absolute inset-x-0 bottom-0 p-4">
+              <span className="block text-[12px] font-semibold opacity-80">
+                {p.source.meta.days}
+              </span>
+              <span className="block font-display text-[20px] font-semibold">{p.name}</span>
+              {p.source.description ? (
+                <span className="mt-0.5 line-clamp-2 block text-[12px] leading-4 opacity-85">
+                  {p.source.description}
+                </span>
+              ) : null}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+function YourPrograms({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  const started = hydrated
+    ? programmes.filter((p) => data.programmeStates[p.slug]!.completed.length > 0)
+    : [];
+  return (
+    <Section
+      title={started.length ? "Your programs" : "Programs"}
+      action={{ label: "See all", to: "/program" }}
+    >
+      {started.length ? (
+        <ul className="space-y-2 px-4">
+          {started.map((p) => {
+            const s = data.programmeStates[p.slug]!;
+            const done = Math.min(new Set(s.completed).size, p.days.length);
             return (
-              <Link
-                key={o.label}
-                to={o.to}
-                className="surface tile flex flex-col gap-3 p-4"
-                style={{ transitionDelay: `${i * 20}ms` }}
-              >
-                <span className={`score-tile ${o.tone}`}>
-                  <Icon className="h-5 w-5" />
+              <li key={p.slug}>
+                <Link
+                  to="/program/$slug"
+                  params={{ slug: p.slug }}
+                  style={accentStyle(p.accent)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-[20px] bg-secondary p-2.5 pr-4",
+                    stateLayer,
+                  )}
+                >
+                  <img
+                    src={p.cover}
+                    alt=""
+                    className="h-14 w-14 shrink-0 rounded-[14px] object-cover"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-baseline justify-between gap-2">
+                      <span className="truncate font-display text-[16px] font-semibold">
+                        {p.name}
+                      </span>
+                      <span className="text-[12px] tabular-nums text-muted-foreground">
+                        {done} of {p.days.length} days
+                      </span>
+                    </span>
+                    <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-[var(--accent-container)]">
+                      <span
+                        className="block h-full rounded-full bg-[var(--accent)]"
+                        style={{ width: `${(done / p.days.length) * 100}%` }}
+                      />
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1">
+          {programmes.map((p) => (
+            <Link
+              key={p.slug}
+              to="/program/$slug"
+              params={{ slug: p.slug }}
+              className="w-[152px] shrink-0 snap-start"
+            >
+              <img src={p.cover} alt="" className="h-[112px] w-full rounded-[20px] object-cover" />
+              <span className="mt-2 block font-display text-[15px] font-semibold">{p.name}</span>
+              <span className="block text-[12px] text-muted-foreground">{p.source.meta.days}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </Section>
+  );
+}
+
+function ThisWeek({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  const days = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i - 6));
+  const byDay = days.map((d) => {
+    const list = hydrated ? data.journal.entries.filter((e) => e.date === dayKey(d)) : [];
+    return list.length ? Math.round(list.reduce((n, e) => n + e.mood, 0) / list.length) : null;
+  });
+  let run = 0;
+  if (hydrated) {
+    const set = new Set(data.journal.entries.map((e) => e.date));
+    let cursor = set.has(dayKey(new Date())) ? new Date() : addDays(new Date(), -1);
+    while (set.has(dayKey(cursor))) {
+      run += 1;
+      cursor = addDays(cursor, -1);
+    }
+  }
+  const logged = byDay.filter((v) => v !== null).length;
+
+  return (
+    <Section title="This week" action={{ label: "Journal", to: "/journal" }}>
+      <Link
+        to="/journal"
+        className={cn("mx-4 block rounded-[24px] border border-foreground/10 p-4", stateLayer)}
+      >
+        <div className="grid grid-cols-7 gap-1">
+          {days.map((d, i) => {
+            const m = byDay[i] ?? null;
+            const isToday = i === 6;
+            return (
+              <span key={i} className="flex flex-col items-center gap-1.5">
+                <span
+                  className={cn("text-[11px]", isToday ? "font-bold" : "text-muted-foreground")}
+                >
+                  {d.toLocaleDateString("en-IN", { weekday: "narrow" })}
                 </span>
-                <span className="min-w-0">
-                  <span className="block font-display text-sm font-semibold">{o.label}</span>
-                  <span className="mt-0.5 block text-xs text-muted-foreground">{o.meta}</span>
+                <span
+                  className={cn(
+                    "grid h-10 w-10 place-items-center rounded-full text-[20px]",
+                    m === null ? "border border-dashed border-foreground/20" : "bg-[#F9E2E9]",
+                    isToday && m === null && "border-foreground/50",
+                  )}
+                >
+                  {m !== null ? (
+                    <span aria-label={moodScale[m - 1]!.label}>{moodScale[m - 1]!.emoji}</span>
+                  ) : null}
                 </span>
-              </Link>
+              </span>
             );
           })}
         </div>
-      </Reveal>
-
-      {/* Mood check-in */}
-      <Reveal className="mt-6 px-5">
-        <div className="surface p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="eyebrow">Today’s check-in</p>
-              <h2 className="mt-1 font-display text-base font-semibold">How are you feeling?</h2>
-            </div>
-            <span className="semantic-chip bg-secondary text-muted-foreground">40 sec</span>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Mood, energy and stress in a few quick taps.
-          </p>
-          <div className="mt-4 grid grid-cols-5 gap-2">
-            {moodScale.map((m) => (
-              <Link
-                key={m.value}
-                to="/journal"
-                search={{ mood: m.value }}
-                aria-label={m.label}
-                className="flex flex-col items-center gap-1 rounded-2xl bg-secondary py-2 transition-transform active:scale-95"
-              >
-                <span className="text-2xl leading-none" aria-hidden="true">
-                  {m.emoji}
-                </span>
-                <span className="text-[11px] font-medium text-muted-foreground">{m.label}</span>
-              </Link>
-            ))}
-          </div>
-          <Button
-            asChild
-            className="mt-3 w-full rounded-full transition-transform active:scale-[.98]"
-          >
-            <Link to="/journal">
-              <Plus /> Log today’s mood
-            </Link>
-          </Button>
-        </div>
-      </Reveal>
-
-      {/* Health sync */}
-      <Reveal className="mt-4 px-5">
-        <div className="rounded-[22px] border border-mind/25 bg-mind-soft p-4">
-          <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-background text-mind-strong">
-              <Watch className="h-5 w-5" />
-            </span>
-            <div className="min-w-0">
-              <p className="eyebrow text-mind-strong">Connect your data</p>
-              <h2 className="mt-1 font-display text-sm font-semibold">
-                Sync sleep & steps automatically
-              </h2>
-            </div>
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <Button variant="secondary" size="sm" className="h-10 rounded-full">
-              <Activity /> Google Fit
-            </Button>
-            <Button variant="secondary" size="sm" className="h-10 rounded-full">
-              <Heart /> Health Connect
-            </Button>
-          </div>
-        </div>
-      </Reveal>
-
-      {/* Support */}
-      <Reveal className="mt-4 px-5">
-        <div className="rounded-[22px] border border-alert/25 bg-alert-soft p-4">
-          <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-background text-alert-strong">
-              <Heart className="h-5 w-5" />
-            </span>
-            <div className="min-w-0">
-              <p className="eyebrow text-alert-strong">Support</p>
-              <h2 className="mt-1 font-display text-sm font-semibold">Let’s talk about it</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Therapists available near {ctx.city}, today 6–9 PM.
-              </p>
-            </div>
-          </div>
-          <Button
-            asChild
-            variant="support"
-            className="mt-3 w-full rounded-full transition-transform active:scale-[.98]"
-          >
-            <Link to="/consult">
-              <CalendarDays /> Book a consultation
-            </Link>
-          </Button>
-        </div>
-      </Reveal>
-
-      {/* Resources */}
-      <Reveal className="mt-6 px-5">
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <p className="eyebrow">Resources</p>
-            <h2 className="mt-1 font-display text-lg font-semibold tracking-[-0.01em]">
-              Read for your week
-            </h2>
-          </div>
-          <Link to="/resources" className="text-xs font-semibold text-foreground">
-            See all
-          </Link>
-        </div>
-        <div className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto px-5 pb-1">
-          {readForWeek.map((r) => (
-            <Link key={r.id} to="/resources" className="read-card snap-start">
-              <img src={r.img} alt="" aria-hidden="true" loading="lazy" width={816} height={816} />
-              <div className="read-veil" />
-              <div className="read-body">
-                <span className="read-tag">
-                  <BookOpen className="h-3 w-3" /> {r.tag}
-                </span>
-                <strong className="line-clamp-3">{r.resource.title}</strong>
-                <span className="read-meta">{r.resource.minutes} min read</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </Reveal>
-
-      <Reveal className="mx-5 mt-6 rounded-[22px] border border-border bg-secondary/45 p-4">
-        <p className="font-display text-sm font-semibold">For you, not everyone</p>
-        <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          This screen shifts with your local time, weather and city — and reorders itself around the
-          check-ins, assessments and sessions you actually finish.
+        <p className="mt-3 flex items-center gap-2 text-[13px] text-muted-foreground">
+          {run > 0 ? <Flame className="h-4 w-4 text-[#C4552E]" /> : null}
+          {run > 0
+            ? `${run}-day run, ${logged} of 7 days logged`
+            : logged
+              ? `${logged} of 7 days logged`
+              : "Your week fills in as you check in."}
         </p>
-      </Reveal>
-    </IkanShell>
+      </Link>
+    </Section>
+  );
+}
+
+function Library() {
+  const picks: Resource[] = [
+    ...resources.filter((r) => covers[r.id]),
+    ...resources.filter((r) => !covers[r.id] && r.featured),
+  ].slice(0, 5);
+  return (
+    <Section title="From the library" action={{ label: "See all", to: "/resources" }}>
+      <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1">
+        {picks.map((r) => (
+          <Link key={r.id} to="/resources" className="w-[200px] shrink-0 snap-start">
+            <span className="block h-[124px] overflow-hidden rounded-[20px]">
+              {covers[r.id] ? (
+                <img src={covers[r.id]} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <Illustration art={r.art} />
+              )}
+            </span>
+            <span className="mt-2 block text-[12px] font-semibold text-muted-foreground">
+              {r.category}, {r.minutes} min read
+            </span>
+            <span className="mt-0.5 line-clamp-2 block text-[14px] font-semibold leading-5">
+              {r.title}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+function RecentResults({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  if (!hydrated || !data.results.length) return null;
+  const recent = [...data.results]
+    .sort((a, b) => b.completedAt.localeCompare(a.completedAt))
+    .slice(0, 3);
+  return (
+    <Section title="Recent results" action={{ label: "History", to: "/assessments" }}>
+      <ul className="mx-4 overflow-hidden rounded-[24px] bg-secondary">
+        {recent.map((r) => {
+          const a = getAssessment(r.slug);
+          if (!a) return null;
+          const head = headlineOf(a, scoreAll(a, r.answers));
+          return (
+            <li key={r.id} className="border-b border-background last:border-0">
+              <Link
+                to="/result/$slug"
+                params={{ slug: a.slug }}
+                search={{ r: r.id }}
+                className={cn("flex min-h-16 items-center gap-3 px-4 py-3", stateLayer)}
+              >
+                <ClipboardList className="h-5 w-5 shrink-0 text-muted-foreground" />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15px] font-medium">{a.title}</span>
+                  <span className="block text-[12px] text-muted-foreground">
+                    {new Date(r.completedAt).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </span>
+                </span>
+                {head?.band ? (
+                  <BandChip label={head.band.label} tone={head.band.tone} />
+                ) : (
+                  <span className="text-[12px] text-muted-foreground">5 scores</span>
+                )}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </Section>
+  );
+}
+
+function HealthCard() {
+  const { settings } = useSettings();
+  const hydrated = useHydrated();
+  if (hydrated && settings.healthConnect) return null;
+  return (
+    <Link
+      to="/settings"
+      className={cn(
+        "mx-4 flex items-center gap-3 rounded-[24px] border border-dashed border-foreground/20 p-4",
+        stateLayer,
+      )}
+    >
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-[#FBEFD2] text-[#7A5A12]">
+        <Watch className="h-5 w-5" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] font-semibold">Add sleep and steps</span>
+        <span className="block text-[13px] text-muted-foreground">
+          Connect Health Connect so they count in your score
+        </span>
+      </span>
+      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+    </Link>
   );
 }
