@@ -64,7 +64,7 @@ function ProgrammePage() {
             <JournalButton slug={slug} />
           </div>
           <div className="absolute inset-x-0 bottom-0 px-4 pb-6">
-            <p className="text-[14px] opacity-85">{src.tagline}</p>
+            {src.tagline ? <p className="text-[14px] opacity-85">{src.tagline}</p> : null}
             <h1 className="mt-1 font-display text-[40px] font-semibold leading-[44px] tracking-[-0.02em]">{programme.name}</h1>
             <p className="mt-2 text-[14px] opacity-85">
               {src.meta.days}, {src.meta.level}
@@ -73,10 +73,10 @@ function ProgrammePage() {
         </header>
 
         <div className="-mt-4 relative rounded-t-[28px] bg-background px-4 pt-6">
-          {!started ? <p className="text-[16px] leading-[1.6] text-foreground/85">{src.description}</p> : null}
+          {!started && src.description ? <p className="mb-5 text-[16px] leading-[1.6] text-foreground/85">{src.description}</p> : null}
 
           {today ? (
-            <section className={cn("rounded-[28px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]", !started && "mt-5")}>
+            <section className="rounded-[28px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
               <p className="text-[14px] font-medium">
                 {started ? "Up next" : "Start here"}, about {minutesOf(today)} min
               </p>
@@ -86,8 +86,8 @@ function ProgrammePage() {
               <ul className="mt-4 flex flex-wrap gap-2">
                 {today.blocks
                   .filter((b) => b.type !== "conclude")
-                  .map((b) => (
-                    <li key={b.n} className="rounded-[8px] border border-current/25 px-3 py-1.5 text-[13px] font-medium">
+                  .map((b, i) => (
+                    <li key={i} className="rounded-[8px] border border-current/25 px-3 py-1.5 text-[13px] font-medium">
                       {b.title}
                     </li>
                   ))}
@@ -118,14 +118,14 @@ function ProgrammePage() {
                 const done = days.filter((d) => state.completed.includes(d)).length;
                 const current = days.includes(nextDay);
                 return (
-                  <li key={u.n} className="flex min-h-[72px] items-center gap-4 px-4 py-2">
+                  <li key={i} className="flex min-h-[72px] items-center gap-4 px-4 py-2">
                     <span
                       className={cn(
                         "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[15px] font-semibold",
                         done === days.length ? "bg-foreground text-background" : current ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]" : "bg-secondary text-muted-foreground",
                       )}
                     >
-                      {done === days.length ? <Check className="h-5 w-5" strokeWidth={3} /> : u.n}
+                      {done === days.length ? <Check className="h-5 w-5" strokeWidth={3} /> : i + 1}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-[16px] font-medium leading-6">{u.title}</p>

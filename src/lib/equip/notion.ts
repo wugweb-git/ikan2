@@ -49,7 +49,7 @@ export type NProgramme = {
   slug: string;
   source: string;
   name: string;
-  tagline: string;
+  tagline?: string;
   description: string;
   meta: { id: string; days: string; blocks: string; category: string; level: string };
   schedule: { Days: string; Unit: string; Focus: string }[];
@@ -130,3 +130,24 @@ export function repeatRef(b: NBlock): { day: number; n: number | "diary"; scope:
   const today = /New entries only|only give options to add new cards/i.test(text);
   return { day: Number(m[2]), n: Number(m[1]), scope: today ? "today" : "all" };
 }
+
+/** "Prompt: What has been stressing you recently?" written inline in a note. */
+export const inlinePrompt = (b: NBlock) => {
+  for (const l of noteLines(b)) {
+    const m = l.match(/Prompt:\s*(.+)$/);
+    if (m) return stripQuotes(m[1]!);
+  }
+  return undefined;
+};
+
+/** "User lists things down. Limit to 10." */
+export const listLimit = (b: NBlock) => {
+  const m = noteLines(b).join(" ").match(/Limit (?:rituals )?to (\d+)/i);
+  return m ? Number(m[1]) : undefined;
+};
+
+/** "Tasks 2-5 can be done by showing 2 at a time on 1 card" */
+export const groupedRange = (b: NBlock) => {
+  const m = noteLines(b).join(" ").match(/Tasks (\d+)\s*-\s*(\d+) can be done by showing (\d+) at a time/i);
+  return m ? { from: Number(m[1]), to: Number(m[2]), perCard: Number(m[3]) } : null;
+};

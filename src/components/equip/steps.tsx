@@ -112,8 +112,17 @@ function LessonStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
       {view.cards ? (
         <div className="no-scrollbar -mx-4 mt-6 flex snap-x items-start gap-3 overflow-x-auto px-4">
           {view.cards.map((c) => (
-            <section key={c.title} className="w-[85%] shrink-0 snap-start rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
+            <section key={c.title} className={cn(
+                view.cards!.length > 1 ? "w-[85%]" : "w-full",
+                "shrink-0 snap-start rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]",
+              )}
+            >
               <p className="font-display text-[17px] font-semibold">{c.title}</p>
+              {c.text?.filter(Boolean).map((t) => (
+                <p key={t} className="mt-2 text-[15px] leading-6">
+                  {t}
+                </p>
+              ))}
               <ul className="mt-3 space-y-2 text-[15px] leading-6">
                 {c.items.map((i) => (
                   <li key={i} className="flex gap-2">
@@ -122,6 +131,7 @@ function LessonStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
                   </li>
                 ))}
               </ul>
+              {c.footer ? <p className="mt-3 text-[15px] leading-6">{c.footer}</p> : null}
             </section>
           ))}
         </div>
@@ -333,7 +343,7 @@ function ConcludeStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui:
 function SortStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "sort" }>; ctx: StepCtx }) {
   const { state, setAnswer } = useProgramme(ctx.slug);
   const pages: (typeof view.items)[] = [];
-  for (let i = 0; i < view.items.length; i += 2) pages.push(view.items.slice(i, i + 2));
+  for (let i = 0; i < view.items.length; i += view.perCard) pages.push(view.items.slice(i, i + view.perCard));
   const [page, setPage] = useState(0);
   const keyOf = (situation: string, line: string) => `${answerKey(step.block, ctx.day)}:${situation}:${line}`;
   const pageDone = (p: typeof view.items) => p.every((it) => it.lines.every((l) => typeof state.answers[keyOf(it.situation, l)] === "string"));
@@ -347,9 +357,9 @@ function SortStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "so
           onIndex={setPage}
           pages={pages.map((p, pi) => (
             <div key={pi} className="space-y-3">
-              {p.map((it) => (
-                <section key={it.situation} className="rounded-[16px] bg-secondary p-4">
-                  <p className="font-display text-[18px] font-semibold leading-6">{it.situation}</p>
+              {p.map((it, ii) => (
+                <section key={ii} className="rounded-[16px] bg-secondary p-4">
+                  {it.situation ? <p className="font-display text-[18px] font-semibold leading-6">{it.situation}</p> : null}
                   <div className="mt-3 space-y-4">
                     {it.lines.map((line) => (
                       <div key={line}>

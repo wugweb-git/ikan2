@@ -122,7 +122,7 @@ export function EntriesStep({ step, view, ctx }: { step: Step; view: Extract<UI,
   const full = view.limit !== undefined && list.length >= view.limit;
   const hasExample = Boolean(view.example && Object.keys(view.example).length);
 
-  if (view.listOf) return <ListEntries step={step} view={view} ctx={ctx} list={list} />;
+  if (view.list) return <ListEntries step={step} view={view} ctx={ctx} list={list} />;
 
   const pages = [
     ...(hasExample ? [
@@ -188,14 +188,16 @@ export function EntriesStep({ step, view, ctx }: { step: Step; view: Extract<UI,
   );
 }
 
-/** "Give options to add 3 things with add more once 3 have been entered". */
+/** Plain lists: "add 3 things with add more once 3 have been entered", "User lists things down. Limit to 10." */
 function ListEntries({ step, view, ctx, list }: { step: Step; view: Extract<UI, { ui: "entries" }>; ctx: StepCtx; list: Entry[] }) {
-  const target = view.listOf ?? 3;
+  const initial = view.list?.initial ?? 3;
+  const max = view.list?.max ?? Infinity;
   const [extra, setExtra] = useState(0);
   const f = view.fields[0]!;
   // Slots are keyed by position, so a blank row keeps focus when it becomes a saved entry.
-  const slots = Math.max(target, list.length) + extra;
+  const slots = Math.min(max, Math.max(initial, list.length) + extra);
   const filled = list.filter((e) => String(e.values[f.key] ?? "").trim()).length;
+  const canAddMore = filled >= slots && slots < max;
 
   return (
     <>
@@ -211,18 +213,23 @@ function ListEntries({ step, view, ctx, list }: { step: Step; view: Extract<UI, 
                 fieldKey={f.key}
                 collection={view.collection}
                 ctx={ctx}
-                onCreated={() => extra > 0 && i >= target && setExtra(extra - 1)}
+                onCreated={() => i >= Math.max(initial, list.length) && setExtra((x) => Math.max(0, x - 1))}
               />
             </div>
           </li>
         ))}
       </ol>
-      {filled >= Math.max(target, list.length) && extra === 0 ? (
+      {canAddMore ? (
         <div className="mt-3">
-          <Button variant="text" icon={<Plus className="h-5 w-5" />} onClick={() => setExtra(1)}>
+          <Button variant="text" icon={<Plus className="h-5 w-5" />} onClick={() => setExtra((x) => x + 1)}>
             Add more
           </Button>
         </div>
+      ) : null}
+      {max !== Infinity ? (
+        <p className="mt-2 text-[13px] text-muted-foreground">
+          {list.length} of {max}
+        </p>
       ) : null}
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
     </>

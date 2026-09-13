@@ -1,7 +1,9 @@
 import sleepCover from "@/assets/equip-sleep-tight.jpg";
 import unburnCover from "@/assets/res-burnout.jpg";
+import stressCover from "@/assets/res-anxiety.jpg";
 import sleepJson from "./content/sleep-tight.json";
 import unburnJson from "./content/unburn.json";
+import stressJson from "./content/stress-buster.json";
 import {
   bulletsAfter,
   exampleCard,
@@ -9,8 +11,12 @@ import {
   lineAfter,
   noteLines,
   optionsAfter,
+  groupedRange,
+  inlinePrompt,
+  listLimit,
   repeatRef,
   splitEmojiOptions,
+  stripQuotes,
   type NBlock,
   type NProgramme,
 } from "./notion";
@@ -54,9 +60,10 @@ function cardFields(b: NBlock): { fields: Field[]; example: Record<string, strin
     else {
       const [label, ...rest] = line.split(":");
       const value = rest.join(":").trim();
+      if (!label!.trim()) continue;
       const f = field(label!.trim(), /^time$/i.test(label!.trim()) ? "time" : "longtext");
       fields.push(f);
-      if (value) example[f.key] = value;
+      if (value && !/time picker/i.test(value)) example[f.key] = value;
     }
   }
   return { fields, example };
@@ -157,7 +164,7 @@ const listStep = (collection: string) => (b: NBlock): UI => ({
   collection,
   prompt: lineAfter(b, /prompt$/i) ?? b.title,
   fields: [{ key: "text", label: "", type: "text" }],
-  listOf: 3,
+  list: { initial: 3 },
   scope: "all",
 });
 
@@ -294,6 +301,126 @@ const unburnOverrides: Overrides = {
   },
 };
 
+/* ------------------------------ Stress Buster ------------------------------ */
+
+/** "Prompt: …  User lists things down. Limit to 10." */
+const noteList = (collection: string) => (b: NBlock): UI => {
+  const max = listLimit(b);
+  return {
+    ui: "entries",
+    collection,
+    prompt: inlinePrompt(b) ?? b.title,
+    fields: [{ key: "text", label: "", type: "text" }],
+    list: { initial: 1, ...(max ? { max } : {}) },
+    scope: "all",
+  };
+};
+
+/** Checklist written in a note: "Prompt: …" then "Options:" and bullets. */
+const noteChecklist = (single = false) => (b: NBlock): UI => {
+  const options = bulletsAfter(b, /^Options:?$/).map((label) => label.trim());
+  const other = options.find((o) => /^Other/i.test(o));
+  const ask = noteLines(b).find((l) => /^Ask\s/.test(l));
+  return {
+    ui: "choice",
+    prompt: inlinePrompt(b) ?? (ask ? stripQuotes(ask.replace(/^Ask\s+/, "")) : b.title),
+    multi: !single,
+    options: options.map((label) => ({ label })),
+    ...(other ? { otherOption: other } : {}),
+  };
+};
+
+const stressThoughtLog = (p: NProgramme) => cardFields(blockAt(p, 12, 2)!).fields;
+
+const stressOverrides: Overrides = {
+  "1.2": noteList("recent_stressors"),
+  "2.1": noteChecklist(),
+  "2.3": noteChecklist(),
+  "3.1": noteList("relaxed_self"),
+  "3.2": noteList("relax_methods"),
+  "4.1": () => ({ ui: "text", prompt: "" }),
+  "4.2": noteList("bugging"),
+  "4.3": noteList("stressful_activities"),
+  "4.4": noteList("joy"),
+  "7.2": (b) => {
+    const lines = noteLines(b);
+    const at = (marker: RegExp) => lines.findIndex((l) => marker.test(l.trim()));
+    const first = at(/^1st Card$/);
+    const second = at(/^2nd Card$/);
+    return {
+      ui: "lesson",
+      cards: [
+        { title: lines[first + 1] ?? "", text: [lines[first + 2] ?? ""], items: bulletsAfter(b, /^What's being asked of you\.$/) },
+        { title: lines[second + 1] ?? "", items: bulletsAfter(b, new RegExp(`^${escape(lines[second + 1] ?? "")}$`)) },
+      ],
+    };
+  },
+  "7.3": noteList("demands"),
+  "7.4": noteList("resources"),
+  "10.2": (b) => {
+    const prompt = inlinePrompt(b) ?? b.title;
+    return {
+      ui: "review",
+      collection: "demands",
+      prompt,
+      fields: [field(prompt, "longtext")],
+      addFields: [{ key: "text", label: "", type: "text" }],
+      scope: "all",
+    };
+  },
+  "10.4": (b) => {
+    const prompt = inlinePrompt(b) ?? b.title;
+    return {
+      ui: "review",
+      collection: "resources",
+      prompt,
+      fields: [field(prompt, "longtext")],
+      addFields: [{ key: "text", label: "", type: "text" }],
+      scope: "all",
+    };
+  },
+  "12.2": (b) => ({ ui: "entries", collection: "thought_log", fields: cardFields(b).fields, scope: "all" }),
+  "16.2": (b) => {
+    const lines = noteLines(b);
+    const intro = lines.find((l) => /^When faced with/.test(l)) ?? "";
+    return {
+      ui: "lesson",
+      cards: [
+        {
+          title: lines.find((l) => /^Reference card\.?$/i.test(l)) ?? b.title,
+          text: [intro],
+          items: bulletsAfter(b, new RegExp(`^${escape(intro)}$`)),
+          footer: lines.find((l) => /^Come back to this/.test(l)) ?? "",
+        },
+      ],
+    };
+  },
+  "16.3": () => ({ ui: "text", prompt: "" }),
+  "17.1": noteChecklist(true),
+  "17.3": (b, p) => {
+    const fields = cardFields(b).fields.map((f) => ({ ...f, type: "longtext" as const }));
+    return {
+      ui: "review",
+      collection: "thought_log",
+      prompt: "",
+      fields,
+      addFields: stressThoughtLog(p),
+      scope: "all",
+    };
+  },
+  "22.2": () => ({
+    ui: "entries",
+    collection: "worries",
+    fields: [field("Time", "time"), { key: "text", label: "", type: "longtext" }],
+    retentionHours: 24,
+    scope: "all",
+  }),
+  "25.2": listStep("good_things"),
+  "25.3": listStep("could_be_better"),
+  "25.4": listStep("tomorrow"),
+  "25.5": listStep("grateful"),
+};
+
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /* ------------------------------ resolution ------------------------------ */
@@ -323,8 +450,8 @@ function defaultView(b: NBlock): UI {
 }
 
 function build(p: NProgramme, overrides: Overrides, cover: string, accent: Programme["accent"]): Programme {
-  const resolve = (day: number, b: NBlock, seen = new Set<string>()): UI => {
-    const id = `${day}.${b.n}`;
+  /** `id` is "day.n", with "#2" for a repeated block number (Notion reuses numbers on some days). */
+  const resolve = (day: number, b: NBlock, id: string, seen = new Set<string>()): UI => {
     if (overrides[id]) return overrides[id]!(b, p);
     const ref = repeatRef(b);
     if (ref && !seen.has(id)) {
@@ -332,7 +459,7 @@ function build(p: NProgramme, overrides: Overrides, cover: string, accent: Progr
       const target = blockAt(p, ref.day, ref.n);
       if (target) {
         seen.add(id);
-        const view = resolve(ref.day, target, seen);
+        const view = resolve(ref.day, target, `${ref.day}.${ref.n}`, seen);
         return view.ui === "entries" || view.ui === "review" ? { ...view, scope: ref.scope } : view;
       }
     }
@@ -342,20 +469,32 @@ function build(p: NProgramme, overrides: Overrides, cover: string, accent: Progr
   const days: Day[] = p.units.flatMap((u) =>
     u.days.map((d) => {
       const steps: Step[] = [];
+      const counts = new Map<number, number>();
+      // "Tasks 2-5 can be done by showing 2 at a time on 1 card"
+      const range = d.blocks.map(groupedRange).find(Boolean) ?? null;
+
       for (const b of d.blocks) {
-        const view = resolve(d.day, b);
-        // consecutive comparison-matrix blocks: "showing 2 at a time on 1 card"
-        if (b.interaction === "comparison-matrix") {
-          const item = { situation: b.columns?.[0] ?? "", labels: b.columns?.slice(1) ?? [], lines: b.rows ?? [] };
+        const nth = (counts.get(b.n) ?? 0) + 1;
+        counts.set(b.n, nth);
+        const id = nth === 1 ? `${d.day}.${b.n}` : `${d.day}.${b.n}#${nth}`;
+
+        const inRange = range && nth === 1 && b.n >= range.from && b.n <= range.to && b.type !== "conclude";
+        const isMatrix = b.interaction === "comparison-matrix";
+        if (inRange || isMatrix) {
+          const item = isMatrix
+            ? { situation: b.columns?.[0] ?? "", labels: b.columns?.slice(1) ?? [], lines: b.rows ?? [] }
+            : { situation: "", labels: b.options ?? [], lines: [b.prompt ?? b.title] };
           const prev = steps.at(-1);
           if (prev?.view.ui === "sort") prev.view.items.push(item);
-          else steps.push({ id: `${d.day}.${b.n}`, block: b, view: { ui: "sort", items: [item] } });
+          else steps.push({ id, block: b, view: { ui: "sort", items: [item], perCard: range?.perCard ?? 2 } });
           continue;
         }
-        steps.push({ id: `${d.day}.${b.n}`, block: b, view });
+
+        const view = resolve(d.day, b, id);
+        steps.push({ id, block: b, view });
         // a lesson carrying "Repeat Sleep Diary" in its note (Day 4 has no numbered diary block)
         if (view.ui === "lesson" && repeatRef(b)?.n === "diary") {
-          steps.push({ id: `${d.day}.${b.n}-diary`, block: { ...b, title: "Sleep Diary", body: [] }, view: { ui: "diary" } });
+          steps.push({ id: `${id}-diary`, block: { ...b, title: "Sleep Diary", body: [] }, view: { ui: "diary" } });
         }
       }
       return { ...d, steps };
@@ -363,9 +502,11 @@ function build(p: NProgramme, overrides: Overrides, cover: string, accent: Progr
   );
 
   const tools = days.flatMap((d) =>
-    d.blocks
-      .filter((b) => noteLines(b).some((l) => /available for ever, on demand/i.test(l)))
-      .map((b) => ({ day: d.day, n: b.n, title: b.title })),
+    d.steps
+      .filter((s) =>
+        noteLines(s.block).some((l) => /available (?:for ever|to the user for ever)|pull this up anytime/i.test(l)),
+      )
+      .map((s) => ({ day: d.day, n: s.block.n, title: s.block.title })),
   );
 
   return { slug: p.slug, name: p.name.split(" — ")[0]!.trim(), source: p, cover, accent, days, tools };
@@ -374,10 +515,11 @@ function build(p: NProgramme, overrides: Overrides, cover: string, accent: Progr
 export const programmes: Programme[] = [
   build(sleepJson as NProgramme, sleepOverrides, sleepCover, "night"),
   build(unburnJson as NProgramme, unburnOverrides, unburnCover, "ember"),
+  build(stressJson as NProgramme, stressOverrides, stressCover, "calm"),
 ];
 
 /** Equip programmes named in the docs whose content isn't in Notion yet. */
-export const upcoming = [{ name: "Stressbuster" }, { name: "Productivity Reset" }];
+export const upcoming = [{ name: "Productivity Reset" }];
 
 export const getProgramme = (s: string) => programmes.find((p) => p.slug === s);
 export const getDay = (p: Programme, day: number) => p.days.find((d) => d.day === day);

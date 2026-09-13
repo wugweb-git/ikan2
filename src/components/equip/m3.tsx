@@ -4,13 +4,15 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type Accent = "night" | "ember";
+export type Accent = "night" | "ember" | "calm";
 
 /** Tonal accent per programme, used only for progress and selection. */
 export const accentStyle = (accent: Accent): CSSProperties =>
-  (accent === "night"
-    ? { "--accent": "#5E86B8", "--accent-container": "#E3ECF8", "--on-accent-container": "#1C3553" }
-    : { "--accent": "#B98A22", "--accent-container": "#FBEFD2", "--on-accent-container": "#4F3A0A" }) as CSSProperties;
+  ({
+    night: { "--accent": "#5E86B8", "--accent-container": "#E3ECF8", "--on-accent-container": "#1C3553" },
+    ember: { "--accent": "#B98A22", "--accent-container": "#FBEFD2", "--on-accent-container": "#4F3A0A" },
+    calm: { "--accent": "#4E8F75", "--accent-container": "#DFF0E8", "--on-accent-container": "#173D2F" },
+  })[accent] as unknown as CSSProperties;
 
 /** State layer: the pressed/hovered tint M3 puts on interactive surfaces. */
 export const stateLayer =

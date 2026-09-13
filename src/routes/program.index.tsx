@@ -55,7 +55,7 @@ function ProgrammeCard({ programme }: { programme: Programme }) {
       <img src={programme.cover} alt="" className="h-40 w-full object-cover" />
       <div className="p-5">
         <p className="font-display text-[24px] font-semibold leading-8">{programme.name}</p>
-        <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{src.description}</p>
+        {src.description ? <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{src.description}</p> : null}
         <div className="mt-4 flex items-center gap-3">
           <div className="flex h-1 flex-1 gap-1">
             <div className="h-full rounded-full bg-[var(--accent)]" style={{ width: `${(done / total) * 100}%` }} />

@@ -14,7 +14,7 @@ export type EntryValues = Record<string, string | boolean | null>;
 
 /** How a Notion block is presented. The block itself supplies every visible string. */
 export type UI =
-  | { ui: "lesson"; cards?: { title: string; items: string[] }[]; table?: string[][]; example?: string[] }
+  | { ui: "lesson"; cards?: { title: string; text?: string[]; items: string[]; footer?: string }[] }
   | {
       ui: "choice";
       prompt: string;
@@ -28,7 +28,7 @@ export type UI =
   | { ui: "scale"; prompt: string; min: number; max: number }
   | { ui: "text"; prompt: string; dependsOn?: { key: string; equals: string } }
   | { ui: "diary" }
-  | { ui: "sort"; items: { situation: string; lines: string[]; labels: string[] }[] }
+  | { ui: "sort"; items: { situation: string; lines: string[]; labels: string[] }[]; perCard: number }
   | {
       ui: "entries";
       collection: string;
@@ -38,8 +38,8 @@ export type UI =
       limit?: number;
       /** "today": only cards added today are shown (Notion "New entries only") */
       scope: "today" | "all";
-      /** Notion "Give options to add 3 things with add more once 3 have been entered" */
-      listOf?: number;
+      /** a plain list: "add 3 things with add more once 3 have been entered", "Limit to 10" */
+      list?: { initial: number; max?: number };
       retentionHours?: number;
       editable?: string[];
     }
@@ -69,7 +69,7 @@ export type Programme = {
   name: string;
   source: NProgramme;
   cover: string;
-  accent: "night" | "ember";
+  accent: "night" | "ember" | "calm";
   days: Day[];
   /** exercises Notion marks "available for ever, on demand", unlocked once reached */
   tools: { day: number; n: number; title: string }[];
