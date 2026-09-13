@@ -12,13 +12,19 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AssessmentFlowRouteImport } from './routes/assessment-flow'
 import { Route as AssessmentsRouteImport } from './routes/assessments'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as WellnessRouteImport } from './routes/wellness'
 import { Route as AssessmentIndexRouteImport } from './routes/assessment.index'
 import { Route as AssessmentSlugRouteImport } from './routes/assessment.$slug'
@@ -46,6 +52,11 @@ const AssessmentsRoute = AssessmentsRouteImport.update({
   path: '/assessments',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -54,6 +65,11 @@ const HistoryRoute = HistoryRouteImport.update({
 const JournalRoute = JournalRouteImport.update({
   id: '/journal',
   path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotificationsRoute = NotificationsRouteImport.update({
@@ -66,6 +82,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
@@ -76,9 +97,24 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WellnessRoute = WellnessRouteImport.update({
@@ -141,13 +177,19 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessments': typeof AssessmentsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/history': typeof HistoryRoute
   '/journal': typeof JournalRoute
+  '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/resources': typeof ResourcesRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/support': typeof SupportRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/welcome': typeof WelcomeRoute
   '/wellness': typeof WellnessRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/consult/$id': typeof ConsultIdRoute
@@ -164,13 +206,19 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessments': typeof AssessmentsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/history': typeof HistoryRoute
   '/journal': typeof JournalRoute
+  '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/resources': typeof ResourcesRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/support': typeof SupportRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/welcome': typeof WelcomeRoute
   '/wellness': typeof WellnessRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/consult/$id': typeof ConsultIdRoute
@@ -188,13 +236,19 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessments': typeof AssessmentsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/history': typeof HistoryRoute
   '/journal': typeof JournalRoute
+  '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/resources': typeof ResourcesRoute
   '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/support': typeof SupportRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/welcome': typeof WelcomeRoute
   '/wellness': typeof WellnessRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/consult/$id': typeof ConsultIdRoute
@@ -213,13 +267,19 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment-flow'
     | '/assessments'
+    | '/forgot-password'
     | '/history'
     | '/journal'
+    | '/login'
     | '/notifications'
     | '/profile'
+    | '/reset-password'
     | '/resources'
     | '/settings'
+    | '/signup'
     | '/support'
+    | '/verify-email'
+    | '/welcome'
     | '/wellness'
     | '/assessment/$slug'
     | '/consult/$id'
@@ -236,13 +296,19 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment-flow'
     | '/assessments'
+    | '/forgot-password'
     | '/history'
     | '/journal'
+    | '/login'
     | '/notifications'
     | '/profile'
+    | '/reset-password'
     | '/resources'
     | '/settings'
+    | '/signup'
     | '/support'
+    | '/verify-email'
+    | '/welcome'
     | '/wellness'
     | '/assessment/$slug'
     | '/consult/$id'
@@ -259,13 +325,19 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment-flow'
     | '/assessments'
+    | '/forgot-password'
     | '/history'
     | '/journal'
+    | '/login'
     | '/notifications'
     | '/profile'
+    | '/reset-password'
     | '/resources'
     | '/settings'
+    | '/signup'
     | '/support'
+    | '/verify-email'
+    | '/welcome'
     | '/wellness'
     | '/assessment/$slug'
     | '/consult/$id'
@@ -283,13 +355,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AssessmentFlowRoute: typeof AssessmentFlowRoute
   AssessmentsRoute: typeof AssessmentsRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HistoryRoute: typeof HistoryRoute
   JournalRoute: typeof JournalRoute
+  LoginRoute: typeof LoginRoute
   NotificationsRoute: typeof NotificationsRoute
   ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ResourcesRoute: typeof ResourcesRoute
   SettingsRoute: typeof SettingsRoute
+  SignupRoute: typeof SignupRoute
   SupportRoute: typeof SupportRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
+  WelcomeRoute: typeof WelcomeRoute
   WellnessRoute: typeof WellnessRoute
   AssessmentSlugRoute: typeof AssessmentSlugRoute
   ConsultIdRoute: typeof ConsultIdRoute
@@ -326,6 +404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/history': {
       id: '/history'
       path: '/history'
@@ -338,6 +423,13 @@ declare module '@tanstack/react-router' {
       path: '/journal'
       fullPath: '/journal'
       preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notifications': {
@@ -354,6 +446,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resources': {
       id: '/resources'
       path: '/resources'
@@ -368,11 +467,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/support': {
       id: '/support'
       path: '/support'
       fullPath: '/support'
       preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/wellness': {
@@ -459,13 +579,19 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AssessmentFlowRoute: AssessmentFlowRoute,
   AssessmentsRoute: AssessmentsRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HistoryRoute: HistoryRoute,
   JournalRoute: JournalRoute,
+  LoginRoute: LoginRoute,
   NotificationsRoute: NotificationsRoute,
   ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ResourcesRoute: ResourcesRoute,
   SettingsRoute: SettingsRoute,
+  SignupRoute: SignupRoute,
   SupportRoute: SupportRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
+  WelcomeRoute: WelcomeRoute,
   WellnessRoute: WellnessRoute,
   AssessmentSlugRoute: AssessmentSlugRoute,
   ConsultIdRoute: ConsultIdRoute,

@@ -155,7 +155,7 @@ function ProfilePage() {
 
   const exportData = () => {
     const out: Record<string, unknown> = { exportedAt: new Date().toISOString() };
-    for (const k of storageKeys) {
+    for (const k of storageKeys()) {
       try {
         const raw = localStorage.getItem(k);
         if (raw) out[k] = JSON.parse(raw);

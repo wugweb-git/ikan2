@@ -1,29 +1,33 @@
 import { useSyncExternalStore } from "react";
+import { getScope, onScopeChange, scopedKey } from "@/lib/storage-scope";
 
-/* A small localStorage-backed store (no accounts yet).
+/* A small localStorage-backed store, kept per signed-in account (see storage-scope).
  * Hydration-safe: the server and the first client render see `empty`. */
 export function createLocalStore<T extends object>(key: string, empty: T) {
   let cache: T | undefined;
+  let cacheScope = "";
   const listeners = new Set<() => void>();
 
   const read = (): T => {
-    if (cache) return cache;
+    if (cache && cacheScope === getScope()) return cache;
     if (typeof window === "undefined") return empty;
     let state = empty;
     try {
-      const raw = window.localStorage.getItem(key);
+      const raw = window.localStorage.getItem(scopedKey(key));
       if (raw) state = { ...empty, ...(JSON.parse(raw) as Partial<T>) };
     } catch {
       /* unreadable storage — start fresh */
     }
     cache = state;
+    cacheScope = getScope();
     return state;
   };
 
   const write = (next: T) => {
     cache = next;
+    cacheScope = getScope();
     try {
-      window.localStorage.setItem(key, JSON.stringify(next));
+      window.localStorage.setItem(scopedKey(key), JSON.stringify(next));
     } catch {
       /* storage unavailable — keep in memory for this session */
     }
@@ -33,15 +37,20 @@ export function createLocalStore<T extends object>(key: string, empty: T) {
   const subscribe = (listener: () => void) => {
     listeners.add(listener);
     const onStorage = (e: StorageEvent) => {
-      if (e.key === key) {
+      if (e.key === scopedKey(key)) {
         cache = undefined;
         listener();
       }
     };
     window.addEventListener("storage", onStorage);
+    const offScope = onScopeChange(() => {
+      cache = undefined;
+      listener();
+    });
     return () => {
       listeners.delete(listener);
       window.removeEventListener("storage", onStorage);
+      offScope();
     };
   };
 

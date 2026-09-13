@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import type { DiaryEntry } from "./metrics";
 import type { EntryValues } from "./types";
+import { onScopeChange, scopedKey } from "@/lib/storage-scope";
 
 /* Per-programme progress, kept in localStorage (no accounts yet).
  * Hydration-safe: the server and first client render see EMPTY. */
@@ -28,12 +29,12 @@ const EMPTY: ProgrammeState = {
   tracker: {},
 };
 
-const keyFor = (slug: string) => `ikan.equip.${slug}.v2`;
+const keyFor = (slug: string) => scopedKey(`ikan.equip.${slug}.v2`);
 const cache = new Map<string, ProgrammeState>();
 const listeners = new Set<() => void>();
 
 function read(slug: string): ProgrammeState {
-  const hit = cache.get(slug);
+  const hit = cache.get(keyFor(slug));
   if (hit) return hit;
   if (typeof window === "undefined") return EMPTY;
   let state = EMPTY;
@@ -43,12 +44,12 @@ function read(slug: string): ProgrammeState {
   } catch {
     /* unreadable storage — start fresh */
   }
-  cache.set(slug, state);
+  cache.set(keyFor(slug), state);
   return state;
 }
 
 function write(slug: string, next: ProgrammeState) {
-  cache.set(slug, next);
+  cache.set(keyFor(slug), next);
   try {
     window.localStorage.setItem(keyFor(slug), JSON.stringify(next));
   } catch {
@@ -60,15 +61,17 @@ function write(slug: string, next: ProgrammeState) {
 function subscribe(listener: () => void) {
   listeners.add(listener);
   const onStorage = (e: StorageEvent) => {
-    if (e.key?.startsWith("ikan.equip.")) {
+    if (e.key?.includes(".equip.")) {
       cache.clear();
       listener();
     }
   };
   window.addEventListener("storage", onStorage);
+  const offScope = onScopeChange(listener);
   return () => {
     listeners.delete(listener);
     window.removeEventListener("storage", onStorage);
+    offScope();
   };
 }
 

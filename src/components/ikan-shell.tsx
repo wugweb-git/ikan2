@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
   BookOpen,
@@ -12,6 +12,7 @@ import {
   House,
   LayoutGrid,
   LifeBuoy,
+  LogOut,
   NotebookPen,
   Settings,
   Smile,
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { useAuth } from "@/lib/auth";
 import { useEverything } from "@/lib/activity";
 import { useNotifications } from "@/lib/notifications";
 import { resources } from "@/lib/resources";
@@ -127,6 +129,8 @@ type Row = { label: string; sub: string; icon: LucideIcon } & (
 
 function MoreSheet({ onClose }: { onClose: () => void }) {
   const hydrated = useHydrated();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const data = useEverything();
   const { unreadCount } = useNotifications();
 
@@ -334,6 +338,24 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
             </ul>
           </section>
         ))}
+        <div className="mx-3 mt-5">
+          <button
+            type="button"
+            onClick={async () => {
+              onClose();
+              await signOut();
+              navigate({ to: "/login", replace: true });
+            }}
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[15px] font-semibold text-[#B3261E]"
+          >
+            <LogOut className="h-5 w-5" /> Log out
+          </button>
+          {user?.email ? (
+            <p className="mt-2 text-center text-[12px] text-muted-foreground">
+              Signed in as {user.email}
+            </p>
+          ) : null}
+        </div>
       </div>
     </div>
   );

@@ -2,6 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
+  KeyRound,
+  LogOut,
+  UserRound,
   Bell,
   BookOpen,
   CalendarClock,
@@ -33,6 +36,7 @@ import {
 } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import {
   defaultSettings,
@@ -51,6 +55,7 @@ function SettingsPage() {
   const hydrated = useHydrated();
   const navigate = useNavigate();
   const { settings: stored, set } = useSettings();
+  const { user, signOut, sendReset } = useAuth();
   const settings = hydrated ? stored : defaultSettings;
   const snack = useSnack();
   const [clearing, setClearing] = useState(false);
@@ -67,7 +72,7 @@ function SettingsPage() {
 
   const exportData = () => {
     const out: Record<string, unknown> = { exportedAt: new Date().toISOString() };
-    for (const k of storageKeys) {
+    for (const k of storageKeys()) {
       try {
         const raw = localStorage.getItem(k);
         if (raw) out[k] = JSON.parse(raw);
@@ -97,6 +102,43 @@ function SettingsPage() {
           }
           title="Settings"
         />
+
+        <Group title="Account">
+          <div className="flex min-h-[72px] items-center gap-4 px-4 py-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--accent-container)] text-[var(--on-accent-container)]">
+              <UserRound className="h-5 w-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[16px]">Signed in</span>
+              <span className="block truncate text-[13px] leading-5 text-muted-foreground">
+                {user?.email ?? ""}
+              </span>
+            </span>
+          </div>
+          <ActionRow
+            icon={KeyRound}
+            label="Change password"
+            sub="We’ll email you a link to set a new one"
+            onClick={async () => {
+              if (!user?.email) return;
+              try {
+                await sendReset(user.email);
+                snack.show("Check your email for the link");
+              } catch (e) {
+                snack.show((e as Error).message);
+              }
+            }}
+          />
+          <ActionRow
+            icon={LogOut}
+            label="Sign out"
+            sub="Your data stays on this device for next time"
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/login", replace: true });
+            }}
+          />
+        </Group>
 
         <Group
           title="Notifications"
@@ -235,7 +277,7 @@ function SettingsPage() {
             <Button
               className="bg-[#B3261E] text-white"
               onClick={() => {
-                for (const k of storageKeys) {
+                for (const k of storageKeys()) {
                   try {
                     localStorage.removeItem(k);
                   } catch {
