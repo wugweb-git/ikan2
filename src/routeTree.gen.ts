@@ -21,6 +21,7 @@ import { Route as ResultSlugRouteImport } from './routes/result.$slug'
 import { Route as ProgramSlugIndexRouteImport } from './routes/program.$slug.index'
 import { Route as ProgramSlugJournalRouteImport } from './routes/program.$slug.journal'
 import { Route as ProgramSlugDayDayRouteImport } from './routes/program.$slug.day.$day'
+import { Route as ProgramSlugToolStepRouteImport } from './routes/program.$slug.tool.$step'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +83,11 @@ const ProgramSlugDayDayRoute = ProgramSlugDayDayRouteImport.update({
   path: '/program/$slug/day/$day',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgramSlugToolStepRoute = ProgramSlugToolStepRouteImport.update({
+  id: '/program/$slug/tool/$step',
+  path: '/program/$slug/tool/$step',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/program/$slug/journal': typeof ProgramSlugJournalRoute
   '/program/$slug/': typeof ProgramSlugIndexRoute
   '/program/$slug/day/$day': typeof ProgramSlugDayDayRoute
+  '/program/$slug/tool/$step': typeof ProgramSlugToolStepRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/program/$slug/journal': typeof ProgramSlugJournalRoute
   '/program/$slug': typeof ProgramSlugIndexRoute
   '/program/$slug/day/$day': typeof ProgramSlugDayDayRoute
+  '/program/$slug/tool/$step': typeof ProgramSlugToolStepRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/program/$slug/journal': typeof ProgramSlugJournalRoute
   '/program/$slug/': typeof ProgramSlugIndexRoute
   '/program/$slug/day/$day': typeof ProgramSlugDayDayRoute
+  '/program/$slug/tool/$step': typeof ProgramSlugToolStepRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/program/$slug/journal'
     | '/program/$slug/'
     | '/program/$slug/day/$day'
+    | '/program/$slug/tool/$step'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/program/$slug/journal'
     | '/program/$slug'
     | '/program/$slug/day/$day'
+    | '/program/$slug/tool/$step'
   id:
     | '__root__'
     | '/'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/program/$slug/journal'
     | '/program/$slug/'
     | '/program/$slug/day/$day'
+    | '/program/$slug/tool/$step'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   ProgramSlugJournalRoute: typeof ProgramSlugJournalRoute
   ProgramSlugIndexRoute: typeof ProgramSlugIndexRoute
   ProgramSlugDayDayRoute: typeof ProgramSlugDayDayRoute
+  ProgramSlugToolStepRoute: typeof ProgramSlugToolStepRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgramSlugDayDayRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/program/$slug/tool/$step': {
+      id: '/program/$slug/tool/$step'
+      path: '/program/$slug/tool/$step'
+      fullPath: '/program/$slug/tool/$step'
+      preLoaderRoute: typeof ProgramSlugToolStepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProgramSlugJournalRoute: ProgramSlugJournalRoute,
   ProgramSlugIndexRoute: ProgramSlugIndexRoute,
   ProgramSlugDayDayRoute: ProgramSlugDayDayRoute,
+  ProgramSlugToolStepRoute: ProgramSlugToolStepRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

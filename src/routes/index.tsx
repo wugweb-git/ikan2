@@ -149,8 +149,8 @@ function Index() {
             <div className="hero-track mt-4"><i style={{ width: "29%" }} /></div>
             <p className="mt-3 text-sm opacity-85">Ready for your next session? Takes about 10 minutes.</p>
             <div className="mt-4 flex gap-2">
-              <Button className="flex-1 rounded-full bg-background text-foreground transition-transform hover:bg-background/90 active:scale-[.97]"><Play /> Start session</Button>
-              <Button variant="ghost" className="rounded-full border border-white/25 text-background hover:bg-white/10 hover:text-background"><CalendarCheck /> Progress</Button>
+              <Button asChild className="flex-1 rounded-full bg-background text-foreground transition-transform hover:bg-background/90 active:scale-[.97]"><Link to="/program/$slug" params={{ slug: "unburn" }}><Play /> Start session</Link></Button>
+              <Button asChild variant="ghost" className="rounded-full border border-white/25 text-background hover:bg-white/10 hover:text-background"><Link to="/program/$slug/journal" params={{ slug: "unburn" }}><CalendarCheck /> Progress</Link></Button>
             </div>
           </div>
         </div>

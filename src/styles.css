@@ -238,6 +238,13 @@
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 /* opacity only: no transform, so fixed children (step footers) stay anchored to the viewport */
 @utility animate-fade { animation: fade .35s ease both; }
+/* M3 slider thumb over a custom track */
+.m3-slider::-webkit-slider-runnable-track { background: transparent; height: 40px; }
+.m3-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 4px; height: 40px; border-radius: 2px; background: var(--foreground); }
+.m3-slider::-moz-range-thumb { width: 4px; height: 40px; border: 0; border-radius: 2px; background: var(--foreground); }
+.m3-slider:focus-visible { outline: 2px solid var(--foreground); outline-offset: 4px; border-radius: 8px; }
+@keyframes sheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@utility animate-sheet { animation: sheet .4s cubic-bezier(.05,.7,.1,1) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes grow { from { transform: scaleY(.1); opacity: .3; } to { transform: scaleY(1); opacity: 1; } }
 @utility animate-fade-in { animation: rise .55s cubic-bezier(.32,.72,0,1) both; }

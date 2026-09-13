@@ -1,86 +1,76 @@
-/* ------------------------------------------------------------------ *
- * Equip programme model — mirrors the Notion programme docs:
- * programme → units (day ranges) → days → steps (the Notion "blocks").
- * ------------------------------------------------------------------ */
+import type { NBlock, NDay, NProgramme } from "./notion";
 
-export type FieldType = "text" | "longtext" | "time" | "date" | "yesno";
+export type FieldType = "text" | "longtext" | "time" | "date" | "datetime" | "yesno" | "select";
 
-export type Field = { key: string; label: string; type: FieldType; placeholder?: string };
+export type Field = {
+  key: string;
+  /** visible label, verbatim from Notion; empty for Notion's "blank text" cards */
+  label: string;
+  type: FieldType;
+  options?: string[];
+};
 
 export type EntryValues = Record<string, string | boolean | null>;
 
-export type Step =
-  | { kind: "lesson"; title: string; body: string[]; bullets?: string[]; example?: string }
-  /** quiz (single) and checklist (multi) blocks */
+/** How a Notion block is presented. The block itself supplies every visible string. */
+export type UI =
+  | { ui: "lesson"; cards?: { title: string; items: string[] }[]; table?: string[][]; example?: string[] }
   | {
-      kind: "choice";
-      key: string;
-      title: string;
+      ui: "choice";
       prompt: string;
       options: { label: string; glyph?: string }[];
-      multi?: boolean;
-      /** adds a free-text "Other" option */
-      other?: boolean;
+      multi: boolean;
+      /** an option (e.g. "Others") that opens a text field */
+      otherOption?: string;
+      table?: string[][];
+      cards?: boolean;
     }
+  | { ui: "scale"; prompt: string; min: number; max: number }
+  | { ui: "text"; prompt: string; dependsOn?: { key: string; equals: string } }
+  | { ui: "diary" }
+  | { ui: "sort"; items: { situation: string; lines: string[]; labels: string[] }[] }
   | {
-      kind: "scale";
-      key: string;
-      title: string;
-      prompt: string;
-      min: number;
-      max: number;
-      unit: string;
-    }
-  | { kind: "reflect"; key: string; title: string; prompt: string; optional?: boolean }
-  /** the Day 1 sleep diary, one question per screen */
-  | { kind: "diary"; title: string }
-  /** comparison matrix: label each line as a thought or a feeling */
-  | {
-      kind: "sort";
-      title: string;
-      prompt: string;
-      worked: { situation: string; lines: { text: string; answer: "Thought" | "Feeling" }[] };
-      items: { situation: string; lines: string[] }[];
-    }
-  /** input table as swipeable cards; the user adds as many as they like */
-  | {
-      kind: "entries";
+      ui: "entries";
       collection: string;
-      title: string;
-      prompt: string;
+      prompt?: string;
       fields: Field[];
       example?: EntryValues;
       limit?: number;
-      timerSeconds?: number;
+      /** "today": only cards added today are shown (Notion "New entries only") */
+      scope: "today" | "all";
+      /** Notion "Give options to add 3 things with add more once 3 have been entered" */
+      listOf?: number;
+      retentionHours?: number;
+      editable?: string[];
     }
-  /** pull earlier cards back up and answer one more question on each */
   | {
-      kind: "review";
+      ui: "review";
       collection: string;
-      title: string;
+      /** collections whose cards are pulled up (defaults to `collection`) */
+      from?: string[];
       prompt: string;
       fields: Field[];
-      /** checklist answers to seed as cards before reviewing them */
-      seedFrom?: { choiceKey: string; field: string };
-      /** lets the user add a fresh card, prompted with these fields plus the review fields */
       addFields?: Field[];
+      seedFrom?: { choiceKey: string; field: string };
+      seeds?: EntryValues[];
+      example?: string[];
+      scope: "today" | "all";
     }
-  /** daily habit tracker over the user's habit list */
-  | { kind: "tracker"; collection: string; field: string; title: string; prompt: string }
-  | { kind: "conclude"; line: string; reflectKey?: string; prompt?: string };
+  | { ui: "tracker"; collection: string; field: string; prompt: string; note?: string }
+  | { ui: "statements"; prompt: string; statements: string[]; options: string[] }
+  | { ui: "conclude"; prompt?: string };
 
-export type Day = { day: number; title: string; subtitle?: string; steps: Step[] };
+export type Step = { id: string; block: NBlock; view: UI };
 
-export type Unit = { n: number; title: string; focus: string; days: Day[] };
+export type Day = NDay & { steps: Step[] };
 
 export type Programme = {
   slug: string;
   name: string;
-  tagline: string;
-  description: string;
-  level: string;
+  source: NProgramme;
   cover: string;
-  units: Unit[];
-  /** things the programme wants the user to know before starting */
-  notes: string[];
+  accent: "night" | "ember";
+  days: Day[];
+  /** exercises Notion marks "available for ever, on demand", unlocked once reached */
+  tools: { day: number; n: number; title: string }[];
 };

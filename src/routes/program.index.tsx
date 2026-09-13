@@ -1,48 +1,36 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { IkanShell } from "@/components/ikan-shell";
-import { BackLink, ProgramHeader, pageMeta } from "@/components/equip/program-header";
-import { allDays, programmes, upcoming } from "@/lib/equip/programs";
+import { accentStyle, stateLayer } from "@/components/equip/m3";
+import { pageMeta } from "@/components/equip/program-header";
+import { cn } from "@/lib/utils";
+import { programmes, upcoming } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 import type { Programme } from "@/lib/equip/types";
 
 export const Route = createFileRoute("/program/")({
-  head: () =>
-    pageMeta(
-      "Programmes",
-      "Self-paced Equip programmes that build skills for sleep, stress and burnout.",
-    ),
+  head: () => pageMeta("Programmes", "iKAN Equip programmes for sleep and burnout."),
   component: ProgramsPage,
 });
 
 function ProgramsPage() {
   return (
     <IkanShell>
-      <ProgramHeader back={<BackLink to="/" />} />
-      <section className="px-5 pt-3">
-        <h1 className="font-display text-[40px] font-semibold leading-none tracking-[-0.025em]">
-          Programmes
-        </h1>
-        <p className="mt-3 max-w-[22rem] text-[15px] leading-6 text-muted-foreground">
-          Short daily sittings that build one skill at a time. Go at your own pace.
-        </p>
-      </section>
-
-      <section className="mt-7 space-y-4 px-5">
+      <header className="px-4 pb-2 pt-8">
+        <h1 className="font-display text-[32px] font-semibold leading-10">Programmes</h1>
+      </header>
+      <ul className="space-y-4 px-4 pt-2">
         {programmes.map((p) => (
-          <ProgrammeCard key={p.slug} programme={p} />
+          <li key={p.slug}>
+            <ProgrammeCard programme={p} />
+          </li>
         ))}
-      </section>
-
-      <section className="mt-10 px-5">
-        <h2 className="font-display text-lg font-semibold">On the way</h2>
-        <ul className="mt-2 divide-y divide-foreground/[0.07]">
+      </ul>
+      <section className="mt-8">
+        <h2 className="px-4 font-display text-[16px] font-semibold">Coming soon</h2>
+        <ul className="mt-1">
           {upcoming.map((u) => (
-            <li key={u.name} className="flex items-center justify-between gap-4 py-4">
-              <div>
-                <p className="font-display text-[16px] font-semibold">{u.name}</p>
-                <p className="mt-0.5 text-[14px] text-muted-foreground">{u.body}</p>
-              </div>
-              <span className="shrink-0 text-[13px] text-muted-foreground">Soon</span>
+            <li key={u.name} className="flex min-h-14 items-center px-4 text-[16px] text-muted-foreground">
+              {u.name}
             </li>
           ))}
         </ul>
@@ -53,44 +41,28 @@ function ProgramsPage() {
 
 function ProgrammeCard({ programme }: { programme: Programme }) {
   const { state, nextDay } = useProgramme(programme.slug);
-  const total = allDays(programme).length;
+  const total = programme.days.length;
   const done = state.completed.length;
-  const started = done > 0;
+  const src = programme.source;
 
   return (
     <Link
       to="/program/$slug"
       params={{ slug: programme.slug }}
-      className="hero-card block min-h-[320px]"
+      style={accentStyle(programme.accent)}
+      className={cn("block overflow-hidden rounded-[28px] bg-secondary", stateLayer)}
     >
-      <img src={programme.cover} alt="" className="hero-media !opacity-80" />
-      <div className="hero-veil" />
-      <div className="relative flex min-h-[280px] flex-col">
-        <p className="text-sm opacity-80">
-          {started ? `Day ${Math.min(nextDay, total - 1)} is next` : `${total} days`}
-        </p>
-        <div className="mt-auto">
-          <p className="font-display text-[34px] font-semibold leading-none tracking-[-0.02em]">
-            {programme.name}
-          </p>
-          <p className="mt-2 max-w-[18rem] text-[15px] leading-snug opacity-85">
-            {programme.tagline}
-          </p>
-          {started ? (
-            <div className="mt-5 flex items-center gap-3">
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-background/20">
-                <div
-                  className="h-full rounded-full bg-background"
-                  style={{ width: `${(done / total) * 100}%` }}
-                />
-              </div>
-              <span className="text-sm tabular-nums opacity-85">
-                {done}/{total}
-              </span>
-            </div>
-          ) : null}
-          <span className="mt-5 flex h-12 items-center justify-center rounded-full bg-background font-display text-[15px] font-semibold text-foreground">
-            {started ? "Continue" : "See the programme"}
+      <img src={programme.cover} alt="" className="h-40 w-full object-cover" />
+      <div className="p-5">
+        <p className="font-display text-[24px] font-semibold leading-8">{programme.name}</p>
+        <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{src.description}</p>
+        <div className="mt-4 flex items-center gap-3">
+          <div className="flex h-1 flex-1 gap-1">
+            <div className="h-full rounded-full bg-[var(--accent)]" style={{ width: `${(done / total) * 100}%` }} />
+            <div className="h-full flex-1 rounded-full bg-[var(--accent-container)]" />
+          </div>
+          <span className="text-[13px] tabular-nums text-muted-foreground">
+            {done > 0 ? (nextDay < total ? `Day ${nextDay} next` : "Done") : `${src.meta.days}, ${src.meta.level}`}
           </span>
         </div>
       </div>
