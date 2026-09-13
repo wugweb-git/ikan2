@@ -1,8 +1,17 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { ArrowLeft, Check, ChevronRight, Sparkles, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { assessments, getAssessment } from "@/lib/assessments";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, X } from "lucide-react";
+import {
+  accentStyle,
+  BottomSheet,
+  Button,
+  IconButton,
+  LinearProgress,
+  SelectRow,
+} from "@/components/equip/m3";
+import { assessments, getAssessment } from "@/lib/assessment/instruments";
+import { optionLabel, type Answers } from "@/lib/assessment/scoring";
+import { readAssessmentState, useAssessmentStore } from "@/lib/assessment/store";
 
 type Search = { id?: string };
 
@@ -10,148 +19,205 @@ export const Route = createFileRoute("/assessment-flow")({
   validateSearch: (search: Record<string, unknown>): Search =>
     typeof search["id"] === "string" ? { id: search["id"] } : {},
   head: () => ({
-    meta: [
-      { title: "Taking your assessment — iKAN" },
-      { name: "description", content: "Answer one question at a time. Your progress is saved as you go." },
-      { property: "og:title", content: "Taking your assessment — iKAN" },
-      { property: "og:description", content: "Answer one question at a time. Your progress is saved as you go." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Assessment — iKAN" }, { name: "robots", content: "noindex" }],
   }),
   component: AssessmentFlowPage,
 });
 
 function AssessmentFlowPage() {
   const { id } = Route.useSearch();
+  const a = getAssessment(id ?? "") ?? assessments[0]!;
   const navigate = useNavigate();
-  const assessment = useMemo(() => getAssessment(id ?? "") ?? assessments[0]!, [id]);
+  const store = useAssessmentStore();
 
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [done, setDone] = useState(false);
+  const [answers, setAnswers] = useState<Answers>({});
+  const [index, setIndex] = useState(0);
+  const [leaving, setLeaving] = useState(false);
+  const [resumed, setResumed] = useState(false);
+  const seconds = useRef(0);
+  const loaded = useRef(false);
+  const advance = useRef<number | undefined>(undefined);
 
-  const total = assessment.questions.length;
-  const question = assessment.questions[Math.min(step, total - 1)]!;
+  // resume a partial run once storage is readable
+  useEffect(() => {
+    if (loaded.current) return;
+    loaded.current = true;
+    const draft = readAssessmentState().drafts[a.slug];
+    if (draft && Object.keys(draft.answers).length > 0) {
+      setAnswers(draft.answers);
+      setIndex(Math.min(draft.index, a.questions.length - 1));
+      seconds.current = draft.seconds;
+      setResumed(true);
+    }
+  }, [a.slug, a.questions.length]);
+
+  // time on task, counted only while the page is visible
+  useEffect(() => {
+    const t = window.setInterval(() => {
+      if (document.visibilityState === "visible") seconds.current += 1;
+    }, 1000);
+    return () => window.clearInterval(t);
+  }, []);
+
+  useEffect(() => () => window.clearTimeout(advance.current), []);
+
+  const total = a.questions.length;
+  const question = a.questions[index]!;
+  const scale = a.scales[question.scale]!;
   const selected = answers[question.id];
-  const progress = done ? 100 : Math.round((step / total) * 100);
-  const score = Object.values(answers).reduce((sum, value) => sum + value, 0);
+  const answeredCount = Object.keys(answers).length;
+  const isLast = index === total - 1;
+
+  // multi-instrument assessments say which part a question belongs to
+  const part =
+    a.category === "general" ? a.scores.findIndex((s) => question.scores.includes(s.id)) : -1;
+  const partLabel =
+    a.category === "general"
+      ? part >= 0
+        ? `${a.scores[part]!.label}`
+        : "One more question"
+      : null;
+
+  const finish = (final: Answers) => {
+    const result = store.saveResult(a.slug, final, seconds.current);
+    navigate({
+      to: "/result/$slug",
+      params: { slug: a.slug },
+      search: { r: result.id },
+      replace: true,
+    });
+  };
 
   const choose = (value: number) => {
-    setAnswers((prev) => ({ ...prev, [question.id]: value }));
-    window.setTimeout(() => {
-      if (step + 1 < total) setStep(step + 1);
-      else setDone(true);
-    }, 220);
+    const next = { ...answers, [question.id]: value };
+    setAnswers(next);
+    setResumed(false);
+    store.saveDraft(a.slug, {
+      answers: next,
+      index: isLast ? index : index + 1,
+      seconds: seconds.current,
+    });
+    window.clearTimeout(advance.current);
+    if (!isLast)
+      advance.current = window.setTimeout(() => setIndex((i) => Math.min(i + 1, total - 1)), 260);
   };
 
-  const back = () => {
-    if (done) setDone(false);
-    else if (step > 0) setStep(step - 1);
-  };
-
-  if (done) {
-    return (
-      <div className="flex min-h-screen flex-col bg-canvas">
-        <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center bg-background px-6 shadow-app">
-          <div className="animate-fade-in surface p-8 text-center">
-            <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-calm-soft">
-              <Check className="h-10 w-10 text-calm-strong" strokeWidth={3} />
-            </div>
-            <h1 className="mt-7 font-display text-2xl font-semibold">All done</h1>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              Thank you for taking a moment for yourself. Your {assessment.category.toLowerCase()} result is ready.
-            </p>
-            <div className="mt-6 rounded-2xl bg-secondary/60 p-4 text-left">
-              <p className="eyebrow">You answered</p>
-              <p className="mt-1 font-display text-lg font-semibold">{total} of {total} questions</p>
-            </div>
-            <Button
-              className="mt-6 h-13 w-full text-base"
-              onClick={() => navigate({ to: "/result/$slug", params: { slug: assessment.slug }, search: { score } })}
-            >
-              View results <ChevronRight />
-            </Button>
-            <Button asChild variant="ghost" className="mt-2 w-full text-muted-foreground">
-              <Link to="/assessment">Back to assessments</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const firstUnanswered = a.questions.findIndex((qq) => answers[qq.id] === undefined);
+  const exit = () => navigate({ to: "/assessment/$slug", params: { slug: a.slug } });
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-screen bg-canvas" style={accentStyle("mind")}>
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-background shadow-app">
-        <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur-xl">
-          <div className="grid grid-cols-[44px_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
-            <Button asChild variant="ghost" size="icon" className="h-11 w-11 rounded-full">
-              <Link to="/assessment/$slug" params={{ slug: assessment.slug }} aria-label="Exit assessment"><X /></Link>
-            </Button>
-            <p className="truncate text-center font-display text-sm font-semibold">{assessment.title}</p>
-            <span className="rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold">{step + 1} of {total}</span>
+        <header className="sticky top-0 z-30 bg-background">
+          <div className="flex h-16 items-center gap-1 px-1">
+            <IconButton
+              label="Close"
+              onClick={() => (answeredCount > 0 ? setLeaving(true) : exit())}
+            >
+              <X className="h-6 w-6" />
+            </IconButton>
+            <p className="min-w-0 flex-1 truncate px-2 font-display text-[18px] font-semibold">
+              {a.name}
+            </p>
+            <p className="px-4 text-[14px] tabular-nums text-muted-foreground" aria-live="polite">
+              {index + 1} of {total}
+            </p>
           </div>
-          <div className="h-1 w-full bg-secondary">
-            <div className="h-full rounded-r-full bg-foreground transition-[width] duration-500 ease-out" style={{ width: `${progress}%` }} />
+          <div className="px-4 pb-2">
+            <LinearProgress value={(answeredCount / total) * 100} />
           </div>
         </header>
 
-        <main className="flex-1 px-5 pb-40 pt-8">
-          <div key={question.id} className="animate-fade-in">
-            {question.helper ? <p className="eyebrow">{question.helper}</p> : <p className="eyebrow">{assessment.category} screening</p>}
-            <h1 className="mt-2 font-display text-[26px] font-semibold leading-[1.2] tracking-tight">{question.text}</h1>
+        <main className="flex-1 px-4 pb-36 pt-6">
+          {resumed ? (
+            <p className="mb-5 rounded-[12px] bg-[var(--accent-container)] px-4 py-3 text-[14px] text-[var(--on-accent-container)]">
+              Picking up where you left off.
+            </p>
+          ) : null}
 
-            <div className="mt-8 space-y-3">
-              {question.options.map((option) => {
-                const active = selected === option.value;
-                return (
-                  <button
-                    key={option.label}
-                    type="button"
-                    onClick={() => choose(option.value)}
-                    aria-pressed={active}
-                    className={`tile flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-colors ${
-                      active
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border bg-card shadow-[var(--shadow-card)]"
-                    }`}
-                  >
-                    <span
-                      className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 ${
-                        active ? "border-background bg-background text-foreground" : "border-border"
-                      }`}
-                    >
-                      {active ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : null}
-                    </span>
-                    <span className="font-display text-sm font-semibold">{option.label}</span>
-                  </button>
-                );
-              })}
+          <div key={question.id} className="animate-fade">
+            {partLabel ? (
+              <p className="text-[14px] font-medium text-[var(--accent-strong)]">{partLabel}</p>
+            ) : null}
+            {scale.prompt ? (
+              <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{scale.prompt}</p>
+            ) : null}
+            <h1 className="mt-2 font-display text-[24px] font-semibold leading-8">
+              {question.text}
+            </h1>
+
+            <div
+              role="radiogroup"
+              aria-label={question.text}
+              className="mt-6 overflow-hidden rounded-[20px] border border-foreground/10"
+            >
+              {scale.options.map((o, i) => (
+                <div key={o.text} className={i > 0 ? "border-t border-foreground/10" : undefined}>
+                  <SelectRow selected={selected === o.value} onClick={() => choose(o.value)}>
+                    {optionLabel(o.text)}
+                  </SelectRow>
+                </div>
+              ))}
             </div>
           </div>
         </main>
 
         <footer className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
-          <div className="w-full max-w-md border-t border-border bg-background/92 px-5 pb-6 pt-4 backdrop-blur-xl">
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="icon" className="h-12 w-12 shrink-0 rounded-full" onClick={back} disabled={step === 0} aria-label="Previous question">
-                <ArrowLeft />
-              </Button>
+          <div className="flex w-full max-w-md items-center gap-3 border-t border-foreground/10 bg-background px-4 pb-6 pt-3">
+            <Button
+              variant="outlined"
+              className="w-12 px-0"
+              disabled={index === 0}
+              onClick={() => {
+                window.clearTimeout(advance.current);
+                setIndex((i) => Math.max(0, i - 1));
+              }}
+            >
+              <ArrowLeft className="h-5 w-5" aria-label="Previous question" />
+            </Button>
+            {isLast ? (
               <Button
-                className="h-12 flex-1 text-base"
+                className="flex-1"
                 disabled={selected === undefined}
-                onClick={() => (step + 1 < total ? setStep(step + 1) : setDone(true))}
+                onClick={() =>
+                  firstUnanswered === -1 ? finish(answers) : setIndex(firstUnanswered)
+                }
               >
-                {step + 1 === total ? "Finish" : "Continue"}
+                {firstUnanswered === -1
+                  ? "See my result"
+                  : `Answer question ${firstUnanswered + 1}`}
               </Button>
-            </div>
-            <p className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground">
-              <Sparkles className="h-3 w-3" /> Answer honestly. There are no wrong answers.
-            </p>
+            ) : (
+              <Button
+                className="flex-1"
+                disabled={selected === undefined}
+                onClick={() => {
+                  window.clearTimeout(advance.current);
+                  setIndex((i) => Math.min(i + 1, total - 1));
+                }}
+              >
+                Next
+              </Button>
+            )}
           </div>
         </footer>
+
+        <BottomSheet
+          open={leaving}
+          onClose={() => setLeaving(false)}
+          title="Leave this assessment?"
+        >
+          <p className="text-[15px] leading-6 text-muted-foreground">
+            Your {answeredCount} {answeredCount === 1 ? "answer is" : "answers are"} saved on this
+            device. You can pick up where you left off.
+          </p>
+          <div className="mt-6 flex flex-col gap-2">
+            <Button onClick={() => setLeaving(false)}>Keep going</Button>
+            <Button variant="text" onClick={exit}>
+              Leave for now
+            </Button>
+          </div>
+        </BottomSheet>
       </div>
     </div>
   );

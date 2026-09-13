@@ -4,15 +4,42 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type Accent = "night" | "ember" | "calm";
+export type Accent = "night" | "ember" | "calm" | "mind" | "mood";
 
 /** Tonal accent per programme, used only for progress and selection.
  * `--accent-strong` is the text-safe shade (4.5:1+ on white) for small labels. */
 export const accentStyle = (accent: Accent): CSSProperties =>
   ({
-    night: { "--accent": "#5E86B8", "--accent-strong": "#2F5580", "--accent-container": "#E3ECF8", "--on-accent-container": "#1C3553" },
-    ember: { "--accent": "#B98A22", "--accent-strong": "#7A5A12", "--accent-container": "#FBEFD2", "--on-accent-container": "#4F3A0A" },
-    calm: { "--accent": "#4E8F75", "--accent-strong": "#2B634D", "--accent-container": "#DFF0E8", "--on-accent-container": "#173D2F" },
+    night: {
+      "--accent": "#5E86B8",
+      "--accent-strong": "#2F5580",
+      "--accent-container": "#E3ECF8",
+      "--on-accent-container": "#1C3553",
+    },
+    ember: {
+      "--accent": "#B98A22",
+      "--accent-strong": "#7A5A12",
+      "--accent-container": "#FBEFD2",
+      "--on-accent-container": "#4F3A0A",
+    },
+    calm: {
+      "--accent": "#4E8F75",
+      "--accent-strong": "#2B634D",
+      "--accent-container": "#DFF0E8",
+      "--on-accent-container": "#173D2F",
+    },
+    mind: {
+      "--accent": "#5D64B4",
+      "--accent-strong": "#3B418C",
+      "--accent-container": "#E6E7F6",
+      "--on-accent-container": "#232761",
+    },
+    mood: {
+      "--accent": "#C2607C",
+      "--accent-strong": "#8C3652",
+      "--accent-container": "#F9E2E9",
+      "--on-accent-container": "#5A1F32",
+    },
   })[accent] as unknown as CSSProperties;
 
 /** State layer: the pressed/hovered tint M3 puts on interactive surfaces. */
@@ -35,7 +62,11 @@ export function IconButton({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className={cn("grid h-12 w-12 shrink-0 place-items-center rounded-full", stateLayer, className)}
+      className={cn(
+        "grid h-12 w-12 shrink-0 place-items-center rounded-full",
+        stateLayer,
+        className,
+      )}
     >
       {children}
     </button>
@@ -56,11 +87,17 @@ export function TopAppBar({
   className?: string;
 }) {
   return (
-    <header className={cn("sticky top-0 z-30 flex h-16 items-center gap-1 bg-background px-1", className)}>
+    <header
+      className={cn("sticky top-0 z-30 flex h-16 items-center gap-1 bg-background px-1", className)}
+    >
       {leading}
       <div className="min-w-0 flex-1 px-2">
-        {title ? <p className="truncate font-display text-[20px] font-semibold leading-7">{title}</p> : null}
-        {subtitle ? <p className="truncate text-[13px] leading-4 text-muted-foreground">{subtitle}</p> : null}
+        {title ? (
+          <p className="truncate font-display text-[20px] font-semibold leading-7">{title}</p>
+        ) : null}
+        {subtitle ? (
+          <p className="truncate text-[13px] leading-4 text-muted-foreground">{subtitle}</p>
+        ) : null}
       </div>
       {trailing}
     </header>
@@ -76,7 +113,10 @@ export function LinearProgress({ value }: { value: number }) {
       aria-valuenow={Math.round(value)}
       className="flex h-1 w-full gap-1"
     >
-      <div className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500" style={{ width: `${value}%` }} />
+      <div
+        className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500"
+        style={{ width: `${value}%` }}
+      />
       <div className="h-full flex-1 rounded-full bg-[var(--accent-container)]" />
     </div>
   );
@@ -157,14 +197,22 @@ export function SelectRow({
           selected && multi && "bg-[var(--accent-strong)] text-background",
         )}
       >
-        {selected ? multi ? <Check className="h-3.5 w-3.5" strokeWidth={3.5} /> : <span className="h-2.5 w-2.5 rounded-full bg-[var(--accent-strong)]" /> : null}
+        {selected ? (
+          multi ? (
+            <Check className="h-3.5 w-3.5" strokeWidth={3.5} />
+          ) : (
+            <span className="h-2.5 w-2.5 rounded-full bg-[var(--accent-strong)]" />
+          )
+        ) : null}
       </span>
       {glyph ? (
         <span className="text-[22px] leading-none" aria-hidden="true">
           {glyph}
         </span>
       ) : null}
-      <span className="flex-1 text-[16px] leading-6">{typeof children === "string" ? <Label text={children} /> : children}</span>
+      <span className="flex-1 text-[16px] leading-6">
+        {typeof children === "string" ? <Label text={children} /> : children}
+      </span>
     </button>
   );
 }
@@ -197,7 +245,11 @@ export function Segmented({
   label: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="flex h-12 w-full overflow-hidden rounded-full border border-foreground/25">
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className="flex h-12 w-full overflow-hidden rounded-full border border-foreground/25"
+    >
       {options.map((o, i) => {
         const on = value === o;
         return (
@@ -249,11 +301,17 @@ export function TextField({
     placeholder,
     "aria-label": label || ariaLabel,
     onChange: (e: { target: { value: string } }) => onChange(e.target.value),
-    className: cn("w-full bg-transparent px-4 text-[16px] leading-6 outline-none placeholder:text-muted-foreground/70", label ? "pb-2.5 pt-0.5" : "py-4", multiline && "min-h-24 resize-none"),
+    className: cn(
+      "w-full bg-transparent px-4 text-[16px] leading-6 outline-none placeholder:text-muted-foreground/70",
+      label ? "pb-2.5 pt-0.5" : "py-4",
+      multiline && "min-h-24 resize-none",
+    ),
   };
   return (
     <label className="block rounded-t-[4px] border-b border-foreground/50 bg-secondary transition-colors focus-within:border-b-2 focus-within:border-foreground">
-      {label ? <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">{label}</span> : null}
+      {label ? (
+        <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">{label}</span>
+      ) : null}
       {multiline ? <textarea {...common} rows={3} /> : <input {...common} type={type} />}
     </label>
   );
@@ -284,8 +342,18 @@ export function BottomSheet({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal="true" aria-label={title}>
-      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 bg-foreground/40 animate-fade" />
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute inset-0 bg-foreground/40 animate-fade"
+      />
       <div className="animate-sheet relative max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-[28px] bg-background px-6 pb-8 pt-3">
         <div className="mx-auto h-1 w-8 rounded-full bg-foreground/30" />
         <p className="mt-5 font-display text-[22px] font-semibold">{title}</p>
@@ -308,8 +376,14 @@ export function Snackbar({ message }: { message: SnackMessage }) {
   }, [message?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!shown) return null;
   return (
-    <div role="status" aria-live="polite" className="animate-fade pointer-events-none fixed inset-x-0 bottom-[96px] z-50 flex justify-center px-4">
-      <p className="w-full max-w-sm rounded-[8px] bg-foreground px-4 py-3.5 text-[14px] text-background shadow-lg">{shown.text}</p>
+    <div
+      role="status"
+      aria-live="polite"
+      className="animate-fade pointer-events-none fixed inset-x-0 bottom-[96px] z-50 flex justify-center px-4"
+    >
+      <p className="w-full max-w-sm rounded-[8px] bg-foreground px-4 py-3.5 text-[14px] text-background shadow-lg">
+        {shown.text}
+      </p>
     </div>
   );
 }
@@ -320,7 +394,15 @@ export const useSnack = () => {
 };
 
 /** Horizontal pager, one card per page, with page dots. */
-export function Pager({ pages, index, onIndex }: { pages: ReactNode[]; index: number; onIndex: (i: number) => void }) {
+export function Pager({
+  pages,
+  index,
+  onIndex,
+}: {
+  pages: ReactNode[];
+  index: number;
+  onIndex: (i: number) => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const programmatic = useRef(false);
 
@@ -363,7 +445,10 @@ export function Pager({ pages, index, onIndex }: { pages: ReactNode[]; index: nu
               aria-selected={i === index}
               aria-label={`Card ${i + 1} of ${pages.length}`}
               onClick={() => onIndex(i)}
-              className={cn("h-2 rounded-full transition-all", i === index ? "w-6 bg-foreground" : "w-2 bg-foreground/25")}
+              className={cn(
+                "h-2 rounded-full transition-all",
+                i === index ? "w-6 bg-foreground" : "w-2 bg-foreground/25",
+              )}
             />
           ))}
         </div>

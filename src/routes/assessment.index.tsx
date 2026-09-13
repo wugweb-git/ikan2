@@ -1,99 +1,107 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ChevronRight, Clock3, History, Lock, Sparkles } from "lucide-react";
+import { ChevronRight, History } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { Reveal } from "@/components/reveal";
-import { Button } from "@/components/ui/button";
-import { assessments, maxScore } from "@/lib/assessments";
+import { accentStyle, stateLayer } from "@/components/equip/m3";
+import { pageMeta } from "@/components/equip/program-header";
+import { BandChip, categoryIcon } from "@/components/assessment/ui";
+import { cn } from "@/lib/utils";
+import { assessments, type Assessment } from "@/lib/assessment/instruments";
+import { headlineOf, scoreAll } from "@/lib/assessment/scoring";
+import { useAssessmentStore } from "@/lib/assessment/store";
 
 export const Route = createFileRoute("/assessment/")({
-  head: () => ({
-    meta: [
-      { title: "Health Assessments — iKAN" },
-      { name: "description", content: "Seven quick, evidence-based screenings for stress, anxiety, mood, sleep, burnout, self-worth and focus." },
-      { property: "og:title", content: "Health Assessments — iKAN" },
-      { property: "og:description", content: "Seven quick, evidence-based screenings for stress, anxiety, mood, sleep, burnout, self-worth and focus." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () =>
+    pageMeta(
+      "Assessments",
+      "Seven short assessments for depression, anxiety, stress, sleep, work balance, burnout and general wellbeing.",
+    ),
   component: AssessmentListPage,
 });
 
-const promises = [
-  { icon: Sparkles, title: "Clinical screenings", body: "Built on instruments used in practice." },
-  { icon: Lock, title: "Private by default", body: "Results stay in your account only." },
-  { icon: Clock3, title: "Two to four minutes", body: "Short enough to finish in one sitting." },
-];
-
 function AssessmentListPage() {
+  const store = useAssessmentStore();
+  const taken = store.results.length;
+
   return (
     <IkanShell>
-      <header className="px-5 pb-4 pt-6">
-        <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-11 w-11 rounded-full">
-            <Link to="/" aria-label="Back to dashboard"><ArrowLeft /></Link>
-          </Button>
-          <div className="min-w-0 text-center">
-            <p className="eyebrow">iKAN screenings</p>
-            <h1 className="font-display text-xl font-semibold">Assessments</h1>
-          </div>
-          <Button asChild variant="outline" size="icon" className="h-11 w-11 rounded-full">
-            <Link to="/assessments" aria-label="Assessment history"><History /></Link>
-          </Button>
-        </div>
-      </header>
-
-      <Reveal>
-        <section className="px-5">
-          <div className="hero-card">
-            <span className="hero-chip">7 available</span>
-            <p className="mt-4 font-display text-2xl font-semibold leading-tight">Understand what you are carrying.</p>
-            <p className="mt-2 max-w-[16rem] text-sm leading-6 opacity-80">
-              Each screening gives you a score, a plain-language reading, and a next step that fits it.
+      <div style={accentStyle("mind")}>
+        <header className="flex items-start gap-2 px-4 pb-1 pt-8">
+          <div className="min-w-0 flex-1">
+            <h1 className="font-display text-[32px] font-semibold leading-10">Assessments</h1>
+            <p className="mt-1 text-[15px] text-muted-foreground">
+              Answer a few questions and see where you stand today.
             </p>
           </div>
-        </section>
-      </Reveal>
+          <Link
+            to="/assessments"
+            aria-label="Your results"
+            className={cn(
+              "relative grid h-12 w-12 shrink-0 place-items-center rounded-full",
+              stateLayer,
+            )}
+          >
+            <History className="h-6 w-6" />
+            {taken > 0 ? (
+              <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-strong)] px-1 text-[10px] font-bold text-background">
+                {taken}
+              </span>
+            ) : null}
+          </Link>
+        </header>
 
-      <Reveal>
-        <section className="mt-4 grid grid-cols-3 gap-2 px-5">
-          {promises.map(({ icon: Icon, title, body }) => (
-            <div key={title} className="surface p-3">
-              <Icon className="h-4 w-4" aria-hidden="true" />
-              <p className="mt-3 font-display text-[11px] font-semibold leading-tight">{title}</p>
-              <p className="mt-1 text-[10px] leading-4 text-muted-foreground">{body}</p>
-            </div>
+        <ul className="space-y-3 px-4 pt-5">
+          {assessments.map((a) => (
+            <li key={a.slug}>
+              <AssessmentCard assessment={a} />
+            </li>
           ))}
-        </section>
-      </Reveal>
+        </ul>
 
-      <section className="mt-7 px-5">
-        <p className="eyebrow">Available assessments</p>
-        <div className="mt-3 space-y-3">
-          {assessments.map((item) => (
-            <Reveal key={item.slug}>
-              <Link
-                to="/assessment/$slug"
-                params={{ slug: item.slug }}
-                className="surface tile grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-4"
-              >
-                <div className={`score-tile score-${item.tone}`}>{item.questions.length}</div>
-                <div className="min-w-0">
-                  <p className="truncate font-display text-sm font-semibold">{item.title}</p>
-                  <p className="mt-1 truncate text-xs text-muted-foreground">
-                    {item.category} · {item.minutes} min · {maxScore(item)} pts
-                  </p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      <p className="mx-auto mt-6 max-w-xs px-5 text-center text-[10px] leading-4 text-muted-foreground">
-        Screenings are not a diagnosis. iKAN supports, but never replaces, care from a qualified professional.
-      </p>
+        <p className="mx-auto mt-8 max-w-xs px-4 text-center text-[12px] leading-5 text-muted-foreground">
+          These are screenings, not a diagnosis. iKAN supports, but never replaces, care from a
+          qualified professional.
+        </p>
+      </div>
     </IkanShell>
+  );
+}
+
+function AssessmentCard({ assessment: a }: { assessment: Assessment }) {
+  const { resultsFor, draftFor } = useAssessmentStore();
+  const latest = resultsFor(a.slug)[0];
+  const draft = draftFor(a.slug);
+  const head = latest ? headlineOf(a, scoreAll(a, latest.answers)) : null;
+  const Icon = categoryIcon[a.category];
+
+  return (
+    <Link
+      to="/assessment/$slug"
+      params={{ slug: a.slug }}
+      className={cn("flex items-center gap-4 rounded-[24px] bg-secondary p-4", stateLayer)}
+    >
+      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[16px] bg-[var(--accent-container)] text-[var(--on-accent-container)]">
+        <Icon className="h-6 w-6" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13px] font-medium text-[var(--accent-strong)]">{a.name}</span>
+        <span className="block font-display text-[17px] font-semibold leading-6">{a.title}</span>
+        <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
+          <span>{a.questions.length} questions</span>
+          <span>{a.minutes} min</span>
+          {draft ? (
+            <span className="font-medium text-foreground">
+              {Object.keys(draft.answers).length} of {a.questions.length} answered
+            </span>
+          ) : null}
+        </span>
+        {head?.band ? (
+          <BandChip className="mt-2" label={head.band.label} tone={head.band.tone} />
+        ) : null}
+        {latest && !head ? (
+          <span className="mt-2 block text-[13px] font-medium">Result saved</span>
+        ) : null}
+      </span>
+      <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+    </Link>
   );
 }

@@ -1,125 +1,180 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Check, Clock3, FileText, Lock, ListChecks, ShieldCheck } from "lucide-react";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, ChevronRight, Clock3, ListChecks, Lock } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { Reveal } from "@/components/reveal";
-import { Button } from "@/components/ui/button";
-import { getAssessment, maxScore } from "@/lib/assessments";
+import { accentStyle, Button, IconButton, stateLayer, TopAppBar } from "@/components/equip/m3";
+import { pageMeta } from "@/components/equip/program-header";
+import { BandChip, categoryIcon } from "@/components/assessment/ui";
+import { cn } from "@/lib/utils";
+import { getAssessment, profiles } from "@/lib/assessment/instruments";
+import { formatValue, headlineOf, optionLabel, scoreAll } from "@/lib/assessment/scoring";
+import { useAssessmentStore } from "@/lib/assessment/store";
 
 export const Route = createFileRoute("/assessment/$slug")({
   loader: ({ params }) => {
-    const assessment = getAssessment(params.slug);
-    if (!assessment) throw notFound();
-    return { assessment };
+    const a = getAssessment(params.slug);
+    if (!a) throw notFound();
+    return { slug: a.slug };
   },
   head: ({ loaderData }) => {
-    if (!loaderData) {
-      return { meta: [{ title: "Assessment not found — iKAN" }, { name: "robots", content: "noindex" }] };
-    }
-    const { title, blurb } = loaderData.assessment;
-    return {
-      meta: [
-        { title: `${title} — iKAN Assessment` },
-        { name: "description", content: blurb },
-        { property: "og:title", content: `${title} — iKAN Assessment` },
-        { property: "og:description", content: blurb },
-        { property: "og:type", content: "article" },
-        { name: "twitter:card", content: "summary_large_image" },
-      ],
-    };
+    const a = loaderData ? getAssessment(loaderData.slug) : undefined;
+    return a
+      ? pageMeta(
+          a.title,
+          `${a.questions.length} questions, about ${a.minutes} minutes. ${a.instrument}.`,
+        )
+      : { meta: [{ title: "Assessment — iKAN" }] };
   },
-  notFoundComponent: AssessmentMissing,
-  component: AssessmentDetailPage,
-});
-
-function AssessmentMissing() {
-  return (
+  notFoundComponent: () => (
     <IkanShell>
       <div className="grid min-h-[70vh] place-items-center px-8 text-center">
         <div>
-          <h1 className="font-display text-xl font-semibold">We could not find that screening</h1>
-          <Button asChild className="mt-5"><Link to="/assessment">Browse assessments</Link></Button>
+          <h1 className="font-display text-xl font-semibold">We couldn’t find that assessment</h1>
+          <Link
+            to="/assessment"
+            className="mt-5 inline-flex h-12 items-center rounded-full bg-foreground px-6 font-semibold text-background"
+          >
+            See all assessments
+          </Link>
         </div>
       </div>
     </IkanShell>
-  );
-}
+  ),
+  component: AssessmentDetailPage,
+});
 
 function AssessmentDetailPage() {
-  const { assessment } = Route.useLoaderData();
+  const { slug } = Route.useLoaderData();
+  const a = getAssessment(slug)!;
+  const navigate = useNavigate();
+  const store = useAssessmentStore();
+  const draft = store.draftFor(slug);
+  const past = store.resultsFor(slug);
+  const Icon = categoryIcon[a.category];
+  const scaleKeys = [...new Set(a.questions.map((q) => q.scale))];
+  const answered = draft ? Object.keys(draft.answers).length : 0;
 
   return (
     <IkanShell>
-      <header className="px-5 pb-4 pt-6">
-        <Button asChild variant="ghost" size="icon" className="h-11 w-11 rounded-full">
-          <Link to="/assessment" aria-label="Back to assessments"><ArrowLeft /></Link>
-        </Button>
-      </header>
+      <div style={accentStyle("mind")}>
+        <TopAppBar
+          leading={
+            <IconButton label="Back" onClick={() => navigate({ to: "/assessment" })}>
+              <ArrowLeft className="h-6 w-6" />
+            </IconButton>
+          }
+        />
 
-      <section className="px-5">
-        <span className={`semantic-chip bg-${assessment.tone}-soft text-${assessment.tone}-strong`}>{assessment.category}</span>
-        <h1 className="mt-3 font-display text-[28px] font-semibold leading-[1.15] tracking-tight">{assessment.title}</h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">{assessment.about}</p>
-      </section>
+        <section className="px-4 pt-2">
+          <span className="grid h-14 w-14 place-items-center rounded-[18px] bg-[var(--accent-container)] text-[var(--on-accent-container)]">
+            <Icon className="h-7 w-7" />
+          </span>
+          <p className="mt-5 text-[14px] font-medium text-[var(--accent-strong)]">{a.name}</p>
+          <h1 className="mt-1 font-display text-[28px] font-semibold leading-9">{a.title}</h1>
+          <p className="mt-2 text-[15px] leading-6 text-muted-foreground">{a.instrument}</p>
 
-      <Reveal>
-        <section className="mt-5 px-5">
-          <div className="surface grid grid-cols-3 divide-x divide-border py-3 text-center">
-            <div><ListChecks className="mx-auto h-4 w-4 text-muted-foreground" /><strong className="mt-2 block font-display text-sm">{assessment.questions.length}</strong><p className="text-[10px] text-muted-foreground">Questions</p></div>
-            <div><Clock3 className="mx-auto h-4 w-4 text-muted-foreground" /><strong className="mt-2 block font-display text-sm">{assessment.minutes} min</strong><p className="text-[10px] text-muted-foreground">To finish</p></div>
-            <div><FileText className="mx-auto h-4 w-4 text-muted-foreground" /><strong className="mt-2 block font-display text-sm">{maxScore(assessment)}</strong><p className="text-[10px] text-muted-foreground">Max score</p></div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
+              <ListChecks className="h-4 w-4" /> {a.questions.length} questions
+            </span>
+            <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
+              <Clock3 className="h-4 w-4" /> {a.minutes} min
+            </span>
           </div>
         </section>
-      </Reveal>
 
-      <Reveal>
-        <section className="mt-5 px-5">
-          <div className="surface p-5">
-            <p className="eyebrow">What it looks at</p>
-            <ul className="mt-3 space-y-2">
-              {assessment.focus.map((item) => (
-                <li key={item} className="flex items-center gap-3 text-sm">
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-secondary"><Check className="h-3.5 w-3.5" /></span>
-                  {item}
+        <section className="mt-8 px-4">
+          <h2 className="font-display text-[16px] font-semibold">What you’ll get</h2>
+          <ul className="mt-3 overflow-hidden rounded-[20px] bg-secondary">
+            {a.scores.map((s, i) => {
+              const p = profiles[s.profile]!;
+              return (
+                <li
+                  key={s.id}
+                  className={cn(
+                    "flex min-h-14 items-center gap-3 px-4 py-3",
+                    i > 0 && "border-t border-background",
+                  )}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[16px] leading-6">{s.label}</span>
+                    <span className="block text-[13px] text-muted-foreground">
+                      {s.instrument}, {formatValue(p, p.min)} to {p.max}
+                      {p.direction === "better" ? ", higher is better" : ""}
+                    </span>
+                  </span>
+                  <span className="text-[13px] text-muted-foreground">{p.bands.length} levels</span>
                 </li>
-              ))}
+              );
+            })}
+          </ul>
+        </section>
+
+        <section className="mt-8 px-4">
+          <h2 className="font-display text-[16px] font-semibold">How you’ll answer</h2>
+          <div className="mt-3 space-y-3">
+            {scaleKeys.map((k) => (
+              <div key={k} className="flex flex-wrap gap-2">
+                {a.scales[k]!.options.map((o) => (
+                  <span key={o.text} className="rounded-[8px] bg-secondary px-3 py-1.5 text-[13px]">
+                    {optionLabel(o.text)}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {past.length > 0 ? (
+          <section className="mt-8 px-4">
+            <h2 className="font-display text-[16px] font-semibold">Your results</h2>
+            <ul className="mt-3 overflow-hidden rounded-[20px] bg-secondary">
+              {past.slice(0, 3).map((r, i) => {
+                const head = headlineOf(a, scoreAll(a, r.answers));
+                return (
+                  <li key={r.id} className={cn(i > 0 && "border-t border-background")}>
+                    <Link
+                      to="/result/$slug"
+                      params={{ slug }}
+                      search={{ r: r.id }}
+                      className={cn("flex min-h-14 items-center gap-3 px-4 py-3", stateLayer)}
+                    >
+                      <span className="flex-1 text-[15px]">
+                        {new Date(r.completedAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                      {head?.band ? (
+                        <BandChip label={head.band.label} tone={head.band.tone} />
+                      ) : null}
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
-            <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">{assessment.instrument}</p>
-          </div>
-        </section>
-      </Reveal>
+          </section>
+        ) : null}
 
-      <Reveal>
-        <section className="mt-5 px-5">
-          <div className="surface p-4">
-            <p className="eyebrow">How you will answer</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {assessment.scale.map((option) => (
-                <span key={option.label} className="rounded-full bg-secondary px-3 py-1.5 text-[11px] font-semibold">{option.label}</span>
-              ))}
-            </div>
-          </div>
-        </section>
-      </Reveal>
-
-      <Reveal>
-        <section className="mt-5 px-5">
-          <div className="flex gap-3 rounded-[20px] border border-border bg-secondary/45 p-4">
-            <Lock className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
-            <p className="text-xs leading-5 text-muted-foreground">
-              Your answers stay private to your account. You can stop halfway and pick up where you left off.
-            </p>
-          </div>
-        </section>
-      </Reveal>
-
-      <section className="mt-6 px-5">
-        <Button asChild className="h-13 w-full text-base">
-          <Link to="/assessment-flow" search={{ id: assessment.slug }}>Start assessment</Link>
-        </Button>
-        <p className="mt-4 flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
-          <ShieldCheck className="h-3.5 w-3.5" /> Screening only. This is not a diagnosis.
+        <p className="mx-4 mt-8 flex gap-3 rounded-[16px] border border-foreground/10 p-4 text-[13px] leading-5 text-muted-foreground">
+          <Lock className="mt-0.5 h-4 w-4 shrink-0" />
+          Your answers stay on this device. If you stop partway, you can pick up where you left off.
         </p>
-      </section>
+
+        <div className="sticky bottom-[88px] z-20 mt-6 bg-gradient-to-t from-background via-background to-transparent px-4 pb-3 pt-6">
+          <Button
+            className="w-full"
+            onClick={() => navigate({ to: "/assessment-flow", search: { id: slug } })}
+          >
+            {draft
+              ? `Continue, ${answered} of ${a.questions.length} answered`
+              : past.length
+                ? "Take it again"
+                : "Start assessment"}
+          </Button>
+        </div>
+      </div>
     </IkanShell>
   );
 }

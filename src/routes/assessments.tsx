@@ -1,81 +1,169 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowUpRight, CalendarDays, ChevronRight, Filter } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { Button } from "@/components/ui/button";
+import { accentStyle, Button, IconButton, stateLayer, TopAppBar } from "@/components/equip/m3";
+import { pageMeta } from "@/components/equip/program-header";
+import { BandChip, categoryIcon, toneColors } from "@/components/assessment/ui";
+import { cn } from "@/lib/utils";
+import { assessments, type Assessment } from "@/lib/assessment/instruments";
+import { headlineOf, percentOfRange, scoreAll } from "@/lib/assessment/scoring";
+import { useAssessmentStore, type StoredResult } from "@/lib/assessment/store";
 
 export const Route = createFileRoute("/assessments")({
-  head: () => ({
-    meta: [
-      { title: "Assessment History — iKAN" },
-      { name: "description", content: "Review your wellness assessments, trends, and progress over time." },
-      { property: "og:title", content: "Assessment History — iKAN" },
-      { property: "og:description", content: "Review your wellness assessments, trends, and progress over time." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: AssessmentsPage,
+  head: () =>
+    pageMeta(
+      "Your results",
+      "Every assessment you’ve taken, with how your results change over time.",
+    ),
+  component: HistoryPage,
 });
 
-const history = [
-  { title: "Feeling overwhelmed and anxious", kind: "Anxiety", score: "13/21", state: "Moderately severe", date: "Sep 8", tone: "mind" },
-  { title: "Struggling with quality sleep", kind: "Sleep", score: "23/40", state: "Improving", date: "Sep 8", tone: "calm" },
-  { title: "Feeling worried and stressed", kind: "Stress", score: "16/40", state: "Mild", date: "Sep 8", tone: "rest" },
-  { title: "Feeling depressed and hopeless", kind: "Mood", score: "30/36", state: "Needs attention", date: "Sep 3", tone: "alert" },
-];
+function HistoryPage() {
+  const navigate = useNavigate();
+  const store = useAssessmentStore();
+  const taken = assessments.filter((a) => store.resultsFor(a.slug).length > 0);
 
-function AssessmentsPage() {
   return (
     <IkanShell>
-      <header className="px-5 pb-5 pt-6">
-        <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-11 w-11 rounded-full">
-            <Link to="/" aria-label="Back to dashboard"><ArrowLeft /></Link>
-          </Button>
-          <div className="min-w-0 text-center">
-            <p className="eyebrow">Your progress</p>
-            <h1 className="font-display text-xl font-semibold">Assessment history</h1>
-          </div>
-          <Button variant="outline" size="icon" className="h-11 w-11 rounded-full" aria-label="Filter assessments"><Filter /></Button>
-        </div>
-      </header>
+      <div style={accentStyle("mind")}>
+        <TopAppBar
+          leading={
+            <IconButton label="Back" onClick={() => navigate({ to: "/assessment" })}>
+              <ArrowLeft className="h-6 w-6" />
+            </IconButton>
+          }
+        />
+        <header className="px-4 pb-2">
+          <h1 className="font-display text-[32px] font-semibold leading-10">Your results</h1>
+        </header>
 
-      <section className="px-5">
-        <div className="surface p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div><p className="eyebrow">Last 30 days</p><p className="mt-1 font-display text-3xl font-semibold">5 check-ins</p></div>
-            <div className="rounded-full bg-calm-soft px-3 py-1.5 text-xs font-semibold text-calm-strong">↗ 8% steadier</div>
+        {taken.length === 0 ? (
+          <div className="px-4 pt-10 text-center">
+            <p className="font-display text-[20px] font-semibold">No results yet</p>
+            <p className="mt-2 text-[15px] text-muted-foreground">
+              Results appear here after you finish an assessment.
+            </p>
+            <Button className="mt-6" onClick={() => navigate({ to: "/assessment" })}>
+              Choose an assessment
+            </Button>
           </div>
-          <div className="mt-5 flex h-24 items-end gap-2" aria-label="Recent wellness trend">
-            {[42, 55, 48, 66, 74, 68, 79].map((height, index) => (
-              <div key={height + index} className="flex flex-1 flex-col items-center gap-2">
-                <div className={index === 6 ? "chart-column bg-calm" : "chart-column bg-secondary"} style={{ height }} />
-                <span className="text-[10px] text-muted-foreground">{index === 6 ? "Now" : `W${index + 1}`}</span>
-              </div>
+        ) : (
+          <ul className="space-y-4 px-4 pt-3">
+            {taken.map((a) => (
+              <li key={a.slug}>
+                <AssessmentHistory a={a} results={store.resultsFor(a.slug)} />
+              </li>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-7 px-5">
-        <div className="mb-3 flex items-center justify-between">
-          <div><p className="eyebrow">All attempts</p><h2 className="font-display text-lg font-semibold">Your timeline</h2></div>
-          <Button variant="ghost" size="sm" className="rounded-full text-muted-foreground"><CalendarDays /> 2026</Button>
-        </div>
-        <div className="space-y-3">
-          {history.map((item, index) => (
-            <Link key={item.title} to={index === 0 ? "/assessment-result" : "/assessments"} className="surface grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-4 transition-transform active:scale-[.99]">
-              <div className={`score-tile score-${item.tone}`}>{item.score.split("/")[0]}</div>
-              <div className="min-w-0"><p className="truncate font-display text-sm font-semibold">{item.title}</p><p className="mt-1 text-xs text-muted-foreground">{item.kind} · {item.state}</p></div>
-              <div className="text-right"><p className="text-xs font-medium">{item.date}</p><ChevronRight className="ml-auto mt-2 h-4 w-4 text-muted-foreground" /></div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-5 mt-6 rounded-[20px] border border-border bg-secondary/45 p-4">
-        <div className="flex gap-3"><ArrowUpRight className="mt-0.5 h-5 w-5 shrink-0 text-calm-strong" /><div><p className="font-display text-sm font-semibold">A useful pattern</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Your sleep scores improve when you complete at least three grounding sessions in a week.</p></div></div>
-      </section>
+          </ul>
+        )}
+      </div>
     </IkanShell>
+  );
+}
+
+function AssessmentHistory({ a, results }: { a: Assessment; results: StoredResult[] }) {
+  const Icon = categoryIcon[a.category];
+  const scored = results.map((r) => ({ r, head: headlineOf(a, scoreAll(a, r.answers)) }));
+
+  return (
+    <section className="overflow-hidden rounded-[24px] bg-secondary">
+      <div className="flex items-center gap-3 px-4 pt-4">
+        <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-[var(--accent-container)] text-[var(--on-accent-container)]">
+          <Icon className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-display text-[17px] font-semibold">{a.title}</p>
+          <p className="text-[13px] text-muted-foreground">
+            {results.length} {results.length === 1 ? "result" : "results"}
+          </p>
+        </div>
+      </div>
+
+      {a.headline ? (
+        scored.length >= 2 ? (
+          <Trend points={[...scored].reverse()} />
+        ) : (
+          <p className="mx-4 mt-3 rounded-[12px] bg-background px-4 py-3 text-[14px] leading-5 text-muted-foreground">
+            Take this assessment again to see how your results change over time.
+          </p>
+        )
+      ) : null}
+
+      <ul className="mt-3">
+        {scored.map(({ r, head }) => (
+          <li key={r.id} className="border-t border-background">
+            <Link
+              to="/result/$slug"
+              params={{ slug: a.slug }}
+              search={{ r: r.id }}
+              className={cn("flex min-h-14 items-center gap-3 px-4 py-3", stateLayer)}
+            >
+              <span className="flex-1 text-[15px]">
+                {new Date(r.completedAt).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+              {head?.band ? (
+                <BandChip label={head.band.label} tone={head.band.tone} />
+              ) : (
+                <span className="text-[13px] text-muted-foreground">5 scores</span>
+              )}
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/** Headline score over time, oldest to newest, drawn as position within the instrument's range. */
+function Trend({ points }: { points: { r: StoredResult; head: ReturnType<typeof headlineOf> }[] }) {
+  const w = 300;
+  const h = 72;
+  const pad = 8;
+  const xy = points.map(({ head }, i) => {
+    const p = head?.value != null ? percentOfRange(head.profile, head.value) : 0;
+    return {
+      x: pad + (i * (w - pad * 2)) / Math.max(1, points.length - 1),
+      y: pad + (1 - p) * (h - pad * 2),
+      tone: head?.band?.tone,
+    };
+  });
+  const better = points[0]?.head?.profile.direction === "better";
+  return (
+    <div className="mx-4 mt-3 rounded-[12px] bg-background px-3 py-2">
+      <svg
+        viewBox={`0 0 ${w} ${h}`}
+        className="h-[72px] w-full"
+        role="img"
+        aria-label="Score over time"
+      >
+        <polyline
+          points={xy.map((p) => `${p.x},${p.y}`).join(" ")}
+          fill="none"
+          stroke="currentColor"
+          strokeOpacity="0.35"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+        {xy.map((p, i) => (
+          <circle
+            key={i}
+            cx={p.x}
+            cy={p.y}
+            r="5"
+            fill={p.tone ? toneColors[p.tone].bar : "currentColor"}
+            stroke="white"
+            strokeWidth="2"
+          />
+        ))}
+      </svg>
+      <p className="text-[12px] text-muted-foreground">
+        {better ? "Higher is better" : "Lower is better"}
+      </p>
+    </div>
   );
 }

@@ -11,8 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AssessmentFlowRouteImport } from './routes/assessment-flow'
-import { Route as AssessmentResultRouteImport } from './routes/assessment-result'
 import { Route as AssessmentsRouteImport } from './routes/assessments'
+import { Route as JournalRouteImport } from './routes/journal'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as AssessmentIndexRouteImport } from './routes/assessment.index'
 import { Route as AssessmentSlugRouteImport } from './routes/assessment.$slug'
@@ -33,14 +33,14 @@ const AssessmentFlowRoute = AssessmentFlowRouteImport.update({
   path: '/assessment-flow',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AssessmentResultRoute = AssessmentResultRouteImport.update({
-  id: '/assessment-result',
-  path: '/assessment-result',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AssessmentsRoute = AssessmentsRouteImport.update({
   id: '/assessments',
   path: '/assessments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalRoute = JournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SupportRoute = SupportRouteImport.update({
@@ -92,8 +92,8 @@ const ProgramSlugToolStepRoute = ProgramSlugToolStepRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
-  '/assessment-result': typeof AssessmentResultRoute
   '/assessments': typeof AssessmentsRoute
+  '/journal': typeof JournalRoute
   '/support': typeof SupportRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/result/$slug': typeof ResultSlugRoute
@@ -107,8 +107,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
-  '/assessment-result': typeof AssessmentResultRoute
   '/assessments': typeof AssessmentsRoute
+  '/journal': typeof JournalRoute
   '/support': typeof SupportRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/result/$slug': typeof ResultSlugRoute
@@ -123,8 +123,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
-  '/assessment-result': typeof AssessmentResultRoute
   '/assessments': typeof AssessmentsRoute
+  '/journal': typeof JournalRoute
   '/support': typeof SupportRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/result/$slug': typeof ResultSlugRoute
@@ -140,8 +140,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/assessment-flow'
-    | '/assessment-result'
     | '/assessments'
+    | '/journal'
     | '/support'
     | '/assessment/$slug'
     | '/result/$slug'
@@ -155,8 +155,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/assessment-flow'
-    | '/assessment-result'
     | '/assessments'
+    | '/journal'
     | '/support'
     | '/assessment/$slug'
     | '/result/$slug'
@@ -170,8 +170,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/assessment-flow'
-    | '/assessment-result'
     | '/assessments'
+    | '/journal'
     | '/support'
     | '/assessment/$slug'
     | '/result/$slug'
@@ -186,8 +186,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AssessmentFlowRoute: typeof AssessmentFlowRoute
-  AssessmentResultRoute: typeof AssessmentResultRoute
   AssessmentsRoute: typeof AssessmentsRoute
+  JournalRoute: typeof JournalRoute
   SupportRoute: typeof SupportRoute
   AssessmentSlugRoute: typeof AssessmentSlugRoute
   ResultSlugRoute: typeof ResultSlugRoute
@@ -215,18 +215,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentFlowRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/assessment-result': {
-      id: '/assessment-result'
-      path: '/assessment-result'
-      fullPath: '/assessment-result'
-      preLoaderRoute: typeof AssessmentResultRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/assessments': {
       id: '/assessments'
       path: '/assessments'
       fullPath: '/assessments'
       preLoaderRoute: typeof AssessmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/support': {
@@ -298,8 +298,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AssessmentFlowRoute: AssessmentFlowRoute,
-  AssessmentResultRoute: AssessmentResultRoute,
   AssessmentsRoute: AssessmentsRoute,
+  JournalRoute: JournalRoute,
   SupportRoute: SupportRoute,
   AssessmentSlugRoute: AssessmentSlugRoute,
   ResultSlugRoute: ResultSlugRoute,

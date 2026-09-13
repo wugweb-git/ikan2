@@ -1,175 +1,378 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import type { CSSProperties } from "react";
-import { ArrowRight, Download, Phone, Play, RotateCcw, ShieldCheck, Sparkles } from "lucide-react";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useSyncExternalStore } from "react";
+import { History, LifeBuoy, TrendingDown, TrendingUp, X } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { Reveal } from "@/components/reveal";
-import { Button } from "@/components/ui/button";
-import { bandFor, getAssessment, maxScore, type Tone } from "@/lib/assessments";
+import { accentStyle, Button, IconButton, stateLayer, TopAppBar } from "@/components/equip/m3";
+import { BandChip, RangeBar, toneStyle, valueText } from "@/components/assessment/ui";
+import { cn } from "@/lib/utils";
+import { getAssessment, type Assessment } from "@/lib/assessment/instruments";
+import {
+  headlineOf,
+  recommendationsFor,
+  riskEndorsed,
+  scoreAll,
+  type ScoreResult,
+} from "@/lib/assessment/scoring";
+import { useAssessmentStore, type StoredResult } from "@/lib/assessment/store";
+import { getProgramme } from "@/lib/equip/programs";
 
-// Full class names so Tailwind generates them (template-built names are purged).
-const toneClass: Record<Tone, { chip: string; bar: string }> = {
-  calm: { chip: "bg-calm-soft text-calm-strong", bar: "bg-calm" },
-  mind: { chip: "bg-mind-soft text-mind-strong", bar: "bg-mind" },
-  rest: { chip: "bg-rest-soft text-rest-strong", bar: "bg-rest" },
-  alert: { chip: "bg-alert-soft text-alert-strong", bar: "bg-alert" },
-};
-
-type Search = { score?: number };
+type Search = { r?: string };
 
 export const Route = createFileRoute("/result/$slug")({
   validateSearch: (search: Record<string, unknown>): Search =>
-    typeof search["score"] === "number" ? { score: search["score"] } : {},
+    typeof search["r"] === "string" ? { r: search["r"] } : {},
   loader: ({ params }) => {
-    const assessment = getAssessment(params.slug);
-    if (!assessment) throw notFound();
-    return { assessment };
+    if (!getAssessment(params.slug)) throw notFound();
+    return { slug: params.slug };
   },
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return { meta: [{ title: "Result unavailable — iKAN" }, { name: "robots", content: "noindex" }] };
-    }
-    const title = `${loaderData.assessment.title} — Your result`;
-    return {
-      meta: [
-        { title: `${title} — iKAN` },
-        { name: "description", content: `Your ${loaderData.assessment.category.toLowerCase()} screening score, what it means, and what to do next.` },
-        { property: "og:title", content: `${title} — iKAN` },
-        { property: "og:description", content: `Your ${loaderData.assessment.category.toLowerCase()} screening score, what it means, and what to do next.` },
-        { property: "og:type", content: "website" },
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "robots", content: "noindex" },
-      ],
-    };
-  },
-  notFoundComponent: () => (
-    <IkanShell>
-      <div className="grid min-h-[70vh] place-items-center px-8 text-center">
-        <div>
-          <h1 className="font-display text-xl font-semibold">That result is unavailable</h1>
-          <Button asChild className="mt-5"><Link to="/assessment">Browse assessments</Link></Button>
-        </div>
-      </div>
-    </IkanShell>
-  ),
+  head: () => ({ meta: [{ title: "Your result — iKAN" }, { name: "robots", content: "noindex" }] }),
   component: ResultPage,
 });
 
+const useHydrated = () =>
+  useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+
+const dateTime = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}, ${d.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}`;
+};
+
+const duration = (secs: number) => {
+  if (!Number.isFinite(secs) || secs <= 0) return null;
+  if (secs < 60) return `${Math.round(secs)} sec`;
+  const m = Math.floor(secs / 60);
+  const s = Math.round(secs % 60);
+  return s === 0 ? `${m} min` : `${m} min ${s} sec`;
+};
+
 function ResultPage() {
-  const { assessment } = Route.useLoaderData();
-  const { score: rawScore } = Route.useSearch();
-  const max = maxScore(assessment);
-  const score = Math.min(Math.max(rawScore ?? Math.round(max * 0.55), 0), max);
-  const percent = Math.round((score / max) * 100);
-  const band = bandFor(assessment, score);
+  const { slug } = Route.useLoaderData();
+  const { r } = Route.useSearch();
+  const a = getAssessment(slug)!;
+  const navigate = useNavigate();
+  const hydrated = useHydrated();
+  const store = useAssessmentStore();
+  const history = store.resultsFor(slug);
+  const result = r ? history.find((x) => x.id === r) : history[0];
+
+  const bar = (
+    <TopAppBar
+      leading={
+        <IconButton label="Close" onClick={() => navigate({ to: "/assessment" })}>
+          <X className="h-6 w-6" />
+        </IconButton>
+      }
+      title={a.name}
+      trailing={
+        <Link
+          to="/assessments"
+          aria-label="All results"
+          className={cn("grid h-12 w-12 place-items-center rounded-full", stateLayer)}
+        >
+          <History className="h-6 w-6" />
+        </Link>
+      }
+    />
+  );
+
+  if (!hydrated) return <IkanShell>{bar}</IkanShell>;
+
+  if (!result) {
+    return (
+      <IkanShell>
+        <div style={accentStyle("mind")}>
+          {bar}
+          <div className="px-6 pt-16 text-center">
+            <h1 className="font-display text-[22px] font-semibold">No result yet</h1>
+            <p className="mt-2 text-[15px] text-muted-foreground">
+              Take {a.title.toLowerCase()} to see your result here.
+            </p>
+            <Button
+              className="mt-6"
+              onClick={() => navigate({ to: "/assessment-flow", search: { id: slug } })}
+            >
+              Start assessment
+            </Button>
+          </div>
+        </div>
+      </IkanShell>
+    );
+  }
 
   return (
     <IkanShell>
-      <header className="px-5 pb-4 pt-6">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-          <div className="min-w-0">
-            <p className="eyebrow">{assessment.category} result</p>
-            <h1 className="truncate font-display text-lg font-semibold">{assessment.title}</h1>
-          </div>
-          <Button variant="outline" className="h-11 rounded-full px-4"><Download /> Export</Button>
-        </div>
+      <div style={accentStyle("mind")}>
+        {bar}
+        <ResultBody
+          a={a}
+          result={result}
+          previous={history.find((x) => x.completedAt < result.completedAt)}
+        />
+      </div>
+    </IkanShell>
+  );
+}
+
+function ResultBody({
+  a,
+  result,
+  previous,
+}: {
+  a: Assessment;
+  result: StoredResult;
+  previous: StoredResult | undefined;
+}) {
+  const navigate = useNavigate();
+  const scores = scoreAll(a, result.answers);
+  const head = headlineOf(a, scores);
+  const rest = scores.filter((s) => s !== head);
+  const complete = scores.every((s) => s.value !== null);
+  const risk = riskEndorsed(a, result.answers);
+  const severe = scores.some((s) => s.band?.tone === "error");
+  const programmes = recommendationsFor(a, scores)
+    .map(getProgramme)
+    .filter((p) => p !== undefined);
+  const prevHead = previous ? headlineOf(a, scoreAll(a, previous.answers)) : null;
+  const time = duration(result.seconds);
+
+  if (!complete) {
+    return (
+      <div className="px-6 pt-12 text-center">
+        <h1 className="font-display text-[22px] font-semibold">This result couldn’t be scored</h1>
+        <p className="mt-2 text-[15px] text-muted-foreground">
+          Some answers are missing. Take the assessment again to get a result.
+        </p>
+        <Button
+          className="mt-6"
+          onClick={() => navigate({ to: "/assessment-flow", search: { id: a.slug } })}
+        >
+          Retake assessment
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-fade pb-6">
+      <header className="px-4 pt-2">
+        <p className="text-[13px] text-muted-foreground">{dateTime(result.completedAt)}</p>
+        <h1 className="mt-1 font-display text-[26px] font-semibold leading-8">{a.title}</h1>
+        <p className="mt-1 flex flex-wrap gap-x-3 text-[14px] text-muted-foreground">
+          <span>{a.questions.length} questions</span>
+          {a.scores.length > 1 ? <span>{a.scores.length} scores</span> : null}
+          {time ? <span>{time}</span> : null}
+        </p>
       </header>
 
-      <section className="px-5">
-        <div className="surface overflow-hidden p-5">
-          <div className="flex items-center justify-between">
-            <span className={`semantic-chip ${toneClass[band.tone].chip}`}>{band.label}</span>
-            <span className="text-xs text-muted-foreground">{assessment.instrument.split(" · ")[0]}</span>
-          </div>
-          <div className="mt-6 grid grid-cols-[112px_minmax(0,1fr)] items-center gap-5">
-            <div className="score-ring" style={{ "--score": `${percent}%` } as CSSProperties}>
-              <div><strong>{percent}%</strong><span>{score} / {max}</span></div>
-            </div>
-            <div>
-              <p className="font-display text-xl font-semibold leading-tight">{band.headline}</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{band.body}</p>
-            </div>
-          </div>
-          <div className="mt-6 grid grid-cols-3 divide-x divide-border rounded-2xl bg-secondary/55 py-3 text-center">
-            <div><strong className="font-display text-lg">{score}</strong><p className="text-[10px] text-muted-foreground">Your score</p></div>
-            <div><strong className="font-display text-lg">{max}</strong><p className="text-[10px] text-muted-foreground">Maximum</p></div>
-            <div><strong className="font-display text-lg">{assessment.questions.length}</strong><p className="text-[10px] text-muted-foreground">Answers</p></div>
-          </div>
-        </div>
-      </section>
+      {head?.band ? <HeadlineCard r={head} /> : null}
 
-      <Reveal>
-        <section className="mt-4 px-5">
-          <div className="surface p-5">
-            <p className="eyebrow">Where you sit</p>
-            <div className="mt-4 flex h-3 overflow-hidden rounded-full">
-              {assessment.bands.map((b) => (
-                <div key={b.label} className={`h-full flex-1 ${toneClass[b.tone].bar}`} style={{ opacity: b.label === band.label ? 1 : 0.28 }} />
-              ))}
-            </div>
-            <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
-              {assessment.bands.map((b) => <span key={b.label} className="flex-1 truncate text-center">{b.label}</span>)}
-            </div>
-          </div>
+      {risk ? (
+        <section
+          className="mx-4 mt-4 rounded-[24px] p-5"
+          style={{ ...toneStyle("error"), background: "var(--tone-container)" }}
+        >
+          <LifeBuoy className="h-6 w-6 text-[var(--tone)]" />
+          <p className="mt-3 font-display text-[18px] font-semibold text-[var(--tone)]">
+            You don’t have to carry this alone
+          </p>
+          <p className="mt-1 text-[15px] leading-6">
+            You said you’ve had thoughts of being better off dead or of hurting yourself. Talking to
+            someone today can help. These lines are free, confidential and open all day.
+          </p>
+          <Link
+            to="/support"
+            className={cn(
+              "mt-4 inline-flex h-12 items-center rounded-full bg-foreground px-6 text-[15px] font-semibold text-background",
+              stateLayer,
+            )}
+          >
+            Get support now
+          </Link>
         </section>
-      </Reveal>
-
-      {band.seekHelp ? (
-        <Reveal>
-          <section className="mt-4 px-5">
-            <div className="rounded-[20px] border border-alert/25 bg-alert-soft p-4">
-              <div className="flex items-start gap-3">
-                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-alert-strong" />
-                <div>
-                  <p className="font-display text-sm font-semibold">Consider speaking with a professional</p>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    Based on this result, a conversation with someone trained could make the next step feel lighter.
-                  </p>
-                </div>
-              </div>
-              <Button variant="support" className="mt-4 w-full"><Phone /> Book a consultation</Button>
-            </div>
-          </section>
-        </Reveal>
       ) : null}
 
-      <Reveal>
-        <section className="mt-6 px-5">
-          <p className="eyebrow">What helps from here</p>
-          <div className="mt-2 space-y-2">
-            {band.advice.map((item) => (
-              <div key={item} className="surface flex items-center gap-3 p-4">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-secondary"><Sparkles className="h-4 w-4" /></span>
-                <p className="text-sm font-medium">{item}</p>
-                <ArrowRight className="ml-auto h-4 w-4 text-muted-foreground" />
-              </div>
+      {rest.length > 0 ? (
+        <section className="mt-6 px-4">
+          <h2 className="font-display text-[16px] font-semibold">
+            {head ? (a.category === "burnout" ? "By area" : "Also screened") : "Your scores"}
+          </h2>
+          <ul className="mt-3 overflow-hidden rounded-[20px] bg-secondary">
+            {rest.map((s, i) => (
+              <li
+                key={s.score.id}
+                className={cn("px-4 py-4", i > 0 && "border-t border-background")}
+              >
+                <ScoreRow r={s} />
+              </li>
             ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {prevHead?.band && head?.band && previous ? (
+        <Change now={head} before={prevHead} on={previous.completedAt} />
+      ) : null}
+
+      {programmes.length > 0 ? (
+        <section className="mt-8 px-4">
+          <h2 className="font-display text-[16px] font-semibold">Recommended for you</h2>
+          <ul className="mt-3 space-y-3">
+            {programmes.map((p, i) => (
+              <li key={p.slug}>
+                <Link
+                  to="/program/$slug"
+                  params={{ slug: p.slug }}
+                  style={accentStyle(p.accent)}
+                  className={cn("flex overflow-hidden rounded-[20px] bg-secondary", stateLayer)}
+                >
+                  <img src={p.cover} alt="" className="w-[88px] shrink-0 object-cover" />
+                  <span className="min-w-0 flex-1 p-4">
+                    {i === 0 ? (
+                      <span className="block text-[12px] font-semibold text-[var(--accent-strong)]">
+                        Best match
+                      </span>
+                    ) : null}
+                    <span className="block font-display text-[17px] font-semibold">{p.name}</span>
+                    {p.source.description ? (
+                      <span className="mt-1 line-clamp-2 block text-[13px] leading-5 text-muted-foreground">
+                        {p.source.description}
+                      </span>
+                    ) : null}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {severe && !risk ? (
+        <section className="mx-4 mt-6 flex items-start gap-3 rounded-[20px] border border-foreground/10 p-4">
+          <LifeBuoy className="mt-0.5 h-5 w-5 shrink-0" />
+          <div>
+            <p className="text-[15px] leading-6">
+              Talking to a professional can help with what this result shows.
+            </p>
+            <Link
+              to="/support"
+              className="mt-1 inline-block text-[15px] font-semibold underline underline-offset-4"
+            >
+              See support options
+            </Link>
           </div>
         </section>
-      </Reveal>
+      ) : null}
 
-      <Reveal>
-        <section className="mt-6 px-5">
-          <div className="surface p-4">
-            <div className="flex gap-3">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-mind-soft text-mind-strong"><Play className="h-4 w-4" /></div>
-              <div>
-                <p className="font-display text-sm font-semibold">Unburn · 10 minute reset</p>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">Matched to your {assessment.category.toLowerCase()} result and recent check-ins.</p>
-              </div>
-            </div>
-            <Button className="mt-4 w-full">Start guided session</Button>
-          </div>
-        </section>
-      </Reveal>
-
-      <section className="mt-6 grid grid-cols-2 gap-3 px-5">
-        <Button asChild variant="outline"><Link to="/assessment-flow" search={{ id: assessment.slug }}><RotateCcw /> Retake</Link></Button>
-        <Button asChild variant="outline"><Link to="/assessments">History</Link></Button>
+      <section className="mt-8 px-4">
+        <h2 className="font-display text-[16px] font-semibold">What this measured</h2>
+        <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
+          {a.instrument}. {a.scores.map((s) => `${s.label} (${s.instrument})`).join(", ")}.
+        </p>
       </section>
 
-      <p className="mx-auto mt-4 max-w-xs px-5 text-center text-[10px] leading-4 text-muted-foreground">
-        This screening is not a diagnosis. iKAN supports, but never replaces, care from a qualified professional.
+      <div className="mt-8 flex gap-3 px-4">
+        <Button
+          variant="outlined"
+          className="flex-1"
+          onClick={() => navigate({ to: "/assessment-flow", search: { id: a.slug } })}
+        >
+          Retake
+        </Button>
+        <Button className="flex-1" onClick={() => navigate({ to: "/" })}>
+          Back to home
+        </Button>
+      </div>
+
+      <p className="mx-auto mt-6 max-w-xs px-4 text-center text-[12px] leading-5 text-muted-foreground">
+        This is a screening, not a diagnosis. iKAN supports, but never replaces, care from a
+        qualified professional.
       </p>
-    </IkanShell>
+    </div>
+  );
+}
+
+function HeadlineCard({ r }: { r: ScoreResult }) {
+  const band = r.band!;
+  return (
+    <section
+      className="mx-4 mt-5 rounded-[28px] p-5"
+      style={{ ...toneStyle(band.tone), background: "var(--tone-container)" }}
+    >
+      <p className="text-[14px] font-medium text-[var(--tone)]">
+        {r.score.label}, {r.score.instrument}
+      </p>
+      <p className="mt-1 font-display text-[34px] font-bold leading-10 text-[var(--tone)]">
+        {band.label}
+      </p>
+      <p className="mt-1 text-[15px] tabular-nums">
+        <span className="font-semibold">{valueText(r)}</span>
+        {r.profile.direction === "better" ? (
+          <span className="text-muted-foreground">, higher is better</span>
+        ) : null}
+      </p>
+      <div className="mt-5">
+        <RangeBar result={r} large />
+        <div className="mt-2 flex justify-between text-[12px] text-muted-foreground tabular-nums">
+          <span>{r.profile.min}</span>
+          <span>{r.profile.max}</span>
+        </div>
+      </div>
+      {band.interpretation ? (
+        <p className="mt-4 text-[16px] leading-6">{band.interpretation}</p>
+      ) : null}
+    </section>
+  );
+}
+
+function ScoreRow({ r }: { r: ScoreResult }) {
+  return (
+    <div>
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-[16px] font-medium leading-6">{r.score.label}</p>
+          <p className="text-[13px] text-muted-foreground tabular-nums">
+            {r.score.instrument}, {valueText(r)}
+            {r.profile.direction === "better" ? ", higher is better" : ""}
+          </p>
+        </div>
+        {r.band ? (
+          <BandChip label={r.band.label} tone={r.band.tone} className="max-w-[48%] text-right" />
+        ) : null}
+      </div>
+      <div className="mt-3">
+        <RangeBar result={r} />
+      </div>
+      {r.band?.interpretation ? (
+        <p className="mt-3 text-[14px] leading-5 text-muted-foreground">{r.band.interpretation}</p>
+      ) : null}
+    </div>
+  );
+}
+
+function Change({ now, before, on }: { now: ScoreResult; before: ScoreResult; on: string }) {
+  const diff = (now.value ?? 0) - (before.value ?? 0);
+  const better = now.profile.direction === "better" ? diff > 0 : diff < 0;
+  const same = Math.abs(diff) < 1e-9;
+  const Icon = diff > 0 ? TrendingUp : TrendingDown;
+  return (
+    <section className="mx-4 mt-6 flex items-center gap-3 rounded-[20px] border border-foreground/10 p-4">
+      {same ? null : <Icon className="h-5 w-5 shrink-0" />}
+      <p className="text-[15px] leading-6">
+        {same
+          ? "Same score as"
+          : better
+            ? "Better than"
+            : now.profile.direction === "better"
+              ? "Lower than"
+              : "Higher than"}{" "}
+        your last result on{" "}
+        {new Date(on).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}:{" "}
+        {before.band!.label}, {valueText(before)}.
+      </p>
+    </section>
   );
 }
