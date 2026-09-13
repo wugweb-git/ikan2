@@ -111,7 +111,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "A sleep diary tracks your patterns, habits, and quality. Think of it like map before you use to figure out the route to a destination. For the next week, filling it in is the whole assignment."
+                  "text": "A sleep diary tracks your patterns, habits, and quality. Think of it like a map you use to figure out the route to a destination. For the next week, filling it in is the whole assignment."
                 }
               ],
               "notes": []
@@ -168,7 +168,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "That will be all for today, see you tomorrow"
+                  "text": "That will be all for today. See you tomorrow."
                 }
               ],
               "notes": [],
@@ -191,7 +191,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Welcome back. You don't need exact times, close estimates are fine. Let's keep going"
+                  "text": "Welcome back. You don't need exact times, close estimates are fine. Let's keep going."
                 }
               ],
               "notes": []
@@ -454,7 +454,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Last day of the plain diary week . Tomorrow we start looking at what it's telling us."
+                  "text": "Last day of the plain diary week. Tomorrow we start looking at what it's telling us."
                 }
               ],
               "notes": []
@@ -497,7 +497,7 @@
       "notes": [
         {
           "kind": "text",
-          "text": "Days 1–7 are the same day, seven times with different intros and colclusion. Sleep diary."
+          "text": "Days 1–7 are the same day, seven times with different intros and conclusions. Sleep diary."
         },
         {
           "kind": "text",
@@ -545,13 +545,13 @@
             },
             {
               "n": 3,
-              "title": "Thoughts and Feelings.",
+              "title": "Thoughts and Feelings",
               "type": "lesson",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "Your thoughts, feeling and emotions have a direct connection with your sleep. Negative thoughts heighten alertness and delay sleep. Calmer thoughts do the opposite."
+                  "text": "Your thoughts, feelings and emotions have a direct connection with your sleep. Negative thoughts heighten alertness and delay sleep. Calmer thoughts do the opposite."
                 },
                 {
                   "kind": "p",
@@ -629,13 +629,13 @@
             },
             {
               "n": 3,
-              "title": "Thoughts and Feelings.",
+              "title": "Thoughts and Feelings",
               "type": "lesson",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "A thought is a sentence in your head, like, \"This line is taking forever\" whereas a feeling is usually a one word reaction to it the thought say bored, anxious. Telling them apart helps you see why you reacted the way you did."
+                  "text": "A thought is a sentence in your head, like \"This line is taking forever\", whereas a feeling is usually a one-word reaction to that thought, say bored or anxious. Telling them apart helps you see why you reacted the way you did."
                 }
               ],
               "notes": []
@@ -648,7 +648,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "For each situation below, one line is a thought, one is a feeling. We have done the one for you. Frequent power cuts → \"They make me furious!\" = Feeling; \"They make things inconvenient for a lot of us.\" = Thought"
+                  "text": "For each situation below, one line is a thought, one is a feeling. We have done the first one for you. Frequent power cuts → \"They make me furious!\" = Feeling; \"They make things inconvenient for a lot of us.\" = Thought"
                 }
               ],
               "notes": []
@@ -722,8 +722,8 @@
                 "Feeling"
               ],
               "rows": [
-                "I am definitely going to mess this up. I wish I had worked on my presentation instead of playing counterstrike with my friends",
-                "I am so scared and nervous"
+                "I am definitely going to mess this up. I wish I had worked on my presentation instead of playing Counter-Strike with my friends.",
+                "I am so scared and nervous."
               ]
             },
             {
@@ -740,7 +740,7 @@
                 }
               ],
               "columns": [
-                "Tell me about the time when you went to a relatives wedding reception",
+                "Tell me about the time when you went to a relative's wedding reception",
                 "Thought",
                 "Feeling"
               ],
@@ -757,7 +757,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "For the next stretch, jot down what happens ~3 hors before bed and ~1 hour after waking: the situation, the thought, the feeling, and how you responded. Example: 9 PM, late work call → \"Why do they expect this hour?!\" → angry, irritated → kept worrying about work."
+                  "text": "For the next stretch, jot down what happens ~3 hours before bed and ~1 hour after waking: the situation, the thought, the feeling, and how you responded. Example: 9 PM, late work call → \"Why do they expect this hour?!\" → angry, irritated → kept worrying about work."
                 },
                 {
                   "kind": "p",
@@ -853,7 +853,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Good start. Tomorrow we’ll see if any of this actually affect your sleep?"
+                  "text": "Good start. Tomorrow we’ll see if any of this actually affects your sleep."
                 }
               ],
               "notes": []
@@ -896,13 +896,13 @@
             },
             {
               "n": 3,
-              "title": "Digging deeper into thoughts and feelings",
+              "title": "Digging Deeper into Thoughts and Feelings",
               "type": "lesson",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "Look back at yesterday's thought/feeling log. Did any of it, especially thoughts within an hour of waking up carry over from the night before? That overlap is often the actual sleep disruptor."
+                  "text": "Look back at yesterday's thought/feeling log. Did any of it, especially thoughts within an hour of waking up, carry over from the night before? That overlap is often the actual sleep disruptor."
                 }
               ],
               "notes": []
@@ -955,7 +955,7 @@
         },
         {
           "day": 11,
-          "title": "Emptying the mind.",
+          "title": "Emptying the Mind",
           "kind": "learning",
           "declaredBlocks": 5,
           "subtitle": "Digging deeper into thoughts and feelings",
@@ -989,7 +989,7 @@
             },
             {
               "n": 3,
-              "title": "Digging deeper into thoughts and feelings",
+              "title": "Digging Deeper into Thoughts and Feelings",
               "type": "lesson",
               "minutes": 5,
               "body": [
@@ -1002,17 +1002,12 @@
             },
             {
               "n": 4,
-              "title": "Emptying The Mind",
+              "title": "Emptying the Mind",
               "type": "exercise",
               "interaction": "input-table",
               "key": "sleep_emptying_mind",
               "minutes": 5,
-              "body": [
-                {
-                  "kind": "p",
-                  "text": "Just a card to enter date(from picker) and blank text."
-                }
-              ],
+              "body": [],
               "notes": [
                 {
                   "kind": "text",
@@ -1052,7 +1047,7 @@
       "days": [
         {
           "day": 12,
-          "title": "Distractions and control",
+          "title": "Distractions and Control",
           "kind": "learning",
           "declaredBlocks": 6,
           "subtitle": "Small habits.",
@@ -1092,14 +1087,14 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Poor sleep usually comes from two places: trouble falling asleep, or poor quality once you're out. Both are driven by distractions. Some within our control like phone usage, bedtime, racing thoughts and some beyond them like a dog barking, room temperature, a snoring partner."
+                  "text": "Poor sleep usually comes from two places: trouble falling asleep, or poor quality once you're out. Both are driven by distractions. Some are within our control, like phone usage, bedtime and racing thoughts, and some are beyond it, like a dog barking, room temperature or a snoring partner."
                 }
               ],
               "notes": []
             },
             {
               "n": 4,
-              "title": "Let's Check.",
+              "title": "Let's Check",
               "type": "checklist",
               "interaction": "multi-select",
               "key": "sleep_lets_check",
@@ -1123,14 +1118,14 @@
             },
             {
               "n": 5,
-              "title": "Analysing Disruptions",
+              "title": "Analyzing Disruptions",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "Good Job! Now that we have an idea about distractors, let us personalise them for our case. From your personal preferences and previous experiences, list down your distractors. Don't hold back. List everything."
+                  "text": "Good job! Now that we have an idea about distractors, let us personalize them for our case. From your personal preferences and previous experiences, list down your distractors. Don't hold back. List everything."
                 }
               ],
               "notes": [
@@ -1170,13 +1165,13 @@
             },
             {
               "n": 6,
-              "title": "Conclude.",
+              "title": "Conclusion",
               "type": "conclude",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "Now that we know what to target we’ll brainstorm fixes tomorrow. Stay tuned!."
+                  "text": "Now that we know what to target, we’ll brainstorm fixes tomorrow. Stay tuned!"
                 }
               ],
               "notes": []
@@ -1185,7 +1180,7 @@
         },
         {
           "day": 13,
-          "title": "Distractions and control (Continued)",
+          "title": "Distractions and Control (Continued)",
           "kind": "learning",
           "declaredBlocks": 7,
           "subtitle": "Small habits.",
@@ -1237,7 +1232,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "No idea is wrong • Don't critique while writing • Write everything down • Build on your own ideas • Stay on topic • Respect the timer \"Ready to start?”"
+                  "text": "No idea is wrong • Don't critique while writing • Write everything down • Build on your own ideas • Stay on topic • Respect the timer"
                 },
                 {
                   "kind": "p",
@@ -1255,14 +1250,14 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Disturbance: doomscrolling on Instagram → Ideas: uninstall it nightly • keep phone in another room • use night mode • quit the app entirely. (We'll refine these tomorrow — for now, quantity over quality.)"
+                  "text": "Disturbance: doomscrolling on Instagram → Ideas: uninstall it nightly • keep phone in another room • use night mode • quit the app entirely. (We'll refine these later — for now, quantity over quality.)"
                 }
               ],
               "notes": []
             },
             {
               "n": 6,
-              "title": "Ideating Solutions.",
+              "title": "Ideating Solutions",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -1284,7 +1279,7 @@
             },
             {
               "n": 7,
-              "title": "Conclude.",
+              "title": "Conclusion",
               "type": "conclude",
               "minutes": 5,
               "body": [
@@ -1299,7 +1294,7 @@
         },
         {
           "day": 14,
-          "title": "Distractions and control (Continued)",
+          "title": "Distractions and Control (Continued)",
           "kind": "learning",
           "declaredBlocks": 4,
           "subtitle": null,
@@ -1312,7 +1307,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Let's continued brainstorming but sleep diary first."
+                  "text": "Let's continue brainstorming, but sleep diary first."
                 }
               ],
               "notes": []
@@ -1333,7 +1328,7 @@
             },
             {
               "n": 3,
-              "title": "Ideating Solutions.",
+              "title": "Ideating Solutions",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -1347,7 +1342,7 @@
             },
             {
               "n": 4,
-              "title": "Conclude.",
+              "title": "Conclusion",
               "type": "conclude",
               "minutes": 5,
               "body": [
@@ -1362,7 +1357,7 @@
         },
         {
           "day": 15,
-          "title": "Distractions and control (Continued)",
+          "title": "Distractions and Control (Continued)",
           "kind": "learning",
           "declaredBlocks": 5,
           "subtitle": "Part of the Solution!",
@@ -1435,7 +1430,7 @@
             },
             {
               "n": 5,
-              "title": "Conclude.",
+              "title": "Conclusion",
               "type": "conclude",
               "minutes": 5,
               "body": [
@@ -1504,7 +1499,7 @@
             },
             {
               "n": 4,
-              "title": "Countdown to a better sleep",
+              "title": "Countdown to a Better Sleep",
               "type": "checklist",
               "interaction": "multi-select",
               "minutes": 5,
@@ -1524,7 +1519,7 @@
             },
             {
               "n": 5,
-              "title": "Learning to relax",
+              "title": "Learning to Relax",
               "type": "lesson",
               "minutes": 5,
               "body": [
@@ -1571,13 +1566,13 @@
             },
             {
               "n": 7,
-              "title": "Conclude.",
+              "title": "Conclusion",
               "type": "conclude",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "Now that we’ve come up with a list of rituals we’ll work on making it stick from tomorrow onwards."
+                  "text": "Now that we’ve come up with a list of rituals, we’ll work on making it stick from tomorrow onwards."
                 }
               ],
               "notes": []
@@ -1599,7 +1594,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "First tings first, let’s fill the sleep diary."
+                  "text": "First things first, let’s fill the sleep diary."
                 }
               ],
               "notes": []
@@ -1649,12 +1644,7 @@
               "title": "Forming Habits",
               "type": "journal",
               "minutes": 5,
-              "body": [
-                {
-                  "kind": "p",
-                  "text": "(empty block — no content, no prompt, no config)"
-                }
-              ],
+              "body": [],
               "notes": [
                 {
                   "kind": "text",
@@ -1674,7 +1664,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "From that list, flag the moments where you're stationary and could have your phone or laptop out. Example: \"Waiting for the pressure cooker\" → True. \"Taking a bath\" → False."
+                  "text": "From that list, flag the moments where you're stationary and could have your phone or laptop out. Example: \"Waiting for the pressure cooker\" → Yes. \"Taking a bath\" → No."
                 }
               ],
               "notes": []
@@ -1711,7 +1701,7 @@
             },
             {
               "n": 8,
-              "title": "Conclude.",
+              "title": "Conclusion",
               "type": "conclude",
               "minutes": 5,
               "body": [
@@ -1760,20 +1750,20 @@
             },
             {
               "n": 3,
-              "title": "Shortlisting activities",
+              "title": "Shortlisting Activities",
               "type": "lesson",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "From the list of activities you mentioned earlier, pick a small piece of the ritual you want to build. You can even pick anything else you've been meaning to start like reading a chapter from a book before bed."
+                  "text": "From the list of activities you mentioned earlier, pick a small piece of the ritual you want to build. You can even pick anything else you've been meaning to start, like reading a chapter from a book before bed."
                 }
               ],
               "notes": []
             },
             {
               "n": 4,
-              "title": "Shortlisting activities",
+              "title": "Shortlisting Activities",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -1804,7 +1794,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Pick one thing you already do every day, ideally near the end of it say, clearing the dinner table. For the next week, do your new habit immediately after that anchor activity, no distractions. Miss a day? That’s alright, just don't miss two in a row."
+                  "text": "Pick one thing you already do every day, ideally near the end of it, say, clearing the dinner table. For the next week, do your new habit immediately after that anchor activity, no distractions. Miss a day? That’s alright, just don't miss two in a row."
                 }
               ],
               "notes": []
@@ -1839,7 +1829,7 @@
                 }
               ],
               "listItems": [
-                "Tick off the activities you completed from days 17 and 18."
+                "Tick off the habits you completed today."
               ]
             },
             {
@@ -1850,7 +1840,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Now that we have been able to develop a sleep ritual for ourselves, let’s give them a try."
+                  "text": "Now that we have been able to develop a sleep ritual for ourselves, let’s give it a try."
                 }
               ],
               "notes": []
@@ -2340,7 +2330,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "This is the real test, sticking with everything at once: diary, habits, thoughts, disruptions. One step at a time"
+                  "text": "This is the real test, sticking with everything at once: diary, habits, thoughts, disruptions. One step at a time."
                 }
               ],
               "notes": []
@@ -2409,7 +2399,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Good Job with today! Let’s continue it for the next few days..."
+                  "text": "Good job today! Let’s keep it going for the next few days."
                 }
               ],
               "notes": []
@@ -2500,7 +2490,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Good Job with today! Let’s continue it for the next few days..."
+                  "text": "Good job today! Let’s keep it going for the next few days."
                 }
               ],
               "notes": []
@@ -2591,7 +2581,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Good Job with today! Let’s continue it for the next few days..."
+                  "text": "Good job today! Let’s keep it going for the next few days."
                 }
               ],
               "notes": []
@@ -2682,7 +2672,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Good Job with today! Let’s continue it for the next few days..."
+                  "text": "Good job today! Let’s keep it going for the next few days."
                 }
               ],
               "notes": []
@@ -2704,7 +2694,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Last full-stack day. Tomorrow we wrap things up."
+                  "text": "Last full-stack day. Let’s wrap things up."
                 }
               ],
               "notes": []
@@ -2828,11 +2818,6 @@
       "Days": "26–30",
       "Unit": "Rituals in Action",
       "Focus": "Full stack: diary + tracker + thought log + disruption log"
-    },
-    {
-      "Days": "31",
-      "Unit": "",
-      "Focus": ""
     }
   ],
   "description": "A gentle, guided program to help you understand and improve your sleep. There’s nothing to “fix” immediately. We’ll start by noticing patterns and building consistency."

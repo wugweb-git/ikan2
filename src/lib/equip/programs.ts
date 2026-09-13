@@ -351,7 +351,7 @@ const stressOverrides: Overrides = {
       ui: "lesson",
       cards: [
         { title: lines[first + 1] ?? "", text: [lines[first + 2] ?? ""], items: bulletsAfter(b, /^What's being asked of you\.$/) },
-        { title: lines[second + 1] ?? "", items: bulletsAfter(b, new RegExp(`^${escape(lines[second + 1] ?? "")}$`)) },
+        { title: lines[second + 1] ?? "", text: [lines[second + 2] ?? ""], items: bulletsAfter(b, /^What restores you\.$/) },
       ],
     };
   },

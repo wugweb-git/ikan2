@@ -117,7 +117,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "I'm S. A couple of years back I was seriously burnt out. I was unaware while it was happening, missing the signs not recognizing it. That's exactly why this program exists: to help you understand burnout, spot it early, and build tools to manage it. I wish I had this program when needed it."
+                  "text": "I'm S. A couple of years back I was seriously burnt out. I was unaware while it was happening, missing the signs and not recognizing them. That's exactly why this program exists: to help you understand burnout, spot it early, and build tools to manage it. I wish I’d had this program when I needed it."
                 }
               ],
               "notes": []
@@ -193,7 +193,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "This gives us a first read on how work feels to you day to day. Not everything here is in your control and that’s alright because resilience against burnout is something you can build. See you tomorrow."
+                  "text": "This gives us a first read on how work feels to you day to day. Not everything here is in your control, and that’s alright, because resilience against burnout is something you can build. See you tomorrow."
                 }
               ],
               "notes": []
@@ -215,7 +215,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "A thought is a sentence in your head, like, \"This line is taking forever\" whereas a feeling is usually a one word reaction to it the thought say bored, anxious. Telling them apart helps you see why you reacted the way you did."
+                  "text": "A thought is a sentence in your head, like \"This line is taking forever\", whereas a feeling is usually a one-word reaction to that thought, say bored or anxious. Telling them apart helps you see why you reacted the way you did."
                 }
               ],
               "notes": []
@@ -231,7 +231,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "For each situation below, one line is a thought, one is a feeling. We have done the one for you. Frequent power cuts → \"They make me furious!\" = Feeling; \"They make things inconvenient for a lot of us.\" = Thought"
+                  "text": "For each situation below, one line is a thought, one is a feeling. We have done the first one for you. Frequent power cuts → \"They make me furious!\" = Feeling; \"They make things inconvenient for a lot of us.\" = Thought"
                 }
               ],
               "notes": [],
@@ -310,8 +310,8 @@
                 "Feeling"
               ],
               "rows": [
-                "I am definitely going to mess this up. I wish I had worked on my presentation instead of playing counterstrike with my friends",
-                "I am so scared and nervous"
+                "I am definitely going to mess this up. I wish I had worked on my presentation instead of playing Counter-Strike with my friends.",
+                "I am so scared and nervous."
               ]
             },
             {
@@ -329,7 +329,7 @@
                 }
               ],
               "columns": [
-                "Tell me about the time when you went to a relatives wedding reception",
+                "Tell me about the time when you went to a relative's wedding reception",
                 "Thought",
                 "Feeling"
               ],
@@ -362,10 +362,10 @@
       "days": [
         {
           "day": 3,
-          "title": "Tracking Thoughts And Feelings.",
+          "title": "Tracking Thoughts and Feelings",
           "kind": "learning",
           "declaredBlocks": 3,
-          "subtitle": "Tracking Thoughts And Feelings.",
+          "subtitle": null,
           "blocks": [
             {
               "n": 1,
@@ -377,7 +377,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Burnout clouds your thinking and tracking this is the first step from being overwhelmed by your thoughts to actually managing them. Two worked examples:"
+                  "text": "Burnout clouds your thinking, and tracking it is the first step from being overwhelmed by your thoughts to actually managing them. Two worked examples:"
                 },
                 {
                   "kind": "ol",
@@ -420,7 +420,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Notice anything? Hold onto it. We'll get back to back to it soon."
+                  "text": "Notice anything? Hold onto it. We'll get back to it soon."
                 }
               ],
               "notes": []
@@ -442,7 +442,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Burnout drains the parts of work you used to enjoy, and turns work relationships cynical. From today, we add one more column: Response. What you actually did after the thought/feeling hit like staying up late working or listening to calming music\")."
+                  "text": "Burnout drains the parts of work you used to enjoy, and turns work relationships cynical. From today, we add one more column: Response. What you actually did after the thought or feeling hit, like staying up late working or listening to calming music."
                 }
               ],
               "notes": []
@@ -644,7 +644,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Now that we have some insights about our real attitude towards works and our real stressors, we’ll explore some activities that will help us improve our relationship with our workplace."
+                  "text": "Now that we have some insights about our real attitude towards work and our real stressors, we’ll explore some activities that will help us improve our relationship with our workplace."
                 }
               ],
               "notes": []
@@ -668,27 +668,27 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "A few years ago I hit a wall, I was juggling research, management, and admin. On top of all that there were also plus roles that didn't even matter to me. I worked harder to force results, but the returns stayed flat. Eventually I realized the effort wasn't worth the cost. Whether you’re a student, a professional, a caregiver or any other role, the lesson remains the same. If the output's plateaued, working harder isn't the fix. Alignment is."
+                  "text": "A few years ago I hit a wall. I was juggling research, management, and admin. On top of all that, there were extra roles that didn't even matter to me. I worked harder to force results, but the returns stayed flat. Eventually I realized the effort wasn't worth the cost. Whether you’re a student, a professional, a caregiver or any other role, the lesson remains the same. If the output's plateaued, working harder isn't the fix. Alignment is."
                 }
               ],
               "notes": []
             },
             {
               "n": 2,
-              "title": "Efforts And Rewards",
+              "title": "Efforts and Rewards",
               "type": "lesson",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "Burnout often comes down to an imbalance between the effort put in and the reward received. Stress only worsens it. Effort might be caregiving, a demanding course, or a job with little tangible payoff. Reward is what you get back like recovery, a good grade, real recognition."
+                  "text": "Burnout often comes down to an imbalance between the effort put in and the reward received. Stress only worsens it. Effort might be caregiving, a demanding course, or a job with little tangible payoff. Reward is what you get back, like recovery, a good grade or real recognition."
                 }
               ],
               "notes": []
             },
             {
               "n": 3,
-              "title": "Understanding The Balance",
+              "title": "Understanding the Balance",
               "type": "exercise",
               "interaction": "single-select",
               "minutes": 5,
@@ -741,7 +741,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Over the next few days we'll dig into your own efforts and rewards, in your own words.nit 4. Effort vs. Reward"
+                  "text": "Over the next few days we'll dig into your own efforts and rewards, in your own words."
                 }
               ],
               "notes": []
@@ -757,7 +757,7 @@
       "days": [
         {
           "day": 9,
-          "title": "Efforts And Rewards",
+          "title": "Efforts and Rewards",
           "kind": "learning",
           "declaredBlocks": 5,
           "subtitle": "Pause and Breathe.",
@@ -895,7 +895,7 @@
         },
         {
           "day": 10,
-          "title": "Efforts And Rewards  (Continued)",
+          "title": "Efforts and Rewards (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": "Pause and Breathe.",
@@ -948,7 +948,7 @@
         },
         {
           "day": 11,
-          "title": "Efforts And Rewards  (Continued)",
+          "title": "Efforts and Rewards (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": "Pause and Breathe.",
@@ -992,7 +992,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Well done, tomorrow we shall work on the next steps."
+                  "text": "Well done. Tomorrow we shall work on the next steps."
                 }
               ],
               "notes": []
@@ -1004,7 +1004,7 @@
           "title": "Anatomy of Burnout",
           "kind": "learning",
           "declaredBlocks": 4,
-          "subtitle": "Demands vs Resources.",
+          "subtitle": "Goals and success.",
           "blocks": [
             {
               "n": 1,
@@ -1014,18 +1014,18 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Welcome back. Burnout often means losing sight of your longer-term goals and values. Write down your personal goals both long and short term."
+                  "text": "Welcome back. Burnout often means losing sight of your longer-term goals and values. Write down your personal goals, both long and short term."
                 },
                 {
                   "kind": "p",
-                  "text": "For each goal, describe what realistic success looks like. Realistic not perfect, just genuinely achievable. Example: goal = become a surgeon → realistic success = admission to a solid program, a well-paying job after training. Only list what's genuinely necessary and aligned with your real goals."
+                  "text": "For each goal, describe what realistic success looks like. Realistic, not perfect: just genuinely achievable. Example: goal = become a surgeon → realistic success = admission to a solid program, a well-paying job after training. Only list what's genuinely necessary and aligned with your real goals."
                 }
               ],
               "notes": []
             },
             {
               "n": 2,
-              "title": "Goals And Success",
+              "title": "Goals and Success",
               "type": "exercise",
               "interaction": "input-table",
               "key": "demands_resources",
@@ -1042,7 +1042,7 @@
                 },
                 {
                   "kind": "text",
-                  "text": "List your current demands and resources."
+                  "text": "List your goals and what success looks like."
                 },
                 {
                   "kind": "text",
@@ -1103,10 +1103,10 @@
         },
         {
           "day": 13,
-          "title": "Anatomy of Burnout (Copy)",
+          "title": "Anatomy of Burnout (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
-          "subtitle": "Demands vs Resources.",
+          "subtitle": "Goals and success.",
           "blocks": [
             {
               "n": 1,
@@ -1123,7 +1123,7 @@
             },
             {
               "n": 2,
-              "title": "Goals And Success",
+              "title": "Goals and Success",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -1156,7 +1156,7 @@
         },
         {
           "day": 14,
-          "title": "Goals And Necessities",
+          "title": "Goals and Necessities",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": null,
@@ -1253,7 +1253,7 @@
           "blocks": [
             {
               "n": 1,
-              "title": "Managing Workplad",
+              "title": "Managing Workload",
               "type": "lesson",
               "interaction": "matrix",
               "key": "effort_map",
@@ -1342,10 +1342,10 @@
               "notes": [],
               "options": [
                 "I can delegate some tasks",
-                "I can organise my schedule to prioritise the urgent tasks",
+                "I can organize my schedule to prioritize the urgent tasks",
                 "I can outright refuse the tasks allotted to me a while back",
-                "I can take a sick-leave",
-                "I dont need anyone, I can do it all on my own",
+                "I can take sick leave",
+                "I don’t need anyone, I can do it all on my own",
                 "I can cut out the absolute non-essential tasks"
               ]
             },
@@ -1366,7 +1366,7 @@
         },
         {
           "day": 16,
-          "title": "Reducing Weight.",
+          "title": "Reducing Weight",
           "kind": "learning",
           "declaredBlocks": 4,
           "subtitle": "Outcome Check.",
@@ -1379,7 +1379,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "We often take on tasks that don't actually help us like going beyond the call of duty, activities that don't benefit us, things we take on just because we know we can do them. That's often unfair to both you and your colleagues"
+                  "text": "We often take on tasks that don't actually help us, like going beyond the call of duty, activities that don't benefit us, things we take on just because we know we can do them. That's often unfair to both you and your colleagues."
                 }
               ],
               "notes": []
@@ -1393,7 +1393,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Today and tomorrow: go through your non-essential tasks and start shedding them. Postpone, pull out, or delege. By the day after, aim to have dropped at least some deadweight."
+                  "text": "Today and tomorrow: go through your non-essential tasks and start shedding them. Postpone, pull out, or delegate. By the day after, aim to have dropped at least some deadweight."
                 }
               ],
               "notes": [
@@ -1432,7 +1432,7 @@
         },
         {
           "day": 17,
-          "title": "Reducing Weight. (Continued)",
+          "title": "Reducing Weight (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": "Outcome Check.",
@@ -1445,7 +1445,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Let's continue where we left."
+                  "text": "Let's continue where we left off."
                 }
               ],
               "notes": []
@@ -1477,10 +1477,6 @@
                 {
                   "kind": "p",
                   "text": "That's a real piece of the work done. You’ve shed what doesn't serve you. Next up: a few more tools for managing burnout day to day."
-                },
-                {
-                  "kind": "p",
-                  "text": "."
                 }
               ],
               "notes": []
@@ -1496,10 +1492,10 @@
       "days": [
         {
           "day": 18,
-          "title": "Journalling",
+          "title": "Journaling",
           "kind": "learning",
           "declaredBlocks": 3,
-          "subtitle": "Effort & Reward.",
+          "subtitle": "A daily release valve.",
           "blocks": [
             {
               "n": 1,
@@ -1516,7 +1512,7 @@
             },
             {
               "n": 2,
-              "title": "Emptying the mind.",
+              "title": "Emptying the Mind",
               "type": "exercise",
               "interaction": "input-table",
               "key": "er_control",
@@ -1558,10 +1554,10 @@
         },
         {
           "day": 19,
-          "title": "Journalling (Continued)",
+          "title": "Journaling (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
-          "subtitle": "Effort & Reward.",
+          "subtitle": "A daily release valve.",
           "blocks": [
             {
               "n": 1,
@@ -1578,7 +1574,7 @@
             },
             {
               "n": 2,
-              "title": "Emptying the mind.",
+              "title": "Emptying the Mind",
               "type": "exercise",
               "interaction": "input-table",
               "key": "er_control",
@@ -1608,10 +1604,10 @@
         },
         {
           "day": 20,
-          "title": "Journalling (ontinued)",
+          "title": "Journaling (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
-          "subtitle": "Effort & Reward.",
+          "subtitle": "A daily release valve.",
           "blocks": [
             {
               "n": 1,
@@ -1621,14 +1617,14 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Last day of this one. Next, we'll look at other things keeping you up at night."
+                  "text": "Last day of this one. Next, we'll look at what's going well."
                 }
               ],
               "notes": []
             },
             {
               "n": 2,
-              "title": "Emptying the mind.",
+              "title": "Emptying the Mind",
               "type": "exercise",
               "interaction": "input-table",
               "key": "er_control",
@@ -1649,7 +1645,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Now that we have figured out this technique, when we meet next, we will work on understanding other factors that keep us awake."
+                  "text": "Now that we have figured out this technique, when we meet next, we will work on noticing what’s going well."
                 }
               ],
               "notes": []
@@ -1668,7 +1664,7 @@
           "title": "Positive Capturing",
           "kind": "learning",
           "declaredBlocks": 6,
-          "subtitle": "Necessities.",
+          "subtitle": "Rebalancing perspective.",
           "blocks": [
             {
               "n": 1,
@@ -1685,7 +1681,7 @@
             },
             {
               "n": 2,
-              "title": "Good Things.",
+              "title": "Good Things",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -1729,7 +1725,7 @@
             },
             {
               "n": 4,
-              "title": "For tomorrow",
+              "title": "For Tomorrow",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -1763,7 +1759,7 @@
                 },
                 {
                   "kind": "text",
-                  "text": "List down some things things you’re grateful for today."
+                  "text": "List down some things you’re grateful for today."
                 },
                 {
                   "kind": "text",
@@ -1791,7 +1787,7 @@
           "title": "Positive Capturing (Continued)",
           "kind": "learning",
           "declaredBlocks": 6,
-          "subtitle": "Necessities.",
+          "subtitle": "Rebalancing perspective.",
           "blocks": [
             {
               "n": 1,
@@ -1801,14 +1797,14 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Same four, one more time"
+                  "text": "Same four, one more time."
                 }
               ],
               "notes": []
             },
             {
               "n": 2,
-              "title": "Good Things.",
+              "title": "Good Things",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -1844,7 +1840,7 @@
             },
             {
               "n": 4,
-              "title": "For tomorrow",
+              "title": "For Tomorrow",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -1909,20 +1905,20 @@
           "blocks": [
             {
               "n": 1,
-              "title": "Perfectionism.",
+              "title": "Perfectionism",
               "type": "lesson",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "Perfectionism is the need to be, or appear, perfect. While it can drive real excellence but left unchecked, it feeds low self-esteem, procrastination, and constant pressure."
+                  "text": "Perfectionism is the need to be, or appear, perfect. While it can drive real excellence, left unchecked it feeds low self-esteem, procrastination, and constant pressure."
                 }
               ],
               "notes": []
             },
             {
               "n": 2,
-              "title": "Perfectionsim",
+              "title": "Perfectionism",
               "type": "lesson",
               "minutes": 5,
               "body": [
@@ -1935,7 +1931,7 @@
             },
             {
               "n": 3,
-              "title": "Perfectionism In Daily Life.",
+              "title": "Perfectionism in Daily Life",
               "type": "checklist",
               "interaction": "multi-select",
               "minutes": 5,
@@ -2019,14 +2015,14 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Perfectionism feeds stress and procrastination, and narrows how you see your own work. Nothing ever feels good enough. But perfection is a result of iteration, not a starting point. Example: \"I have to write a document for marketing\" → perfect outcome: \"grammatically flawless, no follow-up questions."
+                  "text": "Perfectionism feeds stress and procrastination, and narrows how you see your own work. Nothing ever feels good enough. But perfection is a result of iteration, not a starting point. Example: \"I have to write a document for marketing\" → perfect outcome: \"grammatically flawless, no follow-up questions.\""
                 }
               ],
               "notes": []
             },
             {
               "n": 2,
-              "title": "Situations And Outcomes",
+              "title": "Situations and Outcomes",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -2054,7 +2050,7 @@
                 },
                 {
                   "kind": "li",
-                  "text": "I have to make a presentation for the half yearly meeting"
+                  "text": "I have to make a presentation for the half-yearly meeting"
                 },
                 {
                   "kind": "li",
@@ -2087,14 +2083,14 @@
         },
         {
           "day": 25,
-          "title": "Bringing In Realism",
+          "title": "Bringing in Realism",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": "Closure.",
           "blocks": [
             {
               "n": 1,
-              "title": "Bringing In Realism",
+              "title": "Bringing in Realism",
               "type": "lesson",
               "minutes": 5,
               "body": [
@@ -2116,7 +2112,7 @@
             },
             {
               "n": 2,
-              "title": "Bringing In Realism",
+              "title": "Bringing in Realism",
               "type": "exercise",
               "interaction": "input-table",
               "key": "burnout_recalibration",
@@ -2173,7 +2169,7 @@
                 },
                 {
                   "kind": "text",
-                  "text": "I have to write a document for the marketing team. → The document is grammatically excellent, extremely clear and the marketing team has no queries about it. → The document had some grammatical errors and the marketing team had a few questions about the document. → The document’s first iteration gets some feedback which is worked upon swiftly. → Create the first draft, double check it, Send it for feedback. Work on the feedback and get approval."
+                  "text": "I have to write a document for the marketing team. → The document is grammatically excellent, extremely clear and the marketing team has no queries about it. → The document had some grammatical errors and the marketing team had a few questions about the document. → The document’s first iteration gets some feedback which is worked upon swiftly. → Create the first draft, double-check it, send it for feedback. Work on the feedback and get approval."
                 }
               ]
             },
@@ -2339,7 +2335,7 @@
                 },
                 {
                   "kind": "text",
-                  "text": "Dependencies, if any (if i need support from someone to complete this task)"
+                  "text": "Dependencies, if any (if I need support from someone to complete this task)"
                 },
                 {
                   "kind": "text",
@@ -2390,7 +2386,7 @@
         },
         {
           "day": 28,
-          "title": "Just Do It!",
+          "title": "Just Do It! (Continued)",
           "kind": "lesson",
           "declaredBlocks": 3,
           "subtitle": null,
@@ -2403,7 +2399,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Pick up your plan from yesterday and keep going. Falling behind schedule is normal. Adjust the plan, don't abandon it. Keep closing tasks from your list"
+                  "text": "Pick up your plan from yesterday and keep going. Falling behind schedule is normal. Adjust the plan, don't abandon it. Keep closing tasks from your list."
                 }
               ],
               "notes": []
@@ -2509,7 +2505,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Did you close out the tasks? Let’s keep doing this for all tasks from now on.”"
+                  "text": "Did you close out the tasks? Let’s keep doing this for all tasks from now on."
                 }
               ],
               "notes": []
@@ -2540,7 +2536,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Great work. Whenever work starts feeling like it's turning sour again, come back to this program. Every table and framework here stays available to you. Feeling like burnout is affecting your sleep or stress levels too? Our sleep and stress-relief program is there whenever you need it."
+                  "text": "Great work. Whenever work starts feeling like it's turning sour again, come back to this program. Every table and framework here stays available to you. Feeling like burnout is affecting your sleep or stress levels too? Our Sleep Tight and Stress Buster programs are there whenever you need them."
                 }
               ],
               "notes": []
@@ -2554,7 +2550,7 @@
   "name": "Unburn — burnout-reset",
   "meta": {
     "id": "416feb50-e73f-4898-a996-f8a4695a708e",
-    "days": "30 days",
+    "days": "31 days",
     "blocks": "111 blocks",
     "category": "burnout",
     "level": "intermediate"

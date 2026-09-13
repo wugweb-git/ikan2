@@ -229,14 +229,14 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Not all stress is bad. Some stress helps. At times it gives the push before a deadline, or an exam, can sharpen you up. The problem is stress that persists long after (or during) whatever caused it has the ability to wear on you both mentally (constantly on edge) and physically (poor sleep, appetite changes, stomach issues). It is your fight-or-flight response got stuck in overdrive."
+                  "text": "Not all stress is bad. Some stress helps. At times, the push before a deadline or an exam can sharpen you up. The problem is stress that persists long after (or during) whatever caused it. It can wear on you both mentally (constantly on edge) and physically (poor sleep, appetite changes, stomach issues). It is your fight-or-flight response stuck in overdrive."
                 }
               ],
               "notes": []
             },
             {
               "n": 3,
-              "title": "Stress and you.",
+              "title": "Stress and You",
               "type": "checklist",
               "interaction": "multi-select",
               "minutes": 5,
@@ -298,7 +298,7 @@
             },
             {
               "n": 4,
-              "title": "Conclusion.",
+              "title": "Conclusion",
               "type": "lesson",
               "minutes": 5,
               "body": [
@@ -413,7 +413,7 @@
               "notes": [
                 {
                   "kind": "text",
-                  "text": "Prompt: What’s bugging?"
+                  "text": "Prompt: What’s bugging you?"
                 },
                 {
                   "kind": "text",
@@ -431,7 +431,7 @@
               "notes": [
                 {
                   "kind": "text",
-                  "text": "Prompt: Activities stressing you out?"
+                  "text": "Prompt: Which activities are stressing you out?"
                 },
                 {
                   "kind": "text",
@@ -449,7 +449,7 @@
               "notes": [
                 {
                   "kind": "text",
-                  "text": "Prompt: Activities, things and people bring you joy?"
+                  "text": "Prompt: Which activities, things and people bring you joy?"
                 },
                 {
                   "kind": "text",
@@ -488,7 +488,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Same three lists as yesterday. Add to them, or start fresh if today looks different"
+                  "text": "Same three lists as yesterday. Add to them, or start fresh if today looks different."
                 }
               ],
               "notes": []
@@ -543,7 +543,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Good work over these two days. Tomorrow we’ll do something lighter, a quick mindfulness exercise"
+                  "text": "Good work over these two days. Tomorrow we’ll do something lighter, a quick mindfulness exercise."
                 }
               ],
               "notes": []
@@ -566,7 +566,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Mindfulness just means being present. Here in the now, rather than caught in past or future. Try this: stop, take a breath. Say out loud 5 colors you see, then close your eyes and name 4 sounds, 3 smells, 2 things you can feel."
+                  "text": "Mindfulness just means being present. Here in the now, rather than caught in the past or future. Try this: stop, take a breath. Say out loud 5 colors you see, then close your eyes and name 4 sounds, 3 smells, 2 things you can feel."
                 }
               ],
               "notes": []
@@ -598,7 +598,7 @@
           "title": "Anatomy of Stress",
           "kind": "learning",
           "declaredBlocks": 4,
-          "subtitle": "Understand what causes stress",
+          "subtitle": "Understand what causes stress.",
           "blocks": [
             {
               "n": 1,
@@ -622,10 +622,6 @@
                 {
                   "kind": "p",
                   "text": "Excessive stress usually comes down to an imbalance between demands and resources."
-                },
-                {
-                  "kind": "p",
-                  "text": "."
                 }
               ],
               "notes": [
@@ -670,7 +666,7 @@
                   "text": "Resource"
                 },
                 {
-                  "kind": "li",
+                  "kind": "text",
                   "text": "What restores you."
                 },
                 {
@@ -736,7 +732,7 @@
               ]
             },
             {
-              "n": 4,
+              "n": 5,
               "title": "Conclusion",
               "type": "conclude",
               "minutes": 5,
@@ -755,7 +751,7 @@
           "title": "Anatomy of Stress (Continued)",
           "kind": "learning",
           "declaredBlocks": 6,
-          "subtitle": "Understand what causes stress",
+          "subtitle": "Understand what causes stress.",
           "blocks": [
             {
               "n": 1,
@@ -765,7 +761,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Keep going. Today’s demands and resources. Don't spend more than 20 minutes on it."
+                  "text": "Keep going with today’s demands and resources. Don't spend more than 20 minutes on it."
                 }
               ],
               "notes": []
@@ -818,7 +814,7 @@
           "title": "Anatomy of Stress (Continued)",
           "kind": "learning",
           "declaredBlocks": 4,
-          "subtitle": "Understand what causes stress",
+          "subtitle": "Understand what causes stress.",
           "blocks": [
             {
               "n": 1,
@@ -881,11 +877,11 @@
           "title": "Demands & Resources",
           "kind": "learning",
           "declaredBlocks": 5,
-          "subtitle": "Get an idea of what demands and resources are",
+          "subtitle": "Rebalancing demands and resources.",
           "blocks": [
             {
               "n": 1,
-              "title": "Balancing demands and resources",
+              "title": "Balancing Demands and Resources",
               "type": "lesson",
               "interaction": "matrix",
               "key": "demands_resources",
@@ -893,7 +889,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "With your list in front of you, look for ways to reduce demands you actually control. Some ways to do so are to delegate, ask for flexibility, outsource what you can."
+                  "text": "With your list in front of you, look for ways to reduce demands you actually control. Some ways to do so are to delegate, ask for flexibility and outsource what you can."
                 }
               ],
               "notes": []
@@ -922,20 +918,20 @@
             },
             {
               "n": 3,
-              "title": "Increasing resources",
+              "title": "Increasing Resources",
               "type": "lesson",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "More time with people who matter, actual time off, some downtime built into your workday. Keep in mind small but real and meaningful reductions count."
+                  "text": "More time with people who matter, actual time off, some downtime built into your workday. Keep in mind that small but real and meaningful changes count."
                 }
               ],
               "notes": []
             },
             {
               "n": 4,
-              "title": "Increasing resources",
+              "title": "Increasing Resources",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -947,7 +943,7 @@
                 },
                 {
                   "kind": "text",
-                  "text": "Bring up list of resources from task 4 of day 7 and task 3 of day 8 and Prompt: How can you increase your resouces?"
+                  "text": "Bring up list of resources from task 4 of day 7 and task 3 of day 8 and Prompt: How can you increase your resources?"
                 },
                 {
                   "kind": "text",
@@ -979,7 +975,7 @@
       "days": [
         {
           "day": 11,
-          "title": "Thoughts and patters.",
+          "title": "Thoughts and Patterns",
           "kind": "learning",
           "declaredBlocks": 6,
           "subtitle": "Introduction.",
@@ -992,7 +988,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Your thoughts, feeling and emotions have a direct connection with your sleep. Negative thoughts heighten alertness and delay sleep. Calmer thoughts do the opposite."
+                  "text": "Your thoughts, feelings and emotions have a direct connection with your stress. Negative thoughts heighten alertness and tension. Calmer thoughts do the opposite."
                 }
               ],
               "notes": []
@@ -1005,7 +1001,7 @@
               "minutes": 5,
               "body": [],
               "notes": [],
-              "prompt": "We won the cricket tournament after a really long time. The spinners played really well",
+              "prompt": "We won the cricket tournament after a really long time. The spinners played really well.",
               "options": [
                 "Thought",
                 "Feeling"
@@ -1033,7 +1029,7 @@
               "minutes": 5,
               "body": [],
               "notes": [],
-              "prompt": "She won a well deserved award for her performance.",
+              "prompt": "She won a well-deserved award for her performance.",
               "options": [
                 "Thought",
                 "Feeling"
@@ -1187,7 +1183,7 @@
                 }
               ],
               "notes": [],
-              "prompt": "How it made you feel"
+              "prompt": "How did it make you feel?"
             }
           ]
         },
@@ -1244,7 +1240,7 @@
                 }
               ],
               "notes": [],
-              "prompt": "How it made you feel"
+              "prompt": "How did it make you feel?"
             }
           ]
         },
@@ -1301,13 +1297,13 @@
                 }
               ],
               "notes": [],
-              "prompt": "How it made you feel"
+              "prompt": "How did it make you feel?"
             }
           ]
         },
         {
           "day": 15,
-          "title": "Thought Log",
+          "title": "Thought Log (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": "Journaling thoughts.",
@@ -1365,12 +1361,12 @@
       "notes": []
     },
     {
-      "n": 5,
+      "n": 6,
       "title": "Challenging Thoughts",
       "days": [
         {
           "day": 16,
-          "title": "Reasoning With Thoughts",
+          "title": "Reasoning with Thoughts",
           "kind": "learning",
           "declaredBlocks": 4,
           "subtitle": "Cognitive distortions.",
@@ -1405,7 +1401,7 @@
                 },
                 {
                   "kind": "text",
-                  "text": "When faced with a situation where your thought feels bigger than a situation, ask yourself these questions."
+                  "text": "When faced with a situation where your thought feels bigger than the situation, ask yourself these questions."
                 },
                 {
                   "kind": "li",
@@ -1471,7 +1467,7 @@
         },
         {
           "day": 17,
-          "title": "Challenging thoughts",
+          "title": "Challenging Thoughts",
           "kind": "learning",
           "declaredBlocks": 4,
           "subtitle": "Tools to challenge.",
@@ -1486,7 +1482,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Yesterday, we asked ourselves some questions about out own thoughts. Sometimes it is important to have the talk with our own thoughts. Let's get to putting them in practice."
+                  "text": "Yesterday, we asked ourselves some questions about our own thoughts. Sometimes it is important to have the talk with our own thoughts. Let's put them into practice."
                 }
               ],
               "notes": [
@@ -1530,7 +1526,7 @@
             },
             {
               "n": 2,
-              "title": "From The Thought Log",
+              "title": "From the Thought Log",
               "type": "lesson",
               "minutes": 5,
               "body": [
@@ -1587,7 +1583,7 @@
                 },
                 {
                   "kind": "text",
-                  "text": "How they make me feelings now:"
+                  "text": "How they make me feel now:"
                 },
                 {
                   "kind": "divider"
@@ -1637,7 +1633,7 @@
         },
         {
           "day": 18,
-          "title": "Challenging thoughts (Continued)",
+          "title": "Challenging Thoughts (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": "Tools to challenge.",
@@ -1692,7 +1688,7 @@
         },
         {
           "day": 19,
-          "title": "Challenging thoughts (Continued)",
+          "title": "Challenging Thoughts (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": "Tools to challenge.",
@@ -1747,7 +1743,7 @@
         },
         {
           "day": 20,
-          "title": "Challenging thoughts (Continued)",
+          "title": "Challenging Thoughts (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": "Tools to challenge.",
@@ -1802,7 +1798,7 @@
         },
         {
           "day": 21,
-          "title": "Challenging thoughts (Continued)",
+          "title": "Challenging Thoughts (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": "Tools to challenge.",
@@ -1868,10 +1864,10 @@
       "days": [
         {
           "day": 22,
-          "title": "Journalling",
+          "title": "Journaling",
           "kind": "learning",
           "declaredBlocks": 3,
-          "subtitle": "Effort & Reward.",
+          "subtitle": "A daily release valve.",
           "blocks": [
             {
               "n": 1,
@@ -1888,7 +1884,7 @@
             },
             {
               "n": 2,
-              "title": "Emptying the mind.",
+              "title": "Emptying the Mind",
               "type": "exercise",
               "interaction": "input-table",
               "key": "er_control",
@@ -1930,10 +1926,10 @@
         },
         {
           "day": 23,
-          "title": "Journalling (Continued)",
+          "title": "Journaling (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
-          "subtitle": "Effort & Reward.",
+          "subtitle": "A daily release valve.",
           "blocks": [
             {
               "n": 1,
@@ -1950,7 +1946,7 @@
             },
             {
               "n": 2,
-              "title": "Emptying the mind.",
+              "title": "Emptying the Mind",
               "type": "exercise",
               "interaction": "input-table",
               "key": "er_control",
@@ -1980,10 +1976,10 @@
         },
         {
           "day": 24,
-          "title": "Journalling (ontinued)",
+          "title": "Journaling (Continued)",
           "kind": "learning",
           "declaredBlocks": 3,
-          "subtitle": "Effort & Reward.",
+          "subtitle": "A daily release valve.",
           "blocks": [
             {
               "n": 1,
@@ -1993,14 +1989,14 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Last day of this one. Next, we'll look at other things keeping you up at night."
+                  "text": "Last day of this one. Next, we'll look at what's going well."
                 }
               ],
               "notes": []
             },
             {
               "n": 2,
-              "title": "Emptying the mind.",
+              "title": "Emptying the Mind",
               "type": "exercise",
               "interaction": "input-table",
               "key": "er_control",
@@ -2021,7 +2017,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Now that we have figured out this technique, when we meet next, we will work on understanding other factors that keep us awake."
+                  "text": "Now that we have figured out this technique, when we meet next, we will work on noticing what’s going well."
                 }
               ],
               "notes": []
@@ -2040,7 +2036,7 @@
           "title": "Positive Capturing",
           "kind": "learning",
           "declaredBlocks": 6,
-          "subtitle": "Necessities.",
+          "subtitle": "Rebalancing perspective.",
           "blocks": [
             {
               "n": 1,
@@ -2057,7 +2053,7 @@
             },
             {
               "n": 2,
-              "title": "Good Things.",
+              "title": "Good Things",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -2101,7 +2097,7 @@
             },
             {
               "n": 4,
-              "title": "For tomorrow",
+              "title": "For Tomorrow",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -2135,7 +2131,7 @@
                 },
                 {
                   "kind": "text",
-                  "text": "List down some things things you’re grateful for today."
+                  "text": "List down some things you’re grateful for today."
                 },
                 {
                   "kind": "text",
@@ -2163,7 +2159,7 @@
           "title": "Positive Capturing (Continued)",
           "kind": "learning",
           "declaredBlocks": 6,
-          "subtitle": "Necessities.",
+          "subtitle": "Rebalancing perspective.",
           "blocks": [
             {
               "n": 1,
@@ -2173,14 +2169,14 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Same four, one more time"
+                  "text": "Same four, one more time."
                 }
               ],
               "notes": []
             },
             {
               "n": 2,
-              "title": "Good Things.",
+              "title": "Good Things",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -2216,7 +2212,7 @@
             },
             {
               "n": 4,
-              "title": "For tomorrow",
+              "title": "For Tomorrow",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -2287,7 +2283,7 @@
             },
             {
               "n": 2,
-              "title": "Good Things.",
+              "title": "Good Things",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -2323,7 +2319,7 @@
             },
             {
               "n": 4,
-              "title": "For tomorrow",
+              "title": "For Tomorrow",
               "type": "exercise",
               "interaction": "input-table",
               "minutes": 5,
@@ -2355,25 +2351,17 @@
                   "kind": "text",
                   "text": "New entries only"
                 }
-              ],
-              "prompt": "List down 3 good things which happened to you today.",
-              "columns": [
-                "Good Things That Happened Today."
-              ],
-              "quoteText": [
-                "User may add rows"
-              ],
-              "userMayAddRows": true
+              ]
             },
             {
-              "n": 5,
+              "n": 6,
               "title": "Conclusion",
               "type": "conclude",
               "minutes": 5,
               "body": [
                 {
                   "kind": "p",
-                  "text": "Nice work. Over these 27 days you've built a real toolkit: a thought log, a way to challenge distorted thinking, a worry log, and a habit of noticing what's actually going well. Come back to any of these whenever stress creeps back up. Everything here stays available whenever you need it.”"
+                  "text": "Nice work. Over these 27 days you've built a real toolkit: a thought log, a way to challenge distorted thinking, a worry log, and a habit of noticing what's actually going well. Come back to any of these whenever stress creeps back up. Everything here stays available whenever you need it."
                 }
               ],
               "notes": []
@@ -2434,5 +2422,6 @@
       "Focus": "Rebalancing perspective, wrap-up"
     }
   ],
-  "description": ""
+  "description": "A 28-day program to understand what stresses you, and build practical tools to manage it.",
+  "tagline": "Transform your life with daily practice."
 }
