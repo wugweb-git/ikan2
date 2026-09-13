@@ -11,7 +11,7 @@ export type StoredResult = {
   answers: Answers;
 };
 
-export type Draft = { answers: Answers; index: number; seconds: number };
+export type Draft = { answers: Answers; index: number; seconds: number; updatedAt?: string };
 
 type State = { results: StoredResult[]; drafts: Record<string, Draft> };
 
@@ -24,6 +24,7 @@ export function useAssessmentStore() {
   const state = store.use();
   return {
     results: state.results,
+    drafts: state.drafts,
     /** newest first */
     resultsFor: (slug: string) =>
       state.results
@@ -31,7 +32,10 @@ export function useAssessmentStore() {
         .sort((a, b) => b.completedAt.localeCompare(a.completedAt)),
     draftFor: (slug: string) => state.drafts[slug],
     saveDraft: (slug: string, draft: Draft) =>
-      store.update((s) => ({ ...s, drafts: { ...s.drafts, [slug]: draft } })),
+      store.update((s) => ({
+        ...s,
+        drafts: { ...s.drafts, [slug]: { ...draft, updatedAt: new Date().toISOString() } },
+      })),
     clearDraft: (slug: string) =>
       store.update((s) => {
         const { [slug]: _gone, ...drafts } = s.drafts;

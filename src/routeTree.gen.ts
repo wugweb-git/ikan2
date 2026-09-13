@@ -12,10 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AssessmentFlowRouteImport } from './routes/assessment-flow'
 import { Route as AssessmentsRouteImport } from './routes/assessments'
+import { Route as HistoryRouteImport } from './routes/history'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as WellnessRouteImport } from './routes/wellness'
 import { Route as AssessmentIndexRouteImport } from './routes/assessment.index'
 import { Route as AssessmentSlugRouteImport } from './routes/assessment.$slug'
+import { Route as ConsultIndexRouteImport } from './routes/consult.index'
+import { Route as ConsultIdRouteImport } from './routes/consult.$id'
 import { Route as ProgramIndexRouteImport } from './routes/program.index'
 import { Route as ResultSlugRouteImport } from './routes/result.$slug'
 import { Route as ProgramSlugIndexRouteImport } from './routes/program.$slug.index'
@@ -38,14 +46,44 @@ const AssessmentsRoute = AssessmentsRouteImport.update({
   path: '/assessments',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JournalRoute = JournalRouteImport.update({
   id: '/journal',
   path: '/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WellnessRoute = WellnessRouteImport.update({
+  id: '/wellness',
+  path: '/wellness',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AssessmentIndexRoute = AssessmentIndexRouteImport.update({
@@ -56,6 +94,16 @@ const AssessmentIndexRoute = AssessmentIndexRouteImport.update({
 const AssessmentSlugRoute = AssessmentSlugRouteImport.update({
   id: '/assessment/$slug',
   path: '/assessment/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsultIndexRoute = ConsultIndexRouteImport.update({
+  id: '/consult/',
+  path: '/consult/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsultIdRoute = ConsultIdRouteImport.update({
+  id: '/consult/$id',
+  path: '/consult/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgramIndexRoute = ProgramIndexRouteImport.update({
@@ -93,11 +141,19 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessments': typeof AssessmentsRoute
+  '/history': typeof HistoryRoute
   '/journal': typeof JournalRoute
+  '/notifications': typeof NotificationsRoute
+  '/profile': typeof ProfileRoute
+  '/resources': typeof ResourcesRoute
+  '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
+  '/wellness': typeof WellnessRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
+  '/consult/$id': typeof ConsultIdRoute
   '/result/$slug': typeof ResultSlugRoute
   '/assessment/': typeof AssessmentIndexRoute
+  '/consult/': typeof ConsultIndexRoute
   '/program/': typeof ProgramIndexRoute
   '/program/$slug/journal': typeof ProgramSlugJournalRoute
   '/program/$slug/': typeof ProgramSlugIndexRoute
@@ -108,11 +164,19 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessments': typeof AssessmentsRoute
+  '/history': typeof HistoryRoute
   '/journal': typeof JournalRoute
+  '/notifications': typeof NotificationsRoute
+  '/profile': typeof ProfileRoute
+  '/resources': typeof ResourcesRoute
+  '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
+  '/wellness': typeof WellnessRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
+  '/consult/$id': typeof ConsultIdRoute
   '/result/$slug': typeof ResultSlugRoute
   '/assessment': typeof AssessmentIndexRoute
+  '/consult': typeof ConsultIndexRoute
   '/program': typeof ProgramIndexRoute
   '/program/$slug/journal': typeof ProgramSlugJournalRoute
   '/program/$slug': typeof ProgramSlugIndexRoute
@@ -124,11 +188,19 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessments': typeof AssessmentsRoute
+  '/history': typeof HistoryRoute
   '/journal': typeof JournalRoute
+  '/notifications': typeof NotificationsRoute
+  '/profile': typeof ProfileRoute
+  '/resources': typeof ResourcesRoute
+  '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
+  '/wellness': typeof WellnessRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
+  '/consult/$id': typeof ConsultIdRoute
   '/result/$slug': typeof ResultSlugRoute
   '/assessment/': typeof AssessmentIndexRoute
+  '/consult/': typeof ConsultIndexRoute
   '/program/': typeof ProgramIndexRoute
   '/program/$slug/journal': typeof ProgramSlugJournalRoute
   '/program/$slug/': typeof ProgramSlugIndexRoute
@@ -141,11 +213,19 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment-flow'
     | '/assessments'
+    | '/history'
     | '/journal'
+    | '/notifications'
+    | '/profile'
+    | '/resources'
+    | '/settings'
     | '/support'
+    | '/wellness'
     | '/assessment/$slug'
+    | '/consult/$id'
     | '/result/$slug'
     | '/assessment/'
+    | '/consult/'
     | '/program/'
     | '/program/$slug/journal'
     | '/program/$slug/'
@@ -156,11 +236,19 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment-flow'
     | '/assessments'
+    | '/history'
     | '/journal'
+    | '/notifications'
+    | '/profile'
+    | '/resources'
+    | '/settings'
     | '/support'
+    | '/wellness'
     | '/assessment/$slug'
+    | '/consult/$id'
     | '/result/$slug'
     | '/assessment'
+    | '/consult'
     | '/program'
     | '/program/$slug/journal'
     | '/program/$slug'
@@ -171,11 +259,19 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment-flow'
     | '/assessments'
+    | '/history'
     | '/journal'
+    | '/notifications'
+    | '/profile'
+    | '/resources'
+    | '/settings'
     | '/support'
+    | '/wellness'
     | '/assessment/$slug'
+    | '/consult/$id'
     | '/result/$slug'
     | '/assessment/'
+    | '/consult/'
     | '/program/'
     | '/program/$slug/journal'
     | '/program/$slug/'
@@ -187,11 +283,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AssessmentFlowRoute: typeof AssessmentFlowRoute
   AssessmentsRoute: typeof AssessmentsRoute
+  HistoryRoute: typeof HistoryRoute
   JournalRoute: typeof JournalRoute
+  NotificationsRoute: typeof NotificationsRoute
+  ProfileRoute: typeof ProfileRoute
+  ResourcesRoute: typeof ResourcesRoute
+  SettingsRoute: typeof SettingsRoute
   SupportRoute: typeof SupportRoute
+  WellnessRoute: typeof WellnessRoute
   AssessmentSlugRoute: typeof AssessmentSlugRoute
+  ConsultIdRoute: typeof ConsultIdRoute
   ResultSlugRoute: typeof ResultSlugRoute
   AssessmentIndexRoute: typeof AssessmentIndexRoute
+  ConsultIndexRoute: typeof ConsultIndexRoute
   ProgramIndexRoute: typeof ProgramIndexRoute
   ProgramSlugJournalRoute: typeof ProgramSlugJournalRoute
   ProgramSlugIndexRoute: typeof ProgramSlugIndexRoute
@@ -222,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/journal': {
       id: '/journal'
       path: '/journal'
@@ -229,11 +340,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JournalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/support': {
       id: '/support'
       path: '/support'
       fullPath: '/support'
       preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wellness': {
+      id: '/wellness'
+      path: '/wellness'
+      fullPath: '/wellness'
+      preLoaderRoute: typeof WellnessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/assessment/': {
@@ -248,6 +394,20 @@ declare module '@tanstack/react-router' {
       path: '/assessment/$slug'
       fullPath: '/assessment/$slug'
       preLoaderRoute: typeof AssessmentSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consult/': {
+      id: '/consult/'
+      path: '/consult'
+      fullPath: '/consult/'
+      preLoaderRoute: typeof ConsultIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consult/$id': {
+      id: '/consult/$id'
+      path: '/consult/$id'
+      fullPath: '/consult/$id'
+      preLoaderRoute: typeof ConsultIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/program/': {
@@ -299,11 +459,19 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AssessmentFlowRoute: AssessmentFlowRoute,
   AssessmentsRoute: AssessmentsRoute,
+  HistoryRoute: HistoryRoute,
   JournalRoute: JournalRoute,
+  NotificationsRoute: NotificationsRoute,
+  ProfileRoute: ProfileRoute,
+  ResourcesRoute: ResourcesRoute,
+  SettingsRoute: SettingsRoute,
   SupportRoute: SupportRoute,
+  WellnessRoute: WellnessRoute,
   AssessmentSlugRoute: AssessmentSlugRoute,
+  ConsultIdRoute: ConsultIdRoute,
   ResultSlugRoute: ResultSlugRoute,
   AssessmentIndexRoute: AssessmentIndexRoute,
+  ConsultIndexRoute: ConsultIndexRoute,
   ProgramIndexRoute: ProgramIndexRoute,
   ProgramSlugJournalRoute: ProgramSlugJournalRoute,
   ProgramSlugIndexRoute: ProgramSlugIndexRoute,

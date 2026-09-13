@@ -1,6 +1,7 @@
 import { createFileRoute, Link, linkOptions } from "@tanstack/react-router";
 import {
   Activity,
+  Bell,
   ArrowUpRight,
   BookOpen,
   CalendarCheck,
@@ -20,6 +21,12 @@ import { IkanShell } from "@/components/ikan-shell";
 import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
 import { moodScale } from "@/lib/journal";
+import { saveSnapshot, useEverything, wellnessBand } from "@/lib/activity";
+import { defaultProfile, firstName, profileInitials, useProfile } from "@/lib/profile";
+import { getResource } from "@/lib/resources";
+import { useNotifications } from "@/lib/notifications";
+import { useHydrated } from "@/hooks/use-hydrated";
+import { useEffect } from "react";
 import { usePersonalContext, useScrollY } from "@/hooks/use-personal-context";
 import programCover from "@/assets/program-cover.jpg";
 import resAnxiety from "@/assets/res-anxiety.jpg";
@@ -48,12 +55,6 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const rings = [
-  { label: "Energy", value: 62, color: "var(--rest)" },
-  { label: "Calm", value: 48, color: "var(--calm)" },
-  { label: "Focus", value: 71, color: "var(--mind)" },
-];
-
 const offerings = [
   {
     label: "Programs",
@@ -76,7 +77,13 @@ const offerings = [
     to: "/journal" as const,
     tone: "score-rest",
   },
-  { label: "Consult", meta: "Book a slot", icon: Heart, to: "/" as const, tone: "score-alert" },
+  {
+    label: "Consult",
+    meta: "5 consultants",
+    icon: Heart,
+    to: "/consult" as const,
+    tone: "score-alert",
+  },
 ];
 
 const activity = [
@@ -103,19 +110,30 @@ const activity = [
   },
 ];
 
-const resources = [
-  {
-    tag: "Anxiety",
-    title: "The 3-minute reset that actually works",
-    read: "4 min read",
-    img: resAnxiety,
-  },
-  { tag: "Sleep", title: "Why your mind races at 1 AM", read: "6 min read", img: resSleep },
-  { tag: "Burnout", title: "Small boundaries, big recovery", read: "5 min read", img: resBurnout },
-];
+const readForWeek = [
+  { id: "98d536d4-938b-4fbf-bc2c-f37e6d0b9409", tag: "Burnout", img: resBurnout },
+  { id: "c775a1e1-a938-4aac-8519-e5ad9f8dda1f", tag: "Sleep", img: resSleep },
+  { id: "resource-1766237270444", tag: "Anxiety", img: resAnxiety },
+].map((r) => ({ ...r, resource: getResource(r.id)! }));
 
 function Index() {
-  const ctx = usePersonalContext("Ravi");
+  const hydrated = useHydrated();
+  const { profile } = useProfile();
+  const data = useEverything();
+  const { unreadCount } = useNotifications();
+  const who = hydrated ? profile : defaultProfile;
+  const ctx = usePersonalContext(firstName(who), who.city || "Pune");
+  const score = hydrated ? data.score : null;
+  const band = score !== null ? wellnessBand(score) : null;
+  const part = (k: string) => data.parts.find((x) => x.key === k)?.value ?? null;
+  const rings = [
+    { label: "Assess", value: hydrated ? part("assessments") : null, color: "var(--mind)" },
+    { label: "Mood", value: hydrated ? part("mood") : null, color: "var(--rest)" },
+    { label: "Programs", value: hydrated ? part("programs") : null, color: "var(--calm)" },
+  ];
+  useEffect(() => {
+    if (score !== null) saveSnapshot(score);
+  }, [score]);
   const scrollY = useScrollY();
   const collapsed = scrollY > 64;
 
@@ -125,9 +143,9 @@ function Index() {
       <div className={`ambient ambient-${ctx.dayPart}`} aria-hidden="true" />
 
       <div className={collapsed ? "sticky-bar sticky-bar-on" : "sticky-bar"}>
-        <span className="avatar avatar-sm">RA</span>
+        <span className="avatar avatar-sm">{profileInitials(who)}</span>
         <span className="truncate font-display text-sm font-semibold">{ctx.greeting}</span>
-        <span className="ml-auto text-xs font-semibold text-muted-foreground">78</span>
+        <span className="ml-auto text-xs font-semibold text-muted-foreground">{score ?? ""}</span>
       </div>
 
       <header className="relative px-5 pt-7">
@@ -149,9 +167,25 @@ function Index() {
             </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">{ctx.subline}</p>
           </div>
-          <span className="avatar-ring">
-            <span className="avatar">RA</span>
-          </span>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/notifications"
+              aria-label={
+                hydrated && unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"
+              }
+              className="relative grid h-11 w-11 place-items-center rounded-full bg-background/70 backdrop-blur transition-transform active:scale-95"
+            >
+              <Bell className="h-5 w-5" />
+              {hydrated && unreadCount ? (
+                <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#B3261E] px-1 text-[10px] font-bold text-white">
+                  {unreadCount}
+                </span>
+              ) : null}
+            </Link>
+            <Link to="/profile" aria-label="Profile" className="avatar-ring">
+              <span className="avatar">{profileInitials(who)}</span>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -159,19 +193,26 @@ function Index() {
       <Reveal className="mt-5 px-5">
         <div className="surface overflow-hidden">
           <div className="grid grid-cols-[92px_minmax(0,1fr)] items-center gap-4 p-4">
-            <div className="score-orb">
+            <div
+              className="score-orb"
+              style={{
+                background: `conic-gradient(from 210deg, var(--calm) 0 ${score ?? 0}%, var(--secondary) ${score ?? 0}%)`,
+              }}
+            >
               <span>
-                <strong>78</strong>
+                <strong>{score ?? "—"}</strong>
                 <small>score</small>
               </span>
             </div>
             <div className="min-w-0">
               <p className="eyebrow">iKAN wellness score</p>
               <h2 className="mt-1 font-display text-base font-semibold leading-snug">
-                Steady, slightly stretched
+                {band ? band.label : "Your score starts with one check-in"}
               </h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                +6 this month · sleep is carrying you
+                {score !== null
+                  ? `Built from ${data.parts.filter((x) => x.value !== null).length} of 4 parts`
+                  : "Log your mood or take an assessment"}
               </p>
             </div>
           </div>
@@ -180,16 +221,16 @@ function Index() {
               <div key={r.label} className="ring-stat">
                 <span
                   className="ring-dial"
-                  style={{ ["--p" as string]: `${r.value}%`, ["--c" as string]: r.color }}
+                  style={{ ["--p" as string]: `${r.value ?? 0}%`, ["--c" as string]: r.color }}
                 >
-                  <i>{r.value}</i>
+                  <i>{r.value === null ? "—" : Math.round(r.value)}</i>
                 </span>
                 <span className="ring-label">{r.label}</span>
               </div>
             ))}
           </div>
-          <Link to="/assessments" className="row-link">
-            See wellness timeline <ChevronRight className="h-4 w-4" />
+          <Link to="/wellness" className="row-link">
+            See iKAN Wellness <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
       </Reveal>
@@ -398,10 +439,13 @@ function Index() {
             </div>
           </div>
           <Button
+            asChild
             variant="support"
             className="mt-3 w-full rounded-full transition-transform active:scale-[.98]"
           >
-            <CalendarDays /> Book a consultation
+            <Link to="/consult">
+              <CalendarDays /> Book a consultation
+            </Link>
           </Button>
         </div>
       </Reveal>
@@ -415,21 +459,23 @@ function Index() {
               Read for your week
             </h2>
           </div>
-          <span className="text-xs text-muted-foreground">Swipe</span>
+          <Link to="/resources" className="text-xs font-semibold text-foreground">
+            See all
+          </Link>
         </div>
         <div className="no-scrollbar -mx-5 flex snap-x gap-3 overflow-x-auto px-5 pb-1">
-          {resources.map((r) => (
-            <article key={r.title} className="read-card snap-start">
+          {readForWeek.map((r) => (
+            <Link key={r.id} to="/resources" className="read-card snap-start">
               <img src={r.img} alt="" aria-hidden="true" loading="lazy" width={816} height={816} />
               <div className="read-veil" />
               <div className="read-body">
                 <span className="read-tag">
                   <BookOpen className="h-3 w-3" /> {r.tag}
                 </span>
-                <strong>{r.title}</strong>
-                <span className="read-meta">{r.read}</span>
+                <strong className="line-clamp-3">{r.resource.title}</strong>
+                <span className="read-meta">{r.resource.minutes} min read</span>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </Reveal>

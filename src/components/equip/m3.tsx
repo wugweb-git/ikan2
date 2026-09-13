@@ -456,3 +456,41 @@ export function Pager({
     </div>
   );
 }
+
+/** M3 switch: 52×32 track, thumb grows when on. */
+export function Switch({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={() => onChange(!checked)}
+      className={cn(
+        "relative h-8 w-[52px] shrink-0 rounded-full border-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground",
+        checked
+          ? "border-transparent bg-[var(--accent-strong,#1f2937)]"
+          : "border-foreground/40 bg-secondary",
+      )}
+    >
+      <span
+        className={cn(
+          "absolute top-1/2 grid -translate-y-1/2 place-items-center rounded-full transition-all",
+          checked
+            ? "left-[22px] h-6 w-6 bg-background text-[var(--accent-strong,#1f2937)]"
+            : "left-1.5 h-4 w-4 bg-foreground/55",
+        )}
+      >
+        {checked ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : null}
+      </span>
+    </button>
+  );
+}

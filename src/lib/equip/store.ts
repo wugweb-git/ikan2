@@ -9,6 +9,8 @@ export type Entry = { id: string; day: number; createdAt: string; values: EntryV
 
 export type ProgrammeState = {
   completed: number[];
+  /** day → ISO time it was completed (days finished before this field existed have none) */
+  completedAt?: Record<string, string>;
   /** choice, scale and reflect answers, keyed by step key (reflections are per day: `${key}@${day}`) */
   answers: Record<string, string | string[] | number>;
   collections: Record<string, Entry[]>;
@@ -130,7 +132,11 @@ export function useProgramme(slug: string) {
       update((s) =>
         s.completed.includes(day)
           ? s
-          : { ...s, completed: [...s.completed, day].sort((a, b) => a - b) },
+          : {
+              ...s,
+              completed: [...s.completed, day].sort((a, b) => a - b),
+              completedAt: { ...s.completedAt, [String(day)]: new Date().toISOString() },
+            },
       ),
     reset: () => write(slug, EMPTY),
   };
