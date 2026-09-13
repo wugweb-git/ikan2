@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, BookOpen, Check, CircleCheckBig, PencilLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDuration, formatTime, nightMetrics, type DiaryEntry } from "@/lib/equip/metrics";
 import { visibleBody, type NBlock } from "@/lib/equip/notion";
@@ -35,14 +35,12 @@ export function Footer({
 }) {
   return (
     <footer className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
-      <div className="flex w-full max-w-md items-center gap-2 border-t border-foreground/[0.08] bg-background px-3 py-3">
+      <div className="flex w-full max-w-md items-center gap-3 border-t border-foreground/[0.08] bg-background px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {onBack ? (
-          <IconButton label="Back" onClick={onBack}>
+          <IconButton label="Back" onClick={onBack} className="h-14 w-14 bg-secondary">
             <ArrowLeft className="h-6 w-6" />
           </IconButton>
-        ) : (
-          <span className="w-12" />
-        )}
+        ) : null}
         <Button onClick={onNext} disabled={disabled} className="h-14 flex-1 text-[16px]">
           {label}
         </Button>
@@ -53,15 +51,36 @@ export function Footer({
 
 const nextLabel = (ctx: StepCtx) => ctx.finishLabel ?? (ctx.isLast ? `Finish day ${ctx.day}` : "Next");
 
-/** Block title (Notion) and its body text. `skip` hides a body line already used as the prompt. */
-function BlockText({ block, headline, skip }: { block: NBlock; headline?: string | undefined; skip?: string }) {
+/** Block title (Notion) and its body text. With no prompt, the title is the headline. */
+function BlockText({
+  block,
+  headline,
+  skip,
+  icon,
+}: {
+  block: NBlock;
+  headline?: string | undefined;
+  skip?: string;
+  icon?: ReactNode;
+}) {
   const body = visibleBody(block).filter((i) => i.text !== skip);
   const ordered = body.every((i) => i.kind === "ol");
   return (
     <div>
-      <p className="text-[14px] font-semibold leading-5 text-[var(--accent)]">{block.title}</p>
+      <div className={cn("flex gap-3", headline ? "items-center" : "flex-col items-start")}>
+        {icon ? (
+          <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--accent-container)] text-[var(--on-accent-container)] [&_svg]:h-5 [&_svg]:w-5">
+            {icon}
+          </span>
+        ) : null}
+        {headline ? (
+          <p className="text-[14px] font-semibold leading-5 text-[var(--accent-strong)]">{block.title}</p>
+        ) : (
+          <h2 className="font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">{block.title}</h2>
+        )}
+      </div>
       {body.length ? (
-        <div className="mt-3 space-y-3 text-[16px] leading-[1.6] text-foreground/85">
+        <div className="mt-4 space-y-4 text-[17px] leading-[1.6] text-foreground/90">
           {body.map((item, i) =>
             item.kind === "p" ? (
               <p key={i} className="whitespace-pre-line">
@@ -69,7 +88,7 @@ function BlockText({ block, headline, skip }: { block: NBlock; headline?: string
               </p>
             ) : (
               <p key={i} className="flex gap-3 pl-1">
-                <span className="w-4 shrink-0 text-muted-foreground">{item.kind === "ol" || ordered ? `${body.slice(0, i + 1).filter((x) => x.kind !== "p").length}.` : "•"}</span>
+                <span className="w-5 shrink-0 text-muted-foreground">{item.kind === "ol" || ordered ? `${body.slice(0, i + 1).filter((x) => x.kind !== "p").length}.` : "•"}</span>
                 <span>{item.text}</span>
               </p>
             ),
@@ -77,7 +96,7 @@ function BlockText({ block, headline, skip }: { block: NBlock; headline?: string
         </div>
       ) : null}
       {headline ? (
-        <h2 className="mt-3 font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">{headline}</h2>
+        <h2 className="mt-4 font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">{headline}</h2>
       ) : null}
     </div>
   );
@@ -92,7 +111,7 @@ function LessonStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
     <>
       {bullets ? (
         <div>
-          <p className="text-[14px] font-semibold text-[var(--accent)]">{step.block.title}</p>
+          <h2 className="font-display text-[26px] font-semibold leading-8">{step.block.title}</h2>
           <ul className="mt-4 divide-y divide-foreground/[0.08] rounded-[16px] bg-secondary">
             {step.block.body[0]!.text.split(" • ").map((item) => (
               <li key={item} className="px-4 py-3.5 text-[16px]">
@@ -107,7 +126,7 @@ function LessonStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
           ))}
         </div>
       ) : (
-        <BlockText block={step.block} />
+        <BlockText block={step.block} icon={<BookOpen />} />
       )}
       {view.cards ? (
         <div className="no-scrollbar -mx-4 mt-6 flex snap-x items-start gap-3 overflow-x-auto px-4">
@@ -156,7 +175,12 @@ function ChoiceStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
 
   return (
     <>
-      <BlockText block={step.block} headline={view.prompt === step.block.title ? undefined : view.prompt} skip={view.prompt} />
+      <BlockText
+        block={step.block}
+        headline={view.prompt === step.block.title ? undefined : view.prompt}
+        skip={view.prompt}
+        icon={<CircleCheckBig />}
+      />
       {view.table ? <DataTable rows={view.table} /> : null}
       {view.cards ? (
         // Notion "UI hints: cards"
@@ -288,9 +312,9 @@ function TextStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "te
   if (hidden) return null;
   return (
     <>
-      <BlockText block={step.block} headline={view.prompt} />
+      <BlockText block={step.block} headline={view.prompt || undefined} icon={<PencilLine />} />
       <div className="mt-6">
-        <TextField label="" ariaLabel={view.prompt} value={value} onChange={(v) => setAnswer(key, v)} multiline />
+        <TextField label="" ariaLabel={view.prompt || step.block.title} placeholder="Write here" value={value} onChange={(v) => setAnswer(key, v)} multiline />
       </div>
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
     </>
@@ -317,7 +341,7 @@ function ConcludeStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui:
           />
           <Check className="relative h-10 w-10 text-background transition-opacity delay-500 duration-500" style={{ opacity: full ? 1 : 0 }} strokeWidth={2.5} />
         </span>
-        <p className="mt-6 text-[14px] font-semibold text-[var(--accent)]">{step.block.title}</p>
+        <p className="mt-6 text-[14px] font-semibold text-[var(--accent-strong)]">{step.block.title}</p>
         <div className="mt-2 space-y-2">
           {visibleBody(step.block).map((b) => (
             <p key={b.text} className="font-display text-[22px] font-semibold leading-8 text-balance">
@@ -350,7 +374,7 @@ function SortStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "so
 
   return (
     <>
-      <p className="text-[14px] font-semibold text-[var(--accent)]">{step.block.title}</p>
+      <p className="text-[14px] font-semibold text-[var(--accent-strong)]">{step.block.title}</p>
       <div className="mt-4">
         <Pager
           index={page}
@@ -463,7 +487,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
     const m = nightMetrics(entry);
     return (
       <>
-        <p className="text-[14px] font-semibold text-[var(--accent)]">Sleep Diary</p>
+        <p className="text-[14px] font-semibold text-[var(--accent-strong)]">Sleep Diary</p>
         {m ? (
           <div className="mt-4 rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
             <div className="grid grid-cols-2 gap-4">
@@ -501,7 +525,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
   return (
     <>
       <div className="flex items-center justify-between">
-        <p className="text-[14px] font-semibold text-[var(--accent)]">Sleep Diary</p>
+        <p className="text-[14px] font-semibold text-[var(--accent-strong)]">Sleep Diary</p>
         <p className="text-[13px] tabular-nums text-muted-foreground">
           {q + 1} of {questions.length}
         </p>

@@ -94,8 +94,13 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
               </Link>
             }
           />
-          <div className="px-4 pb-2">
-            <LinearProgress value={((index + 1) / day.steps.length) * 100} />
+          <div className="flex items-center gap-3 px-4 pb-2">
+            <div className="flex-1">
+              <LinearProgress value={((index + 1) / day.steps.length) * 100} />
+            </div>
+            <span className="text-[12px] tabular-nums text-muted-foreground" aria-live="polite">
+              {index + 1} of {day.steps.length}
+            </span>
           </div>
         </div>
 
@@ -112,6 +117,11 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
                 onNext: () => {
                   if (index + 1 < day.steps.length) return go(index + 1);
                   complete(day.day);
+                  try {
+                    sessionStorage.setItem("ikan.equip.finished", `${slug}:${day.day}`);
+                  } catch {
+                    /* the confirmation is a nicety; storage may be unavailable */
+                  }
                   toProgramme();
                 },
               }}

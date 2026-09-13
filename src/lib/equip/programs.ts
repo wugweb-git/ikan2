@@ -55,7 +55,7 @@ function cardFields(b: NBlock): { fields: Field[]; example: Record<string, strin
     if (/^\+-+\+?$/.test(line)) continue;
     const picker = line.match(/^(.*?)\.?\s*Time Picker$/i);
     const select = line.match(/^(.*?)\s+Let user choose from (.+?)(?:\s+etc\.?)?$/i);
-    if (picker) fields.push(field(picker[1]!.trim(), "time"));
+    if (picker) fields.push(field(picker[1]!.replace(/:\s*$/, "").trim(), "time"));
     else if (select) fields.push(field(select[1]!.trim(), "select", select[2]!.split(",").map((s) => s.trim())));
     else {
       const [label, ...rest] = line.split(":");
@@ -427,7 +427,10 @@ const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 function defaultView(b: NBlock): UI {
   if (b.title === "Sleep Diary" && b.interaction === "input-table") return { ui: "diary" };
-  if (b.type === "conclude") return { ui: "conclude", ...(b.prompt ? { prompt: b.prompt } : {}) };
+  // Some days close with a lesson titled "Conclusion"; give them the same finish as conclude blocks.
+  if (b.type === "conclude" || (b.type === "lesson" && /^Conclusion$/i.test(b.title))) {
+    return { ui: "conclude", ...(b.prompt ? { prompt: b.prompt } : {}) };
+  }
   if (b.interaction === "scale" && typeof b.constraints === "object") {
     return { ui: "scale", prompt: b.prompt ?? b.title, min: b.constraints.min ?? 0, max: b.constraints.max ?? 10 };
   }

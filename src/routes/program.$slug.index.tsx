@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, BookOpen, Check, ChevronRight, LifeBuoy, Lock, Wrench } from "lucide-react";
+import { useEffect } from "react";
+import { ArrowLeft, BookOpen, Check, ChevronRight, LifeBuoy, Lock, Play, Wrench } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { accentStyle, Button, IconButton, stateLayer } from "@/components/equip/m3";
+import { accentStyle, Button, IconButton, Snackbar, stateLayer, useSnack } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useScrollY } from "@/hooks/use-personal-context";
 import { cn } from "@/lib/utils";
@@ -28,12 +29,30 @@ function ProgrammePage() {
   const navigate = useNavigate();
   const { state, nextDay } = useProgramme(slug);
   const y = useScrollY();
-  const collapsed = y > 180;
+  const collapsed = y > 150;
   const lastDay = programme.days.at(-1)!.day;
   const finished = nextDay > lastDay;
   const today = finished ? undefined : programme.days.find((d) => d.day === nextDay);
   const started = state.completed.length > 0;
   const src = programme.source;
+  const snack = useSnack();
+
+  // "Day N complete" once, after returning from a finished day
+  useEffect(() => {
+    try {
+      const flag = sessionStorage.getItem("ikan.equip.finished");
+      if (flag?.startsWith(`${slug}:`)) {
+        sessionStorage.removeItem("ikan.equip.finished");
+        snack.show(`Day ${flag.split(":")[1]} complete`);
+      }
+    } catch {
+      /* storage unavailable */
+    }
+  }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const activities = today?.steps.filter((st) => st.view.ui !== "conclude").map((st) => st.block.title) ?? [];
+  const uniqueActivities = activities.filter((t, i) => activities.indexOf(t) === i);
+  const shown = uniqueActivities.slice(0, 4);
 
   return (
     <IkanShell>
@@ -54,88 +73,110 @@ function ProgrammePage() {
         </div>
 
         {/* large top app bar over the cover */}
-        <header className="relative h-[300px] overflow-hidden text-background">
-          <img src={programme.cover} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ transform: `translateY(${y * 0.3}px) scale(1.05)` }} />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/20 to-black/75" />
+        <header className="relative h-[232px] overflow-hidden text-background">
+          <img
+            src={programme.cover}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover motion-reduce:transform-none"
+            style={{ transform: `translateY(${Math.min(y, 232) * 0.3}px) scale(1.05)` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/15 to-black/80" />
           <div className="relative flex h-16 items-center justify-between px-1">
             <IconButton label="Back" onClick={() => navigate({ to: "/program" })}>
               <ArrowLeft className="h-6 w-6" />
             </IconButton>
             <JournalButton slug={slug} />
           </div>
-          <div className="absolute inset-x-0 bottom-0 px-4 pb-6">
-            {src.tagline ? <p className="text-[14px] opacity-85">{src.tagline}</p> : null}
-            <h1 className="mt-1 font-display text-[40px] font-semibold leading-[44px] tracking-[-0.02em]">{programme.name}</h1>
-            <p className="mt-2 text-[14px] opacity-85">
-              {src.meta.days}, {src.meta.level}
+          <div className="absolute inset-x-0 bottom-0 px-4 pb-8">
+            <h1 className="font-display text-[36px] font-semibold leading-[40px] tracking-[-0.02em]">{programme.name}</h1>
+            <p className="mt-1.5 text-[14px] opacity-90">
+              {src.meta.days}, {src.meta.level.charAt(0).toUpperCase() + src.meta.level.slice(1)}
             </p>
           </div>
         </header>
 
-        <div className="-mt-4 relative rounded-t-[28px] bg-background px-4 pt-6">
-          {!started && src.description ? <p className="mb-5 text-[16px] leading-[1.6] text-foreground/85">{src.description}</p> : null}
-
+        <div className="-mt-4 relative rounded-t-[28px] bg-background px-4 pt-5">
           {today ? (
             <section className="rounded-[28px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
-              <p className="text-[14px] font-medium">
-                {started ? "Up next" : "Start here"}, about {minutesOf(today)} min
-              </p>
-              <p className="mt-1 font-display text-[36px] font-semibold leading-[44px] tabular-nums">Day {today.day}</p>
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="font-display text-[32px] font-semibold leading-10 tabular-nums">Day {today.day}</p>
+                <p className="text-[13px] font-medium">About {minutesOf(today)} min</p>
+              </div>
               <p className="font-display text-[20px] font-semibold leading-7">{today.title}</p>
-              {today.subtitle ? <p className="mt-1 text-[15px] opacity-80">{today.subtitle}</p> : null}
-              <ul className="mt-4 flex flex-wrap gap-2">
-                {today.blocks
-                  .filter((b) => b.type !== "conclude")
-                  .map((b, i) => (
-                    <li key={i} className="rounded-[8px] border border-current/25 px-3 py-1.5 text-[13px] font-medium">
-                      {b.title}
+              {today.subtitle ? <p className="mt-0.5 text-[15px] opacity-80">{today.subtitle}</p> : null}
+              {shown.length ? (
+                <ol className="mt-4 space-y-1.5 text-[15px]">
+                  {shown.map((t, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-background/60 text-[12px] font-semibold tabular-nums">
+                        {i + 1}
+                      </span>
+                      <span className="truncate">{t}</span>
                     </li>
                   ))}
-              </ul>
+                  {uniqueActivities.length > shown.length ? (
+                    <li className="pl-9 text-[14px] opacity-80">and {uniqueActivities.length - shown.length} more</li>
+                  ) : null}
+                </ol>
+              ) : null}
               <Button
                 className="mt-5 h-14 w-full text-[16px]"
+                icon={<Play className="h-5 w-5" />}
                 onClick={() => navigate({ to: "/program/$slug/day/$day", params: { slug, day: String(today.day) } })}
               >
-                Start day {today.day}
+                {started ? `Continue with day ${today.day}` : `Start day ${today.day}`}
               </Button>
             </section>
           ) : (
             <section className="rounded-[28px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
-              <p className="font-display text-[24px] font-semibold">All {programme.days.length} days done</p>
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-background/60">
+                <Check className="h-6 w-6" strokeWidth={3} />
+              </span>
+              <p className="mt-3 font-display text-[24px] font-semibold">All {programme.days.length} days done</p>
               <p className="mt-1 text-[15px]">Every day stays open to revisit below.</p>
             </section>
           )}
+
+          {!started && src.description ? (
+            <section className="mt-6">
+              <h2 className="font-display text-[16px] font-semibold">About</h2>
+              {src.description ? <p className="mt-2 text-[16px] leading-[1.6] text-foreground/85">{src.description}</p> : null}
+            </section>
+          ) : null}
 
           <DayGrid programme={programme} completed={state.completed} next={nextDay} />
 
           {programme.tools.length ? <Tools programme={programme} reached={nextDay} /> : null}
 
           <section className="mt-8">
-            <h2 className="px-0 font-display text-[16px] font-semibold">Units</h2>
+            <h2 className="font-display text-[16px] font-semibold">Units</h2>
             <ul className="-mx-4 mt-1">
               {src.units.map((u, i) => {
                 const days = u.days.map((d) => d.day);
                 const done = days.filter((d) => state.completed.includes(d)).length;
+                const complete = done === days.length;
                 const current = days.includes(nextDay);
                 return (
-                  <li key={i} className="flex min-h-[72px] items-center gap-4 px-4 py-2">
+                  <li key={i} className={cn("flex min-h-[72px] items-center gap-4 px-4 py-2", current && "bg-[var(--accent-container)]/40")}>
                     <span
                       className={cn(
                         "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[15px] font-semibold",
-                        done === days.length ? "bg-foreground text-background" : current ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]" : "bg-secondary text-muted-foreground",
+                        complete ? "bg-foreground text-background" : current ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]" : "bg-secondary text-muted-foreground",
                       )}
                     >
-                      {done === days.length ? <Check className="h-5 w-5" strokeWidth={3} /> : i + 1}
+                      {complete ? <Check className="h-5 w-5" strokeWidth={3} /> : i + 1}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-[16px] font-medium leading-6">{u.title}</p>
                       <p className="text-[14px] leading-5 text-muted-foreground">{focusOf(programme, i)}</p>
+                      {done > 0 && !complete ? (
+                        <div className="mt-2 h-1 overflow-hidden rounded-full bg-[var(--accent-container)]">
+                          <div className="h-full rounded-full bg-[var(--accent)]" style={{ width: `${(done / days.length) * 100}%` }} />
+                        </div>
+                      ) : null}
                     </div>
                     <p className="shrink-0 text-right text-[12px] leading-4 tabular-nums text-muted-foreground">
                       {days.length === 1 ? `Day ${days[0]}` : `Days ${days[0]}–${days.at(-1)}`}
-                      <span className="block">
-                        {done}/{days.length}
-                      </span>
                     </p>
                   </li>
                 );
@@ -149,6 +190,7 @@ function ProgrammePage() {
             <ChevronRight className="h-5 w-5" />
           </Link>
         </div>
+        <Snackbar message={snack.message} />
       </div>
     </IkanShell>
   );

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { CalendarCheck, ListChecks, NotebookPen, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatTime } from "@/lib/equip/metrics";
 import { useProgramme, type Entry } from "@/lib/equip/store";
 import type { EntryValues, Field, Step, UI } from "@/lib/equip/types";
 import { BlockText, Footer, type StepCtx } from "./steps";
-import { BottomSheet, Button, IconButton, Pager, Segmented, TextField } from "./m3";
+import { BottomSheet, Button, IconButton, Pager, Segmented, Snackbar, TextField, useSnack } from "./m3";
 
 const nextLabel = (ctx: StepCtx) => ctx.finishLabel ?? (ctx.isLast ? `Finish day ${ctx.day}` : "Next");
 
@@ -112,6 +112,22 @@ function Values({ entry, fields }: { entry: Entry | { values: EntryValues }; fie
   );
 }
 
+function EmptyCards({ onAdd, canAdd }: { onAdd: () => void; canAdd: boolean }) {
+  return (
+    <div className="flex flex-col items-center rounded-[16px] border border-dashed border-foreground/25 px-6 py-8 text-center">
+      <p className="text-[16px] font-medium">No entries yet</p>
+      <p className="mt-1 text-[14px] text-muted-foreground">Each entry gets its own card. Swipe between them.</p>
+      {canAdd ? (
+        <Button variant="tonal" className="mt-4" icon={<Plus className="h-5 w-5" />} onClick={onAdd}>
+          Add New Entry
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+const countLabel = (n: number) => `${n} ${n === 1 ? "entry" : "entries"}`;
+
 /* --------------------------------- entries --------------------------------- */
 
 export function EntriesStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "entries" }>; ctx: StepCtx }) {
@@ -121,6 +137,7 @@ export function EntriesStep({ step, view, ctx }: { step: Step; view: Extract<UI,
   const [page, setPage] = useState(0);
   const full = view.limit !== undefined && list.length >= view.limit;
   const hasExample = Boolean(view.example && Object.keys(view.example).length);
+  const snack = useSnack();
 
   if (view.list) return <ListEntries step={step} view={view} ctx={ctx} list={list} />;
 
@@ -155,17 +172,16 @@ export function EntriesStep({ step, view, ctx }: { step: Step; view: Extract<UI,
 
   return (
     <>
-      <BlockText block={step.block} headline={view.prompt} />
-      <div className="mt-5">
+      <BlockText block={step.block} headline={view.prompt} icon={<NotebookPen />} />
+      {list.length ? <p className="mt-3 text-[14px] text-muted-foreground">{countLabel(list.length)}</p> : null}
+      <div className="mt-4">
         {pages.length ? (
           <Pager pages={pages} index={Math.min(page, pages.length - 1)} onIndex={setPage} />
         ) : (
-          <p className="rounded-[16px] border border-dashed border-foreground/25 p-6 text-center text-[15px] text-muted-foreground">
-            No entries yet
-          </p>
+          <EmptyCards canAdd={!full} onAdd={() => setSheet(true)} />
         )}
       </div>
-      {full ? null : (
+      {full || !pages.length ? null : (
         <div className="mt-4 flex justify-center">
           <Button variant="tonal" icon={<Plus className="h-5 w-5" />} onClick={() => setSheet(true)}>
             Add New Entry
@@ -180,9 +196,11 @@ export function EntriesStep({ step, view, ctx }: { step: Step; view: Extract<UI,
             addEntry(view.collection, v, ctx.day);
             setSheet(false);
             setPage((hasExample ? 1 : 0) + list.length);
+            snack.show("Entry added");
           }}
         />
       </BottomSheet>
+      <Snackbar message={snack.message} />
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
     </>
   );
@@ -197,11 +215,12 @@ function ListEntries({ step, view, ctx, list }: { step: Step; view: Extract<UI, 
   // Slots are keyed by position, so a blank row keeps focus when it becomes a saved entry.
   const slots = Math.min(max, Math.max(initial, list.length) + extra);
   const filled = list.filter((e) => String(e.values[f.key] ?? "").trim()).length;
-  const canAddMore = filled >= slots && slots < max;
+  const canAddMore = slots < max;
+  const allFilled = filled >= slots;
 
   return (
     <>
-      <BlockText block={step.block} headline={view.prompt} />
+      <BlockText block={step.block} headline={view.prompt} icon={<ListChecks />} />
       <ol className="mt-6 space-y-3">
         {Array.from({ length: slots }, (_, i) => (
           <li key={`slot-${i}`} className="flex items-start gap-3">
@@ -219,18 +238,20 @@ function ListEntries({ step, view, ctx, list }: { step: Step; view: Extract<UI, 
           </li>
         ))}
       </ol>
-      {canAddMore ? (
-        <div className="mt-3">
-          <Button variant="text" icon={<Plus className="h-5 w-5" />} onClick={() => setExtra((x) => x + 1)}>
-            Add more
+      <div className="mt-3 flex items-center justify-between">
+        {canAddMore ? (
+          <Button variant="text" icon={<Plus className="h-5 w-5" />} disabled={!allFilled} onClick={() => setExtra((x) => x + 1)}>
+            Add another
           </Button>
-        </div>
-      ) : null}
-      {max !== Infinity ? (
-        <p className="mt-2 text-[13px] text-muted-foreground">
-          {list.length} of {max}
-        </p>
-      ) : null}
+        ) : (
+          <span />
+        )}
+        {max !== Infinity && list.length > 0 ? (
+          <p className="text-[13px] tabular-nums text-muted-foreground">
+            {list.length} of {max}
+          </p>
+        ) : null}
+      </div>
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
     </>
   );
@@ -259,6 +280,7 @@ function ListSlot({
     <TextField
       label=""
       ariaLabel={label}
+      placeholder="Write one thing"
       value={value}
       onChange={(v) => {
         setValue(v);
@@ -279,6 +301,7 @@ export function ReviewStep({ step, view, ctx }: { step: Step; view: Extract<UI, 
   const list = useVisibleEntries(ctx.slug, view.collection, view.scope, ctx.day);
   const [sheet, setSheet] = useState(false);
   const [page, setPage] = useState(0);
+  const snack = useSnack();
   const reviewKeys = new Set(view.fields.map((f) => f.key));
   const hydrated = Object.keys(state.answers).length > 0 || Object.keys(state.collections).length > 0;
 
@@ -346,9 +369,9 @@ export function ReviewStep({ step, view, ctx }: { step: Step; view: Extract<UI, 
 
   return (
     <>
-      <BlockText block={step.block} headline={view.fields.length === 1 && view.fields[0]!.label === view.prompt ? view.prompt : view.prompt || undefined} />
+      <BlockText block={step.block} headline={view.prompt || undefined} icon={<NotebookPen />} />
       {list.length ? (
-        <p className="mt-2 text-[14px] text-muted-foreground">
+        <p className="mt-3 text-[14px] text-muted-foreground">
           {answered} of {list.length} done
         </p>
       ) : null}
@@ -356,12 +379,10 @@ export function ReviewStep({ step, view, ctx }: { step: Step; view: Extract<UI, 
         {pages.length ? (
           <Pager pages={pages} index={Math.min(page, pages.length - 1)} onIndex={setPage} />
         ) : (
-          <p className="rounded-[16px] border border-dashed border-foreground/25 p-6 text-center text-[15px] text-muted-foreground">
-            No entries yet
-          </p>
+          <EmptyCards canAdd={Boolean(view.addFields)} onAdd={() => setSheet(true)} />
         )}
       </div>
-      {view.addFields ? (
+      {view.addFields && pages.length ? (
         <div className="mt-4 flex justify-center">
           <Button variant="tonal" icon={<Plus className="h-5 w-5" />} onClick={() => setSheet(true)}>
             Add New Entry
@@ -376,9 +397,11 @@ export function ReviewStep({ step, view, ctx }: { step: Step; view: Extract<UI, 
             addEntry(view.collection, v, ctx.day);
             setSheet(false);
             setPage((view.example ? 1 : 0) + list.length);
+            snack.show("Entry added");
           }}
         />
       </BottomSheet>
+      <Snackbar message={snack.message} />
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
     </>
   );
@@ -399,7 +422,7 @@ export function TrackerStep({ step, view, ctx }: { step: Step; view: Extract<UI,
 
   return (
     <>
-      <BlockText block={step.block} headline={view.prompt} />
+      <BlockText block={step.block} headline={view.prompt} icon={<CalendarCheck />} />
       {view.note ? <p className="mt-2 text-[15px] text-muted-foreground">{view.note}</p> : null}
       <ul className="-mx-4 mt-4 divide-y divide-foreground/[0.08]">
         {habits.map((h) => (
