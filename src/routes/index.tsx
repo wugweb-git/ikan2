@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, linkOptions } from "@tanstack/react-router";
 import {
   Activity,
   ArrowUpRight,
@@ -80,9 +80,27 @@ const offerings = [
 ];
 
 const activity = [
-  { title: "Unburn · Day 9 session", meta: "6 of 10 min listened", progress: 60 },
-  { title: "Sleep quality assessment", meta: "12 of 20 questions", progress: 55 },
-  { title: "Evening breathing", meta: "Completed today", progress: 100 },
+  {
+    title: "Unburn · Day 9 session",
+    meta: "6 of 10 min listened",
+    progress: 60,
+    link: linkOptions({ to: "/program/$slug", params: { slug: "unburn" } }),
+  },
+  {
+    title: "Sleep assessment",
+    meta: "Struggling with quality sleep · 8 questions",
+    progress: 0,
+    link: linkOptions({
+      to: "/assessment/$slug",
+      params: { slug: "struggling-with-quality-sleep" },
+    }),
+  },
+  {
+    title: "Mood check-in",
+    meta: "How are you feeling today?",
+    progress: 0,
+    link: linkOptions({ to: "/journal" }),
+  },
 ];
 
 const resources = [
@@ -250,26 +268,25 @@ function Index() {
         </div>
         <div className="surface divide-y divide-border">
           {activity.map((a) => (
-            <div
+            <Link
               key={a.title}
-              className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-4"
+              {...a.link}
+              className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-4 transition-colors hover:bg-secondary/50"
             >
               <span className="activity-dial" style={{ ["--p" as string]: `${a.progress}%` }}>
-                <span>{a.progress}%</span>
+                <span>{a.progress ? `${a.progress}%` : "New"}</span>
               </span>
               <div className="min-w-0">
                 <p className="truncate font-display text-sm font-semibold">{a.title}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">{a.meta}</p>
               </div>
-              <Button
-                size="icon"
-                variant={a.progress === 100 ? "secondary" : "default"}
-                className="h-9 w-9 rounded-full transition-transform active:scale-90"
-                aria-label={`Resume ${a.title}`}
+              <span
+                aria-hidden="true"
+                className="grid h-9 w-9 place-items-center rounded-full bg-foreground text-background [&_svg]:h-4 [&_svg]:w-4"
               >
-                {a.progress === 100 ? <ArrowUpRight /> : <Play />}
-              </Button>
-            </div>
+                {a.progress > 0 ? <Play /> : <ArrowUpRight />}
+              </span>
+            </Link>
           ))}
         </div>
       </Reveal>

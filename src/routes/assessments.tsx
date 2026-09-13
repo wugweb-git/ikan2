@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { accentStyle, Button, IconButton, stateLayer, TopAppBar } from "@/components/equip/m3";
+import { accentStyle, IconButton, stateLayer, TopAppBar } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { BandChip, categoryIcon, toneColors } from "@/components/assessment/ui";
 import { cn } from "@/lib/utils";
@@ -35,27 +35,18 @@ function HistoryPage() {
         />
         <header className="px-4 pb-2">
           <h1 className="font-display text-[32px] font-semibold leading-10">Your results</h1>
+          <p className="mt-1 text-[15px] text-muted-foreground">
+            {taken.length} of {assessments.length} assessments taken
+          </p>
         </header>
 
-        {taken.length === 0 ? (
-          <div className="px-4 pt-10 text-center">
-            <p className="font-display text-[20px] font-semibold">No results yet</p>
-            <p className="mt-2 text-[15px] text-muted-foreground">
-              Results appear here after you finish an assessment.
-            </p>
-            <Button className="mt-6" onClick={() => navigate({ to: "/assessment" })}>
-              Choose an assessment
-            </Button>
-          </div>
-        ) : (
-          <ul className="space-y-4 px-4 pt-3">
-            {taken.map((a) => (
-              <li key={a.slug}>
-                <AssessmentHistory a={a} results={store.resultsFor(a.slug)} />
-              </li>
-            ))}
-          </ul>
-        )}
+        <ul className="space-y-4 px-4 pt-3">
+          {assessments.map((a) => (
+            <li key={a.slug}>
+              <AssessmentHistory a={a} results={store.resultsFor(a.slug)} />
+            </li>
+          ))}
+        </ul>
       </div>
     </IkanShell>
   );
@@ -67,29 +58,36 @@ function AssessmentHistory({ a, results }: { a: Assessment; results: StoredResul
 
   return (
     <section className="overflow-hidden rounded-[24px] bg-secondary">
-      <div className="flex items-center gap-3 px-4 pt-4">
-        <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-[var(--accent-container)] text-[var(--on-accent-container)]">
+      <Link
+        to="/assessment/$slug"
+        params={{ slug: a.slug }}
+        className={cn("flex items-center gap-3 px-4 py-4", stateLayer)}
+      >
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[var(--accent-container)] text-[var(--on-accent-container)]">
           <Icon className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-display text-[17px] font-semibold">{a.title}</p>
+          <p className="text-[13px] font-medium text-[var(--accent-strong)]">{a.name}</p>
+          <p className="font-display text-[17px] font-semibold leading-6">{a.title}</p>
           <p className="text-[13px] text-muted-foreground">
-            {results.length} {results.length === 1 ? "result" : "results"}
+            {results.length === 0
+              ? `Not taken yet, ${a.questions.length} questions`
+              : `${results.length} ${results.length === 1 ? "result" : "results"}`}
           </p>
         </div>
-      </div>
+        <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+      </Link>
 
-      {a.headline ? (
+      {results.length === 0 ? null : a.headline ? (
         scored.length >= 2 ? (
           <Trend points={[...scored].reverse()} />
         ) : (
-          <p className="mx-4 mt-3 rounded-[12px] bg-background px-4 py-3 text-[14px] leading-5 text-muted-foreground">
+          <p className="mx-4 rounded-[12px] bg-background px-4 py-3 text-[14px] leading-5 text-muted-foreground">
             Take this assessment again to see how your results change over time.
           </p>
         )
       ) : null}
-
-      <ul className="mt-3">
+      <ul className={results.length ? "mt-3" : undefined}>
         {scored.map(({ r, head }) => (
           <li key={r.id} className="border-t border-background">
             <Link
@@ -134,7 +132,7 @@ function Trend({ points }: { points: { r: StoredResult; head: ReturnType<typeof 
   });
   const better = points[0]?.head?.profile.direction === "better";
   return (
-    <div className="mx-4 mt-3 rounded-[12px] bg-background px-3 py-2">
+    <div className="mx-4 rounded-[12px] bg-background px-3 py-2">
       <svg
         viewBox={`0 0 ${w} ${h}`}
         className="h-[72px] w-full"
