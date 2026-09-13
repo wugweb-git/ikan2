@@ -343,7 +343,7 @@ const difficulty = opts(
 )(0);
 /* Instruction lines shown above a question. Not in the spec's tables; they are the published
  * PHQ/GAD/WHO-5 instructions, or a plain "how often/how much" so a fragment item reads. */
-const twoWeeks = "Over the last 2 weeks, how often have you been bothered by this?";
+const twoWeeks = "Over the last 2 weeks, how often have you been bothered by…";
 
 const q = (
   id: string,
