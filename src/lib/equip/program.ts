@@ -285,7 +285,7 @@ export function standingBlocks(unit: number): Block[] {
         beat: "work",
         instrument: entry.instrument,
         mode: "collect",
-        title: instruments[entry.instrument].name,
+        title: instruments[entry.instrument]?.name ?? entry.instrument,
       };
     });
 }

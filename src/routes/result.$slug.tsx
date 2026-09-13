@@ -4,14 +4,21 @@ import { ArrowRight, Download, Phone, Play, RotateCcw, ShieldCheck, Sparkles } f
 import { IkanShell } from "@/components/ikan-shell";
 import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
-import { bandFor, getAssessment, maxScore } from "@/lib/assessments";
+import { bandFor, getAssessment, maxScore, type Tone } from "@/lib/assessments";
+
+// Full class names so Tailwind generates them (template-built names are purged).
+const toneClass: Record<Tone, { chip: string; bar: string }> = {
+  calm: { chip: "bg-calm-soft text-calm-strong", bar: "bg-calm" },
+  mind: { chip: "bg-mind-soft text-mind-strong", bar: "bg-mind" },
+  rest: { chip: "bg-rest-soft text-rest-strong", bar: "bg-rest" },
+  alert: { chip: "bg-alert-soft text-alert-strong", bar: "bg-alert" },
+};
 
 type Search = { score?: number };
 
 export const Route = createFileRoute("/result/$slug")({
-  validateSearch: (search: Record<string, unknown>): Search => ({
-    score: typeof search.score === "number" ? search.score : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): Search =>
+    typeof search["score"] === "number" ? { score: search["score"] } : {},
   loader: ({ params }) => {
     const assessment = getAssessment(params.slug);
     if (!assessment) throw notFound();
@@ -70,7 +77,7 @@ function ResultPage() {
       <section className="px-5">
         <div className="surface overflow-hidden p-5">
           <div className="flex items-center justify-between">
-            <span className={`semantic-chip bg-${band.tone}-soft text-${band.tone}-strong`}>{band.label}</span>
+            <span className={`semantic-chip ${toneClass[band.tone].chip}`}>{band.label}</span>
             <span className="text-xs text-muted-foreground">{assessment.instrument.split(" · ")[0]}</span>
           </div>
           <div className="mt-6 grid grid-cols-[112px_minmax(0,1fr)] items-center gap-5">
@@ -96,7 +103,7 @@ function ResultPage() {
             <p className="eyebrow">Where you sit</p>
             <div className="mt-4 flex h-3 overflow-hidden rounded-full">
               {assessment.bands.map((b) => (
-                <div key={b.label} className={`h-full flex-1 bg-${b.tone}`} style={{ opacity: b.label === band.label ? 1 : 0.28 }} />
+                <div key={b.label} className={`h-full flex-1 ${toneClass[b.tone].bar}`} style={{ opacity: b.label === band.label ? 1 : 0.28 }} />
               ))}
             </div>
             <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">

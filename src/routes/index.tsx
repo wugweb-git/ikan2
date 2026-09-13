@@ -46,7 +46,7 @@ const rings = [
 ];
 
 const offerings = [
-  { label: "Programs", meta: "1 active", icon: Sparkles, to: "/" as const, tone: "score-calm" },
+  { label: "Programs", meta: "1 active", icon: Sparkles, to: "/program" as const, tone: "score-calm" },
   { label: "Assessments", meta: "4 taken", icon: ChartNoAxesColumn, to: "/assessments" as const, tone: "score-mind" },
   { label: "Mood journal", meta: "5-day streak", icon: Smile, to: "/" as const, tone: "score-rest" },
   { label: "Consult", meta: "Book a slot", icon: Heart, to: "/" as const, tone: "score-alert" },

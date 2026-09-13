@@ -311,5 +311,5 @@ export function maxScore(a: Assessment) {
 }
 
 export function bandFor(a: Assessment, score: number) {
-  return a.bands.find((b) => score <= b.max) ?? a.bands[a.bands.length - 1];
+  return (a.bands.find((b) => score <= b.max) ?? a.bands[a.bands.length - 1])!;
 }

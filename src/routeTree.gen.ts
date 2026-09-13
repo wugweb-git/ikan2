@@ -13,9 +13,16 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AssessmentFlowRouteImport } from './routes/assessment-flow'
 import { Route as AssessmentResultRouteImport } from './routes/assessment-result'
 import { Route as AssessmentsRouteImport } from './routes/assessments'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as AssessmentIndexRouteImport } from './routes/assessment.index'
 import { Route as AssessmentSlugRouteImport } from './routes/assessment.$slug'
+import { Route as ProgramIndexRouteImport } from './routes/program.index'
 import { Route as ResultSlugRouteImport } from './routes/result.$slug'
+import { Route as ProgramSleepTightIndexRouteImport } from './routes/program.sleep-tight.index'
+import { Route as ProgramSleepTightInstrumentsRouteImport } from './routes/program.sleep-tight.instruments'
+import { Route as ProgramSleepTightStartRouteImport } from './routes/program.sleep-tight.start'
+import { Route as ProgramSleepTightUnitsRouteImport } from './routes/program.sleep-tight.units'
+import { Route as ProgramSleepTightUnitUnitRouteImport } from './routes/program.sleep-tight.unit.$unit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -37,6 +44,11 @@ const AssessmentsRoute = AssessmentsRouteImport.update({
   path: '/assessments',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AssessmentIndexRoute = AssessmentIndexRouteImport.update({
   id: '/assessment/',
   path: '/assessment/',
@@ -47,29 +59,75 @@ const AssessmentSlugRoute = AssessmentSlugRouteImport.update({
   path: '/assessment/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgramIndexRoute = ProgramIndexRouteImport.update({
+  id: '/program/',
+  path: '/program/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResultSlugRoute = ResultSlugRouteImport.update({
   id: '/result/$slug',
   path: '/result/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgramSleepTightIndexRoute = ProgramSleepTightIndexRouteImport.update({
+  id: '/program/sleep-tight/',
+  path: '/program/sleep-tight/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramSleepTightInstrumentsRoute =
+  ProgramSleepTightInstrumentsRouteImport.update({
+    id: '/program/sleep-tight/instruments',
+    path: '/program/sleep-tight/instruments',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProgramSleepTightStartRoute = ProgramSleepTightStartRouteImport.update({
+  id: '/program/sleep-tight/start',
+  path: '/program/sleep-tight/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramSleepTightUnitsRoute = ProgramSleepTightUnitsRouteImport.update({
+  id: '/program/sleep-tight/units',
+  path: '/program/sleep-tight/units',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramSleepTightUnitUnitRoute =
+  ProgramSleepTightUnitUnitRouteImport.update({
+    id: '/program/sleep-tight/unit/$unit',
+    path: '/program/sleep-tight/unit/$unit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessment-result': typeof AssessmentResultRoute
   '/assessments': typeof AssessmentsRoute
+  '/support': typeof SupportRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/result/$slug': typeof ResultSlugRoute
   '/assessment/': typeof AssessmentIndexRoute
+  '/program/': typeof ProgramIndexRoute
+  '/program/sleep-tight/instruments': typeof ProgramSleepTightInstrumentsRoute
+  '/program/sleep-tight/start': typeof ProgramSleepTightStartRoute
+  '/program/sleep-tight/units': typeof ProgramSleepTightUnitsRoute
+  '/program/sleep-tight/': typeof ProgramSleepTightIndexRoute
+  '/program/sleep-tight/unit/$unit': typeof ProgramSleepTightUnitUnitRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessment-result': typeof AssessmentResultRoute
   '/assessments': typeof AssessmentsRoute
+  '/support': typeof SupportRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/result/$slug': typeof ResultSlugRoute
   '/assessment': typeof AssessmentIndexRoute
+  '/program': typeof ProgramIndexRoute
+  '/program/sleep-tight/instruments': typeof ProgramSleepTightInstrumentsRoute
+  '/program/sleep-tight/start': typeof ProgramSleepTightStartRoute
+  '/program/sleep-tight/units': typeof ProgramSleepTightUnitsRoute
+  '/program/sleep-tight': typeof ProgramSleepTightIndexRoute
+  '/program/sleep-tight/unit/$unit': typeof ProgramSleepTightUnitUnitRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,9 +135,16 @@ export interface FileRoutesById {
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessment-result': typeof AssessmentResultRoute
   '/assessments': typeof AssessmentsRoute
+  '/support': typeof SupportRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/result/$slug': typeof ResultSlugRoute
   '/assessment/': typeof AssessmentIndexRoute
+  '/program/': typeof ProgramIndexRoute
+  '/program/sleep-tight/instruments': typeof ProgramSleepTightInstrumentsRoute
+  '/program/sleep-tight/start': typeof ProgramSleepTightStartRoute
+  '/program/sleep-tight/units': typeof ProgramSleepTightUnitsRoute
+  '/program/sleep-tight/': typeof ProgramSleepTightIndexRoute
+  '/program/sleep-tight/unit/$unit': typeof ProgramSleepTightUnitUnitRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,27 +153,48 @@ export interface FileRouteTypes {
     | '/assessment-flow'
     | '/assessment-result'
     | '/assessments'
+    | '/support'
     | '/assessment/$slug'
     | '/result/$slug'
     | '/assessment/'
+    | '/program/'
+    | '/program/sleep-tight/instruments'
+    | '/program/sleep-tight/start'
+    | '/program/sleep-tight/units'
+    | '/program/sleep-tight/'
+    | '/program/sleep-tight/unit/$unit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/assessment-flow'
     | '/assessment-result'
     | '/assessments'
+    | '/support'
     | '/assessment/$slug'
     | '/result/$slug'
     | '/assessment'
+    | '/program'
+    | '/program/sleep-tight/instruments'
+    | '/program/sleep-tight/start'
+    | '/program/sleep-tight/units'
+    | '/program/sleep-tight'
+    | '/program/sleep-tight/unit/$unit'
   id:
     | '__root__'
     | '/'
     | '/assessment-flow'
     | '/assessment-result'
     | '/assessments'
+    | '/support'
     | '/assessment/$slug'
     | '/result/$slug'
     | '/assessment/'
+    | '/program/'
+    | '/program/sleep-tight/instruments'
+    | '/program/sleep-tight/start'
+    | '/program/sleep-tight/units'
+    | '/program/sleep-tight/'
+    | '/program/sleep-tight/unit/$unit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,9 +202,16 @@ export interface RootRouteChildren {
   AssessmentFlowRoute: typeof AssessmentFlowRoute
   AssessmentResultRoute: typeof AssessmentResultRoute
   AssessmentsRoute: typeof AssessmentsRoute
+  SupportRoute: typeof SupportRoute
   AssessmentSlugRoute: typeof AssessmentSlugRoute
   ResultSlugRoute: typeof ResultSlugRoute
   AssessmentIndexRoute: typeof AssessmentIndexRoute
+  ProgramIndexRoute: typeof ProgramIndexRoute
+  ProgramSleepTightInstrumentsRoute: typeof ProgramSleepTightInstrumentsRoute
+  ProgramSleepTightStartRoute: typeof ProgramSleepTightStartRoute
+  ProgramSleepTightUnitsRoute: typeof ProgramSleepTightUnitsRoute
+  ProgramSleepTightIndexRoute: typeof ProgramSleepTightIndexRoute
+  ProgramSleepTightUnitUnitRoute: typeof ProgramSleepTightUnitUnitRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -151,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/assessment/': {
       id: '/assessment/'
       path: '/assessment'
@@ -165,11 +265,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/program/': {
+      id: '/program/'
+      path: '/program'
+      fullPath: '/program/'
+      preLoaderRoute: typeof ProgramIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/result/$slug': {
       id: '/result/$slug'
       path: '/result/$slug'
       fullPath: '/result/$slug'
       preLoaderRoute: typeof ResultSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/program/sleep-tight/': {
+      id: '/program/sleep-tight/'
+      path: '/program/sleep-tight'
+      fullPath: '/program/sleep-tight/'
+      preLoaderRoute: typeof ProgramSleepTightIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/program/sleep-tight/instruments': {
+      id: '/program/sleep-tight/instruments'
+      path: '/program/sleep-tight/instruments'
+      fullPath: '/program/sleep-tight/instruments'
+      preLoaderRoute: typeof ProgramSleepTightInstrumentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/program/sleep-tight/start': {
+      id: '/program/sleep-tight/start'
+      path: '/program/sleep-tight/start'
+      fullPath: '/program/sleep-tight/start'
+      preLoaderRoute: typeof ProgramSleepTightStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/program/sleep-tight/units': {
+      id: '/program/sleep-tight/units'
+      path: '/program/sleep-tight/units'
+      fullPath: '/program/sleep-tight/units'
+      preLoaderRoute: typeof ProgramSleepTightUnitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/program/sleep-tight/unit/$unit': {
+      id: '/program/sleep-tight/unit/$unit'
+      path: '/program/sleep-tight/unit/$unit'
+      fullPath: '/program/sleep-tight/unit/$unit'
+      preLoaderRoute: typeof ProgramSleepTightUnitUnitRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -180,9 +322,16 @@ const rootRouteChildren: RootRouteChildren = {
   AssessmentFlowRoute: AssessmentFlowRoute,
   AssessmentResultRoute: AssessmentResultRoute,
   AssessmentsRoute: AssessmentsRoute,
+  SupportRoute: SupportRoute,
   AssessmentSlugRoute: AssessmentSlugRoute,
   ResultSlugRoute: ResultSlugRoute,
   AssessmentIndexRoute: AssessmentIndexRoute,
+  ProgramIndexRoute: ProgramIndexRoute,
+  ProgramSleepTightInstrumentsRoute: ProgramSleepTightInstrumentsRoute,
+  ProgramSleepTightStartRoute: ProgramSleepTightStartRoute,
+  ProgramSleepTightUnitsRoute: ProgramSleepTightUnitsRoute,
+  ProgramSleepTightIndexRoute: ProgramSleepTightIndexRoute,
+  ProgramSleepTightUnitUnitRoute: ProgramSleepTightUnitUnitRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

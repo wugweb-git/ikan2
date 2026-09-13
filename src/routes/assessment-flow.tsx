@@ -7,9 +7,8 @@ import { assessments, getAssessment } from "@/lib/assessments";
 type Search = { id?: string };
 
 export const Route = createFileRoute("/assessment-flow")({
-  validateSearch: (search: Record<string, unknown>): Search => ({
-    id: typeof search.id === "string" ? search.id : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): Search =>
+    typeof search["id"] === "string" ? { id: search["id"] } : {},
   head: () => ({
     meta: [
       { title: "Taking your assessment — iKAN" },
@@ -27,14 +26,14 @@ export const Route = createFileRoute("/assessment-flow")({
 function AssessmentFlowPage() {
   const { id } = Route.useSearch();
   const navigate = useNavigate();
-  const assessment = useMemo(() => getAssessment(id ?? "") ?? assessments[0], [id]);
+  const assessment = useMemo(() => getAssessment(id ?? "") ?? assessments[0]!, [id]);
 
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [done, setDone] = useState(false);
 
   const total = assessment.questions.length;
-  const question = assessment.questions[step];
+  const question = assessment.questions[Math.min(step, total - 1)]!;
   const selected = answers[question.id];
   const progress = done ? 100 : Math.round((step / total) * 100);
   const score = Object.values(answers).reduce((sum, value) => sum + value, 0);
