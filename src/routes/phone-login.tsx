@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { Mail } from "lucide-react";
 import { pageMeta } from "@/components/equip/program-header";
 import { AuthLayout, FormError, PrimaryButton } from "@/components/auth-ui";
 import { PhoneField } from "@/components/phone-field";
@@ -141,12 +142,16 @@ function PhoneLoginPage() {
           </div>
         </form>
       )}
-      <p className="mt-4 text-center text-[15px]">
-        Prefer email?{" "}
-        <Link to="/login" className="font-semibold underline underline-offset-4">
-          Sign in with email
-        </Link>
-      </p>
+      <div className="my-4 flex items-center gap-3 text-[13px] text-muted-foreground">
+        <span className="h-px flex-1 bg-foreground/10" /> or{" "}
+        <span className="h-px flex-1 bg-foreground/10" />
+      </div>
+      <Link
+        to="/login"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[15px] font-semibold"
+      >
+        <Mail className="h-5 w-5" /> Sign in with email
+      </Link>
     </AuthLayout>
   );
 }
