@@ -6,7 +6,10 @@ import {
   ChartNoAxesColumn,
   ChevronRight,
   ClipboardList,
-  ExternalLink,
+  CircleHelp,
+  FileText,
+  Info,
+  Mail,
   HeartPulse,
   History,
   House,
@@ -29,6 +32,7 @@ import { useSettings } from "@/lib/profile";
 import { resources } from "@/lib/resources";
 import { consultants } from "@/lib/consultants";
 import { cn } from "@/lib/utils";
+import type { LegalSlug } from "@/lib/content";
 
 const navItems = [
   { to: "/", label: "Home", icon: House },
@@ -127,9 +131,12 @@ type Row = { label: string; sub: string; icon: LucideIcon } & (
         | "/profile"
         | "/notifications"
         | "/settings"
-        | "/support";
+        | "/support"
+        | "/about"
+        | "/faq"
+        | "/contact";
     }
-  | { href: string }
+  | { legal: LegalSlug }
 );
 
 function MoreSheet({ onClose }: { onClose: () => void }) {
@@ -230,22 +237,22 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
       title: "About iKAN",
       rows: [
         {
-          href: "https://ikanhealth.in/about",
+          to: "/about",
           label: "About",
           sub: "Who we are",
-          icon: ExternalLink,
+          icon: Info,
         },
         {
-          href: "https://ikanhealth.in/faq",
+          to: "/faq",
           label: "FAQ",
           sub: "Common questions",
-          icon: ExternalLink,
+          icon: CircleHelp,
         },
         {
-          href: "https://ikanhealth.in/contact",
+          to: "/contact",
           label: "Contact",
           sub: "Get in touch",
-          icon: ExternalLink,
+          icon: Mail,
         },
       ],
     },
@@ -253,28 +260,28 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
       title: "Legal",
       rows: [
         {
-          href: "https://ikanhealth.in/terms",
+          legal: "terms",
           label: "Terms of use",
           sub: "Service terms",
-          icon: ExternalLink,
+          icon: FileText,
         },
         {
-          href: "https://ikanhealth.in/privacy-policy",
+          legal: "privacy-policy",
           label: "Privacy policy",
           sub: "How your data is handled",
-          icon: ExternalLink,
+          icon: FileText,
         },
         {
-          href: "https://ikanhealth.in/cancellation-policy",
+          legal: "cancellation-policy",
           label: "Cancellation policy",
           sub: "Cancelling a booking",
-          icon: ExternalLink,
+          icon: FileText,
         },
         {
-          href: "https://ikanhealth.in/return-policy",
+          legal: "return-policy",
           label: "Return policy",
           sub: "Refunds",
-          icon: ExternalLink,
+          icon: FileText,
         },
       ],
     },
@@ -321,7 +328,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
                         {r.sub}
                       </span>
                     </span>
-                    {"to" in r ? <ChevronRight className="h-4 w-4 text-muted-foreground" /> : null}
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </>
                 );
                 const cls =
@@ -333,9 +340,14 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
                         {inner}
                       </Link>
                     ) : (
-                      <a href={r.href} target="_blank" rel="noreferrer" className={cls}>
+                      <Link
+                        to="/legal/$slug"
+                        params={{ slug: r.legal }}
+                        className={cls}
+                        onClick={onClose}
+                      >
                         {inner}
-                      </a>
+                      </Link>
                     )}
                   </li>
                 );

@@ -10,8 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AssessmentFlowRouteImport } from './routes/assessment-flow'
 import { Route as AssessmentsRouteImport } from './routes/assessments'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as JournalRouteImport } from './routes/journal'
@@ -19,7 +22,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SupportRouteImport } from './routes/support'
@@ -30,7 +32,10 @@ import { Route as AssessmentIndexRouteImport } from './routes/assessment.index'
 import { Route as AssessmentSlugRouteImport } from './routes/assessment.$slug'
 import { Route as ConsultIndexRouteImport } from './routes/consult.index'
 import { Route as ConsultIdRouteImport } from './routes/consult.$id'
+import { Route as LegalSlugRouteImport } from './routes/legal.$slug'
 import { Route as ProgramIndexRouteImport } from './routes/program.index'
+import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
+import { Route as ResourcesIdRouteImport } from './routes/resources.$id'
 import { Route as ResultSlugRouteImport } from './routes/result.$slug'
 import { Route as ProgramSlugIndexRouteImport } from './routes/program.$slug.index'
 import { Route as ProgramSlugJournalRouteImport } from './routes/program.$slug.journal'
@@ -42,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AssessmentFlowRoute = AssessmentFlowRouteImport.update({
   id: '/assessment-flow',
   path: '/assessment-flow',
@@ -50,6 +60,16 @@ const AssessmentFlowRoute = AssessmentFlowRouteImport.update({
 const AssessmentsRoute = AssessmentsRouteImport.update({
   id: '/assessments',
   path: '/assessments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -85,11 +105,6 @@ const ProfileRoute = ProfileRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResourcesRoute = ResourcesRouteImport.update({
-  id: '/resources',
-  path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -142,9 +157,24 @@ const ConsultIdRoute = ConsultIdRouteImport.update({
   path: '/consult/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalSlugRoute = LegalSlugRouteImport.update({
+  id: '/legal/$slug',
+  path: '/legal/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgramIndexRoute = ProgramIndexRouteImport.update({
   id: '/program/',
   path: '/program/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
+  id: '/resources/',
+  path: '/resources/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesIdRoute = ResourcesIdRouteImport.update({
+  id: '/resources/$id',
+  path: '/resources/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResultSlugRoute = ResultSlugRouteImport.update({
@@ -175,8 +205,11 @@ const ProgramSlugToolStepRoute = ProgramSlugToolStepRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessments': typeof AssessmentsRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/history': typeof HistoryRoute
   '/journal': typeof JournalRoute
@@ -184,7 +217,6 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/resources': typeof ResourcesRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/support': typeof SupportRoute
@@ -193,10 +225,13 @@ export interface FileRoutesByFullPath {
   '/wellness': typeof WellnessRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/consult/$id': typeof ConsultIdRoute
+  '/legal/$slug': typeof LegalSlugRoute
+  '/resources/$id': typeof ResourcesIdRoute
   '/result/$slug': typeof ResultSlugRoute
   '/assessment/': typeof AssessmentIndexRoute
   '/consult/': typeof ConsultIndexRoute
   '/program/': typeof ProgramIndexRoute
+  '/resources/': typeof ResourcesIndexRoute
   '/program/$slug/journal': typeof ProgramSlugJournalRoute
   '/program/$slug/': typeof ProgramSlugIndexRoute
   '/program/$slug/day/$day': typeof ProgramSlugDayDayRoute
@@ -204,8 +239,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessments': typeof AssessmentsRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/history': typeof HistoryRoute
   '/journal': typeof JournalRoute
@@ -213,7 +251,6 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/resources': typeof ResourcesRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/support': typeof SupportRoute
@@ -222,10 +259,13 @@ export interface FileRoutesByTo {
   '/wellness': typeof WellnessRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/consult/$id': typeof ConsultIdRoute
+  '/legal/$slug': typeof LegalSlugRoute
+  '/resources/$id': typeof ResourcesIdRoute
   '/result/$slug': typeof ResultSlugRoute
   '/assessment': typeof AssessmentIndexRoute
   '/consult': typeof ConsultIndexRoute
   '/program': typeof ProgramIndexRoute
+  '/resources': typeof ResourcesIndexRoute
   '/program/$slug/journal': typeof ProgramSlugJournalRoute
   '/program/$slug': typeof ProgramSlugIndexRoute
   '/program/$slug/day/$day': typeof ProgramSlugDayDayRoute
@@ -234,8 +274,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/assessments': typeof AssessmentsRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/history': typeof HistoryRoute
   '/journal': typeof JournalRoute
@@ -243,7 +286,6 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/resources': typeof ResourcesRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/support': typeof SupportRoute
@@ -252,10 +294,13 @@ export interface FileRoutesById {
   '/wellness': typeof WellnessRoute
   '/assessment/$slug': typeof AssessmentSlugRoute
   '/consult/$id': typeof ConsultIdRoute
+  '/legal/$slug': typeof LegalSlugRoute
+  '/resources/$id': typeof ResourcesIdRoute
   '/result/$slug': typeof ResultSlugRoute
   '/assessment/': typeof AssessmentIndexRoute
   '/consult/': typeof ConsultIndexRoute
   '/program/': typeof ProgramIndexRoute
+  '/resources/': typeof ResourcesIndexRoute
   '/program/$slug/journal': typeof ProgramSlugJournalRoute
   '/program/$slug/': typeof ProgramSlugIndexRoute
   '/program/$slug/day/$day': typeof ProgramSlugDayDayRoute
@@ -265,8 +310,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/assessment-flow'
     | '/assessments'
+    | '/contact'
+    | '/faq'
     | '/forgot-password'
     | '/history'
     | '/journal'
@@ -274,7 +322,6 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/reset-password'
-    | '/resources'
     | '/settings'
     | '/signup'
     | '/support'
@@ -283,10 +330,13 @@ export interface FileRouteTypes {
     | '/wellness'
     | '/assessment/$slug'
     | '/consult/$id'
+    | '/legal/$slug'
+    | '/resources/$id'
     | '/result/$slug'
     | '/assessment/'
     | '/consult/'
     | '/program/'
+    | '/resources/'
     | '/program/$slug/journal'
     | '/program/$slug/'
     | '/program/$slug/day/$day'
@@ -294,8 +344,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/assessment-flow'
     | '/assessments'
+    | '/contact'
+    | '/faq'
     | '/forgot-password'
     | '/history'
     | '/journal'
@@ -303,7 +356,6 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/reset-password'
-    | '/resources'
     | '/settings'
     | '/signup'
     | '/support'
@@ -312,10 +364,13 @@ export interface FileRouteTypes {
     | '/wellness'
     | '/assessment/$slug'
     | '/consult/$id'
+    | '/legal/$slug'
+    | '/resources/$id'
     | '/result/$slug'
     | '/assessment'
     | '/consult'
     | '/program'
+    | '/resources'
     | '/program/$slug/journal'
     | '/program/$slug'
     | '/program/$slug/day/$day'
@@ -323,8 +378,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/assessment-flow'
     | '/assessments'
+    | '/contact'
+    | '/faq'
     | '/forgot-password'
     | '/history'
     | '/journal'
@@ -332,7 +390,6 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/reset-password'
-    | '/resources'
     | '/settings'
     | '/signup'
     | '/support'
@@ -341,10 +398,13 @@ export interface FileRouteTypes {
     | '/wellness'
     | '/assessment/$slug'
     | '/consult/$id'
+    | '/legal/$slug'
+    | '/resources/$id'
     | '/result/$slug'
     | '/assessment/'
     | '/consult/'
     | '/program/'
+    | '/resources/'
     | '/program/$slug/journal'
     | '/program/$slug/'
     | '/program/$slug/day/$day'
@@ -353,8 +413,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AssessmentFlowRoute: typeof AssessmentFlowRoute
   AssessmentsRoute: typeof AssessmentsRoute
+  ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HistoryRoute: typeof HistoryRoute
   JournalRoute: typeof JournalRoute
@@ -362,7 +425,6 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  ResourcesRoute: typeof ResourcesRoute
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
   SupportRoute: typeof SupportRoute
@@ -371,10 +433,13 @@ export interface RootRouteChildren {
   WellnessRoute: typeof WellnessRoute
   AssessmentSlugRoute: typeof AssessmentSlugRoute
   ConsultIdRoute: typeof ConsultIdRoute
+  LegalSlugRoute: typeof LegalSlugRoute
+  ResourcesIdRoute: typeof ResourcesIdRoute
   ResultSlugRoute: typeof ResultSlugRoute
   AssessmentIndexRoute: typeof AssessmentIndexRoute
   ConsultIndexRoute: typeof ConsultIndexRoute
   ProgramIndexRoute: typeof ProgramIndexRoute
+  ResourcesIndexRoute: typeof ResourcesIndexRoute
   ProgramSlugJournalRoute: typeof ProgramSlugJournalRoute
   ProgramSlugIndexRoute: typeof ProgramSlugIndexRoute
   ProgramSlugDayDayRoute: typeof ProgramSlugDayDayRoute
@@ -390,6 +455,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/assessment-flow': {
       id: '/assessment-flow'
       path: '/assessment-flow'
@@ -402,6 +474,20 @@ declare module '@tanstack/react-router' {
       path: '/assessments'
       fullPath: '/assessments'
       preLoaderRoute: typeof AssessmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -451,13 +537,6 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resources': {
-      id: '/resources'
-      path: '/resources'
-      fullPath: '/resources'
-      preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -530,11 +609,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsultIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal/$slug': {
+      id: '/legal/$slug'
+      path: '/legal/$slug'
+      fullPath: '/legal/$slug'
+      preLoaderRoute: typeof LegalSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/program/': {
       id: '/program/'
       path: '/program'
       fullPath: '/program/'
       preLoaderRoute: typeof ProgramIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/': {
+      id: '/resources/'
+      path: '/resources'
+      fullPath: '/resources/'
+      preLoaderRoute: typeof ResourcesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/$id': {
+      id: '/resources/$id'
+      path: '/resources/$id'
+      fullPath: '/resources/$id'
+      preLoaderRoute: typeof ResourcesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/result/$slug': {
@@ -577,8 +677,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AssessmentFlowRoute: AssessmentFlowRoute,
   AssessmentsRoute: AssessmentsRoute,
+  ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HistoryRoute: HistoryRoute,
   JournalRoute: JournalRoute,
@@ -586,7 +689,6 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsRoute: NotificationsRoute,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  ResourcesRoute: ResourcesRoute,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
   SupportRoute: SupportRoute,
@@ -595,10 +697,13 @@ const rootRouteChildren: RootRouteChildren = {
   WellnessRoute: WellnessRoute,
   AssessmentSlugRoute: AssessmentSlugRoute,
   ConsultIdRoute: ConsultIdRoute,
+  LegalSlugRoute: LegalSlugRoute,
+  ResourcesIdRoute: ResourcesIdRoute,
   ResultSlugRoute: ResultSlugRoute,
   AssessmentIndexRoute: AssessmentIndexRoute,
   ConsultIndexRoute: ConsultIndexRoute,
   ProgramIndexRoute: ProgramIndexRoute,
+  ResourcesIndexRoute: ResourcesIndexRoute,
   ProgramSlugJournalRoute: ProgramSlugJournalRoute,
   ProgramSlugIndexRoute: ProgramSlugIndexRoute,
   ProgramSlugDayDayRoute: ProgramSlugDayDayRoute,

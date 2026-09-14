@@ -11,7 +11,6 @@ import {
   ChevronRight,
   ClipboardList,
   Download,
-  ExternalLink,
   Accessibility,
   LifeBuoy,
   Lock,
@@ -37,6 +36,7 @@ import {
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
+import type { LegalSlug } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import {
   defaultSettings,
@@ -244,24 +244,35 @@ function SettingsPage() {
         </Group>
 
         <Group title="Legal">
-          {legalLinks.map((l) => (
-            <a
-              key={l.id}
-              href={`https://ikanhealth.in/${l.id}`}
-              target="_blank"
-              rel="noreferrer"
-              className={cn("flex min-h-16 items-center gap-4 px-4 py-3", stateLayer)}
-            >
-              <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
-                <Lock className="h-5 w-5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[16px]">{l.label}</span>
-                <span className="block text-[13px] text-muted-foreground">{l.description}</span>
-              </span>
-              <ExternalLink className="h-4 w-4 text-muted-foreground" />
-            </a>
-          ))}
+          {legalLinks.map((l) => {
+            const inner = (
+              <>
+                <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
+                  <Lock className="h-5 w-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[16px]">{l.label}</span>
+                  <span className="block text-[13px] text-muted-foreground">{l.description}</span>
+                </span>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </>
+            );
+            const cls = cn("flex min-h-16 items-center gap-4 px-4 py-3", stateLayer);
+            return l.id === "about" || l.id === "faq" ? (
+              <Link key={l.id} to={l.id === "about" ? "/about" : "/faq"} className={cls}>
+                {inner}
+              </Link>
+            ) : (
+              <Link
+                key={l.id}
+                to="/legal/$slug"
+                params={{ slug: l.id as LegalSlug }}
+                className={cls}
+              >
+                {inner}
+              </Link>
+            );
+          })}
         </Group>
 
         <p className="mt-6 text-center text-[12px] text-muted-foreground">

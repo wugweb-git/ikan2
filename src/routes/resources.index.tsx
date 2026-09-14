@@ -1,30 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  Bookmark,
-  BookmarkCheck,
-  BookOpen,
-  ChevronRight,
-  ExternalLink,
-  Search,
-} from "lucide-react";
+import { Bookmark, BookmarkCheck, BookOpen, Search } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
-import {
-  accentStyle,
-  BottomSheet,
-  IconButton,
-  Snackbar,
-  stateLayer,
-  useSnack,
-} from "@/components/equip/m3";
+import { accentStyle, IconButton, Snackbar, stateLayer, useSnack } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
-import { getAssessment } from "@/lib/assessment/instruments";
-import { resources, resourceUrl, useResourceStore, type Resource } from "@/lib/resources";
+import { resources, useResourceStore, type Resource } from "@/lib/resources";
 
-export const Route = createFileRoute("/resources")({
+export const Route = createFileRoute("/resources/")({
   head: () => pageMeta("Resources", "Articles and guides to support your mental health journey."),
   component: ResourcesPage,
 });
@@ -45,7 +30,8 @@ function ResourcesPage() {
   const snack = useSnack();
   const [filter, setFilter] = useState<Filter>("All");
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState<Resource | null>(null);
+  const navigate = useNavigate();
+  const open = (r: Resource) => navigate({ to: "/resources/$id", params: { id: r.id } });
 
   const featured = resources.filter((r) => r.featured);
   const q = query.trim().toLowerCase();
@@ -94,7 +80,7 @@ function ResourcesPage() {
                 <button
                   key={r.id}
                   type="button"
-                  onClick={() => setOpen(r)}
+                  onClick={() => open(r)}
                   className={cn(
                     "relative h-[232px] w-[86%] shrink-0 snap-center overflow-hidden rounded-[28px] text-left text-white",
                     stateLayer,
@@ -181,7 +167,7 @@ function ResourcesPage() {
                   <div className="flex items-center gap-3 py-3">
                     <button
                       type="button"
-                      onClick={() => setOpen(r)}
+                      onClick={() => open(r)}
                       className={cn(
                         "flex min-w-0 flex-1 items-center gap-3 rounded-[16px] text-left",
                         stateLayer,
@@ -222,90 +208,8 @@ function ResourcesPage() {
           </ul>
         )}
 
-        <ArticleSheet
-          resource={open}
-          saved={open ? hydrated && store.isSaved(open.id) : false}
-          onClose={() => setOpen(null)}
-          onToggle={() => open && toggle(open)}
-          onRead={() => open && store.markOpened(open.id)}
-        />
         <Snackbar message={snack.message} />
       </div>
     </IkanShell>
-  );
-}
-
-function ArticleSheet({
-  resource: r,
-  saved,
-  onClose,
-  onToggle,
-  onRead,
-}: {
-  resource: Resource | null;
-  saved: boolean;
-  onClose: () => void;
-  onToggle: () => void;
-  onRead: () => void;
-}) {
-  const assessment = r?.assessment ? getAssessment(r.assessment) : undefined;
-  return (
-    <BottomSheet open={Boolean(r)} onClose={onClose} title={r?.category ?? ""}>
-      {r ? (
-        <div>
-          <div className="-mt-2 h-40 overflow-hidden rounded-[20px]">
-            <Illustration art={r.art} />
-          </div>
-          <p className="mt-4 font-display text-[22px] font-semibold leading-7">{r.title}</p>
-          <p className="mt-2 text-[14px] text-muted-foreground">
-            {dateLabel(r.date)}, {r.minutes} min read, on ikanhealth.in
-          </p>
-          <div className="mt-5 flex gap-2">
-            <a
-              href={resourceUrl(r.id)}
-              target="_blank"
-              rel="noreferrer"
-              onClick={onRead}
-              className={cn(
-                "inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-foreground px-6 text-[15px] font-semibold text-background",
-                stateLayer,
-              )}
-            >
-              Read article <ExternalLink className="h-4 w-4" />
-            </a>
-            <button
-              type="button"
-              onClick={onToggle}
-              aria-pressed={saved}
-              className={cn(
-                "inline-flex h-12 items-center gap-2 rounded-full border border-foreground/25 px-5 text-[15px] font-semibold",
-                stateLayer,
-              )}
-            >
-              {saved ? <BookmarkCheck className="h-5 w-5" /> : <Bookmark className="h-5 w-5" />}
-              {saved ? "Saved" : "Save"}
-            </button>
-          </div>
-          {assessment ? (
-            <Link
-              to="/assessment/$slug"
-              params={{ slug: assessment.slug }}
-              className={cn(
-                "mt-4 flex items-center gap-3 rounded-[16px] bg-secondary p-4",
-                stateLayer,
-              )}
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block text-[13px] text-muted-foreground">
-                  Take the test this article explains
-                </span>
-                <span className="block text-[15px] font-semibold">{assessment.title}</span>
-              </span>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
-            </Link>
-          ) : null}
-        </div>
-      ) : null}
-    </BottomSheet>
   );
 }

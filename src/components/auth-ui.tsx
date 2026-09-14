@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 import { displayName, useAuth, type Provider } from "@/lib/auth";
 import { onboardingDone, seedProfile } from "@/lib/profile";
 
-const PUBLIC = /^\/(login|signup|verify-email|forgot-password|reset-password|support)(\/|$)/;
+const PUBLIC =
+  /^\/(login|signup|verify-email|forgot-password|reset-password|support|about|faq|contact|legal)(\/|$)/;
 const AUTH_ONLY = /^\/(login|signup|verify-email|forgot-password)(\/|$)/;
 
 /** Keeps the app behind sign-in. Crisis support and the auth screens stay open to everyone. */
@@ -34,6 +35,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
         if (!onboardingDone()) navigate({ to: "/welcome", replace: true });
         else navigate({ href: target, replace: true });
       } else if (
+        !isPublic &&
         path !== "/welcome" &&
         path !== "/reset-password" &&
         !path.startsWith("/support") &&
@@ -261,23 +263,17 @@ export function TrustList() {
 export const TermsNote = () => (
   <p className="mt-5 text-center text-[12px] leading-5 text-muted-foreground">
     By continuing you agree to the{" "}
-    <a
-      href="https://ikanhealth.in/terms"
-      target="_blank"
-      rel="noreferrer"
-      className="underline underline-offset-2"
-    >
+    <Link to="/legal/$slug" params={{ slug: "terms" }} className="underline underline-offset-2">
       Terms of use
-    </a>{" "}
+    </Link>{" "}
     and{" "}
-    <a
-      href="https://ikanhealth.in/privacy-policy"
-      target="_blank"
-      rel="noreferrer"
+    <Link
+      to="/legal/$slug"
+      params={{ slug: "privacy-policy" }}
       className="underline underline-offset-2"
     >
       Privacy policy
-    </a>
+    </Link>
     .
   </p>
 );

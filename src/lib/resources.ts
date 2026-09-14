@@ -115,7 +115,6 @@ export const resources: Resource[] = [
   },
 ];
 
-export const resourceUrl = (id: string) => `https://ikanhealth.in/resource-detail?id=${id}`;
 export const getResource = (id: string) => resources.find((r) => r.id === id);
 
 type State = { saved: string[]; opened: Record<string, string> };

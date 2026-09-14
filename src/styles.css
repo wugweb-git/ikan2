@@ -264,3 +264,20 @@ html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after 
 :where(a, button, input, textarea, select, summary, [role="button"], [role="radio"], [role="checkbox"], [role="switch"], [role="tab"]):focus-visible {
   outline: 2px solid var(--foreground); outline-offset: 2px;
 }
+
+/* Article and legal text copied from ikanhealth.in, rendered as plain HTML */
+.prose-ikan { font-size: 16.5px; line-height: 1.7; color: color-mix(in oklab, var(--foreground) 88%, transparent); }
+.prose-ikan > * + * { margin-top: 1em; }
+.prose-ikan h2 { margin-top: 1.9em; font-family: var(--font-display); font-size: 21px; line-height: 1.3; font-weight: 600; color: var(--foreground); }
+.prose-ikan h3 { margin-top: 1.5em; font-family: var(--font-display); font-size: 17px; line-height: 1.35; font-weight: 600; color: var(--foreground); }
+.prose-ikan > :first-child { margin-top: 0; }
+.prose-ikan strong { font-weight: 650; color: var(--foreground); }
+.prose-ikan ul, .prose-ikan ol { padding-left: 1.3em; }
+.prose-ikan ul { list-style: disc; }
+.prose-ikan ol { list-style: decimal; }
+.prose-ikan li + li { margin-top: .4em; }
+.prose-ikan li::marker { color: var(--muted-foreground); }
+.prose-ikan a { text-decoration: underline; text-underline-offset: 3px; }
+.prose-ikan table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 14px; line-height: 1.45; }
+.prose-ikan td, .prose-ikan th { border: 1px solid var(--border); padding: 8px 10px; vertical-align: top; min-width: 110px; }
+.prose-ikan tr:first-child td, .prose-ikan th { background: var(--secondary); font-weight: 600; color: var(--foreground); }
