@@ -31,27 +31,22 @@ const typeMeta: Record<
   { label: string; icon: LucideIcon; color: string; soft: string }
 > = {
   assessment: { label: "Assessments", icon: ClipboardList, color: "#3B418C", soft: "#E6E7F6" },
-  mood: { label: "Mood", icon: Smile, color: "#8C3652", soft: "#F9E2E9" },
+  mood: { label: "Journal", icon: Smile, color: "#8C3652", soft: "#F9E2E9" },
   program: { label: "Programs", icon: Sparkles, color: "#2B634D", soft: "#DFF0E8" },
   consult: { label: "Consultations", icon: CalendarCheck, color: "#2F5580", soft: "#E3ECF8" },
   resource: { label: "Reading", icon: BookOpen, color: "#7A5A12", soft: "#FBEFD2" },
 };
 
-const filters: ("all" | ActivityType)[] = [
-  "all",
-  "assessment",
-  "mood",
-  "program",
-  "consult",
-  "resource",
-];
+/** My history covers the three things people come back to: assessments, programs and the journal. */
+const HISTORY_TYPES: ActivityType[] = ["assessment", "program", "mood"];
+const filters: ("all" | ActivityType)[] = ["all", ...HISTORY_TYPES];
 
 function HistoryPage() {
   const hydrated = useHydrated();
   const navigate = useNavigate();
   const data = useEverything();
   const [filter, setFilter] = useState<(typeof filters)[number]>("all");
-  const events = hydrated ? data.events : [];
+  const events = hydrated ? data.events.filter((e) => HISTORY_TYPES.includes(e.type)) : [];
 
   const count = (t: ActivityType) => events.filter((e) => e.type === t).length;
   const weekAgo = addDays(new Date(), -6);
@@ -86,7 +81,7 @@ function HistoryPage() {
         <header className="px-4 pb-1">
           <h1 className="font-display text-[32px] font-semibold leading-10">My history</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">
-            Everything you’ve done in iKAN, in one place
+            Your assessments, programs and journal, in one place
           </p>
         </header>
 
@@ -138,31 +133,19 @@ function HistoryPage() {
           </div>
         </section>
 
-        <section className="mt-4 grid grid-cols-3 gap-2 px-4">
+        <section className="mt-4 grid grid-cols-2 gap-2 px-4">
           <Stat
             icon={ClipboardList}
             value={count("assessment")}
             label="Assessments"
             meta={typeMeta.assessment}
           />
-          <Stat icon={Smile} value={count("mood")} label="Check-ins" meta={typeMeta.mood} />
+          <Stat icon={Smile} value={count("mood")} label="Journal check-ins" meta={typeMeta.mood} />
           <Stat
             icon={Sparkles}
             value={count("program")}
             label="Program days"
             meta={typeMeta.program}
-          />
-          <Stat
-            icon={CalendarCheck}
-            value={count("consult")}
-            label="Sessions"
-            meta={typeMeta.consult}
-          />
-          <Stat
-            icon={BookOpen}
-            value={count("resource")}
-            label="Articles"
-            meta={typeMeta.resource}
           />
           <Stat
             icon={Flame}

@@ -16,7 +16,6 @@ import {
   LayoutGrid,
   LifeBuoy,
   LogOut,
-  NotebookPen,
   Settings,
   Smile,
   Sparkles,
@@ -171,9 +170,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
         {
           to: "/history",
           label: "My history",
-          sub: hydrated
-            ? n(data.events.length, "event", "events") + " on one timeline"
-            : "Everything on one timeline",
+          sub: hydrated ? "Assessments, programs and journal" : "Assessments, programs and journal",
           icon: History,
         },
         {
@@ -186,11 +183,12 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
         },
         {
           to: "/journal",
-          label: "Mood journal",
-          sub: hydrated ? n(data.journal.entries.length, "entry", "entries") : "Daily check-ins",
+          label: "Journal",
+          sub: hydrated
+            ? n(data.journal.entries.length, "check-in", "check-ins")
+            : "Daily mood check-ins",
           icon: Smile,
         },
-        { to: "/program", label: "Learning diaries", sub: "One per program", icon: NotebookPen },
       ],
     },
     {

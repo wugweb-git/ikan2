@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { getScope, onScopeChange, scopedKey } from "@/lib/storage-scope";
+import { getScope, onScopeChange, reportWrite, scopedKey } from "@/lib/storage-scope";
 
 /* A small localStorage-backed store, kept per signed-in account (see storage-scope).
  * Hydration-safe: the server and the first client render see `empty`. */
@@ -31,6 +31,7 @@ export function createLocalStore<T extends object>(key: string, empty: T) {
     } catch {
       /* storage unavailable — keep in memory for this session */
     }
+    reportWrite(scopedKey(key));
     listeners.forEach((l) => l());
   };
 

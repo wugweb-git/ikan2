@@ -1,6 +1,7 @@
 import { createClient, type Session, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { claimGuestData, setScope } from "@/lib/storage-scope";
+import { startCloudSync, stopCloudSync } from "@/lib/cloud-sync";
+import { claimGuestData, getScope, setScope } from "@/lib/storage-scope";
 
 /* Sign-in against the existing iKan Supabase project ("Ikan - App"), the same way the live app
  * does it: password sign-in and OAuth through Supabase Auth, and sign-up through the app's edge
@@ -78,9 +79,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const apply = (s: Session | null) => {
     if (s?.user) {
+      const changed = getScope() !== s.user.id;
       claimGuestData(s.user.id);
       setScope(s.user.id);
+      if (changed) {
+        void startCloudSync(s.user.id, async () => {
+          const { data } = await supabase().auth.getSession();
+          return data.session?.access_token ?? null;
+        });
+      }
     } else {
+      if (getScope() !== "guest") stopCloudSync();
       setScope("guest");
     }
     setSession(s);

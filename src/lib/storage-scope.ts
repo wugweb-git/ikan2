@@ -43,3 +43,13 @@ export function claimGuestData(userId: string) {
     /* storage unavailable */
   }
 }
+
+/** Re-read every store from storage, e.g. after account data arrives from the database. */
+export const refreshStores = () => listeners.forEach((l) => l());
+
+let writeHook: ((scopedKey: string) => void) | null = null;
+/** Called by the stores after each local save, so it can be queued for the database. */
+export const reportWrite = (key: string) => writeHook?.(key);
+export const setWriteHook = (hook: ((scopedKey: string) => void) | null) => {
+  writeHook = hook;
+};

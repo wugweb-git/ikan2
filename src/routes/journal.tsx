@@ -35,7 +35,7 @@ export const Route = createFileRoute("/journal")({
     const m = Number(search["mood"]);
     return Number.isInteger(m) && m >= 1 && m <= 5 ? { mood: m } : {};
   },
-  head: () => pageMeta("Mood journal", "Track how you feel, one day at a time."),
+  head: () => pageMeta("Journal", "Track how you feel, one day at a time."),
   component: JournalPage,
 });
 
@@ -81,7 +81,7 @@ function JournalPage() {
     <IkanShell>
       <div style={accentStyle("mood")}>
         <header className="px-4 pb-1 pt-8">
-          <h1 className="font-display text-[32px] font-semibold leading-10">Mood journal</h1>
+          <h1 className="font-display text-[32px] font-semibold leading-10">Journal</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">
             Track how you feel, one day at a time
           </p>

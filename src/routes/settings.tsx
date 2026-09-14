@@ -2,6 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
+  Cloud,
+  CloudOff,
   KeyRound,
   LogOut,
   UserRound,
@@ -36,6 +38,7 @@ import {
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
+import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
 import type { LegalSlug } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import {
@@ -115,6 +118,7 @@ function SettingsPage() {
               </span>
             </span>
           </div>
+          <SyncRow />
           <ActionRow
             icon={KeyRound}
             label="Change password"
@@ -275,19 +279,19 @@ function SettingsPage() {
           })}
         </Group>
 
-        <p className="mt-6 text-center text-[12px] text-muted-foreground">
-          iKAN preview, data stays on this device
-        </p>
+        <p className="mt-6 text-center text-[12px] text-muted-foreground">iKAN preview</p>
 
         <BottomSheet open={clearing} onClose={() => setClearing(false)} title="Clear all data?">
           <p className="text-[15px] leading-6 text-muted-foreground">
-            This removes your assessment results, mood check-ins, program progress, bookings, saved
-            articles, profile and settings from this device. It can’t be undone.
+            This removes your assessment results, journal check-ins, program progress, bookings,
+            saved articles, profile and settings from this device and from your account. It can’t be
+            undone.
           </p>
           <div className="mt-6 flex flex-col gap-2">
             <Button
               className="bg-[#B3261E] text-white"
-              onClick={() => {
+              onClick={async () => {
+                await clearCloudData().catch(() => {});
                 for (const k of storageKeys()) {
                   try {
                     localStorage.removeItem(k);
@@ -406,5 +410,48 @@ function LinkRow({
       </span>
       <ChevronRight className="h-5 w-5 text-muted-foreground" />
     </Link>
+  );
+}
+
+function SyncRow() {
+  const status = useSyncStatus();
+  const hydrated = useHydrated();
+  const when = status.at
+    ? new Date(status.at).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })
+    : "";
+  const text = !hydrated
+    ? ""
+    : status.state === "synced"
+      ? `Saved to your account${when ? `, last at ${when}` : ""}`
+      : status.state === "syncing"
+        ? "Saving to your account…"
+        : status.state === "error"
+          ? "Couldn’t save to your account. Your data is safe on this device."
+          : status.state === "unconfigured"
+            ? "Saved on this device. Account saving isn’t connected yet."
+            : "Saved on this device";
+  return (
+    <div className="flex min-h-[72px] items-center gap-4 px-4 py-3">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--accent-container)] text-[var(--on-accent-container)]">
+        {status.state === "error" ? (
+          <CloudOff className="h-5 w-5" />
+        ) : (
+          <Cloud className="h-5 w-5" />
+        )}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[16px]">Your data</span>
+        <span className="block text-[13px] leading-5 text-muted-foreground">{text}</span>
+      </span>
+      {status.state === "error" ? (
+        <button
+          type="button"
+          onClick={syncNow}
+          className="h-9 rounded-full border border-foreground/20 px-3 text-[13px] font-semibold"
+        >
+          Try again
+        </button>
+      ) : null}
+    </div>
   );
 }

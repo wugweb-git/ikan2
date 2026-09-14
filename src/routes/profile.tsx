@@ -9,7 +9,6 @@ import {
   Download,
   HeartPulse,
   History,
-  NotebookPen,
   Settings,
   ShieldPlus,
   Smile,
@@ -139,18 +138,17 @@ function ProfilePage() {
       icon: Sparkles,
     },
     {
-      to: "/program",
-      label: "Learning diaries",
-      sub: started.length ? `${started.length} · one per program` : "Start a program to begin one",
-      icon: NotebookPen,
-    },
-    {
       to: "/journal",
-      label: "Mood journal",
-      sub: hydrated ? `${data.journal.entries.length} entries` : "",
+      label: "Journal",
+      sub: hydrated ? `${data.journal.entries.length} mood check-ins` : "",
       icon: Smile,
     },
-    { to: "/history", label: "My history", sub: "Everything on one timeline", icon: History },
+    {
+      to: "/history",
+      label: "My history",
+      sub: "Assessments, programs and journal",
+      icon: History,
+    },
   ];
 
   const exportData = () => {

@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import type { DiaryEntry } from "./metrics";
 import type { EntryValues } from "./types";
-import { onScopeChange, scopedKey } from "@/lib/storage-scope";
+import { onScopeChange, reportWrite, scopedKey } from "@/lib/storage-scope";
 
 /* Per-programme progress, kept in localStorage (no accounts yet).
  * Hydration-safe: the server and first client render see EMPTY. */
@@ -55,6 +55,7 @@ function write(slug: string, next: ProgrammeState) {
   } catch {
     /* storage unavailable — keep in memory for this session */
   }
+  reportWrite(keyFor(slug));
   listeners.forEach((l) => l());
 }
 
@@ -67,7 +68,10 @@ function subscribe(listener: () => void) {
     }
   };
   window.addEventListener("storage", onStorage);
-  const offScope = onScopeChange(listener);
+  const offScope = onScopeChange(() => {
+    cache.clear();
+    listener();
+  });
   return () => {
     listeners.delete(listener);
     window.removeEventListener("storage", onStorage);
