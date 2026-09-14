@@ -97,7 +97,6 @@ function SignupPage() {
           value={phone}
           onChange={setPhone}
           error={show("phone")}
-          hint="10 digits. We only use it if you book a consultation."
         />
         <div>
           <Field

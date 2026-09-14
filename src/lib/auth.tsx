@@ -68,7 +68,7 @@ const backend = {
   }),
   signInWith: async (provider: Provider): Promise<void> => {
     throw new Error(
-      `${providerName[provider]} sign-in isn’t connected yet. Use your email and password.`,
+      `${providerName[provider]} sign-in is coming soon. For now, use your email and password.`,
     );
   },
   resendConfirmation: async (_email: string): Promise<void> => {},

@@ -106,7 +106,7 @@ export function AuthLayout({
             <p className="mt-2 text-[15px] leading-6 text-muted-foreground">{subtitle}</p>
           ) : null}
           <div className="mt-6">{children}</div>
-          <div className="mt-auto pt-8">
+          <div className="mt-auto pb-12 pt-8">
             {footer}
             <MadeBy className={footer ? "mt-6" : ""} />
           </div>
@@ -227,15 +227,16 @@ export function FormError({ message }: { message: string | null }) {
   );
 }
 
-export function SocialButtons({ onError }: { onError: (m: string) => void }) {
+export function SocialButtons({ onError: _onError }: { onError: (m: string) => void }) {
   const { signInWith } = useAuth();
   const [busy, setBusy] = useState<Provider | null>(null);
   const go = async (p: Provider) => {
     setBusy(p);
     try {
       await signInWith(p);
-    } catch (e) {
-      onError((e as Error).message);
+    } catch {
+      // not available yet: the buttons stay as they are, with no message
+    } finally {
       setBusy(null);
     }
   };
