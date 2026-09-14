@@ -4,20 +4,37 @@
       "title": "Feeling depressed and hopeless",
       "main_title": "Why take this depression assessment?",
       "description": "Reflect on how frequently depressive symptoms have impacted your mood, energy, and daily functioning recently.",
-      "main_content": ["Understand your symptoms", "Get personalized insights", "Take the first step to recovery"],
+      "main_content": [
+        "Understand your symptoms",
+        "Get personalized insights",
+        "Take the first step to recovery"
+      ],
       "highlights_title": "Assessment Highlights",
       "section1_title": "How it works",
       "section1_who_title": "Who can take this?",
       "section1_who_content": "This assessment is designed for adults 18+.",
       "section1_eligibility_title": "What to expect:",
-      "section1_eligibility_points": ["Answer honestly", "Takes about 5 minutes", "Instant results"],
+      "section1_eligibility_points": [
+        "Answer honestly",
+        "Takes about 5 minutes",
+        "Instant results"
+      ],
       "section2_title": "What is this assessment?",
       "section2_content": "This assessment helps you reflect on how often low mood, emotional heaviness, or loss of interest has affected you.\n\nIt focuses on emotional wellbeing and daily functioning.",
-      "section2_bullets": ["Mood and emotional state", "Interest and motivation", "Energy levels and engagement"],
+      "section2_bullets": [
+        "Mood and emotional state",
+        "Interest and motivation",
+        "Energy levels and engagement"
+      ],
       "section3_title": "What you'll see",
       "section3_subtitle": "Understanding your mental health is the first step.",
       "section4_notes_title": "Things to remember",
-      "section4_notes": ["Think about recent weeks", "Choose what best describes your experience", "There’s no need to overthink", "Results appear after completion"],
+      "section4_notes": [
+        "Think about recent weeks",
+        "Choose what best describes your experience",
+        "There’s no need to overthink",
+        "Results appear after completion"
+      ],
       "notes_title": "Things to keep in mind",
       "cta_button_text": "Take Assessment",
       "duration": "3",
@@ -35,20 +52,37 @@
       "title": "Feeling overwhelmed and anxious",
       "main_title": "Why take this anxiety assessment?",
       "description": "Measure how often anxiety symptoms have affected you over the last two weeks to better understand your current stress response",
-      "main_content": ["Understand your symptoms", "Get personalized insights", "Take the first step to recovery"],
+      "main_content": [
+        "Understand your symptoms",
+        "Get personalized insights",
+        "Take the first step to recovery"
+      ],
       "highlights_title": "Assessment Highlights",
       "section1_title": "How it works",
       "section1_who_title": "Who can take this?",
       "section1_who_content": "This assessment is designed for adults 18+.",
       "section1_eligibility_title": "What to expect:",
-      "section1_eligibility_points": ["Answer honestly", "Takes about 5 minutes", "Instant results"],
+      "section1_eligibility_points": [
+        "Answer honestly",
+        "Takes about 5 minutes",
+        "Instant results"
+      ],
       "section2_title": "What is this assessment?",
       "section2_content": "This assessment helps you understand how frequently anxiety has been present in your life recently, including excessive worry, nervousness, and restlessness.\n\nIt focuses on how anxiety has affected your thoughts, physical sensations, and ability to manage everyday situations.",
-      "section2_bullets": ["Frequency of anxious thoughts", "Physical and mental tension", "Impact of worry on daily functioning"],
+      "section2_bullets": [
+        "Frequency of anxious thoughts",
+        "Physical and mental tension",
+        "Impact of worry on daily functioning"
+      ],
       "section3_title": "What you'll see",
       "section3_subtitle": "Understanding your mental health is the first step.",
       "section4_notes_title": "Things to remember",
-      "section4_notes": ["Answer based on the past 2 weeks", "Choose whAnswer based on how you’ve felt recently", "Choose what best reflects your experience", "Results are shown after completion"],
+      "section4_notes": [
+        "Answer based on the past 2 weeks",
+        "Choose whAnswer based on how you’ve felt recently",
+        "Choose what best reflects your experience",
+        "Results are shown after completion"
+      ],
       "notes_title": "Things to keep in mind",
       "cta_button_text": "Take Assessment",
       "duration": "4",
@@ -66,20 +100,37 @@
       "title": "Feeling worried and stressed",
       "main_title": "Why take this stress assessment?",
       "description": "Gauge how overwhelmed or in control you’ve felt over the last month to understand your stress levels.",
-      "main_content": ["Understand your symptoms", "Get personalized insights", "Take the first step to recovery"],
+      "main_content": [
+        "Understand your symptoms",
+        "Get personalized insights",
+        "Take the first step to recovery"
+      ],
       "highlights_title": "Assessment Highlights",
       "section1_title": "How it works",
       "section1_who_title": "Who can take this?",
       "section1_who_content": "This assessment is designed for adults 18+.",
       "section1_eligibility_title": "What to expect:",
-      "section1_eligibility_points": ["Answer honestly", "Takes about 5 minutes", "Instant results"],
+      "section1_eligibility_points": [
+        "Answer honestly",
+        "Takes about 5 minutes",
+        "Instant results"
+      ],
       "section2_title": "What is this assessment?",
       "section2_content": "This assessment helps you understand how stressed or overwhelmed you’ve been feeling lately, and whether life has felt manageable or out of control.\n\nIt focuses on how you’ve been responding to everyday pressures at work, at home, or personally.",
-      "section2_bullets": ["Perceived stress and overwhelm", "Sense of control vs pressure", "How demanding life has felt"],
+      "section2_bullets": [
+        "Perceived stress and overwhelm",
+        "Sense of control vs pressure",
+        "How demanding life has felt"
+      ],
       "section3_title": "What you'll see",
       "section3_subtitle": "Understanding your mental health is the first step.",
       "section4_notes_title": "Things to remember",
-      "section4_notes": ["Answer based on the past month", "Choose the option that fits best", "There are no right or wrong answers", "Go with your first instinct"],
+      "section4_notes": [
+        "Answer based on the past month",
+        "Choose the option that fits best",
+        "There are no right or wrong answers",
+        "Go with your first instinct"
+      ],
       "notes_title": "Things to keep in mind",
       "cta_button_text": "Take Assessment",
       "duration": "4",
@@ -97,20 +148,37 @@
       "title": "Struggling with quality sleep",
       "main_title": "Why take this sleep assessment?",
       "description": "An 8-question assessment to understand sleep quality, night-time patterns, and possible insomnia symptoms.",
-      "main_content": ["Understand your symptoms", "Get personalized insights", "Take the first step to recovery"],
+      "main_content": [
+        "Understand your symptoms",
+        "Get personalized insights",
+        "Take the first step to recovery"
+      ],
       "highlights_title": "Assessment Highlights",
       "section1_title": "How it works",
       "section1_who_title": "Who can take this?",
       "section1_who_content": "This assessment is designed for adults 18+.",
       "section1_eligibility_title": "What to expect:",
-      "section1_eligibility_points": ["Answer honestly", "Takes about 5 minutes", "Instant results"],
+      "section1_eligibility_points": [
+        "Answer honestly",
+        "Takes about 5 minutes",
+        "Instant results"
+      ],
       "section2_title": "What is this assessment?",
       "section2_content": "This assessment helps you understand your sleep patterns and how restful or disrupted your sleep has been.\n\nIt looks at both sleep quality and how sleep affects your day.",
-      "section2_bullets": ["Difficulty falling or staying asleep", "Sleep quality and restfulness", "Daytime energy and alertness"],
+      "section2_bullets": [
+        "Difficulty falling or staying asleep",
+        "Sleep quality and restfulness",
+        "Daytime energy and alertness"
+      ],
       "section3_title": "What you'll see",
       "section3_subtitle": "Understanding your mental health is the first step.",
       "section4_notes_title": "Things to remember",
-      "section4_notes": ["Think about your recent sleep habits", "Answer based on typical nights", "There are no correct answers", "Be as accurate as possible"],
+      "section4_notes": [
+        "Think about your recent sleep habits",
+        "Answer based on typical nights",
+        "There are no correct answers",
+        "Be as accurate as possible"
+      ],
       "notes_title": "Things to keep in mind",
       "cta_button_text": "Take Assessment",
       "duration": "10",
@@ -128,13 +196,21 @@
       "title": "Struggling to balance life",
       "main_title": "Why take this balance assessment?",
       "description": "Pinpoint workplace stressors like workload, support, and control that may be disrupting work-life balance.",
-      "main_content": ["Understand your symptoms", "Get personalized insights", "Take the first step to recovery"],
+      "main_content": [
+        "Understand your symptoms",
+        "Get personalized insights",
+        "Take the first step to recovery"
+      ],
       "highlights_title": "Assessment Highlights",
       "section1_title": "How it works",
       "section1_who_title": "Who can take this?",
       "section1_who_content": "This assessment is designed for adults 18+.",
       "section1_eligibility_title": "What to expect:",
-      "section1_eligibility_points": ["Answer honestly", "Takes about 5 minutes", "Instant results"],
+      "section1_eligibility_points": [
+        "Answer honestly",
+        "Takes about 5 minutes",
+        "Instant results"
+      ],
       "section2_title": "What is this assessment?",
       "section2_content": "This assessment helps you understand how your time and energy are divided between work, rest, and the people and activities that matter to you.\n\nIt focuses on whether everyday demands have been leaving room for the rest of your life.",
       "section3_title": "What you'll see",
@@ -155,20 +231,37 @@
       "title": "Feeling drained and burned out",
       "main_title": "Why take this burnout assessment?",
       "description": "Identify emotional exhaustion and mental distance related to work stress as a first step toward recovery.",
-      "main_content": ["Understand your symptoms", "Get personalized insights", "Take the first step to recovery"],
+      "main_content": [
+        "Understand your symptoms",
+        "Get personalized insights",
+        "Take the first step to recovery"
+      ],
       "highlights_title": "Assessment Highlights",
       "section1_title": "How it works",
       "section1_who_title": "Who can take this?",
       "section1_who_content": "This assessment is designed for adults 18+.",
       "section1_eligibility_title": "What to expect:",
-      "section1_eligibility_points": ["Answer honestly", "Takes about 5 minutes", "Instant results"],
+      "section1_eligibility_points": [
+        "Answer honestly",
+        "Takes about 5 minutes",
+        "Instant results"
+      ],
       "section2_title": "What is this assessment?",
       "section2_content": "This assessment helps you identify signs of burnout, including exhaustion, detachment, and reduced motivation.\n\nIt focuses on how prolonged stress may be affecting your work and personal life.",
-      "section2_bullets": ["Emotional and physical exhaustion", "Sense of detachment or cynicism", "Reduced sense of effectiveness"],
+      "section2_bullets": [
+        "Emotional and physical exhaustion",
+        "Sense of detachment or cynicism",
+        "Reduced sense of effectiveness"
+      ],
       "section3_title": "What you'll see",
       "section3_subtitle": "Understanding your mental health is the first step.",
       "section4_notes_title": "Things to remember",
-      "section4_notes": ["Reflect on sustained patterns, not one bad day", "Answer based on your typical experience", "Be honest with yourself", "Results are shown immediately"],
+      "section4_notes": [
+        "Reflect on sustained patterns, not one bad day",
+        "Answer based on your typical experience",
+        "Be honest with yourself",
+        "Results are shown immediately"
+      ],
       "notes_title": "Things to keep in mind",
       "cta_button_text": "Take Assessment",
       "duration": "10",
@@ -186,20 +279,37 @@
       "title": "Unsure or general concern",
       "main_title": "Why take this general assessment?",
       "description": "A quick, holistic snapshot combining anxiety, depression, well-being, resilience, and self-efficacy.",
-      "main_content": ["Understand your symptoms", "Get personalized insights", "Take the first step to recovery"],
+      "main_content": [
+        "Understand your symptoms",
+        "Get personalized insights",
+        "Take the first step to recovery"
+      ],
       "highlights_title": "Assessment Highlights",
       "section1_title": "How it works",
       "section1_who_title": "Who can take this?",
       "section1_who_content": "This assessment is designed for adults 18+.",
       "section1_eligibility_title": "What to expect:",
-      "section1_eligibility_points": ["Answer honestly", "Takes about 5 minutes", "Instant results"],
+      "section1_eligibility_points": [
+        "Answer honestly",
+        "Takes about 5 minutes",
+        "Instant results"
+      ],
       "section2_title": "What is this assessment?",
       "section2_content": "This assessment helps you reflect on your overall emotional state and how balanced or strained you’ve been feeling.\n\nIt focuses on emotional awareness and everyday wellbeing.",
-      "section2_bullets": ["Emotional balance and stability", "Ability to cope with feelings", "Overall sense of wellbeing"],
+      "section2_bullets": [
+        "Emotional balance and stability",
+        "Ability to cope with feelings",
+        "Overall sense of wellbeing"
+      ],
       "section3_title": "What you'll see",
       "section3_subtitle": "Understanding your mental health is the first step.",
       "section4_notes_title": "Things to remember",
-      "section4_notes": ["Answer honestly and intuitively", "Focus on how you’ve felt lately", "No judgment or scoring pressure", "Results appear after completion"],
+      "section4_notes": [
+        "Answer honestly and intuitively",
+        "Focus on how you’ve felt lately",
+        "No judgment or scoring pressure",
+        "Results appear after completion"
+      ],
       "notes_title": "Things to keep in mind",
       "cta_button_text": "Take Assessment",
       "duration": "10",
@@ -225,9 +335,24 @@
       "duration_weeks": "5",
       "tags": ["sleep", "cbt-i", "insomnia", "rest"],
       "metadata.tile1_content": "Having trouble sleeping? I-Kan's Sleep Tight module is here. We know quality sleep is essential for your well-being. Over the next  31 days, we'll work together to address your sleep troubles and help you achieve restful nights, improving your health, focus, and mood.",
-      "metadata.tile2_content": ["Daily micro-lessons (5-10 minutes)", "Evidence-based CBT techniques", "Progress tracking & insights", "Personalized sleep plan"],
-      "metadata.tile3_content": ["Complete your daily lessons at your own pace", "Track your sleep patterns and progress", "Practice new techniques each day", "Review your insights and adjust your plan"],
-      "metadata.tile4_content": ["Better Sleep Quality. Fall asleep faster and wake up refreshed", "Reduced Sleep Anxiety. Stop worrying about sleep and feel more in control", "Sustainable Habits. Build routines that last beyond the program", "Improved Daily Energy. Feel more alert and energized during the day"],
+      "metadata.tile2_content": [
+        "Daily micro-lessons (5-10 minutes)",
+        "Evidence-based CBT techniques",
+        "Progress tracking & insights",
+        "Personalized sleep plan"
+      ],
+      "metadata.tile3_content": [
+        "Complete your daily lessons at your own pace",
+        "Track your sleep patterns and progress",
+        "Practice new techniques each day",
+        "Review your insights and adjust your plan"
+      ],
+      "metadata.tile4_content": [
+        "Better Sleep Quality. Fall asleep faster and wake up refreshed",
+        "Reduced Sleep Anxiety. Stop worrying about sleep and feel more in control",
+        "Sustainable Habits. Build routines that last beyond the program",
+        "Improved Daily Energy. Feel more alert and energized during the day"
+      ],
       "metadata.eligibility_intro": "Daily micro-lessons (5-10 minutes)",
       "metadata.eligibility_point_1": "Evidence-based CBT techniques",
       "metadata.eligibility_point_2": "Progress tracking & insights",
@@ -236,11 +361,27 @@
       "equip_program_by_slug.description": "A gentle, guided program to help you understand and improve your sleep. There’s nothing to “fix” immediately — we’ll start by noticing patterns and building consistency.",
       "equip_program_by_slug.duration_days": "28",
       "equip_program_by_slug.metadata.tile1_content": "Having trouble sleeping? I-Kan's Sleep Tight module is here. We know quality sleep is essential for your well-being. Over the next  18 days, we'll work together to address your sleep troubles and help you achieve restful nights, improving your health, focus, and mood.",
-      "equip_program_by_slug.metadata.tile3_content": ["Complete your daily lesson at your own pace", "Track your sleep patterns and progress", "Practice new techniques each day", "Review your insights and adjust your plan"],
-      "equip_program_by_slug.metadata.tile4_content": ["Better Sleep Quality - Fall asleep faster and wake up refreshed", "Reduced Sleep Anxiety - Stop worrying about sleep and feel more in control", "Sustainable Habits - Build routines that last beyond the program", "Improved Daily Energy - Feel more alert and energized during the day"],
+      "equip_program_by_slug.metadata.tile3_content": [
+        "Complete your daily lesson at your own pace",
+        "Track your sleep patterns and progress",
+        "Practice new techniques each day",
+        "Review your insights and adjust your plan"
+      ],
+      "equip_program_by_slug.metadata.tile4_content": [
+        "Better Sleep Quality - Fall asleep faster and wake up refreshed",
+        "Reduced Sleep Anxiety - Stop worrying about sleep and feel more in control",
+        "Sustainable Habits - Build routines that last beyond the program",
+        "Improved Daily Energy - Feel more alert and energized during the day"
+      ],
       "equip_program_by_slug.metadata.eligibility_point_4": "Personalized sleep plan",
       "repo_editor_placeholder_tile1_content": "Example: Sleep Tight is a guided, self-help program designed to help you understand and improve your sleep. Over the next 18 days, you'll identify factors that disrupt your sleep and gradually build healthier sleep patterns...",
-      "repo_editor_placeholder_eligibility": ["Sleep Tight may be helpful if:", "You have trouble falling asleep or staying asleep", "You find yourself worrying about your sleep", "You wake up too early and struggle to fall back asleep", "Poor sleep is starting to affect your day-to-day life"],
+      "repo_editor_placeholder_eligibility": [
+        "Sleep Tight may be helpful if:",
+        "You have trouble falling asleep or staying asleep",
+        "You find yourself worrying about your sleep",
+        "You wake up too early and struggle to fall back asleep",
+        "Poor sleep is starting to affect your day-to-day life"
+      ],
       "repo_bento_what_is_title": "What is this program about?",
       "repo_bento_is_this_for_you_label": "IS THIS FOR YOU?",
       "repo_bento_how_it_works_title": "How it works",
@@ -257,9 +398,24 @@
       "duration_weeks": "4",
       "tags": ["burnout", "stress", "work", "resilience"],
       "metadata.tile1_content": "Don't let burnout drain your spark. With our Bite-sized daily steps reclaim your energy and peace of mind in 35 days.",
-      "metadata.tile2_content": ["Daily micro-lessons (5-10 minutes)", "Evidence-based CBT techniques", "Progress tracking & insights", "Practical and useful tips"],
-      "metadata.tile3_content": ["Complete your daily lessons at your own pace", "Track your patterns and progress", "Practice new techniques each day", "Review your insights and adjust your plan"],
-      "metadata.tile4_content": ["Restored Mental & Physical Energy. Overcome chronic exhaustion and feel genuinely recharged", "Clear Mental Boundaries. Protect your mental bandwidth and stop taking stress home", "Sustainable Work Habits. Create a pace of life you can maintain without burning out", "Renewed Passion & Focus. Feel engaged, present, and motivated in your day-to-day"],
+      "metadata.tile2_content": [
+        "Daily micro-lessons (5-10 minutes)",
+        "Evidence-based CBT techniques",
+        "Progress tracking & insights",
+        "Practical and useful tips"
+      ],
+      "metadata.tile3_content": [
+        "Complete your daily lessons at your own pace",
+        "Track your patterns and progress",
+        "Practice new techniques each day",
+        "Review your insights and adjust your plan"
+      ],
+      "metadata.tile4_content": [
+        "Restored Mental & Physical Energy. Overcome chronic exhaustion and feel genuinely recharged",
+        "Clear Mental Boundaries. Protect your mental bandwidth and stop taking stress home",
+        "Sustainable Work Habits. Create a pace of life you can maintain without burning out",
+        "Renewed Passion & Focus. Feel engaged, present, and motivated in your day-to-day"
+      ],
       "metadata.eligibility_intro": "Daily micro-lessons (5-10 minutes)",
       "metadata.eligibility_point_1": "Evidence-based CBT techniques",
       "metadata.eligibility_point_2": "Progress tracking & insights",
@@ -282,9 +438,24 @@
       "duration_weeks": "4",
       "tags": ["stress", "resilience", "mindfulness", "cbt"],
       "metadata.tile1_content": "Don't let stress get the better of you. Understanding and learning to manage your stress has never been easier. Simple modules over the next 30 days will teach you how.",
-      "metadata.tile2_content": ["Daily micro-lessons (5-10 minutes)", "Evidence-based CBT techniques", "Progress tracking & insights", "Practical and useful tips"],
-      "metadata.tile3_content": ["Complete your daily lessons at your own pace", "Track your patterns and progress", "Practice new techniques each day", "Review your insights and adjust your plan"],
-      "metadata.tile4_content": ["Lower daily stress. Stay calm under pressure and regain control over your life", "Reduced Mental Overwhelm. Clear mental clutter and stop feeling constantly overloaded", "Sustainable Habits. Build routines that last beyond the program", "Improved Daily Energy. Feel more alert and energized during the day"],
+      "metadata.tile2_content": [
+        "Daily micro-lessons (5-10 minutes)",
+        "Evidence-based CBT techniques",
+        "Progress tracking & insights",
+        "Practical and useful tips"
+      ],
+      "metadata.tile3_content": [
+        "Complete your daily lessons at your own pace",
+        "Track your patterns and progress",
+        "Practice new techniques each day",
+        "Review your insights and adjust your plan"
+      ],
+      "metadata.tile4_content": [
+        "Lower daily stress. Stay calm under pressure and regain control over your life",
+        "Reduced Mental Overwhelm. Clear mental clutter and stop feeling constantly overloaded",
+        "Sustainable Habits. Build routines that last beyond the program",
+        "Improved Daily Energy. Feel more alert and energized during the day"
+      ],
       "metadata.eligibility_intro": "Daily micro-lessons (5-10 minutes)",
       "metadata.eligibility_point_1": "Evidence-based CBT techniques",
       "metadata.eligibility_point_2": "Progress tracking & insights",

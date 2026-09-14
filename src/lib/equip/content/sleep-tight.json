@@ -83,9 +83,7 @@
               "body": [],
               "notes": [],
               "prompt": "Commitment",
-              "options": [
-                "I’m willing to try small sleep changes daily"
-              ]
+              "options": ["I’m willing to try small sleep changes daily"]
             }
           ]
         }
@@ -143,10 +141,7 @@
                   "text": "UI suggestion"
                 }
               ],
-              "columns": [
-                "Question",
-                "Response"
-              ],
+              "columns": ["Question", "Response"],
               "listItems": [
                 "Time I went to bed: [ : pm/am ]",
                 "Time I tried to fall asleep: [ : pm/am ]",
@@ -662,11 +657,7 @@
               "minutes": 5,
               "body": [],
               "notes": [],
-              "columns": [
-                "Your schooldays…",
-                "Thought",
-                "Feeling"
-              ],
+              "columns": ["Your schooldays…", "Thought", "Feeling"],
               "rows": [
                 "I had such a good time there with my friends. I miss those days!",
                 "It makes me nostalgic."
@@ -680,11 +671,7 @@
               "minutes": 5,
               "body": [],
               "notes": [],
-              "columns": [
-                "The last cricket match you watched…",
-                "Thought",
-                "Feeling"
-              ],
+              "columns": ["The last cricket match you watched…", "Thought", "Feeling"],
               "rows": [
                 "I was so excited and happy that our team won!",
                 "We won the tournament after a really long time. The spinners played really well!"
@@ -1154,13 +1141,8 @@
                   "text": "✅Yes ❌No"
                 }
               ],
-              "columns": [
-                "Things that kept me up",
-                "In My control (Yes/No)"
-              ],
-              "quoteText": [
-                "User may add rows"
-              ],
+              "columns": ["Things that kept me up", "In My control (Yes/No)"],
+              "quoteText": ["User may add rows"],
               "userMayAddRows": true
             },
             {
@@ -1778,12 +1760,8 @@
                   "text": "Let user create a list of habits they want to inculcate. Limit rituals to 10"
                 }
               ],
-              "columns": [
-                "Habit I want to inculcate"
-              ],
-              "quoteText": [
-                "User may add rows"
-              ],
+              "columns": ["Habit I want to inculcate"],
+              "quoteText": ["User may add rows"],
               "userMayAddRows": true
             },
             {
@@ -1828,9 +1806,7 @@
                   "text": "✅Yes ❌No"
                 }
               ],
-              "listItems": [
-                "Tick off the habits you completed today."
-              ]
+              "listItems": ["Tick off the habits you completed today."]
             },
             {
               "n": 7,

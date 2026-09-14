@@ -18,6 +18,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as PhoneLoginRouteImport } from './routes/phone-login'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -96,6 +97,11 @@ const LoginRoute = LoginRouteImport.update({
 const NotificationsRoute = NotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PhoneLoginRoute = PhoneLoginRouteImport.update({
+  id: '/phone-login',
+  path: '/phone-login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/phone-login': typeof PhoneLoginRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
@@ -324,6 +331,7 @@ export interface FileRoutesByTo {
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/phone-login': typeof PhoneLoginRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/phone-login': typeof PhoneLoginRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
@@ -417,6 +426,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/login'
     | '/notifications'
+    | '/phone-login'
     | '/profile'
     | '/reset-password'
     | '/settings'
@@ -462,6 +472,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/login'
     | '/notifications'
+    | '/phone-login'
     | '/profile'
     | '/reset-password'
     | '/settings'
@@ -507,6 +518,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/login'
     | '/notifications'
+    | '/phone-login'
     | '/profile'
     | '/reset-password'
     | '/settings'
@@ -553,6 +565,7 @@ export interface RootRouteChildren {
   JournalRoute: typeof JournalRoute
   LoginRoute: typeof LoginRoute
   NotificationsRoute: typeof NotificationsRoute
+  PhoneLoginRoute: typeof PhoneLoginRoute
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
@@ -652,6 +665,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/phone-login': {
+      id: '/phone-login'
+      path: '/phone-login'
+      fullPath: '/phone-login'
+      preLoaderRoute: typeof PhoneLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -905,6 +925,7 @@ const rootRouteChildren: RootRouteChildren = {
   JournalRoute: JournalRoute,
   LoginRoute: LoginRoute,
   NotificationsRoute: NotificationsRoute,
+  PhoneLoginRoute: PhoneLoginRoute,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,

@@ -33,9 +33,38 @@ export const password: Check = (v) => {
 };
 
 /** A national number: exactly 10 digits. */
-export const phoneDigits = (v: string) => v.replace(/\D/g, "");
-export const phone10: Check = (v) =>
-  /^\d{10}$/.test(phoneDigits(v)) ? undefined : "Enter a 10-digit phone number.";
+const DIAL_CODES = [
+  "+971",
+  "+966",
+  "+974",
+  "+977",
+  "+880",
+  "+91",
+  "+44",
+  "+61",
+  "+65",
+  "+49",
+  "+94",
+  "+1",
+];
+
+/** Splits "+91 98765 43210" into its country code and national digits ("9876543210"). */
+export function splitPhone(v: string) {
+  const compact = v.replace(/[\s()-]/g, "");
+  const dial = DIAL_CODES.find((d) => compact.startsWith(d)) ?? "";
+  return { dial, digits: compact.slice(dial.length).replace(/\D/g, "") };
+}
+/** The national number only, without the country code. */
+export const phoneDigits = (v: string) => splitPhone(v).digits;
+
+/** 10 digits after the country code; an Indian mobile also starts with 6, 7, 8 or 9. */
+export const phone10: Check = (v) => {
+  const { dial, digits } = splitPhone(v);
+  if (!/^\d{10}$/.test(digits)) return "Enter a 10-digit phone number.";
+  if ((dial === "+91" || dial === "") && !/^[6-9]/.test(digits))
+    return "Indian mobile numbers start with 6, 7, 8 or 9.";
+  return undefined;
+};
 
 /** Indian PIN code: 6 digits, not starting with 0. */
 export const pin: Check = (v) =>
@@ -76,7 +105,8 @@ export const minLength =
 export const optional =
   (...checks: Check[]): Check =>
   (v) =>
-    v.trim() ? all(...checks)(v) : undefined;
+    // a country code with no number counts as empty
+    v.trim() && !/^\+\d{1,4}$/.test(v.replace(/\s/g, "")) ? all(...checks)(v) : undefined;
 
 export const all =
   (...checks: Check[]): Check =>

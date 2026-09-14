@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Eye, EyeOff, Lock, ShieldCheck, Sparkles, UserRoundCheck } from "lucide-react";
+import { Eye, EyeOff, Lock, ShieldCheck, Smartphone, Sparkles, UserRoundCheck } from "lucide-react";
 import { Illustration } from "@/components/art";
 import { cn } from "@/lib/utils";
 import { displayName, useAuth, type Provider } from "@/lib/auth";
@@ -8,8 +8,8 @@ import { markOnboardingDone, onboardingDone, seedProfile } from "@/lib/profile";
 import { MadeBy } from "@/components/made-by";
 
 const PUBLIC =
-  /^\/(login|signup|verify-email|forgot-password|reset-password|support|about|faq|contact|legal)(\/|$)/;
-const AUTH_ONLY = /^\/(login|signup|verify-email|forgot-password)(\/|$)/;
+  /^\/(login|phone-login|signup|verify-email|forgot-password|reset-password|support|about|faq|contact|legal)(\/|$)/;
+const AUTH_ONLY = /^\/(login|phone-login|signup|verify-email|forgot-password)(\/|$)/;
 
 /* Only a brand-new account sees the welcome flow. An account created more than a day ago is a
  * returning person (on a new phone, a cleared browser, or after signing out) and goes straight
@@ -99,26 +99,26 @@ export function AuthLayout({
   return (
     <div className="min-h-dvh bg-canvas">
       <div className="mx-auto flex min-h-dvh w-full max-w-app flex-col bg-background pb-[env(safe-area-inset-bottom)] shadow-app">
-        <div className="relative h-44 overflow-hidden">
+        <div className="relative h-28 shrink-0 overflow-hidden">
           {art === "welcome" ? <WelcomeArt /> : <Illustration art={art} />}
-          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-background to-transparent" />
           <Link
             to="/login"
-            className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-background/85 py-1.5 pl-1.5 pr-3 backdrop-blur"
+            className="absolute left-5 top-[max(1rem,env(safe-area-inset-top))] flex items-center gap-2 rounded-full bg-background/85 py-1 pl-1 pr-3 backdrop-blur"
           >
-            <img src="/favicon.svg" alt="" className="h-8 w-8 rounded-[10px]" />
+            <img src="/favicon.svg" alt="" className="h-7 w-7 rounded-[9px]" />
             <span className="font-display text-[17px] font-semibold">iKAN</span>
           </Link>
         </div>
-        <main className="flex flex-1 flex-col px-6 pb-8">
-          <h1 className="font-display text-[30px] font-semibold leading-9">{title}</h1>
+        <main className="flex flex-1 flex-col px-6">
+          <h1 className="font-display text-[26px] font-semibold leading-8">{title}</h1>
           {subtitle ? (
-            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">{subtitle}</p>
+            <p className="mt-1 text-[14px] leading-5 text-muted-foreground">{subtitle}</p>
           ) : null}
-          <div className="mt-6">{children}</div>
-          <div className="mt-auto pb-12 pt-8">
+          <div className="mt-5">{children}</div>
+          <div className="mt-auto pb-3 pt-4">
             {footer}
-            <MadeBy className={footer ? "mt-6" : ""} />
+            <MadeBy className={footer ? "mt-3" : ""} />
           </div>
         </main>
       </div>
@@ -153,10 +153,10 @@ export function Field({
   const isPassword = type === "password";
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[13px] font-medium text-muted-foreground">{label}</span>
+      <span className="mb-1 block text-[13px] font-medium text-muted-foreground">{label}</span>
       <span
         className={cn(
-          "flex h-14 items-center rounded-[16px] border bg-secondary px-4 transition-colors focus-within:border-foreground/60 focus-within:bg-background",
+          "flex h-12 items-center rounded-[14px] border bg-secondary px-4 transition-colors focus-within:border-foreground/60 focus-within:bg-background",
           error ? "border-[#B3261E]" : "border-transparent",
         )}
       >
@@ -214,7 +214,7 @@ export function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled || busy}
-      className="relative flex h-14 w-full items-center justify-center rounded-full bg-foreground text-[16px] font-semibold text-background transition-opacity disabled:opacity-50"
+      className="relative flex h-12 w-full items-center justify-center rounded-full bg-foreground text-[16px] font-semibold text-background transition-opacity disabled:opacity-50"
     >
       {busy ? (
         <span className="h-5 w-5 animate-spin rounded-full border-2 border-background/40 border-t-background" />
@@ -252,28 +252,36 @@ export function SocialButtons({ onError: _onError }: { onError: (m: string) => v
   };
   return (
     <div>
-      <div className="my-6 flex items-center gap-3 text-[13px] text-muted-foreground">
+      <div className="my-4 flex items-center gap-3 text-[13px] text-muted-foreground">
         <span className="h-px flex-1 bg-foreground/10" /> or{" "}
         <span className="h-px flex-1 bg-foreground/10" />
       </div>
-      <div className="space-y-2.5">
+      <div className="grid grid-cols-3 gap-2">
         <button
           type="button"
           onClick={() => go("google")}
+          aria-label="Continue with Google"
           disabled={Boolean(busy)}
-          className="flex h-14 w-full items-center justify-center gap-3 rounded-full border border-foreground/15 text-[15px] font-semibold disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[14px] font-semibold disabled:opacity-50"
         >
-          <GoogleMark /> {busy === "google" ? "Opening Google…" : "Continue with Google"}
+          <GoogleMark /> <span>{busy === "google" ? "…" : "Google"}</span>
         </button>
         <button
           type="button"
           onClick={() => go("linkedin_oidc")}
+          aria-label="Continue with LinkedIn"
           disabled={Boolean(busy)}
-          className="flex h-14 w-full items-center justify-center gap-3 rounded-full border border-foreground/15 text-[15px] font-semibold disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[14px] font-semibold disabled:opacity-50"
         >
-          <LinkedInMark />{" "}
-          {busy === "linkedin_oidc" ? "Opening LinkedIn…" : "Continue with LinkedIn"}
+          <LinkedInMark /> <span>{busy === "linkedin_oidc" ? "…" : "LinkedIn"}</span>
         </button>
+        <Link
+          to="/phone-login"
+          aria-label="Continue with phone"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[14px] font-semibold"
+        >
+          <Smartphone className="h-5 w-5" /> Phone
+        </Link>
       </div>
     </div>
   );
@@ -297,7 +305,7 @@ export function TrustList() {
 }
 
 export const TermsNote = () => (
-  <p className="mt-5 text-center text-[12px] leading-5 text-muted-foreground">
+  <p className="mt-3 text-center text-[12px] leading-5 text-muted-foreground">
     By continuing you agree to the{" "}
     <Link to="/legal/$slug" params={{ slug: "terms" }} className="underline underline-offset-2">
       Terms of use

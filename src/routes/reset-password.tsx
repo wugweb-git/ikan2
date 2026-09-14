@@ -51,7 +51,7 @@ function ResetPage() {
     >
       <form
         noValidate
-        className="space-y-4"
+        className="space-y-3"
         onSubmit={async (e) => {
           e.preventDefault();
           const weak = v.password(password);

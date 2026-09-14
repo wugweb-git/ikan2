@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   Cloud,
@@ -22,6 +22,8 @@ import {
   TrendingUp,
   Watch,
   BellRing,
+  HeartPulse,
+  Unlink,
   Footprints,
   MapPin,
   Smartphone,
@@ -56,6 +58,8 @@ import {
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
+import { recentAverage, useGoogleHealth } from "@/lib/google-health";
+import { enablePush, pushSupported, sendTestPush } from "@/lib/push";
 import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
 import type { LegalSlug } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -67,7 +71,13 @@ import {
   type Settings,
 } from "@/lib/profile";
 
+type Search = { health?: "connected" | "cancelled" | "error" };
+
 export const Route = createFileRoute("/settings")({
+  validateSearch: (s: Record<string, unknown>): Search =>
+    s["health"] === "connected" || s["health"] === "cancelled" || s["health"] === "error"
+      ? { health: s["health"] }
+      : {},
   head: () => pageMeta("Settings", "Notifications, health data, privacy and legal."),
   component: SettingsPage,
 });
@@ -80,6 +90,13 @@ function SettingsPage() {
   const settings = hydrated ? stored : defaultSettings;
   const snack = useSnack();
   const [clearing, setClearing] = useState(false);
+  const notifications = useNotificationAccess();
+
+  // keep this device's push subscription and reminder time in step with the settings
+  useEffect(() => {
+    if (!hydrated || notifications !== "granted" || !pushSupported()) return;
+    void enablePush({ moodReminder: stored.moodReminders, time: stored.moodReminderTime });
+  }, [hydrated, notifications, stored.moodReminders, stored.moodReminderTime]);
 
   const toggle = (key: keyof Settings, label: string, sub: string, icon: LucideIcon) => (
     <Row icon={icon} label={label} sub={sub}>
@@ -212,11 +229,15 @@ function SettingsPage() {
           )}
         </Group>
 
-        <Group title="Health data">
+        <Group
+          title="Health data"
+          note="iKAN collects health and fitness data you choose to connect to show your sleep, steps and heart rate alongside your iKAN Score and programs. It is never sold or shared."
+        >
+          <GoogleHealthRows onMessage={snack.show} />
           {toggle(
             "healthConnect",
             "Health Connect",
-            "Sleep and steps from Health Connect or Google Fit. Syncs in the installed Android app.",
+            "All phone health data, from the iKAN Android app (coming soon)",
             Watch,
           )}
         </Group>
@@ -335,6 +356,87 @@ function SettingsPage() {
   );
 }
 
+function GoogleHealthRows({ onMessage }: { onMessage: (m: string) => void }) {
+  const hydrated = useHydrated();
+  const navigate = useNavigate();
+  const { health } = Route.useSearch();
+  const g = useGoogleHealth();
+
+  useEffect(() => {
+    if (!health) return;
+    onMessage(
+      health === "connected"
+        ? "Google Health is connected"
+        : health === "cancelled"
+          ? "Google Health wasn’t connected"
+          : "Google Health didn’t connect. Try again.",
+    );
+    void navigate({ to: "/settings", search: {}, replace: true });
+  }, [health]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (g.error) onMessage(g.error);
+  }, [g.error]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const connected = hydrated && g.status?.connected;
+  const steps = recentAverage(g.days, "steps");
+  const sleep = recentAverage(g.days, "sleep_minutes");
+  const summary = [
+    steps ? `${Math.round(steps).toLocaleString("en-IN")} steps` : null,
+    sleep ? `${Math.floor(sleep / 60)}h ${Math.round(sleep % 60)}m sleep` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const synced = g.status?.lastSyncedAt
+    ? new Date(g.status.lastSyncedAt).toLocaleString("en-IN", {
+        day: "numeric",
+        month: "short",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : null;
+
+  return (
+    <>
+      <Row
+        icon={HeartPulse}
+        label="Google Health"
+        sub={
+          connected
+            ? summary
+              ? `7-day average: ${summary}`
+              : "Connected. Data appears after your device syncs."
+            : "Sleep, steps and heart rate from Fitbit and Google devices"
+        }
+      >
+        <button
+          type="button"
+          disabled={g.busy || !hydrated || g.status === null || g.status.configured === false}
+          onClick={() => void (connected ? g.sync() : g.connect())}
+          className={cn(
+            "inline-flex h-9 shrink-0 items-center rounded-full px-4 text-[13px] font-semibold disabled:opacity-50",
+            connected ? "border border-foreground/15" : "bg-foreground text-background",
+          )}
+        >
+          {g.busy ? "…" : connected ? "Sync" : g.status?.configured === false ? "Soon" : "Connect"}
+        </button>
+      </Row>
+      {connected ? (
+        <ActionRow
+          icon={Unlink}
+          label="Disconnect Google Health"
+          sub={
+            synced
+              ? `Last synced ${synced}. Removes the health data iKAN saved.`
+              : "Removes the health data iKAN saved"
+          }
+          onClick={() => void g.disconnect().then(() => onMessage("Google Health disconnected"))}
+        />
+      ) : null}
+    </>
+  );
+}
+
 function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
   const hydrated = useHydrated();
   const notifications = useNotificationAccess();
@@ -386,6 +488,8 @@ function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
           label="Send a test notification"
           sub="Check that reminders reach this phone"
           onClick={async () => {
+            const sent = await sendTestPush().catch(() => 0);
+            if (sent) return onMessage("Test notification sent");
             const ok = await notify("Hello from iKAN", "This is how reminders will look.");
             onMessage(ok ? "Test notification sent" : "Couldn’t show a notification");
           }}

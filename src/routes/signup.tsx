@@ -67,10 +67,10 @@ function SignupPage() {
   return (
     <AuthLayout
       title="Create your account"
-      subtitle="Take assessments, follow programs and track how you feel, all in one place."
+      subtitle="Assessments, programs and mood tracking."
       art="welcome"
     >
-      <form onSubmit={submit} noValidate className="space-y-4">
+      <form onSubmit={submit} noValidate className="space-y-3">
         <FormError message={error} />
         <Field
           label="Full name"
@@ -109,7 +109,9 @@ function SignupPage() {
             maxLength={72}
             error={show("password")}
           />
-          <ul className="mt-2 flex flex-wrap gap-2">
+          <ul
+            className={cn("mt-2 flex flex-wrap gap-2", !password && !show("password") && "hidden")}
+          >
             {checks.map((c) => (
               <li
                 key={c.label}
@@ -161,7 +163,7 @@ function SignupPage() {
         <PrimaryButton busy={busy}>Create account</PrimaryButton>
       </form>
       <SocialButtons onError={setError} />
-      <p className="mt-6 text-center text-[15px]">
+      <p className="mt-4 text-center text-[15px]">
         Already have an account?{" "}
         <Link to="/login" className="font-semibold underline underline-offset-4">
           Sign in

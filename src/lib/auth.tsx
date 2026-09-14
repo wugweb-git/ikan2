@@ -4,25 +4,18 @@ import { startCloudSync, stopCloudSync } from "@/lib/cloud-sync";
 import { importLegacyData, resetLegacyImport } from "@/lib/legacy-import";
 import { claimGuestData, getScope, setScope } from "@/lib/storage-scope";
 
-/* Accounts live in ikan2's Lovable Cloud backend. Every iKan account was copied there with its
- * id and password, so people sign in with the details they already have.
- * Connection settings come from VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY. Until they
- * are set, sign-in falls back to the old iKan project ("Ikan - App") so the app keeps working. */
+import { BACKEND_KEY, BACKEND_URL, functionUrl } from "@/lib/backend";
 
-const CLOUD_URL = (import.meta.env["VITE_SUPABASE_URL"] as string | undefined)?.replace(/\/$/, "");
-const CLOUD_KEY = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as string | undefined;
-/** true when sign-in and saving go through Lovable Cloud */
-export const usingLovableCloud = Boolean(CLOUD_URL && CLOUD_KEY);
+/* Accounts live in the iKAN Supabase project (see backend.ts). */
 
-const LEGACY_URL = "https://jpfvoevxegnknxoqmwye.supabase.co";
-const LEGACY_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZnZvZXZ4ZWdua254b3Ftd3llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMjIyNDIsImV4cCI6MjA3MzY5ODI0Mn0.VGYSE8LqBEggrQcUHJH9NcvursaoNfQK9K8-ESCo-rc";
-
-export const SUPABASE_URL = usingLovableCloud ? CLOUD_URL! : LEGACY_URL;
-export const SUPABASE_ANON_KEY = usingLovableCloud ? CLOUD_KEY! : LEGACY_KEY;
-/** the old iKan edge function (legacy sign-up and the contact form) */
-export const LEGACY_API = `${LEGACY_URL}/functions/v1/make-server-cc205da9`;
-export const LEGACY_ANON_KEY = LEGACY_KEY;
+export const SUPABASE_URL = BACKEND_URL;
+export const SUPABASE_ANON_KEY = BACKEND_KEY;
+/** the old iKan edge function (sign-up and the contact form) */
+export const LEGACY_API = functionUrl("make-server-cc205da9");
+export const LEGACY_ANON_KEY = BACKEND_KEY;
+const LEGACY_KEY = BACKEND_KEY;
+/** kept for the sign-up branch below; ikan2 now uses the iKAN project directly */
+const usingLovableCloud = false;
 
 /* "Keep me signed in": when off, the session lives only until the app is closed. */
 const REMEMBER_KEY = "ikan.remember";
@@ -120,6 +113,9 @@ type AuthValue = {
     phone?: string;
   }) => Promise<"signedIn" | "confirm">;
   signInWith: (provider: Provider) => Promise<void>;
+  /** text a 6-digit code to a phone number in +<country><number> form */
+  sendPhoneCode: (phone: string) => Promise<void>;
+  verifyPhoneCode: (phone: string, code: string) => Promise<void>;
   resendConfirmation: (email: string) => Promise<void>;
   sendReset: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -273,6 +269,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       if (error) throw new Error(friendly(error.message));
     },
+    sendPhoneCode: async (phone) => {
+      const { error } = await supabase().auth.signInWithOtp({ phone: phone.replace(/\s/g, "") });
+      if (error) {
+        if (
+          /unsupported phone provider|phone.*(disabled|not enabled)|sms provider/i.test(
+            error.message,
+          )
+        )
+          throw new Error("Phone sign-in isn’t available yet. Use your email instead.");
+        throw new Error(friendly(error.message));
+      }
+    },
+    verifyPhoneCode: async (phone, code) => {
+      const { error } = await supabase().auth.verifyOtp({
+        phone: phone.replace(/\s/g, ""),
+        token: code,
+        type: "sms",
+      });
+      if (error) {
+        if (/expired|invalid|otp/i.test(error.message))
+          throw new Error("That code didn’t work. Check it, or send a new one.");
+        throw new Error(friendly(error.message));
+      }
+    },
     resendConfirmation: async (email) => {
       const { error } = await supabase().auth.resend({
         type: "signup",
@@ -293,6 +313,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRecovering(false);
     },
     signOut: async () => {
+      await import("@/lib/push").then((m) => m.disablePush()).catch(() => {});
       await supabase()
         .auth.signOut({ scope: "local" })
         .catch(() => {});

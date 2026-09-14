@@ -71,24 +71,22 @@ function JournalPage() {
   return (
     <IkanShell>
       <div style={accentStyle("mood")}>
-        <header className="relative px-4 pb-1 pt-8">
+        <header className="relative px-4 pb-1 pt-[max(1.25rem,env(safe-area-inset-top))]">
           <Link
             to="/history/journal"
             aria-label="Journal history"
             className={cn(
               stateLayer,
-              "absolute right-2 top-6 grid h-12 w-12 place-items-center rounded-full",
+              "absolute right-2 top-[max(0.75rem,env(safe-area-inset-top))] grid h-12 w-12 place-items-center rounded-full",
             )}
           >
             <History className="h-6 w-6" />
           </Link>
-          <h1 className="font-display text-[32px] font-semibold leading-10">Journal</h1>
-          <p className="mt-1 text-[15px] text-muted-foreground">
-            Track how you feel, one day at a time
-          </p>
+          <h1 className="font-display text-[28px] font-semibold leading-9">Journal</h1>
+          <p className="text-[14px] text-muted-foreground">Track how you feel, one day at a time</p>
         </header>
 
-        <section className="mt-5 grid grid-cols-2 gap-3 px-4">
+        <section className="mt-4 grid grid-cols-2 gap-2 px-4">
           <Stat
             emoji={current > 0 ? "🔥" : "💤"}
             label="Current streak"
@@ -97,7 +95,7 @@ function JournalPage() {
           <Stat emoji="🏆" label="Best streak" value={hydrated ? best : 0} />
         </section>
 
-        <section className="mx-4 mt-3 rounded-[24px] bg-foreground/[0.035] p-4">
+        <section className="mx-4 mt-2 rounded-[20px] bg-foreground/[0.035] px-4 py-3">
           <div className="flex items-baseline justify-between">
             <h2 className="font-display text-[16px] font-semibold">14-day mood</h2>
             <p className="text-[14px] tabular-nums text-muted-foreground">
@@ -107,8 +105,8 @@ function JournalPage() {
           <Sparkline values={hydrated ? daily : []} />
         </section>
 
-        <section className="mt-6 px-4">
-          <h2 className="font-display text-[20px] font-semibold">Today</h2>
+        <section className="mt-4 px-4">
+          <h2 className="font-display text-[18px] font-semibold">Today</h2>
 
           {hydrated ? (
             <CheckIn
@@ -142,8 +140,8 @@ function JournalPage() {
 
 function Stat({ emoji, label, value }: { emoji: string; label: string; value: number }) {
   return (
-    <div className="flex items-center gap-3 rounded-[20px] bg-foreground/[0.05] p-4">
-      <span className="text-[28px] leading-none" aria-hidden="true">
+    <div className="flex items-center gap-3 rounded-[20px] bg-foreground/[0.05] px-4 py-3">
+      <span className="text-[24px] leading-none" aria-hidden="true">
         {emoji}
       </span>
       <span>
@@ -158,7 +156,7 @@ function Stat({ emoji, label, value }: { emoji: string; label: string; value: nu
 
 function Sparkline({ values }: { values: (number | null)[] }) {
   const w = 320;
-  const h = 80;
+  const h = 56;
   const pad = 8;
   const pts = values.map((v, i) =>
     v === null
@@ -181,7 +179,7 @@ function Sparkline({ values }: { values: (number | null)[] }) {
     <>
       <svg
         viewBox={`0 0 ${w} ${h}`}
-        className="mt-3 block h-auto w-full"
+        className="mt-2 block h-auto w-full"
         role="img"
         aria-label="Mood over the last 14 days, 1 to 5"
       >
@@ -307,7 +305,7 @@ function CheckIn({
   };
 
   return (
-    <div className="mt-4 rounded-[28px] bg-secondary p-5">
+    <div className="mt-3 rounded-[24px] bg-secondary p-4">
       <div className="flex gap-1.5" aria-label={`Step ${step + 1} of ${checkinSteps.length}`}>
         {checkinSteps.map((s, i) => (
           <span
@@ -321,10 +319,10 @@ function CheckIn({
       </div>
 
       <div key={current.key} className="animate-fade">
-        <p className="mt-5 font-display text-[20px] font-semibold leading-7">{current.title}</p>
+        <p className="mt-4 font-display text-[20px] font-semibold leading-7">{current.title}</p>
         <p className="mt-1 text-[14px] text-muted-foreground">{current.subtitle}</p>
 
-        <div className="mt-5">
+        <div className="mt-4">
           {current.key === "mood" ? (
             <EmojiScale
               scale={moodScale}
@@ -393,7 +391,7 @@ function CheckIn({
         </div>
       </div>
 
-      <div className="mt-6 flex items-center gap-2">
+      <div className="mt-4 flex items-center gap-2">
         {step > 0 ? (
           <Button variant="text" onClick={() => setStep(step - 1)}>
             Back

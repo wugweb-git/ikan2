@@ -54,6 +54,7 @@ import {
   useSettings,
 } from "@/lib/profile";
 import { checkMoodReminder, refreshWeather, useDevice, weatherWord } from "@/lib/device";
+import { recentAverage, useGoogleHealth } from "@/lib/google-health";
 import { resources, slugOf, type Resource } from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
 import resBurnout from "@/assets/res-burnout.jpg";
@@ -162,6 +163,10 @@ function Home() {
   useEffect(() => {
     if (!hydrated) return;
     void refreshWeather();
+    if (Notification?.permission === "granted")
+      void import("@/lib/push").then((m) =>
+        m.enablePush({ moodReminder: settings.moodReminders, time: settings.moodReminderTime }),
+      );
     checkMoodReminder({
       enabled: settings.moodReminders,
       time: settings.moodReminderTime,
@@ -1360,9 +1365,47 @@ function SupportCard({ city }: { city: string }) {
 }
 
 function HealthCard() {
-  const { settings } = useSettings();
   const hydrated = useHydrated();
-  if (hydrated && settings.healthConnect) return null;
+  const g = useGoogleHealth();
+  if (!hydrated || !g.status) return null;
+  if (g.status.connected) {
+    const steps = recentAverage(g.days, "steps");
+    const sleep = recentAverage(g.days, "sleep_minutes");
+    const rhr = recentAverage(g.days, "resting_heart_rate");
+    const tiles = [
+      steps ? { v: Math.round(steps).toLocaleString("en-IN"), l: "steps a day" } : null,
+      sleep
+        ? { v: `${Math.floor(sleep / 60)}h ${Math.round(sleep % 60)}m`, l: "sleep a night" }
+        : null,
+      rhr ? { v: `${Math.round(rhr)}`, l: "resting bpm" } : null,
+    ].filter((t): t is { v: string; l: string } => Boolean(t));
+    return (
+      <section className="mx-4 rounded-[24px] bg-secondary p-4">
+        <div className="flex items-center gap-2">
+          <Watch className="h-5 w-5" />
+          <h2 className="flex-1 font-display text-[16px] font-semibold">Your last 7 days</h2>
+          <Link to="/settings" className="text-[13px] font-semibold text-muted-foreground">
+            Google Health
+          </Link>
+        </div>
+        {tiles.length ? (
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {tiles.map((t) => (
+              <div key={t.l} className="rounded-[16px] bg-background p-3">
+                <p className="font-display text-[18px] font-semibold tabular-nums">{t.v}</p>
+                <p className="text-[12px] text-muted-foreground">{t.l}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-2 text-[14px] text-muted-foreground">
+            Connected. Your data appears after your watch or phone syncs with Google.
+          </p>
+        )}
+      </section>
+    );
+  }
+  if (!g.status.configured) return null;
   return (
     <Link
       to="/settings"
@@ -1377,7 +1420,7 @@ function HealthCard() {
       <span className="min-w-0 flex-1">
         <span className="block text-[15px] font-semibold">Add sleep and steps</span>
         <span className="block text-[13px] text-muted-foreground">
-          Connect Health Connect so they count in your score
+          Connect Google Health to see them next to your score
         </span>
       </span>
       <ChevronRight className="h-5 w-5 text-muted-foreground" />

@@ -1,19 +1,17 @@
 import { useSyncExternalStore } from "react";
+import { BACKEND_KEY, BACKEND_URL } from "@/lib/backend";
 import { getScope, refreshStores, setWriteHook } from "@/lib/storage-scope";
 
-/* Saves each account's app data to ikan2's Lovable Cloud database (public.user_state), one row per
- * store. The device copy stays the working copy: screens read and write localStorage as before,
- * every save is pushed a moment later, and on sign-in the account's rows are pulled and merged in.
- * Rows are read and written with the signed-in user's token; row level security keeps each
- * account to its own rows.
- *
- * Connection settings come from VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY (the same
- * Lovable Cloud project that handles sign-in). Until they are set, saving stays on the device. */
+/* Saves each account's app data to the iKAN backend (public.ikan2_user_state), one row per store.
+ * The device copy stays the working copy: screens read and write localStorage as before, every
+ * save is pushed a moment later, and on sign-in the account's rows are pulled and merged in, so
+ * the same account sees the same data on every phone. Row level security keeps each account to
+ * its own rows. */
 
-const DB_URL =
-  (import.meta.env["VITE_SUPABASE_URL"] as string | undefined)?.replace(/\/$/, "") ?? "";
-const DB_KEY = (import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as string | undefined) ?? "";
-export const cloudConfigured = Boolean(DB_URL && DB_KEY);
+const DB_URL = BACKEND_URL;
+const DB_KEY = BACKEND_KEY;
+const TABLE = "ikan2_user_state";
+export const cloudConfigured = true;
 
 /** Store names as saved in the database (the part after `ikan.u.<userId>.`). */
 const SYNCED = new Set([
@@ -212,7 +210,7 @@ async function pull() {
   setStatus({ state: "syncing" });
   try {
     const rows = await rest<{ key: string; value: unknown; updated_at: string }[]>(
-      `user_state?select=key,value,updated_at&user_id=eq.${s.uid}`,
+      `${TABLE}?select=key,value,updated_at&user_id=eq.${s.uid}`,
       token,
     );
     if (session?.uid !== s.uid || getScope() !== s.uid) return;
@@ -274,7 +272,7 @@ async function push() {
       .map((key) => ({ key, value: readLocal(s.uid, key), updated_at: meta[key]!.changed }))
       .filter((i) => i.value !== undefined);
     if (items.length)
-      await rest("user_state?on_conflict=user_id,key", token, {
+      await rest(`${TABLE}?on_conflict=user_id,key`, token, {
         method: "POST",
         prefer: "resolution=merge-duplicates,return=minimal",
         body: items.map((i) => ({ user_id: s.uid, ...i })),
@@ -305,7 +303,7 @@ export async function clearCloudData() {
   if (!s || !cloudConfigured) return;
   const token = await s.token();
   if (!token) return;
-  await rest(`user_state?user_id=eq.${s.uid}`, token, { method: "DELETE" });
+  await rest(`${TABLE}?user_id=eq.${s.uid}`, token, { method: "DELETE" });
   try {
     localStorage.removeItem(metaKey(s.uid));
   } catch {

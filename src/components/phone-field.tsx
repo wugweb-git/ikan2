@@ -128,10 +128,10 @@ export function PhoneField({
 
   return (
     <div>
-      <span className="mb-1.5 block text-[13px] font-medium text-muted-foreground">{label}</span>
+      <span className="mb-1 block text-[13px] font-medium text-muted-foreground">{label}</span>
       <div
         className={cn(
-          "flex h-14 items-center rounded-[16px] border bg-secondary px-4 transition-colors focus-within:border-foreground/60 focus-within:bg-background",
+          "flex h-12 items-center rounded-[14px] border bg-secondary px-4 transition-colors focus-within:border-foreground/60 focus-within:bg-background",
           error ? "border-[#B3261E]" : "border-transparent",
         )}
       >

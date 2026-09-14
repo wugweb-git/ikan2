@@ -56,11 +56,7 @@
               "body": [],
               "notes": [],
               "prompt": "Have you ever taken therapy before?",
-              "options": [
-                "Yes",
-                "No",
-                "I'd prefer not to answer"
-              ]
+              "options": ["Yes", "No", "I'd prefer not to answer"]
             },
             {
               "n": 4,
@@ -72,11 +68,7 @@
               "body": [],
               "notes": [],
               "prompt": "Do you have any pre-existing conditions?",
-              "options": [
-                "Yes",
-                "No",
-                "I'd prefer not to answer"
-              ]
+              "options": ["Yes", "No", "I'd prefer not to answer"]
             },
             {
               "n": 5,
@@ -1002,10 +994,7 @@
               "body": [],
               "notes": [],
               "prompt": "We won the cricket tournament after a really long time. The spinners played really well.",
-              "options": [
-                "Thought",
-                "Feeling"
-              ]
+              "options": ["Thought", "Feeling"]
             },
             {
               "n": 3,
@@ -1016,10 +1005,7 @@
               "body": [],
               "notes": [],
               "prompt": "I am furious about the power cuts.",
-              "options": [
-                "Thought",
-                "Feeling"
-              ]
+              "options": ["Thought", "Feeling"]
             },
             {
               "n": 4,
@@ -1030,10 +1016,7 @@
               "body": [],
               "notes": [],
               "prompt": "She won a well-deserved award for her performance.",
-              "options": [
-                "Thought",
-                "Feeling"
-              ]
+              "options": ["Thought", "Feeling"]
             },
             {
               "n": 5,
@@ -1049,10 +1032,7 @@
                 }
               ],
               "prompt": "I am so happy for him!",
-              "options": [
-                "Thought",
-                "Feeling"
-              ]
+              "options": ["Thought", "Feeling"]
             },
             {
               "n": 6,

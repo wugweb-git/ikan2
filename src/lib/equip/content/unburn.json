@@ -56,11 +56,7 @@
               "body": [],
               "notes": [],
               "prompt": "Have you ever taken therapy before?",
-              "options": [
-                "Yes",
-                "No",
-                "I'd prefer not to answer"
-              ]
+              "options": ["Yes", "No", "I'd prefer not to answer"]
             },
             {
               "n": 4,
@@ -73,11 +69,7 @@
               "body": [],
               "notes": [],
               "prompt": "Do you have any pre-existing conditions?",
-              "options": [
-                "Yes",
-                "No",
-                "I'd prefer not to answer"
-              ]
+              "options": ["Yes", "No", "I'd prefer not to answer"]
             },
             {
               "n": 5,
@@ -236,10 +228,7 @@
               ],
               "notes": [],
               "prompt": "“It makes me furious!”",
-              "options": [
-                "Thought",
-                "Feeling"
-              ]
+              "options": ["Thought", "Feeling"]
             },
             {
               "n": 3,
@@ -252,10 +241,7 @@
               "body": [],
               "notes": [],
               "prompt": "“This is inconvenient and difficult.”",
-              "options": [
-                "Thought",
-                "Feeling"
-              ]
+              "options": ["Thought", "Feeling"]
             },
             {
               "n": 4,
@@ -266,11 +252,7 @@
               "group": "tf_identification",
               "body": [],
               "notes": [],
-              "columns": [
-                "The last cricket match you watched…",
-                "Thought",
-                "Feeling"
-              ],
+              "columns": ["The last cricket match you watched…", "Thought", "Feeling"],
               "rows": [
                 "I was so excited and happy that our team won!",
                 "We won the tournament after a really long time. The spinners played really well!"
@@ -713,22 +695,10 @@
                 {
                   "kind": "table",
                   "rows": [
-                    [
-                      "Effort",
-                      "Return"
-                    ],
-                    [
-                      "Preparing a presentation",
-                      "Successful delivery"
-                    ],
-                    [
-                      "Working on a report",
-                      "Timely recognition"
-                    ],
-                    [
-                      "Helping a colleague",
-                      "Committee membership"
-                    ]
+                    ["Effort", "Return"],
+                    ["Preparing a presentation", "Successful delivery"],
+                    ["Working on a report", "Timely recognition"],
+                    ["Helping a colleague", "Committee membership"]
                   ]
                 }
               ]

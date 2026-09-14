@@ -65,7 +65,7 @@ function LoginPage() {
 
   return (
     <AuthLayout title="Welcome back" subtitle="Sign in to continue your mental health journey.">
-      <form onSubmit={submit} noValidate className="space-y-4">
+      <form onSubmit={submit} noValidate className="space-y-3">
         <FormError message={error} />
         <Field
           label="Email"
@@ -103,7 +103,7 @@ function LoginPage() {
         <PrimaryButton busy={busy}>Sign in</PrimaryButton>
       </form>
       <SocialButtons onError={setError} />
-      <p className="mt-6 text-center text-[15px]">
+      <p className="mt-4 text-center text-[15px]">
         New to iKAN?{" "}
         <Link
           to="/signup"
