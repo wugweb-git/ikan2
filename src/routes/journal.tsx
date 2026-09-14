@@ -356,6 +356,7 @@ function CheckIn({
               value={draft.note ?? ""}
               onChange={(note) => setDraft((d) => ({ ...d, note }))}
               multiline
+              maxLength={500}
               placeholder="Write a line or two"
             />
           ) : null}

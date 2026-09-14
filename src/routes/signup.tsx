@@ -2,16 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { pageMeta } from "@/components/equip/program-header";
-import {
-  AuthLayout,
-  Field,
-  FormError,
-  PrimaryButton,
-  SocialButtons,
-  TermsNote,
-} from "@/components/auth-ui";
+import { AuthLayout, Field, FormError, PrimaryButton, SocialButtons } from "@/components/auth-ui";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
+import { PhoneField } from "@/components/phone-field";
+import * as v from "@/lib/validate";
 
 type Search = { redirect?: string };
 
@@ -35,36 +30,31 @@ function SignupPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [touched, setTouched] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [agreed, setAgreed] = useState(false);
 
-  const checks = [
-    { ok: password.length >= 8, label: "At least 8 characters" },
-    { ok: /[A-Za-z]/.test(password) && /\d/.test(password), label: "Letters and a number" },
-  ];
-  const errors = {
-    name: touched && !name.trim() ? "Tell us what to call you." : undefined,
-    email:
-      touched && !/^\S+@\S+\.\S+$/.test(email.trim()) ? "Enter a valid email address." : undefined,
-    phone:
-      touched && phone && !/^\+?[\d\s-]{8,15}$/.test(phone.trim())
-        ? "Enter a valid phone number, or leave it blank."
-        : undefined,
-    password: touched && password.length < 8 ? "Use at least 8 characters." : undefined,
-  };
+  const checks = v.passwordRules(password);
+  const { errors, ok } = v.validate(
+    { name, email, phone, password },
+    { name: v.personName, email: v.email, phone: v.optional(v.phone10), password: v.password },
+  );
+  const show = (k: keyof typeof errors) => (touched[k] || touched["all"] ? errors[k] : undefined);
+  const blur = (k: string) => () => setTouched((t) => ({ ...t, [k]: true }));
+  const agreeError =
+    touched["all"] && !agreed ? "Agree to the terms to create an account." : undefined;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTouched(true);
-    if (!name.trim() || !/^\S+@\S+\.\S+$/.test(email.trim()) || password.length < 8) return;
-    if (phone && !/^\+?[\d\s-]{8,15}$/.test(phone.trim())) return;
+    setTouched({ all: true });
+    if (!ok || !agreed) return;
     setBusy(true);
     setError(null);
     try {
       const outcome = await signUp({
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim(),
         password,
-        ...(phone.trim() ? { phone: phone.trim() } : {}),
+        ...(v.phoneDigits(phone).length === 10 ? { phone: phone.trim() } : {}),
       });
       if (outcome === "confirm") navigate({ to: "/verify-email", search: { email: email.trim() } });
       // "signedIn": the auth gate takes it from here
@@ -78,7 +68,7 @@ function SignupPage() {
     <AuthLayout
       title="Create your account"
       subtitle="Take assessments, follow programs and track how you feel, all in one place."
-      art="checkup"
+      art="welcome"
     >
       <form onSubmit={submit} noValidate className="space-y-4">
         <FormError message={error} />
@@ -87,7 +77,9 @@ function SignupPage() {
           autoComplete="name"
           value={name}
           onChange={setName}
-          error={errors.name}
+          onBlur={blur("name")}
+          maxLength={60}
+          error={show("name")}
         />
         <Field
           label="Email"
@@ -95,17 +87,17 @@ function SignupPage() {
           autoComplete="email"
           value={email}
           onChange={setEmail}
+          onBlur={blur("email")}
+          maxLength={254}
           placeholder="you@example.com"
-          error={errors.email}
+          error={show("email")}
         />
-        <Field
+        <PhoneField
           label="Phone (optional)"
-          type="tel"
-          autoComplete="tel"
           value={phone}
           onChange={setPhone}
-          placeholder="+91 98765 43210"
-          error={errors.phone}
+          error={show("phone")}
+          hint="10 digits. We only use it if you book a consultation."
         />
         <div>
           <Field
@@ -114,7 +106,9 @@ function SignupPage() {
             autoComplete="new-password"
             value={password}
             onChange={setPassword}
-            error={errors.password}
+            onBlur={blur("password")}
+            maxLength={72}
+            error={show("password")}
           />
           <ul className="mt-2 flex flex-wrap gap-2">
             {checks.map((c) => (
@@ -130,6 +124,41 @@ function SignupPage() {
             ))}
           </ul>
         </div>
+        <div>
+          <label className="flex cursor-pointer items-start gap-3 text-[14px] leading-5">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              aria-invalid={Boolean(agreeError)}
+              className="mt-0.5 h-5 w-5 shrink-0 accent-foreground"
+            />
+            <span>
+              I agree to the{" "}
+              <Link
+                to="/legal/$slug"
+                params={{ slug: "terms" }}
+                className="underline underline-offset-2"
+              >
+                Terms of use
+              </Link>{" "}
+              and{" "}
+              <Link
+                to="/legal/$slug"
+                params={{ slug: "privacy-policy" }}
+                className="underline underline-offset-2"
+              >
+                Privacy policy
+              </Link>
+              , and I’m 13 or older.
+            </span>
+          </label>
+          {agreeError ? (
+            <p role="alert" className="mt-1.5 text-[13px] text-[#B3261E]">
+              {agreeError}
+            </p>
+          ) : null}
+        </div>
         <PrimaryButton busy={busy}>Create account</PrimaryButton>
       </form>
       <SocialButtons onError={setError} />
@@ -139,7 +168,6 @@ function SignupPage() {
           Sign in
         </Link>
       </p>
-      <TermsNote />
     </AuthLayout>
   );
 }

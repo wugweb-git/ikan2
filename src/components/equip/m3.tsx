@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useBackToClose } from "@/hooks/use-back-close";
 
 export type Accent = "night" | "ember" | "calm" | "mind" | "mood";
 
@@ -289,21 +290,42 @@ export function TextField({
   autoFocus,
   ariaLabel,
   placeholder,
+  error,
+  hint,
+  maxLength,
+  inputMode,
+  autoComplete,
+  max,
+  min,
+  onBlur,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
-  type?: "text" | "time" | "date" | "datetime-local";
+  type?: "text" | "time" | "date" | "datetime-local" | "email";
   multiline?: boolean;
   autoFocus?: boolean;
   ariaLabel?: string;
   placeholder?: string;
+  error?: string | undefined;
+  hint?: string | undefined;
+  maxLength?: number | undefined;
+  inputMode?: "text" | "numeric" | "email" | "tel" | undefined;
+  autoComplete?: string | undefined;
+  max?: string | undefined;
+  min?: string | undefined;
+  onBlur?: (() => void) | undefined;
 }) {
   const common = {
     value,
     autoFocus,
     placeholder,
+    maxLength,
+    inputMode,
+    autoComplete,
+    onBlur,
     "aria-label": label || ariaLabel,
+    "aria-invalid": Boolean(error),
     onChange: (e: { target: { value: string } }) => onChange(e.target.value),
     className: cn(
       "w-full bg-transparent px-4 text-[16px] leading-6 outline-none placeholder:text-muted-foreground/70",
@@ -312,12 +334,117 @@ export function TextField({
     ),
   };
   return (
-    <label className="block rounded-t-[4px] border-b border-foreground/50 bg-secondary transition-colors focus-within:border-b-2 focus-within:border-foreground">
-      {label ? (
-        <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">{label}</span>
+    <div>
+      <label
+        className={cn(
+          "block rounded-t-[4px] border-b bg-secondary transition-colors focus-within:border-b-2",
+          error ? "border-[#B3261E]" : "border-foreground/50 focus-within:border-foreground",
+        )}
+      >
+        {label ? (
+          <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">
+            {label}
+          </span>
+        ) : null}
+        {multiline ? (
+          <textarea {...common} rows={3} />
+        ) : (
+          <input {...common} type={type} max={max} min={min} />
+        )}
+      </label>
+      <FieldMessage
+        error={error}
+        hint={hint}
+        count={multiline && maxLength ? [value.length, maxLength] : undefined}
+      />
+    </div>
+  );
+}
+
+function FieldMessage({
+  error,
+  hint,
+  count,
+}: {
+  error?: string | undefined;
+  hint?: string | undefined;
+  count?: [number, number] | undefined;
+}) {
+  if (!error && !hint && !count) return null;
+  return (
+    <span className="mt-1 flex gap-3 px-4 text-[12px] leading-4">
+      <span
+        role={error ? "alert" : undefined}
+        className={cn("flex-1", error ? "text-[#B3261E]" : "text-muted-foreground")}
+      >
+        {error ?? hint}
+      </span>
+      {count ? (
+        <span className="tabular-nums text-muted-foreground">
+          {count[0]}/{count[1]}
+        </span>
       ) : null}
-      {multiline ? <textarea {...common} rows={3} /> : <input {...common} type={type} />}
-    </label>
+    </span>
+  );
+}
+
+/** A native select styled like TextField. */
+export function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder = "Choose",
+  error,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: readonly string[];
+  placeholder?: string;
+  error?: string | undefined;
+}) {
+  return (
+    <div>
+      <label
+        className={cn(
+          "relative block rounded-t-[4px] border-b bg-secondary transition-colors focus-within:border-b-2",
+          error ? "border-[#B3261E]" : "border-foreground/50 focus-within:border-foreground",
+        )}
+      >
+        <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">{label}</span>
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-invalid={Boolean(error)}
+          className={cn(
+            "w-full appearance-none bg-transparent px-4 pb-2.5 pt-0.5 pr-10 text-[16px] leading-6 outline-none",
+            !value && "text-muted-foreground/70",
+          )}
+        >
+          <option value="">{placeholder}</option>
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+        >
+          <path
+            d="m6 9 6 6 6-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      </label>
+      <FieldMessage error={error} />
+    </div>
   );
 }
 
@@ -332,6 +459,7 @@ export function BottomSheet({
   title: string;
   children: ReactNode;
 }) {
+  useBackToClose(open, onClose);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();

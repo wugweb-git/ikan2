@@ -4,6 +4,7 @@ import { MailCheck } from "lucide-react";
 import { pageMeta } from "@/components/equip/program-header";
 import { AuthLayout, Field, FormError, PrimaryButton } from "@/components/auth-ui";
 import { useAuth } from "@/lib/auth";
+import * as v from "@/lib/validate";
 
 type Search = { email?: string };
 
@@ -44,8 +45,9 @@ function ForgotPage() {
           className="space-y-4"
           onSubmit={async (e) => {
             e.preventDefault();
-            if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-              setError("Enter a valid email address.");
+            const invalid = v.email(email);
+            if (invalid) {
+              setError(invalid);
               return;
             }
             setBusy(true);
@@ -67,6 +69,7 @@ function ForgotPage() {
             autoComplete="email"
             value={email}
             onChange={setEmail}
+            maxLength={254}
             placeholder="you@example.com"
           />
           <PrimaryButton busy={busy}>Send reset link</PrimaryButton>

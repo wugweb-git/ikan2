@@ -4,6 +4,9 @@ import {
   Activity,
   ArrowUpRight,
   MapPin,
+  CloudSun,
+  UserRoundPen,
+  X,
   Bell,
   CalendarDays,
   ChartNoAxesColumn,
@@ -42,7 +45,15 @@ import { getProgramme, minutesOf, programmes } from "@/lib/equip/programs";
 import { consultants } from "@/lib/consultants";
 import { addDays, dayKey, moodScale } from "@/lib/journal";
 import { useNotifications } from "@/lib/notifications";
-import { cityName, firstName, profileInitials, useProfile, useSettings } from "@/lib/profile";
+import {
+  aboutYouComplete,
+  cityName,
+  firstName,
+  profileInitials,
+  useProfile,
+  useSettings,
+} from "@/lib/profile";
+import { checkMoodReminder, refreshWeather, useDevice, weatherWord } from "@/lib/device";
 import { resources, slugOf, type Resource } from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
 import resBurnout from "@/assets/res-burnout.jpg";
@@ -146,6 +157,19 @@ function Home() {
     if (score !== null) saveSnapshot(score);
   }, [score]);
 
+  const device = useDevice();
+  const { settings } = useSettings();
+  useEffect(() => {
+    if (!hydrated) return;
+    void refreshWeather();
+    checkMoodReminder({
+      enabled: settings.moodReminders,
+      time: settings.moodReminderTime,
+      loggedToday: data.journal.entries.some((e) => e.date === dayKey(new Date())),
+    });
+  }, [hydrated]); // eslint-disable-line react-hooks/exhaustive-deps
+  const city = hydrated ? cityName(profile.city) || device.location?.city || "" : "";
+
   const part = now ? partOf(now.getHours()) : "morning";
   const name = hydrated ? firstName(profile) : "";
   const greeting = `${sky[part].greet}${name && name !== "there" ? `, ${name}` : ""}`;
@@ -173,7 +197,8 @@ function Home() {
         now={now}
         part={part}
         greeting={greeting}
-        city={hydrated ? cityName(profile.city) : ""}
+        city={city}
+        weather={hydrated && device.weather ? device.weather : undefined}
         unread={hydrated ? unreadCount : 0}
         initials={hydrated ? profileInitials(profile) : ""}
         photo={hydrated ? profile.avatar : undefined}
@@ -183,6 +208,7 @@ function Home() {
 
       <div className="relative z-10 -mt-6 space-y-8 rounded-t-[28px] bg-background pb-4 pt-5">
         <TodayCard data={data} hydrated={hydrated} />
+        {hydrated && !aboutYouComplete(profile) ? <AboutYouPrompt /> : null}
         <ReassessPrompt data={data} hydrated={hydrated} />
         <ScoreCard score={score} data={data} hydrated={hydrated} />
         <CurrentProgram data={data} hydrated={hydrated} />
@@ -190,7 +216,7 @@ function Home() {
         <Recommended data={data} hydrated={hydrated} />
         <Offerings data={data} hydrated={hydrated} />
         <MoodCheckin data={data} hydrated={hydrated} />
-        <SupportCard city={hydrated ? cityName(profile.city) : ""} />
+        <SupportCard city={city} />
         <YourPrograms data={data} hydrated={hydrated} />
         <ThisWeek data={data} hydrated={hydrated} />
         <Library />
@@ -208,6 +234,7 @@ function SkyHeader({
   part,
   greeting,
   city,
+  weather,
   unread,
   initials,
   photo,
@@ -218,6 +245,7 @@ function SkyHeader({
   part: Part;
   greeting: string;
   city: string;
+  weather?: { temp: number; code: number } | undefined;
   unread: number;
   initials: string;
   photo?: string | undefined;
@@ -332,6 +360,12 @@ function SkyHeader({
                 <MapPin className="h-3.5 w-3.5" aria-hidden="true" /> {city}
               </span>
             ) : null}
+            {weather ? (
+              <span className="inline-flex items-center gap-1 tabular-nums">
+                <CloudSun className="h-3.5 w-3.5" aria-hidden="true" /> {weather.temp}°{" "}
+                {weatherWord(weather.code)}
+              </span>
+            ) : null}
           </p>
           <h1 className="mt-1 font-display text-[30px] font-semibold leading-9 tracking-[-0.01em]">
             {greeting}
@@ -366,6 +400,49 @@ function SkyHeader({
         </Link>
       </div>
     </header>
+  );
+}
+
+/* ---------- ask for missing profile details, until done or dismissed ---------- */
+
+function AboutYouPrompt() {
+  const key = "ikan.about-you.dismissed";
+  const [hidden, setHidden] = useState(true);
+  useEffect(() => {
+    try {
+      setHidden(Boolean(window.localStorage.getItem(key)));
+    } catch {
+      setHidden(false);
+    }
+  }, []);
+  if (hidden) return null;
+  return (
+    <div className="mx-4 flex items-center gap-3 rounded-[24px] border border-foreground/10 p-4">
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-secondary">
+        <UserRoundPen className="h-5 w-5" />
+      </span>
+      <Link to="/welcome" search={{ step: "about" }} className="min-w-0 flex-1">
+        <span className="block text-[15px] font-semibold">Finish your profile</span>
+        <span className="block text-[13px] leading-5 text-muted-foreground">
+          Date of birth, city and a few details, so suggestions fit you.
+        </span>
+      </Link>
+      <button
+        type="button"
+        aria-label="Not now"
+        onClick={() => {
+          try {
+            window.localStorage.setItem(key, new Date().toISOString());
+          } catch {
+            /* storage unavailable */
+          }
+          setHidden(true);
+        }}
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary"
+      >
+        <X className="h-5 w-5" />
+      </button>
+    </div>
   );
 }
 

@@ -279,6 +279,7 @@ function SessionCheck({
           value={note}
           onChange={setNote}
           multiline
+          maxLength={500}
         />
       </div>
 

@@ -7,6 +7,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { Field, FormError, PrimaryButton } from "@/components/auth-ui";
 import { useAuth, LEGACY_ANON_KEY, LEGACY_API, displayName } from "@/lib/auth";
 import { contactPage as c } from "@/lib/content";
+import * as v from "@/lib/validate";
 
 export const Route = createFileRoute("/contact")({
   head: () => pageMeta("Contact us", c.heroSubtitle),
@@ -22,11 +23,27 @@ function ContactPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const [touched, setTouched] = useState(false);
+
+  const { errors, ok } = v.validate(
+    { name, email, subject, message },
+    {
+      name: v.personName,
+      email: v.email,
+      subject: v.maxLength(120, "the subject"),
+      message: v.all(
+        v.minLength(10, "Write a little more so we can help (10 characters or more)."),
+        v.maxLength(2000, "your message"),
+      ),
+    },
+  );
+  const show = (k: keyof typeof errors) => (touched ? errors[k] : undefined);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !/^\S+@\S+\.\S+$/.test(email.trim()) || !message.trim()) {
-      setError("Add your name, a valid email and a message.");
+    setTouched(true);
+    if (!ok) {
+      setError(null);
       return;
     }
     setBusy(true);
@@ -121,25 +138,48 @@ function ContactPage() {
         ) : (
           <form onSubmit={submit} noValidate className="mt-4 space-y-4">
             <FormError message={error} />
-            <Field label="Name" autoComplete="name" value={name} onChange={setName} />
+            <Field
+              label="Name"
+              autoComplete="name"
+              value={name}
+              onChange={setName}
+              maxLength={60}
+              error={show("name")}
+            />
             <Field
               label="Email"
               type="email"
               autoComplete="email"
               value={email}
               onChange={setEmail}
+              maxLength={254}
+              error={show("email")}
             />
-            <Field label="Subject (optional)" value={subject} onChange={setSubject} />
+            <Field
+              label="Subject (optional)"
+              value={subject}
+              onChange={setSubject}
+              maxLength={120}
+              error={show("subject")}
+            />
             <label className="block">
-              <span className="mb-1.5 block text-[13px] font-medium text-muted-foreground">
+              <span className="mb-1.5 flex justify-between text-[13px] font-medium text-muted-foreground">
                 Message
+                <span className="tabular-nums">{message.length}/2000</span>
               </span>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={5}
-                className="w-full resize-none rounded-[16px] border border-transparent bg-secondary px-4 py-3 text-[16px] outline-none focus:border-foreground/60 focus:bg-background"
+                maxLength={2000}
+                aria-invalid={Boolean(show("message"))}
+                className={`w-full resize-none rounded-[16px] border bg-secondary px-4 py-3 text-[16px] outline-none focus:border-foreground/60 focus:bg-background ${show("message") ? "border-[#B3261E]" : "border-transparent"}`}
               />
+              {show("message") ? (
+                <span role="alert" className="mt-1.5 block text-[13px] text-[#B3261E]">
+                  {show("message")}
+                </span>
+              ) : null}
             </label>
             <PrimaryButton busy={busy}>Send message</PrimaryButton>
           </form>

@@ -9,7 +9,10 @@ export type Profile = {
   email: string;
   phone: string;
   city: string;
+  /** 6-digit PIN code */
+  zip: string;
   birthday: string;
+  maritalStatus: string;
   gender: string;
   bio: string;
   emergencyName: string;
@@ -26,7 +29,9 @@ export const defaultProfile: Profile = {
   email: "",
   phone: "",
   city: "",
+  zip: "",
   birthday: "",
+  maritalStatus: "",
   gender: "",
   bio: "",
   emergencyName: "",
@@ -174,6 +179,10 @@ const onboardingStore = createLocalStore<{ done: boolean; reason: string }>("ika
   done: false,
   reason: "",
 });
+
+/** The "about you" details asked for once after sign-up. */
+export const aboutYouComplete = (p: Profile) =>
+  Boolean(p.birthday && p.gender && p.city && p.zip && p.maritalStatus);
 export const useOnboarding = () => {
   const state = onboardingStore.use();
   return {

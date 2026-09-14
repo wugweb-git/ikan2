@@ -6,11 +6,12 @@ import {
   Field,
   FormError,
   PrimaryButton,
+  RememberMe,
   SocialButtons,
   TermsNote,
-  TrustList,
 } from "@/components/auth-ui";
-import { useAuth } from "@/lib/auth";
+import { rememberLogin, setRememberLogin, useAuth } from "@/lib/auth";
+import * as v from "@/lib/validate";
 
 type Search = { redirect?: string };
 
@@ -29,16 +30,23 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [touched, setTouched] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [remember, setRemember] = useState(() =>
+    typeof window === "undefined" ? true : rememberLogin(),
+  );
 
-  const emailError =
-    touched && !/^\S+@\S+\.\S+$/.test(email.trim()) ? "Enter a valid email address." : undefined;
-  const passwordError = touched && !password ? "Enter your password." : undefined;
+  const { errors, ok } = v.validate(
+    { email, password },
+    { email: v.email, password: v.required("Enter your password.") },
+  );
+  const emailError = touched["email"] ? errors.email : undefined;
+  const passwordError = touched["password"] ? errors.password : undefined;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTouched(true);
-    if (!/^\S+@\S+\.\S+$/.test(email.trim()) || !password) return;
+    setTouched({ email: true, password: true });
+    if (!ok) return;
+    setRememberLogin(remember);
     setBusy(true);
     setError(null);
     try {
@@ -56,11 +64,7 @@ function LoginPage() {
   };
 
   return (
-    <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to continue your mental health journey."
-      footer={<TrustList />}
-    >
+    <AuthLayout title="Welcome back" subtitle="Sign in to continue your mental health journey.">
       <form onSubmit={submit} noValidate className="space-y-4">
         <FormError message={error} />
         <Field
@@ -69,6 +73,8 @@ function LoginPage() {
           autoComplete="email"
           value={email}
           onChange={setEmail}
+          onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+          maxLength={254}
           placeholder="you@example.com"
           error={emailError}
         />
@@ -79,9 +85,12 @@ function LoginPage() {
             autoComplete="current-password"
             value={password}
             onChange={setPassword}
+            onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+            maxLength={72}
             error={passwordError}
           />
-          <div className="mt-2 text-right">
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <RememberMe checked={remember} onChange={setRemember} />
             <Link
               to="/forgot-password"
               search={email ? { email } : {}}

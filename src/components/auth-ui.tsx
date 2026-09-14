@@ -5,6 +5,7 @@ import { Illustration } from "@/components/art";
 import { cn } from "@/lib/utils";
 import { displayName, useAuth, type Provider } from "@/lib/auth";
 import { onboardingDone, seedProfile } from "@/lib/profile";
+import { MadeBy } from "@/components/made-by";
 
 const PUBLIC =
   /^\/(login|signup|verify-email|forgot-password|reset-password|support|about|faq|contact|legal)(\/|$)/;
@@ -56,10 +57,17 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
 function Splash() {
   return (
-    <div className="grid min-h-dvh place-items-center bg-canvas">
-      <div className="flex flex-col items-center gap-4">
-        <img src="/favicon.svg" alt="" className="h-16 w-16 animate-pulse rounded-[18px]" />
-        <p className="text-[14px] text-muted-foreground">Opening iKAN…</p>
+    <div className="flex min-h-dvh flex-col bg-canvas px-8 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[env(safe-area-inset-top)]">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4">
+        <img src="/favicon.svg" alt="" className="h-20 w-20 animate-pulse rounded-[22px]" />
+        <p className="font-display text-[22px] font-semibold">iKAN</p>
+        <p className="text-[14px] text-muted-foreground" role="status">
+          Opening your space…
+        </p>
+      </div>
+      <div className="mx-auto w-full max-w-sm">
+        <TrustList />
+        <MadeBy className="mt-6" />
       </div>
     </div>
   );
@@ -74,15 +82,15 @@ export function AuthLayout({
 }: {
   title: string;
   subtitle?: ReactNode;
-  art?: "mood" | "sleep" | "checkup" | "anxiety";
+  art?: "mood" | "sleep" | "checkup" | "anxiety" | "welcome";
   children: ReactNode;
   footer?: ReactNode;
 }) {
   return (
     <div className="min-h-dvh bg-canvas">
-      <div className="mx-auto flex min-h-dvh w-full max-w-app flex-col bg-background shadow-app">
+      <div className="mx-auto flex min-h-dvh w-full max-w-app flex-col bg-background pb-[env(safe-area-inset-bottom)] shadow-app">
         <div className="relative h-44 overflow-hidden">
-          <Illustration art={art} />
+          {art === "welcome" ? <WelcomeArt /> : <Illustration art={art} />}
           <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent" />
           <Link
             to="/login"
@@ -98,7 +106,10 @@ export function AuthLayout({
             <p className="mt-2 text-[15px] leading-6 text-muted-foreground">{subtitle}</p>
           ) : null}
           <div className="mt-6">{children}</div>
-          <div className="mt-auto pt-8">{footer}</div>
+          <div className="mt-auto pt-8">
+            {footer}
+            <MadeBy className={footer ? "mt-6" : ""} />
+          </div>
         </main>
       </div>
     </div>
@@ -114,6 +125,8 @@ export function Field({
   placeholder,
   error,
   hint,
+  maxLength,
+  onBlur,
 }: {
   label: string;
   type?: "text" | "email" | "password" | "tel";
@@ -123,6 +136,8 @@ export function Field({
   placeholder?: string;
   error?: string | undefined;
   hint?: string;
+  maxLength?: number;
+  onBlur?: () => void;
 }) {
   const [show, setShow] = useState(false);
   const isPassword = type === "password";
@@ -141,6 +156,11 @@ export function Field({
           onChange={(e) => onChange(e.target.value)}
           autoComplete={autoComplete}
           placeholder={placeholder}
+          maxLength={maxLength}
+          onBlur={onBlur}
+          inputMode={type === "email" ? "email" : undefined}
+          autoCapitalize={type === "email" || type === "password" ? "none" : undefined}
+          spellCheck={type === "email" || type === "password" ? false : undefined}
           aria-invalid={Boolean(error)}
           className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted-foreground/70"
         />
@@ -156,7 +176,9 @@ export function Field({
         ) : null}
       </span>
       {error ? (
-        <span className="mt-1.5 block text-[13px] text-[#B3261E]">{error}</span>
+        <span role="alert" className="mt-1.5 block text-[13px] text-[#B3261E]">
+          {error}
+        </span>
       ) : hint ? (
         <span className="mt-1.5 block text-[13px] text-muted-foreground">{hint}</span>
       ) : null}
@@ -314,6 +336,84 @@ function LinkedInMark() {
         fill="#fff"
         d="M7.1 9.4H4.6V19h2.5V9.4zM5.9 5a1.4 1.4 0 1 0 0 2.9 1.4 1.4 0 0 0 0-2.9zM19.4 13.6c0-2.6-1.4-4.3-3.6-4.3-1.3 0-2.2.7-2.6 1.4V9.4h-2.4V19h2.5v-5c0-1.3.6-2.2 1.7-2.2 1.1 0 1.6.8 1.6 2.2v5h2.5v-5.4z"
       />
+    </svg>
+  );
+}
+
+/** "Keep me signed in" for the sign-in screens. */
+export function RememberMe({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <label className="flex cursor-pointer items-center gap-3 text-[14px]">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="h-5 w-5 shrink-0 accent-foreground"
+      />
+      Keep me signed in
+    </label>
+  );
+}
+
+/** Sign-up scene: a sunrise over soft hills with the iKAN burst as the sun. */
+function WelcomeArt() {
+  return (
+    <svg
+      viewBox="0 0 320 176"
+      preserveAspectRatio="xMidYMid slice"
+      className="h-full w-full"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="wa-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#DCEBF6" />
+          <stop offset="0.6" stopColor="#EAF4EE" />
+          <stop offset="1" stopColor="#FFF4E0" />
+        </linearGradient>
+        <radialGradient id="wa-glow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#FFD27A" stopOpacity="0.75" />
+          <stop offset="1" stopColor="#FFD27A" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="320" height="176" fill="url(#wa-sky)" />
+      <circle cx="214" cy="84" r="70" fill="url(#wa-glow)" />
+      <g transform="translate(214 84)" stroke="#E7A93B" strokeWidth="5" strokeLinecap="round">
+        {Array.from({ length: 12 }, (_, i) => {
+          const a = (i * Math.PI) / 6;
+          const r1 = i % 2 ? 18 : 14;
+          const r2 = i % 2 ? 34 : 42;
+          return (
+            <line
+              key={i}
+              x1={Math.cos(a) * r1}
+              y1={Math.sin(a) * r1}
+              x2={Math.cos(a) * r2}
+              y2={Math.sin(a) * r2}
+            />
+          );
+        })}
+        <circle r="10" fill="#E7A93B" stroke="none" />
+      </g>
+      <path
+        d="M0 132 C 60 104, 120 120, 176 110 S 280 96, 320 112 L320 176 L0 176 Z"
+        fill="#9CCBB1"
+      />
+      <path
+        d="M0 150 C 70 132, 150 150, 220 138 S 300 132, 320 140 L320 176 L0 176 Z"
+        fill="#6FAE8E"
+      />
+      <path d="M0 166 C 90 156, 190 170, 320 158 L320 176 L0 176 Z" fill="#4E8F75" />
+      <g fill="#4E8F75" opacity="0.5">
+        <circle cx="52" cy="46" r="2" />
+        <circle cx="96" cy="30" r="1.5" />
+        <circle cx="140" cy="52" r="1.8" />
+      </g>
     </svg>
   );
 }

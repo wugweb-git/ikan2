@@ -44,11 +44,13 @@ function FieldInput({
   value,
   onChange,
   hideLabel,
+  error,
 }: {
   field: Field;
   value: EntryValues[string] | undefined;
   onChange: (v: string) => void;
   hideLabel?: boolean;
+  error?: string | undefined;
 }) {
   if (field.type === "yesno" || field.type === "select") {
     return (
@@ -81,8 +83,28 @@ function FieldInput({
       value={typeof value === "string" ? value : ""}
       onChange={onChange}
       multiline={field.type === "longtext"}
+      maxLength={field.type === "longtext" ? 2000 : field.type === "text" ? 200 : undefined}
+      error={error}
     />
   );
+}
+
+/** Written fields must have words in them; a date must be a real one within a year either way. */
+function entryErrors(fields: Field[], values: EntryValues) {
+  const errors: Record<string, string> = {};
+  for (const f of fields) {
+    const raw = values[f.key];
+    const v = typeof raw === "string" ? raw.trim() : "";
+    if ((f.type === "text" || f.type === "longtext") && f.key === "text" && !v)
+      errors[f.key] = "Write something here first.";
+    if (f.type === "date" && v) {
+      const d = new Date(`${v}T00:00:00`);
+      const year = 366 * 24 * 3_600_000;
+      if (Number.isNaN(d.getTime()) || Math.abs(d.getTime() - Date.now()) > year)
+        errors[f.key] = "Pick a date within a year of today.";
+    }
+  }
+  return errors;
 }
 
 function EntryForm({
@@ -95,13 +117,19 @@ function EntryForm({
   submitLabel: string;
 }) {
   const [values, setValues] = useState<EntryValues>({});
+  const [tried, setTried] = useState(false);
   const ready = fields.some((f) => String(values[f.key] ?? "").trim());
+  const errors = entryErrors(fields, values);
   return (
     <form
       className="space-y-4"
+      noValidate
       onSubmit={(e) => {
         e.preventDefault();
-        if (ready) onSubmit(values);
+        setTried(true);
+        if (!ready || Object.keys(errors).length) return;
+        onSubmit(values);
+        setTried(false);
       }}
     >
       {fields.map((f) => (
@@ -110,6 +138,7 @@ function EntryForm({
           field={f}
           value={values[f.key]}
           onChange={(v) => setValues((p) => ({ ...p, [f.key]: v }))}
+          error={tried ? errors[f.key] : undefined}
         />
       ))}
       <Button type="submit" disabled={!ready} className="w-full">

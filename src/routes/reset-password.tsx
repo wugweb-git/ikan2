@@ -3,6 +3,7 @@ import { useState } from "react";
 import { pageMeta } from "@/components/equip/program-header";
 import { AuthLayout, Field, FormError, PrimaryButton } from "@/components/auth-ui";
 import { useAuth } from "@/lib/auth";
+import * as v from "@/lib/validate";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => pageMeta("Set a new password", "Choose a new password for your iKAN account."),
@@ -45,7 +46,7 @@ function ResetPage() {
   return (
     <AuthLayout
       title="Set a new password"
-      subtitle="Use at least 8 characters. You’ll stay signed in on this device."
+      subtitle="Use at least 8 characters with letters and a number. You’ll stay signed in on this device."
       art="sleep"
     >
       <form
@@ -53,7 +54,8 @@ function ResetPage() {
         className="space-y-4"
         onSubmit={async (e) => {
           e.preventDefault();
-          if (password.length < 8) return setError("Use at least 8 characters.");
+          const weak = v.password(password);
+          if (weak) return setError(weak);
           if (password !== confirm) return setError("The two passwords don’t match.");
           setBusy(true);
           setError(null);

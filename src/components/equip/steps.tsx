@@ -278,6 +278,7 @@ function ChoiceStep({
             value={otherText}
             onChange={(v) => setAnswer(otherKey, v)}
             autoFocus
+            maxLength={200}
           />
         </div>
       ) : null}
@@ -414,6 +415,7 @@ function TextStep({
           value={value}
           onChange={(v) => setAnswer(key, v)}
           multiline
+          maxLength={2000}
         />
       </div>
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
@@ -479,6 +481,7 @@ function ConcludeStep({
             value={value}
             onChange={(v) => setAnswer(key, v)}
             multiline
+            maxLength={2000}
           />
         </div>
       ) : null}
@@ -746,6 +749,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
           <Counter
             unit={question.kind === "minutes" ? "minutes" : "times"}
             step={question.kind === "minutes" ? 5 : 1}
+            max={question.kind === "minutes" ? 720 : 30}
             value={entry[question.key] as number | undefined}
             onChange={(v) => set({ [question.key]: v })}
           />
@@ -781,11 +785,13 @@ function Counter({
   onChange,
   unit,
   step,
+  max,
 }: {
   value: number | undefined;
   onChange: (v: number) => void;
   unit: string;
   step: number;
+  max: number;
 }) {
   const v = value ?? 0;
   return (
@@ -804,7 +810,8 @@ function Counter({
       <Button
         variant="tonal"
         className="h-14 w-14 px-0 text-2xl"
-        onClick={() => onChange(v + step)}
+        onClick={() => onChange(Math.min(max, v + step))}
+        disabled={v >= max}
       >
         <span aria-label={`More ${unit}`}>+</span>
       </Button>

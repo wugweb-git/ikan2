@@ -23,11 +23,14 @@ import { Illustration } from "@/components/art";
 import {
   accentStyle,
   Button,
+  SelectField,
   Snackbar,
   stateLayer,
   TextField,
   useSnack,
 } from "@/components/equip/m3";
+import { PhoneField } from "@/components/phone-field";
+import * as v from "@/lib/validate";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
@@ -63,9 +66,23 @@ function ProfilePage() {
 
   const p = hydrated ? profile : defaultProfile;
   const dirty = hydrated && JSON.stringify(draft) !== JSON.stringify(profile);
+  const [showErrors, setShowErrors] = useState(false);
+  const { errors, ok } = v.validate(draft, {
+    name: v.personName,
+    email: v.email,
+    phone: v.optional(v.phone10),
+    bio: v.maxLength(500, "this"),
+    birthday: v.optional(v.birthday),
+    city: v.optional(v.city),
+    zip: v.optional(v.pin),
+    emergencyName: v.optional(v.personName),
+    emergencyPhone: v.optional(v.phone10),
+    emergencyRelation: v.maxLength(40, "this"),
+  });
   const field = (key: keyof Profile) => ({
     value: draft[key],
-    onChange: (v: string) => setDraft((d) => ({ ...d, [key]: v })),
+    onChange: (val: string) => setDraft((d) => ({ ...d, [key]: val })),
+    error: showErrors ? errors[key] : undefined,
   });
 
   const finished = programmes.filter((pr) => {
@@ -120,7 +137,7 @@ function ProfilePage() {
   ];
 
   const archive: {
-    to: "/history/assessments" | "/history/program" | "/diaries" | "/journal" | "/history";
+    to: "/history/assessments" | "/history/program" | "/diaries" | "/history/journal" | "/history";
     label: string;
     sub: string;
     icon: LucideIcon;
@@ -151,8 +168,8 @@ function ProfilePage() {
       icon: NotebookPen,
     },
     {
-      to: "/journal",
-      label: "Journal",
+      to: "/history/journal",
+      label: "Journal history",
       sub: hydrated ? `${data.journal.entries.length} mood check-ins` : "",
       icon: Smile,
     },
@@ -244,12 +261,20 @@ function ProfilePage() {
             <UserRound className="h-5 w-5" /> Profile
           </h2>
           <div className="mt-3 space-y-3">
-            <TextField label="Full name" {...field("name")} />
-            <TextField label="Email" {...field("email")} placeholder="you@example.com" />
-            <TextField label="Phone" {...field("phone")} placeholder="+91 98765 43210" />
+            <TextField label="Full name" autoComplete="name" maxLength={60} {...field("name")} />
+            <TextField
+              label="Email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              {...field("email")}
+              placeholder="you@example.com"
+            />
+            <PhoneField variant="m3" label="Phone" {...field("phone")} />
             <TextField
               label="About me"
               multiline
+              maxLength={500}
               {...field("bio")}
               placeholder="Anything you’d like your consultant to know"
             />
@@ -259,11 +284,33 @@ function ProfilePage() {
         <section className="mt-8 px-4">
           <h2 className="font-display text-[18px] font-semibold">Personal details</h2>
           <div className="mt-3 space-y-3">
+            <TextField
+              label="Date of birth"
+              type="date"
+              max={new Date().toISOString().slice(0, 10)}
+              {...field("birthday")}
+            />
             <div className="grid grid-cols-2 gap-3">
-              <TextField label="Date of birth" type="date" {...field("birthday")} />
-              <TextField label="Gender" {...field("gender")} placeholder="Optional" />
+              <SelectField label="Gender" options={v.genders} {...field("gender")} />
+              <SelectField
+                label="Marital status"
+                options={v.maritalStatuses}
+                {...field("maritalStatus")}
+              />
             </div>
-            <TextField label="City" {...field("city")} />
+            <div className="grid grid-cols-[1fr_7.5rem] gap-3">
+              <TextField label="City" autoComplete="address-level2" {...field("city")} />
+              <TextField
+                label="PIN code"
+                inputMode="numeric"
+                autoComplete="postal-code"
+                maxLength={6}
+                {...field("zip")}
+                onChange={(val) =>
+                  setDraft((d) => ({ ...d, zip: val.replace(/\D/g, "").slice(0, 6) }))
+                }
+              />
+            </div>
           </div>
         </section>
 
@@ -275,8 +322,13 @@ function ProfilePage() {
             Who we call, and how, if you need urgent help.
           </p>
           <div className="mt-3 space-y-3">
-            <TextField label="Name" {...field("emergencyName")} />
-            <TextField label="Phone" {...field("emergencyPhone")} placeholder="+91 98765 43210" />
+            <TextField label="Name" maxLength={60} {...field("emergencyName")} />
+            <PhoneField
+              variant="m3"
+              label="Phone"
+              autoComplete="off"
+              {...field("emergencyPhone")}
+            />
             <TextField
               label="Relationship"
               {...field("emergencyRelation")}
@@ -293,7 +345,18 @@ function ProfilePage() {
             <Button
               className="flex-1"
               onClick={() => {
-                save(draft);
+                if (!ok) {
+                  setShowErrors(true);
+                  snack.show("Check the highlighted fields");
+                  return;
+                }
+                save({
+                  ...draft,
+                  name: draft.name.trim(),
+                  email: draft.email.trim(),
+                  city: draft.city.trim(),
+                });
+                setShowErrors(false);
                 snack.show("Profile saved");
               }}
             >

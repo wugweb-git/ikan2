@@ -21,8 +21,26 @@ import {
   Trash2,
   TrendingUp,
   Watch,
+  BellRing,
+  Footprints,
+  MapPin,
+  Smartphone,
   type LucideIcon,
 } from "lucide-react";
+import {
+  installApp,
+  isInstalled,
+  notify,
+  requestLocation,
+  requestMotion,
+  requestNotifications,
+  useCanInstall,
+  useDevice,
+  useLocationAccess,
+  useNotificationAccess,
+  weatherWord,
+  type Access,
+} from "@/lib/device";
 import { IkanShell } from "@/components/ikan-shell";
 import {
   accentStyle,
@@ -144,9 +162,11 @@ function SettingsPage() {
           />
         </Group>
 
+        <PermissionsGroup onMessage={snack.show} />
+
         <Group
           title="Notifications"
-          note="Saved on this device. Reminders are sent once the iKAN app is installed."
+          note="Reminders arrive when notifications are allowed above. Install iKAN for the most reliable delivery."
         >
           <Row icon={Bell} label="Mood reminders" sub="Daily reminder to log your mood">
             <Switch
@@ -196,7 +216,7 @@ function SettingsPage() {
           {toggle(
             "healthConnect",
             "Health Connect",
-            "Share sleep and steps to add them to your Wellness Score",
+            "Sleep and steps from Health Connect or Google Fit. Syncs in the installed Android app.",
             Watch,
           )}
         </Group>
@@ -312,6 +332,146 @@ function SettingsPage() {
         <Snackbar message={snack.message} />
       </div>
     </IkanShell>
+  );
+}
+
+function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
+  const hydrated = useHydrated();
+  const notifications = useNotificationAccess();
+  const device = useDevice();
+  const [locationAccess, setLocationAccess] = useLocationAccess();
+  const [busy, setBusy] = useState(false);
+  const canInstall = useCanInstall();
+  const installed = hydrated && isInstalled();
+
+  const label = (a: Access) =>
+    a === "granted" ? "On" : a === "denied" ? "Blocked" : a === "unsupported" ? "N/A" : "Allow";
+  const Pill = ({ access, onClick }: { access: Access; onClick: () => void }) => (
+    <button
+      type="button"
+      disabled={access !== "prompt" || busy}
+      onClick={onClick}
+      className={cn(
+        "inline-flex h-9 shrink-0 items-center rounded-full px-4 text-[13px] font-semibold",
+        access === "prompt"
+          ? "bg-foreground text-background"
+          : access === "granted"
+            ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]"
+            : "text-muted-foreground",
+      )}
+    >
+      {label(access)}
+    </button>
+  );
+
+  return (
+    <Group
+      title="Permissions"
+      note="Blocked? Open your phone’s settings for this site or app and allow it there."
+    >
+      <Row icon={Bell} label="Notifications" sub="Daily check-in and program reminders">
+        <Pill
+          access={hydrated ? notifications : "prompt"}
+          onClick={async () => {
+            const a = await requestNotifications();
+            if (a === "granted")
+              void notify("Reminders are on", "We’ll nudge you at the time you choose.");
+            else if (a === "denied") onMessage("Notifications are blocked for iKAN");
+          }}
+        />
+      </Row>
+      {hydrated && notifications === "granted" ? (
+        <ActionRow
+          icon={BellRing}
+          label="Send a test notification"
+          sub="Check that reminders reach this phone"
+          onClick={async () => {
+            const ok = await notify("Hello from iKAN", "This is how reminders will look.");
+            onMessage(ok ? "Test notification sent" : "Couldn’t show a notification");
+          }}
+        />
+      ) : null}
+      <Row
+        icon={MapPin}
+        label="Location"
+        sub={
+          hydrated && device.location
+            ? `${device.location.city || "Location saved"}${device.weather ? ` · ${device.weather.temp}° ${weatherWord(device.weather.code)}` : ""}`
+            : "City, weather and nearby helplines"
+        }
+      >
+        {hydrated && device.location ? (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await requestLocation();
+                onMessage("Location updated");
+              } catch (e) {
+                onMessage((e as Error).message);
+              } finally {
+                setBusy(false);
+              }
+            }}
+            className="inline-flex h-9 shrink-0 items-center rounded-full border border-foreground/15 px-4 text-[13px] font-semibold"
+          >
+            Update
+          </button>
+        ) : (
+          <Pill
+            access={locationAccess}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await requestLocation();
+                setLocationAccess("granted");
+              } catch (e) {
+                setLocationAccess("denied");
+                onMessage((e as Error).message);
+              } finally {
+                setBusy(false);
+              }
+            }}
+          />
+        )}
+      </Row>
+      <Row icon={Footprints} label="Activity" sub="Movement on this phone, for your iKAN Score">
+        <Pill
+          access={hydrated ? (device.motion ?? "prompt") : "prompt"}
+          onClick={async () => {
+            const a = await requestMotion();
+            if (a === "unsupported") onMessage("This phone doesn’t share motion with web apps");
+          }}
+        />
+      </Row>
+      {installed ? null : (
+        <Row
+          icon={Smartphone}
+          label="Install iKAN"
+          sub={
+            canInstall
+              ? "Add iKAN to your home screen. It opens full screen."
+              : "In your browser menu, tap Add to Home screen"
+          }
+        >
+          {canInstall ? (
+            <button
+              type="button"
+              onClick={async () => {
+                if (await installApp()) onMessage("iKAN is on your home screen");
+              }}
+              className="inline-flex h-9 shrink-0 items-center rounded-full bg-foreground px-4 text-[13px] font-semibold text-background"
+            >
+              Install
+            </button>
+          ) : (
+            <span />
+          )}
+        </Row>
+      )}
+    </Group>
   );
 }
 
