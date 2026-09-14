@@ -1,34 +1,28 @@
+import { createClient, type Session, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import {
-  currentLocalUser,
-  endLocalSession,
-  localSignIn,
-  localSignUp,
-  localUpdatePassword,
-  type LocalUser,
-} from "@/lib/local-auth";
+import { startCloudSync, stopCloudSync } from "@/lib/cloud-sync";
+import { importLegacyData, resetLegacyImport } from "@/lib/legacy-import";
 import { claimGuestData, getScope, setScope } from "@/lib/storage-scope";
 
-/* Sign-in for the app, independent of any backend. The screens only talk to `useAuth()`.
- *
- * Today accounts are kept on this phone (see local-auth). To connect an auth provider, replace
- * the `backend` object below: every method keeps its signature, and `restore` returns the
- * signed-in user (or null) when the app opens. Nothing else needs to change. */
+/* Accounts live in ikan2's Lovable Cloud backend. Every iKan account was copied there with its
+ * id and password, so people sign in with the details they already have.
+ * Connection settings come from VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY. Until they
+ * are set, sign-in falls back to the old iKan project ("Ikan - App") so the app keeps working. */
 
-/** The old iKan contact form endpoint (not used for sign-in). */
-export const LEGACY_API =
-  "https://jpfvoevxegnknxoqmwye.supabase.co/functions/v1/make-server-cc205da9";
-export const LEGACY_ANON_KEY =
+const CLOUD_URL = (import.meta.env["VITE_SUPABASE_URL"] as string | undefined)?.replace(/\/$/, "");
+const CLOUD_KEY = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as string | undefined;
+/** true when sign-in and saving go through Lovable Cloud */
+export const usingLovableCloud = Boolean(CLOUD_URL && CLOUD_KEY);
+
+const LEGACY_URL = "https://jpfvoevxegnknxoqmwye.supabase.co";
+const LEGACY_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZnZvZXZ4ZWdua254b3Ftd3llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMjIyNDIsImV4cCI6MjA3MzY5ODI0Mn0.VGYSE8LqBEggrQcUHJH9NcvursaoNfQK9K8-ESCo-rc";
 
-export type AuthUser = {
-  id: string;
-  email?: string | undefined;
-  user_metadata: Record<string, unknown>;
-};
-export type AuthSession = { user: AuthUser };
-export type AuthStatus = "loading" | "signedOut" | "signedIn";
-export type Provider = "google" | "linkedin_oidc";
+export const SUPABASE_URL = usingLovableCloud ? CLOUD_URL! : LEGACY_URL;
+export const SUPABASE_ANON_KEY = usingLovableCloud ? CLOUD_KEY! : LEGACY_KEY;
+/** the old iKan edge function (legacy sign-up and the contact form) */
+export const LEGACY_API = `${LEGACY_URL}/functions/v1/make-server-cc205da9`;
+export const LEGACY_ANON_KEY = LEGACY_KEY;
 
 /* "Keep me signed in": when off, the session lives only until the app is closed. */
 const REMEMBER_KEY = "ikan.remember";
@@ -46,46 +40,77 @@ export const setRememberLogin = (on: boolean) => {
     /* storage unavailable */
   }
 };
-
-const toAuthUser = (u: LocalUser): AuthUser => ({
-  id: u.id,
-  email: u.email,
-  user_metadata: { name: u.name, full_name: u.name, ...(u.phone ? { phone: u.phone } : {}) },
-});
-
-const providerName: Record<Provider, string> = { google: "Google", linkedin_oidc: "LinkedIn" };
-
-/** The one place that knows how accounts work. Swap this for a real auth provider. */
-const backend = {
-  restore: async (): Promise<AuthUser | null> => {
-    const u = currentLocalUser();
-    return u ? toAuthUser(u) : null;
+const sessionStorageAdapter = {
+  getItem: (k: string) => {
+    try {
+      return window.localStorage.getItem(k) ?? window.sessionStorage.getItem(k);
+    } catch {
+      return null;
+    }
   },
-  signIn: async (email: string, password: string) => toAuthUser(await localSignIn(email, password)),
-  signUp: async (input: { name: string; email: string; password: string; phone?: string }) => ({
-    user: toAuthUser(await localSignUp(input)),
-    needsConfirmation: false,
-  }),
-  signInWith: async (provider: Provider): Promise<void> => {
-    throw new Error(
-      `${providerName[provider]} sign-in is coming soon. For now, use your email and password.`,
-    );
+  setItem: (k: string, v: string) => {
+    try {
+      if (rememberLogin()) {
+        window.localStorage.setItem(k, v);
+        window.sessionStorage.removeItem(k);
+      } else {
+        window.sessionStorage.setItem(k, v);
+        window.localStorage.removeItem(k);
+      }
+    } catch {
+      /* storage unavailable */
+    }
   },
-  resendConfirmation: async (_email: string): Promise<void> => {},
-  sendReset: async (_email: string): Promise<void> => {
-    throw new Error(
-      "Password reset by email isn’t connected yet. Contact us from the Contact page and we’ll help.",
-    );
+  removeItem: (k: string) => {
+    try {
+      window.localStorage.removeItem(k);
+      window.sessionStorage.removeItem(k);
+    } catch {
+      /* storage unavailable */
+    }
   },
-  updatePassword: (password: string) => localUpdatePassword(password),
-  signOut: async () => endLocalSession(),
 };
+
+/* Lovable Cloud issues opaque sb_publishable_ keys. They go in the apikey header only; sending
+ * one as a bearer token is rejected, so the signed-in user's token is the only bearer. */
+const apiKeyFetch =
+  (key: string): typeof fetch =>
+  (input, init) => {
+    const headers = new Headers(
+      typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
+    );
+    if (init?.headers) new Headers(init.headers).forEach((v, k) => headers.set(k, v));
+    if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`)
+      headers.delete("Authorization");
+    headers.set("apikey", key);
+    return fetch(input, { ...init, headers });
+  };
+
+let client: SupabaseClient | null = null;
+export function supabase() {
+  if (!client) {
+    client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { fetch: apiKeyFetch(SUPABASE_ANON_KEY) },
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        ...(usingLovableCloud ? { flowType: "pkce" as const } : {}),
+        ...(typeof window !== "undefined" ? { storage: sessionStorageAdapter } : {}),
+      },
+    });
+  }
+  return client;
+}
+
+export type AuthStatus = "loading" | "signedOut" | "signedIn";
+export type Provider = "google" | "linkedin_oidc";
 
 type AuthValue = {
   status: AuthStatus;
-  session: AuthSession | null;
-  user: AuthUser | null;
-  /** true after arriving from a password-reset link */
+  session: Session | null;
+  user: User | null;
+  /** true after arriving from a password-reset email */
   recovering: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (input: {
@@ -103,69 +128,174 @@ type AuthValue = {
 
 const AuthContext = createContext<AuthValue | null>(null);
 
-export const displayName = (u: AuthUser | null) =>
+export const displayName = (u: User | null) =>
   (u?.user_metadata?.["name"] as string | undefined) ||
   (u?.user_metadata?.["full_name"] as string | undefined) ||
   u?.email?.split("@")[0] ||
   "";
 
-const message = (e: unknown) =>
-  e instanceof Error && e.message ? e.message : "Something went wrong. Try again.";
+/** Supabase and edge errors, in words a person can act on. */
+function friendly(message: string) {
+  if (/invalid login credentials/i.test(message))
+    return "That email and password don’t match. Check them and try again.";
+  if (/not confirmed/i.test(message))
+    return "Confirm your email first. We’ve sent the link to your inbox.";
+  if (/already (been )?registered|already exists|user_already_exists/i.test(message))
+    return "An account with this email already exists. Sign in instead.";
+  if (/rate limit|too many/i.test(message))
+    return "Too many attempts. Wait a minute and try again.";
+  if (/password/i.test(message) && /(short|at least|weak)/i.test(message))
+    return "Use a password of at least 8 characters.";
+  if (/failed to fetch|network/i.test(message))
+    return "Can’t reach iKAN. Check your connection and try again.";
+  return message.replace(/^API Error: \d+\s*/, "") || "Something went wrong. Try again.";
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>("loading");
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [recovering, setRecovering] = useState(false);
 
-  const apply = (u: AuthUser | null) => {
-    if (u) {
-      claimGuestData(u.id);
-      setScope(u.id);
-    } else if (getScope() !== "guest") {
+  const apply = (s: Session | null) => {
+    if (s?.user) {
+      const changed = getScope() !== s.user.id;
+      claimGuestData(s.user.id);
+      setScope(s.user.id);
+      if (changed) {
+        const token = async () => {
+          const { data } = await supabase().auth.getSession();
+          return data.session?.access_token ?? null;
+        };
+        const sync = startCloudSync(s.user.id, token);
+        // accounts already moved to Lovable Cloud carry their iKan data; only the old
+        // sign-in still needs to fetch it from the iKan app
+        if (!usingLovableCloud) void sync.finally(() => importLegacyData(s.user.id, token));
+      }
+    } else {
+      if (getScope() !== "guest") {
+        stopCloudSync();
+        resetLegacyImport();
+      }
       setScope("guest");
     }
-    setUser(u);
-    setStatus(u ? "signedIn" : "signedOut");
+    setSession(s);
+    setStatus(s ? "signedIn" : "signedOut");
   };
 
   useEffect(() => {
+    const sb = supabase();
     let alive = true;
-    backend
-      .restore()
-      .then((u) => alive && apply(u))
+    sb.auth
+      .getSession()
+      .then(({ data }) => alive && apply(data.session))
       .catch(() => alive && apply(null));
+    const { data } = sb.auth.onAuthStateChange((event, s) => {
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
+      apply(s);
+    });
     return () => {
       alive = false;
+      data.subscription.unsubscribe();
     };
   }, []);
 
+  const origin = () => (typeof window === "undefined" ? "" : window.location.origin);
+
   const value: AuthValue = {
     status,
-    session: user ? { user } : null,
-    user,
-    recovering: false,
+    session,
+    user: session?.user ?? null,
+    recovering,
     signIn: async (email, password) => {
-      try {
-        apply(await backend.signIn(email, password));
-      } catch (e) {
-        throw new Error(message(e));
-      }
+      const { error } = await supabase().auth.signInWithPassword({ email: email.trim(), password });
+      if (error) throw new Error(friendly(error.message));
     },
-    signUp: async (input) => {
-      try {
-        const { user: u, needsConfirmation } = await backend.signUp(input);
-        if (needsConfirmation) return "confirm";
-        apply(u);
-        return "signedIn";
-      } catch (e) {
-        throw new Error(message(e));
+    signUp: async ({ name, email, password, phone }) => {
+      if (usingLovableCloud) {
+        const { data, error } = await supabase().auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            emailRedirectTo: `${origin()}/login`,
+            data: { name: name.trim(), full_name: name.trim(), ...(phone ? { phone } : {}) },
+          },
+        });
+        if (error) throw new Error(friendly(error.message));
+        // an existing, confirmed email comes back with no identities
+        if (data.user && !data.user.identities?.length)
+          throw new Error(friendly("user_already_exists"));
+        return data.session ? "signedIn" : "confirm";
       }
+      const res = await fetch(`${LEGACY_API}/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${LEGACY_KEY}`,
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+          name: name.trim(),
+          ...(phone ? { phone } : {}),
+        }),
+      }).catch(() => {
+        throw new Error(friendly("Failed to fetch"));
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        let message = text;
+        try {
+          const j = JSON.parse(text) as { error?: string; message?: string };
+          message = j.error || j.message || text;
+        } catch {
+          /* plain text */
+        }
+        throw new Error(friendly(message));
+      }
+      const { error } = await supabase().auth.signInWithPassword({ email: email.trim(), password });
+      if (!error) return "signedIn";
+      if (/not confirmed/i.test(error.message)) {
+        await supabase()
+          .auth.resend({
+            type: "signup",
+            email: email.trim(),
+            options: { emailRedirectTo: `${origin()}/login` },
+          })
+          .catch(() => {});
+        return "confirm";
+      }
+      throw new Error(friendly(error.message));
     },
-    signInWith: (provider) => backend.signInWith(provider),
-    resendConfirmation: (email) => backend.resendConfirmation(email),
-    sendReset: (email) => backend.sendReset(email),
-    updatePassword: (password) => backend.updatePassword(password),
+    signInWith: async (provider) => {
+      const { error } = await supabase().auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${origin()}/` },
+      });
+      if (error) throw new Error(friendly(error.message));
+    },
+    resendConfirmation: async (email) => {
+      const { error } = await supabase().auth.resend({
+        type: "signup",
+        email: email.trim(),
+        options: { emailRedirectTo: `${origin()}/login` },
+      });
+      if (error) throw new Error(friendly(error.message));
+    },
+    sendReset: async (email) => {
+      const { error } = await supabase().auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${origin()}/reset-password`,
+      });
+      if (error) throw new Error(friendly(error.message));
+    },
+    updatePassword: async (password) => {
+      const { error } = await supabase().auth.updateUser({ password });
+      if (error) throw new Error(friendly(error.message));
+      setRecovering(false);
+    },
     signOut: async () => {
-      await backend.signOut();
+      await supabase()
+        .auth.signOut({ scope: "local" })
+        .catch(() => {});
       apply(null);
     },
   };

@@ -24,6 +24,7 @@ import {
 } from "@/lib/assessment/scoring";
 import { useAssessmentStore, type StoredResult } from "@/lib/assessment/store";
 import { getProgramme } from "@/lib/equip/programs";
+import { useImportStatus } from "@/lib/legacy-import";
 import { useSyncStatus } from "@/lib/cloud-sync";
 
 /* One assessment result: /assessments/<slug>/result/<result id>. Result ids are UUIDs, as in the
@@ -77,7 +78,7 @@ function ResultPage() {
   const navigate = useNavigate();
   const hydrated = useHydrated();
   const store = useAssessmentStore();
-  const importing = false;
+  const importing = useImportStatus().state === "running";
   const syncing = useSyncStatus().state === "syncing";
   const history = store.resultsFor(slug);
   const result = history.find((x) => x.id === id);
