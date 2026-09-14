@@ -4,12 +4,21 @@ import { Eye, EyeOff, Lock, ShieldCheck, Sparkles, UserRoundCheck } from "lucide
 import { Illustration } from "@/components/art";
 import { cn } from "@/lib/utils";
 import { displayName, useAuth, type Provider } from "@/lib/auth";
-import { onboardingDone, seedProfile } from "@/lib/profile";
+import { markOnboardingDone, onboardingDone, seedProfile } from "@/lib/profile";
 import { MadeBy } from "@/components/made-by";
 
 const PUBLIC =
   /^\/(login|signup|verify-email|forgot-password|reset-password|support|about|faq|contact|legal)(\/|$)/;
 const AUTH_ONLY = /^\/(login|signup|verify-email|forgot-password)(\/|$)/;
+
+/* Only a brand-new account sees the welcome flow. An account created more than a day ago is a
+ * returning person (on a new phone, a cleared browser, or after signing out) and goes straight
+ * to Home. */
+const NEW_ACCOUNT_MS = 24 * 60 * 60 * 1000;
+const isNewAccount = (user: { created_at?: string | undefined }) => {
+  const created = user.created_at ? Date.parse(user.created_at) : NaN;
+  return Number.isFinite(created) && Date.now() - created < NEW_ACCOUNT_MS;
+};
 
 /** Keeps the app behind sign-in. Crisis support and the auth screens stay open to everyone. */
 export function AuthGate({ children }: { children: ReactNode }) {
@@ -32,20 +41,21 @@ export function AuthGate({ children }: { children: ReactNode }) {
           (user.user_metadata?.["avatar_url"] as string | undefined) ??
           (user.user_metadata?.["picture"] as string | undefined),
       });
+      const needsWelcome = !onboardingDone() && isNewAccount(user);
+      if (!needsWelcome) markOnboardingDone();
       if (AUTH_ONLY.test(path)) {
-        const redirect = new URLSearchParams(location.searchStr).get("redirect");
-        const target =
-          redirect && redirect.startsWith("/") && !AUTH_ONLY.test(redirect) ? redirect : "/";
-        if (!onboardingDone()) navigate({ to: "/welcome", replace: true });
-        else navigate({ href: target, replace: true });
+        // after signing in: new accounts start the welcome flow, everyone else lands on Home
+        navigate({ to: needsWelcome ? "/welcome" : "/", replace: true });
       } else if (
+        needsWelcome &&
         !isPublic &&
         path !== "/welcome" &&
         path !== "/reset-password" &&
-        !path.startsWith("/support") &&
-        !onboardingDone()
+        !path.startsWith("/support")
       ) {
         navigate({ to: "/welcome", replace: true });
+      } else if (!needsWelcome && path === "/welcome" && !location.searchStr.includes("step=")) {
+        navigate({ to: "/", replace: true });
       }
     }
   }, [status, path]); // eslint-disable-line react-hooks/exhaustive-deps

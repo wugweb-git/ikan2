@@ -191,3 +191,7 @@ export const useOnboarding = () => {
   };
 };
 export const onboardingDone = () => onboardingStore.read().done;
+/** Skip onboarding for an account that has already been through it elsewhere. */
+export const markOnboardingDone = () => {
+  if (!onboardingStore.read().done) onboardingStore.update((s) => ({ ...s, done: true }));
+};
