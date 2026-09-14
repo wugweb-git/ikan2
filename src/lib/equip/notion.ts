@@ -104,7 +104,11 @@ export const exampleCard = (b: NBlock) => {
   return line ? line.split("→").map((s) => s.trim()) : undefined;
 };
 
-export const stripQuotes = (s: string) => s.trim().replace(/^[“"‘']|[”"’']$/g, "").trim();
+export const stripQuotes = (s: string) =>
+  s
+    .trim()
+    .replace(/^[“"‘']|[”"’']$/g, "")
+    .trim();
 
 /** Split an emoji-led run like "😊 Woke up refreshed 💤 Slept soundly" into options. */
 export function splitEmojiOptions(s: string) {
@@ -122,7 +126,9 @@ export function splitEmojiOptions(s: string) {
 export const visibleBody = (b: NBlock) => b.body.filter((i) => !/^\*?\(empty block/i.test(i.text));
 
 /** "Repeat task 2 from day 4", "Repeat Tasks 6 from Day 13", "Repeat of task 3 from day 25". */
-export function repeatRef(b: NBlock): { day: number; n: number | "diary"; scope: "today" | "all" } | null {
+export function repeatRef(
+  b: NBlock,
+): { day: number; n: number | "diary"; scope: "today" | "all" } | null {
   const text = noteLines(b).join(" ");
   if (/Repeat Sleep Diary from day 1/i.test(text)) return { day: 1, n: "diary", scope: "all" };
   const m = text.match(/Repeat (?:of )?(?:task|tasks|exercise)\s+(\d+)\s+from\s+day\s+(\d+)/i);
@@ -142,12 +148,16 @@ export const inlinePrompt = (b: NBlock) => {
 
 /** "User lists things down. Limit to 10." */
 export const listLimit = (b: NBlock) => {
-  const m = noteLines(b).join(" ").match(/Limit (?:rituals )?to (\d+)/i);
+  const m = noteLines(b)
+    .join(" ")
+    .match(/Limit (?:rituals )?to (\d+)/i);
   return m ? Number(m[1]) : undefined;
 };
 
 /** "Tasks 2-5 can be done by showing 2 at a time on 1 card" */
 export const groupedRange = (b: NBlock) => {
-  const m = noteLines(b).join(" ").match(/Tasks (\d+)\s*-\s*(\d+) can be done by showing (\d+) at a time/i);
+  const m = noteLines(b)
+    .join(" ")
+    .match(/Tasks (\d+)\s*-\s*(\d+) can be done by showing (\d+) at a time/i);
   return m ? { from: Number(m[1]), to: Number(m[2]), perCard: Number(m[3]) } : null;
 };

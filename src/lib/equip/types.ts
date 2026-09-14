@@ -28,7 +28,11 @@ export type UI =
   | { ui: "scale"; prompt: string; min: number; max: number }
   | { ui: "text"; prompt: string; dependsOn?: { key: string; equals: string } }
   | { ui: "diary" }
-  | { ui: "sort"; items: { situation: string; lines: string[]; labels: string[] }[]; perCard: number }
+  | {
+      ui: "sort";
+      items: { situation: string; lines: string[]; labels: string[] }[];
+      perCard: number;
+    }
   | {
       ui: "entries";
       collection: string;

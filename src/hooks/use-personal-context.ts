@@ -12,10 +12,19 @@ export type PersonalContext = {
 };
 
 const copy: Record<DayPart, { greeting: string; subline: string }> = {
-  morning: { greeting: "Good morning", subline: "You slept better. Let's protect that calm today." },
+  morning: {
+    greeting: "Good morning",
+    subline: "You slept better. Let's protect that calm today.",
+  },
   afternoon: { greeting: "Good afternoon", subline: "Midday dip is normal — a short reset helps." },
-  evening: { greeting: "Good evening", subline: "Your worry usually eases after 7:30. Let's start there." },
-  night: { greeting: "Winding down", subline: "Screens down soon. A slow session will help you drift off." },
+  evening: {
+    greeting: "Good evening",
+    subline: "Your worry usually eases after 7:30. Let's start there.",
+  },
+  night: {
+    greeting: "Winding down",
+    subline: "Screens down soon. A slow session will help you drift off.",
+  },
 };
 
 function partOfDay(hour: number): DayPart {
@@ -37,7 +46,9 @@ export function usePersonalContext(name: string, city = "Pune"): PersonalContext
   useEffect(() => {
     const now = new Date();
     setDayPart(partOfDay(now.getHours()));
-    setDateLabel(now.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }));
+    setDateLabel(
+      now.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }),
+    );
     setReady(true);
   }, []);
 
