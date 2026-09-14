@@ -71,10 +71,26 @@ const sessionStorageAdapter = {
   },
 };
 
+/* Lovable Cloud issues opaque sb_publishable_ keys. They go in the apikey header only; sending
+ * one as a bearer token is rejected, so the signed-in user's token is the only bearer. */
+const apiKeyFetch =
+  (key: string): typeof fetch =>
+  (input, init) => {
+    const headers = new Headers(
+      typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
+    );
+    if (init?.headers) new Headers(init.headers).forEach((v, k) => headers.set(k, v));
+    if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`)
+      headers.delete("Authorization");
+    headers.set("apikey", key);
+    return fetch(input, { ...init, headers });
+  };
+
 let client: SupabaseClient | null = null;
 export function supabase() {
   if (!client) {
     client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { fetch: apiKeyFetch(SUPABASE_ANON_KEY) },
       auth: {
         persistSession: true,
         autoRefreshToken: true,
