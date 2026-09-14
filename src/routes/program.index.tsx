@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, History, NotebookPen } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { accentStyle, stateLayer } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
@@ -16,9 +16,35 @@ export const Route = createFileRoute("/program/")({
 function ProgramsPage() {
   return (
     <IkanShell>
-      <header className="px-4 pb-1 pt-8">
+      <header className="relative px-4 pb-1 pt-8">
+        <div className="absolute right-2 top-6 flex">
+          <Link
+            to="/history/program"
+            aria-label="Equip history"
+            title="Equip history"
+            className={cn(
+              "grid h-12 w-12 place-items-center rounded-full text-foreground",
+              stateLayer,
+            )}
+          >
+            <History className="h-6 w-6" />
+          </Link>
+          <Link
+            to="/diaries"
+            aria-label="Learning diaries"
+            title="Learning diaries"
+            className={cn(
+              "grid h-12 w-12 place-items-center rounded-full text-foreground",
+              stateLayer,
+            )}
+          >
+            <NotebookPen className="h-6 w-6" />
+          </Link>
+        </div>
         <h1 className="font-display text-[32px] font-semibold leading-10">Programs</h1>
-        <p className="mt-1 text-[15px] text-muted-foreground">Short daily sessions, one skill at a time.</p>
+        <p className="mt-1 text-[15px] text-muted-foreground">
+          Short daily sessions, one skill at a time.
+        </p>
       </header>
       <ul className="space-y-3 px-4 pt-4">
         {programmes.map((p) => (
@@ -31,7 +57,10 @@ function ProgramsPage() {
         <h2 className="font-display text-[16px] font-semibold">Coming soon</h2>
         <ul className="mt-2">
           {upcoming.map((u) => (
-            <li key={u.name} className="flex min-h-14 items-center justify-between rounded-[16px] border border-dashed border-foreground/20 px-4 text-[16px] text-muted-foreground">
+            <li
+              key={u.name}
+              className="flex min-h-14 items-center justify-between rounded-[16px] border border-dashed border-foreground/20 px-4 text-[16px] text-muted-foreground"
+            >
               {u.name}
               <span className="text-[13px]">Soon</span>
             </li>
@@ -59,12 +88,19 @@ function ProgrammeCard({ programme }: { programme: Programme }) {
       <img src={programme.cover} alt="" className="w-[112px] shrink-0 object-cover" />
       <div className="flex min-w-0 flex-1 flex-col p-4">
         <p className="font-display text-[20px] font-semibold leading-7">{programme.name}</p>
-        {src.description ? <p className="mt-1 line-clamp-2 text-[14px] leading-5 text-muted-foreground">{src.description}</p> : null}
+        {src.description ? (
+          <p className="mt-1 line-clamp-2 text-[14px] leading-5 text-muted-foreground">
+            {src.description}
+          </p>
+        ) : null}
         <div className="mt-auto pt-3">
           {started ? (
             <>
               <div className="h-1.5 overflow-hidden rounded-full bg-[var(--accent-container)]">
-                <div className="h-full rounded-full bg-[var(--accent)]" style={{ width: `${(done / total) * 100}%` }} />
+                <div
+                  className="h-full rounded-full bg-[var(--accent)]"
+                  style={{ width: `${(done / total) * 100}%` }}
+                />
               </div>
               <p className="mt-2 flex items-center justify-between text-[13px] font-medium text-[var(--accent-strong)]">
                 {nextDay < total ? `Continue with day ${nextDay}` : "All days done"}

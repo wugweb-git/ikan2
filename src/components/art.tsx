@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Art } from "@/lib/resources";
 
@@ -202,12 +202,36 @@ export function Avatar({
   hue,
   size = 56,
   className,
+  photo,
 }: {
   text: string;
   hue: number;
   size?: number;
   className?: string;
+  /** a real photo; falls back to initials if it fails to load */
+  photo?: string | undefined;
 }) {
+  const [failed, setFailed] = useState(false);
+  const style = {
+    width: size,
+    height: size,
+    fontSize: size * 0.36,
+    color: `hsl(${hue} 45% 22%)`,
+    background: `radial-gradient(circle at 30% 25%, hsl(${hue} 80% 92%), hsl(${hue} 55% 78%))`,
+    boxShadow: `inset 0 0 0 2px hsl(${hue} 60% 96%)`,
+  };
+  if (photo && !failed) {
+    return (
+      <img
+        src={photo}
+        alt=""
+        loading="lazy"
+        onError={() => setFailed(true)}
+        className={cn("shrink-0 rounded-full object-cover", className)}
+        style={{ width: size, height: size, background: style.background }}
+      />
+    );
+  }
   return (
     <span
       aria-hidden="true"
@@ -215,14 +239,7 @@ export function Avatar({
         "grid shrink-0 place-items-center rounded-full font-display font-semibold",
         className,
       )}
-      style={{
-        width: size,
-        height: size,
-        fontSize: size * 0.36,
-        color: `hsl(${hue} 45% 22%)`,
-        background: `radial-gradient(circle at 30% 25%, hsl(${hue} 80% 92%), hsl(${hue} 55% 78%))`,
-        boxShadow: `inset 0 0 0 2px hsl(${hue} 60% 96%)`,
-      }}
+      style={style}
     >
       {text}
     </span>

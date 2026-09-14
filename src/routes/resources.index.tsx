@@ -7,15 +7,20 @@ import { accentStyle, IconButton, Snackbar, stateLayer, useSnack } from "@/compo
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
-import { resources, useResourceStore, type Resource } from "@/lib/resources";
-
-export const Route = createFileRoute("/resources/")({
-  head: () => pageMeta("Resources", "Articles and guides to support your mental health journey."),
-  component: ResourcesPage,
-});
+import { resources, slugOf, useResourceStore, type Resource } from "@/lib/resources";
 
 const filters = ["All", "Saved", "General", "Stress", "Sleep"] as const;
 type Filter = (typeof filters)[number];
+
+/* The category filter lives in the URL: /resources?category=sleep */
+export const Route = createFileRoute("/resources/")({
+  validateSearch: (s: Record<string, unknown>): { category?: string } => {
+    const c = typeof s["category"] === "string" ? s["category"].toLowerCase() : "";
+    return filters.some((f) => f !== "All" && f.toLowerCase() === c) ? { category: c } : {};
+  },
+  head: () => pageMeta("Resources", "Articles and guides to support your mental health journey."),
+  component: ResourcesPage,
+});
 
 const dateLabel = (d: string) =>
   new Date(`${d}T00:00:00`).toLocaleDateString("en-IN", {
@@ -28,10 +33,18 @@ function ResourcesPage() {
   const hydrated = useHydrated();
   const store = useResourceStore();
   const snack = useSnack();
-  const [filter, setFilter] = useState<Filter>("All");
+  const { category } = Route.useSearch();
+  const filter: Filter = filters.find((f) => f.toLowerCase() === category) ?? "All";
+  const setFilter = (f: Filter) =>
+    navigate({
+      to: "/resources",
+      search: f === "All" ? {} : { category: f.toLowerCase() },
+      replace: true,
+      resetScroll: false,
+    });
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
-  const open = (r: Resource) => navigate({ to: "/resources/$id", params: { id: r.id } });
+  const open = (r: Resource) => navigate({ to: "/resources/$slug", params: { slug: slugOf(r) } });
 
   const featured = resources.filter((r) => r.featured);
   const q = query.trim().toLowerCase();
@@ -93,7 +106,7 @@ function ResourcesPage() {
                       <BookOpen className="h-3.5 w-3.5" />
                       {i === 0 ? "Featured story" : r.category}
                     </span>
-                    <span className="mt-2 line-clamp-3 block font-display text-[20px] font-semibold leading-6">
+                    <span className="mt-2 line-clamp-3 font-display text-[20px] font-semibold leading-6">
                       {r.title}
                     </span>
                     <span className="mt-2 block text-[13px] opacity-85">
@@ -183,7 +196,7 @@ function ResourcesPage() {
                             <span className="ml-2 font-normal text-muted-foreground">Read</span>
                           ) : null}
                         </span>
-                        <span className="mt-0.5 line-clamp-2 block text-[15px] font-semibold leading-5">
+                        <span className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">
                           {r.title}
                         </span>
                         <span className="mt-1 block text-[12px] text-muted-foreground">

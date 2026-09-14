@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Check, Trash2 } from "lucide-react";
+import { Check, History } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
+import { EntryCard } from "@/components/journal/entry-card";
 import {
   accentStyle,
   Button,
-  IconButton,
   Snackbar,
   stateLayer,
   TextField,
@@ -24,7 +24,6 @@ import {
   stressScale,
   useJournal,
   type Draft,
-  type JournalEntry,
   type ScalePoint,
 } from "@/lib/journal";
 
@@ -55,8 +54,6 @@ function JournalPage() {
   const snack = useSnack();
   const today = new Date();
   const todayKey = dayKey(today);
-  const [selected, setSelected] = useState(todayKey);
-  const strip = useRef<HTMLDivElement>(null);
 
   const days = Array.from({ length: DAYS }, (_, i) => addDays(today, i - (DAYS - 1)));
   const dates = new Set(journal.entries.map((e) => e.date));
@@ -69,18 +66,22 @@ function JournalPage() {
   const logged = daily.filter((v): v is number => v !== null);
   const average = logged.length ? logged.reduce((n, v) => n + v, 0) / logged.length : null;
 
-  useEffect(() => {
-    const el = strip.current;
-    if (el) el.scrollLeft = el.scrollWidth;
-  }, [hydrated]);
-
-  const selectedDate = days.find((d) => dayKey(d) === selected) ?? today;
-  const entries = hydrated ? journal.on(selected) : [];
+  const entries = hydrated ? journal.on(todayKey) : [];
 
   return (
     <IkanShell>
       <div style={accentStyle("mood")}>
-        <header className="px-4 pb-1 pt-8">
+        <header className="relative px-4 pb-1 pt-8">
+          <Link
+            to="/history/journal"
+            aria-label="Journal history"
+            className={cn(
+              stateLayer,
+              "absolute right-2 top-6 grid h-12 w-12 place-items-center rounded-full",
+            )}
+          >
+            <History className="h-6 w-6" />
+          </Link>
           <h1 className="font-display text-[32px] font-semibold leading-10">Journal</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">
             Track how you feel, one day at a time
@@ -96,59 +97,7 @@ function JournalPage() {
           <Stat emoji="🏆" label="Best streak" value={hydrated ? best : 0} />
         </section>
 
-        <div
-          ref={strip}
-          className="no-scrollbar mt-5 flex gap-2 overflow-x-auto px-4 pb-1"
-          role="tablist"
-          aria-label="Choose a day"
-        >
-          {days.map((d, i) => {
-            const key = dayKey(d);
-            const on = key === selected;
-            const avg = hydrated ? daily[i] : null;
-            const point = avg != null ? moodScale[Math.round(avg) - 1] : undefined;
-            return (
-              <button
-                key={key}
-                type="button"
-                role="tab"
-                aria-selected={on}
-                aria-label={d.toLocaleDateString("en-IN", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                })}
-                onClick={() => setSelected(key)}
-                className={cn(
-                  "flex h-[84px] w-14 shrink-0 flex-col items-center justify-center gap-1 rounded-[16px] transition-colors",
-                  stateLayer,
-                  on ? "bg-foreground text-background" : "bg-secondary",
-                )}
-              >
-                <span className={cn("text-[12px]", on ? "opacity-80" : "text-muted-foreground")}>
-                  {key === todayKey ? "Today" : d.toLocaleDateString("en-IN", { weekday: "short" })}
-                </span>
-                <span className="font-display text-[18px] font-semibold leading-6">
-                  {d.getDate()}
-                </span>
-                <span className="h-5 text-[16px] leading-5" aria-hidden="true">
-                  {point ? (
-                    point.emoji
-                  ) : (
-                    <span
-                      className={cn(
-                        "mt-2 inline-block h-1.5 w-1.5 rounded-full",
-                        on ? "bg-background/40" : "bg-foreground/20",
-                      )}
-                    />
-                  )}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <section className="mx-4 mt-4 rounded-[24px] bg-secondary p-4">
+        <section className="mx-4 mt-3 rounded-[24px] bg-foreground/[0.035] p-4">
           <div className="flex items-baseline justify-between">
             <h2 className="font-display text-[16px] font-semibold">14-day mood</h2>
             <p className="text-[14px] tabular-nums text-muted-foreground">
@@ -159,17 +108,9 @@ function JournalPage() {
         </section>
 
         <section className="mt-6 px-4">
-          <h2 className="font-display text-[20px] font-semibold">
-            {selected === todayKey
-              ? "Today"
-              : selectedDate.toLocaleDateString("en-IN", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "short",
-                })}
-          </h2>
+          <h2 className="font-display text-[20px] font-semibold">Today</h2>
 
-          {selected === todayKey && hydrated ? (
+          {hydrated ? (
             <CheckIn
               preset={preset}
               countToday={journal.on(todayKey).length}
@@ -191,13 +132,6 @@ function JournalPage() {
                 </li>
               ))}
             </ul>
-          ) : selected !== todayKey ? (
-            <div className="mt-4 rounded-[24px] border border-dashed border-foreground/20 px-6 py-10 text-center">
-              <p className="font-display text-[17px] font-semibold">Nothing logged this day</p>
-              <p className="mt-1 text-[14px] text-muted-foreground">
-                That's okay — every day is a fresh start
-              </p>
-            </div>
           ) : null}
         </section>
         <Snackbar message={snack.message} />
@@ -208,12 +142,12 @@ function JournalPage() {
 
 function Stat({ emoji, label, value }: { emoji: string; label: string; value: number }) {
   return (
-    <div className="flex items-center gap-3 rounded-[20px] bg-[var(--accent-container)] p-4 text-[var(--on-accent-container)]">
+    <div className="flex items-center gap-3 rounded-[20px] bg-foreground/[0.05] p-4">
       <span className="text-[28px] leading-none" aria-hidden="true">
         {emoji}
       </span>
       <span>
-        <span className="block text-[12px]">{label}</span>
+        <span className="block text-[12px] text-muted-foreground">{label}</span>
         <span className="block font-display text-[20px] font-semibold tabular-nums">
           {value} {value === 1 ? "day" : "days"}
         </span>
@@ -244,48 +178,59 @@ function Sparkline({ values }: { values: (number | null)[] }) {
   if (run.length) segments.push(run);
 
   return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      className="mt-3 h-20 w-full"
-      role="img"
-      aria-label="Mood over the last 14 days, 1 to 5"
-    >
-      {[1, 3, 5].map((v) => (
-        <line
-          key={v}
-          x1={pad}
-          x2={w - pad}
-          y1={pad + ((5 - v) / 4) * (h - pad * 2)}
-          y2={pad + ((5 - v) / 4) * (h - pad * 2)}
-          stroke="currentColor"
-          strokeOpacity="0.08"
-        />
-      ))}
-      {segments.map((s, i) => (
-        <polyline
-          key={i}
-          points={s.map((p) => `${p.x},${p.y}`).join(" ")}
-          fill="none"
-          stroke="var(--accent)"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      ))}
-      {pts.map((p, i) =>
-        p ? (
-          <circle
-            key={i}
-            cx={p.x}
-            cy={p.y}
-            r="4"
-            fill="var(--accent-strong)"
-            stroke="white"
-            strokeWidth="2"
+    <>
+      <svg
+        viewBox={`0 0 ${w} ${h}`}
+        className="mt-3 block h-auto w-full"
+        role="img"
+        aria-label="Mood over the last 14 days, 1 to 5"
+      >
+        {[1, 3, 5].map((v) => (
+          <line
+            key={v}
+            x1={pad}
+            x2={w - pad}
+            y1={pad + ((5 - v) / 4) * (h - pad * 2)}
+            y2={pad + ((5 - v) / 4) * (h - pad * 2)}
+            stroke="currentColor"
+            strokeOpacity="0.08"
           />
-        ) : null,
-      )}
-    </svg>
+        ))}
+        {segments.map((s, i) => (
+          <polyline
+            key={i}
+            points={s.map((p) => `${p.x},${p.y}`).join(" ")}
+            fill="none"
+            stroke="var(--accent)"
+            strokeWidth="2.5"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+        ))}
+        {pts.map((p, i) =>
+          p ? (
+            <circle
+              key={i}
+              cx={p.x}
+              cy={p.y}
+              r="4"
+              fill="var(--accent-strong)"
+              stroke="white"
+              strokeWidth="2"
+            />
+          ) : null,
+        )}
+      </svg>
+      <div className="mt-1 flex justify-between text-[11px] text-muted-foreground">
+        <span>
+          {addDays(new Date(), -(DAYS - 1)).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+          })}
+        </span>
+        <span>Today</span>
+      </div>
+    </>
   );
 }
 
@@ -511,60 +456,5 @@ function EmojiScale({
         );
       })}
     </div>
-  );
-}
-
-function EntryCard({ entry: e, onDelete }: { entry: JournalEntry; onDelete: () => void }) {
-  const mood = moodScale[e.mood - 1]!;
-  const energy = e.energy ? energyScale[e.energy - 1] : undefined;
-  const stress = e.stress ? stressScale[e.stress - 1] : undefined;
-  return (
-    <article className="rounded-[20px] border border-foreground/10 p-4">
-      <div className="flex items-center gap-3">
-        <span className="text-[32px] leading-none" aria-hidden="true">
-          {mood.emoji}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="font-display text-[16px] font-semibold">
-            {mood.label}{" "}
-            <span className="font-sans text-[13px] font-normal text-muted-foreground">
-              {e.mood}/5
-            </span>
-          </p>
-          <p className="text-[13px] text-muted-foreground">
-            {new Date(e.createdAt).toLocaleTimeString("en-IN", {
-              hour: "numeric",
-              minute: "2-digit",
-            })}
-          </p>
-        </div>
-        <IconButton label="Delete entry" onClick={onDelete} className="text-muted-foreground">
-          <Trash2 className="h-5 w-5" />
-        </IconButton>
-      </div>
-      {energy || stress ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {energy ? <Chip>{`${energy.emoji} Energy: ${energy.label}`}</Chip> : null}
-          {stress ? <Chip>{`${stress.emoji} Stress: ${stress.label}`}</Chip> : null}
-        </div>
-      ) : null}
-      {e.note ? <p className="mt-3 text-[15px] leading-6">“{e.note}”</p> : null}
-      {e.tags.length ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {e.tags.map((id) => {
-            const t = contextTags.find((x) => x.id === id);
-            return t ? <Chip key={id}>{`${t.emoji} ${t.label}`}</Chip> : null;
-          })}
-        </div>
-      ) : null}
-    </article>
-  );
-}
-
-function Chip({ children }: { children: string }) {
-  return (
-    <span className="inline-flex h-7 items-center rounded-[8px] bg-secondary px-2.5 text-[13px]">
-      {children}
-    </span>
   );
 }

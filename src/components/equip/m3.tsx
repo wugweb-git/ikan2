@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 /* Material 3 building blocks for the Equip screens, in iKAN's monochrome palette.
  * Sizes follow M3: 64dp app bars, 48dp touch targets, 56dp list rows, 28dp sheet corners. */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
@@ -88,7 +89,10 @@ export function TopAppBar({
 }) {
   return (
     <header
-      className={cn("sticky top-0 z-30 flex h-16 items-center gap-1 bg-background px-1", className)}
+      className={cn(
+        "sticky top-0 z-30 flex h-16 items-center gap-1 bg-background px-1 print:hidden",
+        className,
+      )}
     >
       {leading}
       <div className="min-w-0 flex-1 px-2">
@@ -340,10 +344,11 @@ export function BottomSheet({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
-  return (
+  if (!open || typeof document === "undefined") return null;
+  // rendered into <body> above everything, so the bottom navigation never covers it
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center"
+      className="fixed inset-0 z-[90] flex items-end justify-center"
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -354,12 +359,13 @@ export function BottomSheet({
         onClick={onClose}
         className="absolute inset-0 bg-foreground/40 animate-fade"
       />
-      <div className="animate-sheet relative max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-[28px] bg-background px-6 pb-8 pt-3">
+      <div className="animate-sheet relative max-h-[88dvh] w-full max-w-app overflow-y-auto rounded-t-[28px] bg-background px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-3">
         <div className="mx-auto h-1 w-8 rounded-full bg-foreground/30" />
         <p className="mt-5 font-display text-[22px] font-semibold">{title}</p>
         <div className="mt-5">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

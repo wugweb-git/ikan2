@@ -75,11 +75,33 @@ export const profiles: Record<string, Profile> = {
     min: 0,
     max: 27,
     bands: [
-      b("Minimal", 0, 5, "minimal", "success"),
-      b("Mild", 5, 10, "mild", "warning"),
-      b("Moderate", 10, 15, "moderate", "warning"),
-      b("Moderately severe", 15, 20, "moderately-severe", "warning"),
-      b("Severe", 20, 27, "severe", "error"),
+      // band sentences from the old iKan scoring profile (the Notion spec has none for PHQ-9)
+      b("Minimal", 0, 5, "minimal", "success", "Minimal depressive symptoms."),
+      b("Mild", 5, 10, "mild", "warning", "Mild depressive symptoms."),
+      b(
+        "Moderate",
+        10,
+        15,
+        "moderate",
+        "warning",
+        "Moderate depressive symptoms — consider speaking with someone you trust.",
+      ),
+      b(
+        "Moderately severe",
+        15,
+        20,
+        "moderately-severe",
+        "warning",
+        "Moderately severe symptoms — professional support is recommended.",
+      ),
+      b(
+        "Severe",
+        20,
+        27,
+        "severe",
+        "error",
+        "Severe depressive symptoms. We recommend speaking with a professional soon.",
+      ),
     ],
   },
   gad7: {

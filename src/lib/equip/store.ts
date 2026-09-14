@@ -8,7 +8,15 @@ import { onScopeChange, reportWrite, scopedKey } from "@/lib/storage-scope";
 
 export type Entry = { id: string; day: number; createdAt: string; values: EntryValues };
 
+export type SessionFeedback = { helpful?: number; feel?: number; note?: string; at: string };
+
+/** A finished run, kept whole so history, results and diaries can show it after the programme
+ * goes back to its default state. */
+export type ArchivedRun = Omit<ProgrammeState, "runs"> & { archivedAt: string };
+
 export type ProgrammeState = {
+  /** finished runs, newest first */
+  runs?: ArchivedRun[];
   completed: number[];
   /** day → ISO time it was completed (days finished before this field existed have none) */
   completedAt?: Record<string, string>;
@@ -19,6 +27,12 @@ export type ProgrammeState = {
   diary: Record<string, DiaryEntry>;
   /** habit tracker: day → entry id → done */
   tracker: Record<string, Record<string, boolean>>;
+  /** active time, in seconds: day → total and per step (step id → seconds) */
+  time?: Record<string, { total: number; steps: Record<string, number> }>;
+  /** end-of-day check: how helpful the session was and how the person feels after it (both 1–5) */
+  feedback?: Record<string, SessionFeedback>;
+  /** answers imported from the old iKan app, which can't be matched to today's steps: day → blocks */
+  legacy?: Record<string, { title: string; lines: string[] }[]>;
 };
 
 const EMPTY: ProgrammeState = {
@@ -33,6 +47,24 @@ const keyFor = (slug: string) => scopedKey(`ikan.equip.${slug}.v2`);
 const cache = new Map<string, ProgrammeState>();
 const listeners = new Set<() => void>();
 
+/* Each programme's day numbers, registered by programs.ts, so a finished run can be recognised
+ * here without importing the programme content. */
+const programmeDays = new Map<string, number[]>();
+export const registerProgrammeDays = (slug: string, days: number[]) =>
+  programmeDays.set(slug, days);
+
+/** When every day is done, the run moves into `runs` and the programme starts fresh. */
+function archiveIfFinished(slug: string, s: ProgrammeState): ProgrammeState {
+  const days = programmeDays.get(slug);
+  if (!days?.length || !days.every((d) => s.completed.includes(d))) return s;
+  const { runs = [], ...run } = s;
+  const archivedAt =
+    Object.values(s.completedAt ?? {})
+      .sort()
+      .at(-1) ?? new Date().toISOString();
+  return { ...EMPTY, runs: [{ ...run, archivedAt }, ...runs] };
+}
+
 function read(slug: string): ProgrammeState {
   const hit = cache.get(keyFor(slug));
   if (hit) return hit;
@@ -44,11 +76,21 @@ function read(slug: string): ProgrammeState {
   } catch {
     /* unreadable storage — start fresh */
   }
-  cache.set(keyFor(slug), state);
-  return state;
+  const normalised = archiveIfFinished(slug, state);
+  if (normalised !== state) {
+    try {
+      window.localStorage.setItem(keyFor(slug), JSON.stringify(normalised));
+      reportWrite(keyFor(slug));
+    } catch {
+      /* keep in memory */
+    }
+  }
+  cache.set(keyFor(slug), normalised);
+  return normalised;
 }
 
-function write(slug: string, next: ProgrammeState) {
+function write(slug: string, incoming: ProgrammeState) {
+  const next = archiveIfFinished(slug, incoming);
   cache.set(keyFor(slug), next);
   try {
     window.localStorage.setItem(keyFor(slug), JSON.stringify(next));
@@ -78,6 +120,13 @@ function subscribe(listener: () => void) {
     offScope();
   };
 }
+
+/** Read a programme's state outside React. */
+export const readProgramme = (slug: string) => read(slug);
+
+/** Change a programme's state outside React; used by the import from the old iKan app. */
+export const updateProgramme = (slug: string, fn: (s: ProgrammeState) => ProgrammeState) =>
+  write(slug, fn(read(slug)));
 
 const newId = () => `e-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -145,6 +194,29 @@ export function useProgramme(slug: string) {
               completedAt: { ...s.completedAt, [String(day)]: new Date().toISOString() },
             },
       ),
-    reset: () => write(slug, EMPTY),
+    /** add active seconds to a day and one of its steps */
+    addTime: (day: number, stepId: string, seconds: number) =>
+      seconds > 0 &&
+      update((s) => {
+        const key = String(day);
+        const cur = s.time?.[key] ?? { total: 0, steps: {} };
+        return {
+          ...s,
+          time: {
+            ...s.time,
+            [key]: {
+              total: cur.total + seconds,
+              steps: { ...cur.steps, [stepId]: (cur.steps[stepId] ?? 0) + seconds },
+            },
+          },
+        };
+      }),
+    saveFeedback: (day: number, fb: Omit<SessionFeedback, "at">) =>
+      update((s) => ({
+        ...s,
+        feedback: { ...s.feedback, [String(day)]: { ...fb, at: new Date().toISOString() } },
+      })),
+    /** cancel the run in progress; finished runs are kept */
+    reset: () => write(slug, { ...EMPTY, ...(state.runs ? { runs: state.runs } : {}) }),
   };
 }

@@ -39,14 +39,14 @@ const partMeta: Record<
   {
     icon: LucideIcon;
     color: string;
-    to: "/assessment" | "/journal" | "/program" | "/settings";
+    to: "/assessments" | "/journal" | "/program" | "/settings";
     cta: string;
   }
 > = {
   assessments: {
     icon: ClipboardList,
     color: "#5D64B4",
-    to: "/assessment",
+    to: "/assessments",
     cta: "Take an assessment",
   },
   checkins: { icon: Smile, color: "#C2607C", to: "/journal", cta: "Log a check-in" },

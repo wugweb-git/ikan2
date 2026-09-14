@@ -16,9 +16,12 @@ export type Profile = {
   emergencyPhone: string;
   emergencyRelation: string;
   memberSince: string;
+  /** profile picture URL (imported from the old iKan app) */
+  avatar: string;
 };
 
 export const defaultProfile: Profile = {
+  avatar: "",
   name: "",
   email: "",
   phone: "",
@@ -76,6 +79,14 @@ export function useSettings() {
   };
 }
 
+/** "Noida, 201310" → "Noida": the place name without a postal code. */
+export const cityName = (city: string) =>
+  city
+    .split(",")
+    .map((x) => x.trim())
+    .filter((x) => x && !/^\d[\d\s-]*$/.test(x))
+    .join(", ");
+
 export const firstName = (p: Profile) => p.name.trim().split(/\s+/)[0] || "there";
 export const profileInitials = (p: Profile) =>
   p.name
@@ -116,15 +127,42 @@ export const legalLinks = [
   { id: "return-policy", label: "Return Policy", description: "Refund and return guidelines" },
 ];
 
-/** Fill a fresh profile from the signed-in account (name, email, phone), once. */
-export function seedProfile(account: { name: string; email: string; phone?: string }) {
+/** Profile details from the old iKan app. The first import fills everything it has; later
+ * imports only fill fields that are still empty, so edits made here are kept. */
+export function importProfile(
+  incoming: { [K in keyof Profile]?: string | undefined },
+  first: boolean,
+) {
+  profileStore.update((p) => {
+    const next = { ...p };
+    for (const [k, v] of Object.entries(incoming) as [keyof Profile, string | undefined][]) {
+      if (!v) continue;
+      if (first || !next[k]) next[k] = v;
+    }
+    return next;
+  });
+}
+
+/** Fill a fresh profile from the signed-in account (name, email, phone), once. A photo from
+ * Google or LinkedIn fills an empty avatar whenever it arrives. */
+export function seedProfile(account: {
+  name: string;
+  email: string;
+  phone?: string;
+  avatar?: string | undefined;
+}) {
   const current = profileStore.read();
-  if (current.email) return;
+  if (current.email) {
+    if (account.avatar && !current.avatar)
+      profileStore.update((p) => ({ ...p, avatar: account.avatar! }));
+    return;
+  }
   profileStore.update((p) => ({
     ...p,
     name: account.name || p.name,
     email: account.email,
     phone: p.phone || account.phone || "",
+    avatar: p.avatar || account.avatar || "",
     memberSince:
       p.memberSince === defaultProfile.memberSince
         ? new Date().toISOString().slice(0, 10)

@@ -117,6 +117,21 @@ export const resources: Resource[] = [
 
 export const getResource = (id: string) => resources.find((r) => r.id === id);
 
+/** Readable URL name for an article, from its title: /resources/<slug>. */
+export const slugOf = (r: Resource) =>
+  r.title
+    .toLowerCase()
+    .replace(/\(.*?\)/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .split("-")
+    .slice(0, 9)
+    .join("-");
+
+/** An article by its slug; old links by id still resolve. */
+export const getResourceBySlug = (slug: string) =>
+  resources.find((r) => slugOf(r) === slug) ?? getResource(slug);
+
 type State = { saved: string[]; opened: Record<string, string> };
 const store = createLocalStore<State>("ikan.resources.v1", { saved: [], opened: {} });
 

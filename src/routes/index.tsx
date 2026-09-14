@@ -1,7 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
+  Activity,
+  ArrowUpRight,
+  MapPin,
   Bell,
+  CalendarDays,
+  ChartNoAxesColumn,
+  Heart,
+  Plus,
+  Smile,
+  Sparkles,
   CalendarCheck,
   ChevronRight,
   ClipboardList,
@@ -10,7 +19,9 @@ import {
   Play,
   Watch,
 } from "lucide-react";
+import { DateText } from "@/components/date-text";
 import { IkanShell } from "@/components/ikan-shell";
+import { ProfilePhoto } from "@/components/profile-photo";
 import { Illustration } from "@/components/art";
 import { accentStyle, stateLayer } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
@@ -20,12 +31,19 @@ import { useScrollY } from "@/hooks/use-personal-context";
 import { cn } from "@/lib/utils";
 import { saveSnapshot, useEverything, useWellnessSnapshots, wellnessBand } from "@/lib/activity";
 import { getAssessment } from "@/lib/assessment/instruments";
+import {
+  dismissReassess,
+  reassessCopy,
+  reassessDismissed,
+  reassessReason,
+} from "@/lib/assessment/reassess";
 import { headlineOf, recommendationsFor, riskEndorsed, scoreAll } from "@/lib/assessment/scoring";
-import { getProgramme, programmes } from "@/lib/equip/programs";
+import { getProgramme, minutesOf, programmes } from "@/lib/equip/programs";
+import { consultants } from "@/lib/consultants";
 import { addDays, dayKey, moodScale } from "@/lib/journal";
 import { useNotifications } from "@/lib/notifications";
-import { firstName, profileInitials, useProfile, useSettings } from "@/lib/profile";
-import { resources, type Resource } from "@/lib/resources";
+import { cityName, firstName, profileInitials, useProfile, useSettings } from "@/lib/profile";
+import { resources, slugOf, type Resource } from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
 import resBurnout from "@/assets/res-burnout.jpg";
 import resSleep from "@/assets/res-sleep.jpg";
@@ -138,7 +156,11 @@ function Home() {
         className={cn("sticky-bar", scrollY > 150 && "sticky-bar-on")}
         aria-hidden={scrollY <= 150}
       >
-        <span className="avatar avatar-sm">{hydrated ? profileInitials(profile) : ""}</span>
+        <span className="avatar avatar-sm overflow-hidden">
+          <ProfilePhoto src={hydrated ? profile.avatar : undefined}>
+            {hydrated ? profileInitials(profile) : ""}
+          </ProfilePhoto>
+        </span>
         <span className="truncate font-display text-sm font-semibold">{greeting}</span>
         {score !== null ? (
           <Link to="/wellness" className="ml-auto text-xs font-semibold text-muted-foreground">
@@ -151,17 +173,24 @@ function Home() {
         now={now}
         part={part}
         greeting={greeting}
-        city={hydrated ? profile.city : ""}
+        city={hydrated ? cityName(profile.city) : ""}
         unread={hydrated ? unreadCount : 0}
         initials={hydrated ? profileInitials(profile) : ""}
+        photo={hydrated ? profile.avatar : undefined}
         data={data}
         hydrated={hydrated}
       />
 
       <div className="relative z-10 -mt-6 space-y-8 rounded-t-[28px] bg-background pb-4 pt-5">
         <TodayCard data={data} hydrated={hydrated} />
+        <ReassessPrompt data={data} hydrated={hydrated} />
         <ScoreCard score={score} data={data} hydrated={hydrated} />
+        <CurrentProgram data={data} hydrated={hydrated} />
+        <PickUp data={data} hydrated={hydrated} />
         <Recommended data={data} hydrated={hydrated} />
+        <Offerings data={data} hydrated={hydrated} />
+        <MoodCheckin data={data} hydrated={hydrated} />
+        <SupportCard city={hydrated ? cityName(profile.city) : ""} />
         <YourPrograms data={data} hydrated={hydrated} />
         <ThisWeek data={data} hydrated={hydrated} />
         <Library />
@@ -181,6 +210,7 @@ function SkyHeader({
   city,
   unread,
   initials,
+  photo,
   data,
   hydrated,
 }: {
@@ -190,6 +220,7 @@ function SkyHeader({
   city: string;
   unread: number;
   initials: string;
+  photo?: string | undefined;
   data: Data;
   hydrated: boolean;
 }) {
@@ -283,11 +314,24 @@ function SkyHeader({
 
       <div className="relative flex items-start gap-2">
         <div className="min-w-0 flex-1">
-          <p className="min-h-5 text-[13px] font-medium" style={{ color: s.muted }}>
-            {now
-              ? now.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })
-              : ""}
-            {city ? `, ${city}` : ""}
+          <p
+            className="flex min-h-5 flex-wrap items-center gap-x-3 text-[13px] font-medium"
+            style={{ color: s.muted }}
+          >
+            <span>
+              {now
+                ? now.toLocaleDateString("en-IN", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                  })
+                : ""}
+            </span>
+            {city ? (
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" aria-hidden="true" /> {city}
+              </span>
+            ) : null}
           </p>
           <h1 className="mt-1 font-display text-[30px] font-semibold leading-9 tracking-[-0.01em]">
             {greeting}
@@ -312,13 +356,13 @@ function SkyHeader({
         <Link
           to="/profile"
           aria-label="Profile"
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-full font-display text-[14px] font-semibold transition-transform active:scale-95"
+          className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full font-display text-[14px] font-semibold transition-transform active:scale-95"
           style={{
             background: night ? "rgba(255,255,255,.18)" : "#FFFFFF",
             color: night ? s.ink : "#151515",
           }}
         >
-          {initials}
+          <ProfilePhoto src={photo}>{initials}</ProfilePhoto>
         </Link>
       </div>
     </header>
@@ -445,7 +489,7 @@ function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
         meta={`${g.questions.length} short questions, about ${g.minutes} min`}
         art="measure"
         cta="Take a short check"
-        link={{ to: "/assessment/$slug", params: { slug: g.slug } }}
+        link={{ to: "/assessments/$slug", params: { slug: g.slug } }}
       />
     );
   }
@@ -483,7 +527,7 @@ function NextStep({
   link:
     | { to: "/assessment-flow"; search: { id: string } }
     | { to: "/program/$slug/day/$day"; params: { slug: string; day: string } }
-    | { to: "/assessment/$slug"; params: { slug: string } };
+    | { to: "/assessments/$slug"; params: { slug: string } };
 }) {
   return (
     <Link
@@ -530,7 +574,7 @@ function Section({
 }: {
   title: string;
   note?: string;
-  action?: { label: string; to: "/program" | "/resources" | "/assessments" | "/journal" };
+  action?: { label: string; to: "/program" | "/resources" | "/history/assessments" | "/journal" };
   children: ReactNode;
 }) {
   return (
@@ -682,7 +726,7 @@ function Recommended({ data, hydrated }: { data: Data; hydrated: boolean }) {
               </span>
               <span className="block font-display text-[20px] font-semibold">{p.name}</span>
               {p.source.description ? (
-                <span className="mt-0.5 line-clamp-2 block text-[12px] leading-4 opacity-85">
+                <span className="mt-0.5 line-clamp-2 text-[12px] leading-4 opacity-85">
                   {p.source.description}
                 </span>
               ) : null}
@@ -836,7 +880,12 @@ function Library() {
     <Section title="From the library" action={{ label: "See all", to: "/resources" }}>
       <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1">
         {picks.map((r) => (
-          <Link key={r.id} to="/resources" className="w-[200px] shrink-0 snap-start">
+          <Link
+            key={r.id}
+            to="/resources/$slug"
+            params={{ slug: slugOf(r) }}
+            className="w-[200px] shrink-0 snap-start"
+          >
             <span className="block h-[124px] overflow-hidden rounded-[20px]">
               {covers[r.id] ? (
                 <img src={covers[r.id]} alt="" className="h-full w-full object-cover" />
@@ -847,7 +896,7 @@ function Library() {
             <span className="mt-2 block text-[12px] font-semibold text-muted-foreground">
               {r.category}, {r.minutes} min read
             </span>
-            <span className="mt-0.5 line-clamp-2 block text-[14px] font-semibold leading-5">
+            <span className="mt-0.5 line-clamp-2 text-[14px] font-semibold leading-5">
               {r.title}
             </span>
           </Link>
@@ -863,7 +912,7 @@ function RecentResults({ data, hydrated }: { data: Data; hydrated: boolean }) {
     .sort((a, b) => b.completedAt.localeCompare(a.completedAt))
     .slice(0, 3);
   return (
-    <Section title="Recent results" action={{ label: "History", to: "/assessments" }}>
+    <Section title="Recent results" action={{ label: "History", to: "/history/assessments" }}>
       <ul className="mx-4 overflow-hidden rounded-[24px] bg-secondary">
         {recent.map((r) => {
           const a = getAssessment(r.slug);
@@ -872,23 +921,26 @@ function RecentResults({ data, hydrated }: { data: Data; hydrated: boolean }) {
           return (
             <li key={r.id} className="border-b border-background last:border-0">
               <Link
-                to="/result/$slug"
-                params={{ slug: a.slug }}
-                search={{ r: r.id }}
+                to="/assessments/$slug/result/$id"
+                params={{ slug: a.slug, id: r.id }}
                 className={cn("flex min-h-16 items-center gap-3 px-4 py-3", stateLayer)}
               >
                 <ClipboardList className="h-5 w-5 shrink-0 text-muted-foreground" />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[15px] font-medium">{a.title}</span>
-                  <span className="block text-[12px] text-muted-foreground">
+                  <DateText className="text-[12px] text-muted-foreground">
                     {new Date(r.completedAt).toLocaleDateString("en-IN", {
                       day: "numeric",
                       month: "short",
                     })}
-                  </span>
+                  </DateText>
                 </span>
                 {head?.band ? (
-                  <BandChip label={head.band.label} tone={head.band.tone} />
+                  <BandChip
+                    label={head.band.label}
+                    tone={head.band.tone}
+                    severity={head.band.severity}
+                  />
                 ) : (
                   <span className="text-[12px] text-muted-foreground">5 scores</span>
                 )}
@@ -898,6 +950,335 @@ function RecentResults({ data, hydrated }: { data: Data; hydrated: boolean }) {
         })}
       </ul>
     </Section>
+  );
+}
+
+/* ---------- re-check prompt (old iKan reassessment triggers) ---------- */
+
+function ReassessPrompt({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  const [hidden, setHidden] = useState(false);
+  if (!hydrated || hidden || reassessDismissed()) return null;
+  const reason = reassessReason(data.results, data.journal.entries, data.programmeStates);
+  if (!reason) return null;
+  return (
+    <section className="mx-4 flex items-center gap-3 rounded-[24px] bg-[oklch(0.96_0.05_85)] p-4">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-background text-[oklch(0.47_0.1_75)]">
+        <Activity className="h-5 w-5" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-display text-[15px] font-semibold">Ready for a re-check?</span>
+        <span className="mt-0.5 block text-[13px] leading-5 text-muted-foreground">
+          {reassessCopy[reason]}
+        </span>
+        <span className="mt-3 flex items-center gap-2">
+          <Link
+            to="/assessments"
+            className="inline-flex h-9 items-center rounded-full bg-foreground px-4 text-[13px] font-semibold text-background"
+          >
+            Choose an assessment
+          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              dismissReassess();
+              setHidden(true);
+            }}
+            className="h-9 rounded-full px-3 text-[13px] font-medium text-muted-foreground"
+          >
+            Not now
+          </button>
+        </span>
+      </span>
+    </section>
+  );
+}
+
+/* ---------- current program, activity, offerings, check-in, support ---------- */
+
+/** The programme you're in the middle of: the most recently active one that isn't finished. */
+function ongoing(data: Data) {
+  return programmes
+    .map((p) => {
+      const s = data.programmeStates[p.slug]!;
+      let next = 0;
+      while (s.completed.includes(next)) next += 1;
+      const last =
+        Object.values(s.completedAt ?? {})
+          .sort()
+          .at(-1) ?? "";
+      return { p, s, next, day: p.days.find((d) => d.day === next), last };
+    })
+    .filter((x) => x.s.completed.length > 0 && x.day)
+    .sort((a, b) => b.last.localeCompare(a.last))[0];
+}
+
+function CurrentProgram({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  const cur = hydrated ? ongoing(data) : undefined;
+  if (!cur) return null;
+  const done = Math.min(new Set(cur.s.completed).size, cur.p.days.length);
+  const pct = Math.round((done / cur.p.days.length) * 100);
+  return (
+    <section className="px-4">
+      <p className="mb-2 text-[13px] font-semibold text-muted-foreground">Your program</p>
+      <div className="hero-card">
+        <img src={cur.p.cover} alt="" className="hero-media" />
+        <div className="hero-veil" />
+        <div className="relative">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+            <div className="min-w-0">
+              <span className="hero-chip">Current program</span>
+              <h2 className="mt-2 font-display text-[26px] font-bold tracking-[-0.02em]">
+                {cur.p.name}
+              </h2>
+              <p className="mt-1 text-[13px] opacity-75">
+                Day {cur.next} of {cur.p.days.length - 1} · {cur.day!.title}
+              </p>
+            </div>
+            <div
+              className="hero-ring"
+              style={{
+                background: `conic-gradient(var(--background) 0 ${pct}%, oklch(1 0 0 / 0.14) ${pct}%)`,
+              }}
+            >
+              <span>{pct}%</span>
+            </div>
+          </div>
+          <div className="hero-track mt-4">
+            <i style={{ width: `${pct}%` }} />
+          </div>
+          <p className="mt-3 text-[14px] opacity-85">
+            Ready for your next session? Takes about {Math.max(5, minutesOf(cur.day!))} minutes.
+          </p>
+          <div className="mt-4 flex gap-2">
+            <Link
+              to="/program/$slug/day/$day"
+              params={{ slug: cur.p.slug, day: String(cur.next) }}
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-background text-[14px] font-semibold text-foreground transition-transform active:scale-[.97]"
+            >
+              <Play className="h-4 w-4" /> Start session
+            </Link>
+            <Link
+              to="/program/$slug"
+              params={{ slug: cur.p.slug }}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/25 px-4 text-[14px] font-semibold hover:bg-white/10"
+            >
+              <CalendarCheck className="h-4 w-4" /> Progress
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Things left open: today's programme session, unfinished assessments, today's check-in. */
+function PickUp({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  if (!hydrated) return null;
+  const today = dayKey(new Date());
+  const cur = ongoing(data);
+  const drafts = data.drafts.slice(0, 2);
+  const needsMood = !data.journal.entries.some((e) => e.date === today);
+  if (!cur && !drafts.length && !needsMood) return null;
+  const rowClass = cn(
+    "grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-4",
+    stateLayer,
+  );
+  return (
+    <Section title="Your activity" note="Pick up where you left off">
+      <div className="mx-4 divide-y divide-background overflow-hidden rounded-[24px] bg-secondary">
+        {cur ? (
+          <Link
+            to="/program/$slug/day/$day"
+            params={{ slug: cur.p.slug, day: String(cur.next) }}
+            className={rowClass}
+          >
+            <ActivityRow
+              title={`${cur.p.name} · Day ${cur.next} session`}
+              meta={cur.day!.title}
+              progress={Math.round(
+                (Math.min(new Set(cur.s.completed).size, cur.p.days.length) / cur.p.days.length) *
+                  100,
+              )}
+            />
+          </Link>
+        ) : null}
+        {drafts.map((d) => (
+          <Link
+            key={d.assessment!.slug}
+            to="/assessment-flow"
+            search={{ id: d.assessment!.slug }}
+            className={rowClass}
+          >
+            <ActivityRow
+              title={`${d.assessment!.name} assessment`}
+              meta={`${d.answered} of ${d.assessment!.questions.length} answered`}
+              progress={Math.round((d.answered / d.assessment!.questions.length) * 100)}
+            />
+          </Link>
+        ))}
+        {needsMood ? (
+          <Link to="/journal" className={rowClass}>
+            <ActivityRow title="Mood check-in" meta="How are you feeling today?" progress={0} />
+          </Link>
+        ) : null}
+      </div>
+    </Section>
+  );
+}
+
+function ActivityRow({ title, meta, progress }: { title: string; meta: string; progress: number }) {
+  return (
+    <>
+      <span className="activity-dial" style={{ ["--p" as string]: `${progress}%` }}>
+        <span>{progress ? `${progress}%` : "New"}</span>
+      </span>
+      <span className="min-w-0">
+        <span className="block truncate font-display text-[15px] font-semibold">{title}</span>
+        <span className="mt-0.5 block truncate text-[13px] text-muted-foreground">{meta}</span>
+      </span>
+      <span className="grid h-9 w-9 place-items-center rounded-full bg-foreground text-background">
+        {progress > 0 ? <Play className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
+      </span>
+    </>
+  );
+}
+
+function Offerings({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  const active = hydrated
+    ? programmes.filter((p) => {
+        const s = data.programmeStates[p.slug]!;
+        return s.completed.length > 0 && new Set(s.completed).size < p.days.length;
+      }).length
+    : 0;
+  const tiles = [
+    {
+      label: "Programs",
+      meta: active ? `${active} active` : `${programmes.length} programs`,
+      icon: Sparkles,
+      to: "/program" as const,
+      tone: "score-calm",
+    },
+    {
+      label: "Assessments",
+      meta: "7 available",
+      icon: ChartNoAxesColumn,
+      to: "/assessments" as const,
+      tone: "score-mind",
+    },
+    {
+      label: "Mood journal",
+      meta: "Daily check-in",
+      icon: Smile,
+      to: "/journal" as const,
+      tone: "score-rest",
+    },
+    {
+      label: "Consult",
+      meta: `${consultants.length} consultants`,
+      icon: Heart,
+      to: "/consult" as const,
+      tone: "score-alert",
+    },
+  ];
+  return (
+    <Section title="Everything in iKAN">
+      <div className="grid grid-cols-2 gap-3 px-4">
+        {tiles.map((o) => {
+          const Icon = o.icon;
+          return (
+            <Link
+              key={o.label}
+              to={o.to}
+              className={cn("surface flex flex-col gap-3 p-4", stateLayer)}
+            >
+              <span className={cn("score-tile", o.tone)}>
+                <Icon className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block font-display text-[15px] font-semibold">{o.label}</span>
+                <span className="mt-0.5 block text-[13px] text-muted-foreground">{o.meta}</span>
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </Section>
+  );
+}
+
+/** The mood check-in card. Hidden while Today's card is already asking the same question. */
+function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
+  if (!hydrated) return null;
+  const today = dayKey(new Date());
+  const logged = data.journal.entries.filter((e) => e.date === today);
+  const latest = [...data.results].sort((a, b) => b.completedAt.localeCompare(a.completedAt))[0];
+  const latestA = latest ? getAssessment(latest.slug) : undefined;
+  const risk = latest && latestA ? riskEndorsed(latestA, latest.answers) : false;
+  const todayAsks = !risk && !data.drafts[0] && logged.length === 0;
+  if (todayAsks) return null;
+  return (
+    <section className="surface mx-4 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[13px] font-semibold text-muted-foreground">Today’s check-in</p>
+          <h2 className="mt-1 font-display text-[17px] font-semibold">How are you feeling?</h2>
+        </div>
+        <span className="rounded-full bg-secondary px-2.5 py-1 text-[12px] text-muted-foreground">
+          {logged.length ? `${logged.length} today` : "40 sec"}
+        </span>
+      </div>
+      <p className="mt-1 text-[13px] text-muted-foreground">
+        Mood, energy and stress in a few quick taps.
+      </p>
+      <div className="mt-4 grid grid-cols-5 gap-2">
+        {moodScale.map((m) => (
+          <Link
+            key={m.value}
+            to="/journal"
+            search={{ mood: m.value }}
+            aria-label={m.label}
+            className="flex flex-col items-center gap-1 rounded-2xl bg-secondary py-2 transition-transform active:scale-95"
+          >
+            <span className="text-2xl leading-none" aria-hidden="true">
+              {m.emoji}
+            </span>
+            <span className="text-[11px] font-medium text-muted-foreground">{m.label}</span>
+          </Link>
+        ))}
+      </div>
+      <Link
+        to="/journal"
+        className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-foreground text-[14px] font-semibold text-background transition-transform active:scale-[.98]"
+      >
+        <Plus className="h-4 w-4" /> {logged.length ? "Add another check-in" : "Log today’s mood"}
+      </Link>
+    </section>
+  );
+}
+
+function SupportCard({ city }: { city: string }) {
+  return (
+    <section className="mx-4 rounded-[22px] border border-[#B3261E]/20 bg-[#FCEEEE] p-4">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-background text-[#8C1D18]">
+          <Heart className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold text-[#8C1D18]">Support</p>
+          <h2 className="font-display text-[16px] font-semibold">Let’s talk about it</h2>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">
+            {consultants.length} consultants{city ? ` for you in ${city}` : ""}, with video, call
+            and chat sessions.
+          </p>
+        </div>
+      </div>
+      <Link
+        to="/consult"
+        className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#8C1D18] text-[14px] font-semibold text-white transition-transform active:scale-[.98]"
+      >
+        <CalendarDays className="h-4 w-4" /> Book a consultation
+      </Link>
+    </section>
   );
 }
 

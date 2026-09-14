@@ -7,6 +7,7 @@ import {
   ChevronRight,
   ClipboardList,
   Flame,
+  NotebookPen,
   Smile,
   Sparkles,
   type LucideIcon,
@@ -21,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { useEverything, wellnessBand, type ActivityEvent, type ActivityType } from "@/lib/activity";
 import { addDays, dayKey, streaks } from "@/lib/journal";
 
-export const Route = createFileRoute("/history")({
+export const Route = createFileRoute("/history/")({
   head: () => pageMeta("My history", "Everything you’ve done in iKAN, in one place."),
   component: HistoryPage,
 });
@@ -46,7 +47,7 @@ function HistoryPage() {
   const navigate = useNavigate();
   const data = useEverything();
   const [filter, setFilter] = useState<(typeof filters)[number]>("all");
-  const events = hydrated ? data.events.filter((e) => HISTORY_TYPES.includes(e.type)) : [];
+  const events = hydrated ? data.archive : [];
 
   const count = (t: ActivityType) => events.filter((e) => e.type === t).length;
   const weekAgo = addDays(new Date(), -6);
@@ -144,7 +145,7 @@ function HistoryPage() {
           <Stat
             icon={Sparkles}
             value={count("program")}
-            label="Program days"
+            label="Programs completed"
             meta={typeMeta.program}
           />
           <Stat
@@ -154,6 +155,38 @@ function HistoryPage() {
             meta={{ color: "#B3441E", soft: "#FDE7D8" }}
           />
         </section>
+
+        <nav className="mt-4 grid grid-cols-2 gap-2 px-4" aria-label="History sections">
+          {(
+            [
+              {
+                to: "/history/assessments",
+                label: "Assessments",
+                sub: "All 7",
+                icon: ClipboardList,
+              },
+              { to: "/history/program", label: "Programs", sub: "All 3", icon: Sparkles },
+              { to: "/history/journal", label: "Journals", sub: "By month", icon: Smile },
+              { to: "/diaries", label: "Learning diaries", sub: "All 4", icon: NotebookPen },
+            ] as const
+          ).map((t) => (
+            <Link
+              key={t.to}
+              to={t.to}
+              className={cn(
+                "flex items-center gap-3 rounded-[20px] border border-foreground/10 p-3",
+                stateLayer,
+              )}
+            >
+              <t.icon className="h-5 w-5 shrink-0" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14px] font-semibold">{t.label}</span>
+                <span className="block text-[12px] text-muted-foreground">{t.sub}</span>
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </Link>
+          ))}
+        </nav>
 
         <div
           className="no-scrollbar mt-6 flex gap-2 overflow-x-auto px-4"
@@ -191,7 +224,7 @@ function HistoryPage() {
             <div className="p-5 text-center">
               <p className="font-display text-[17px] font-semibold">Nothing here yet</p>
               <p className="mt-1 text-[14px] text-muted-foreground">
-                Your check-ins, assessments, program days and sessions will appear here.
+                Finished assessments, completed programs and journal check-ins appear here.
               </p>
               <Link
                 to="/journal"
@@ -266,7 +299,7 @@ function EventRow({ e }: { e: ActivityEvent }) {
             />
           ) : null}
         </span>
-        <span className="line-clamp-1 block text-[13px] text-muted-foreground">{e.detail}</span>
+        <span className="line-clamp-1 text-[13px] text-muted-foreground">{e.detail}</span>
       </span>
       <span className="text-[12px] tabular-nums text-muted-foreground">
         {new Date(e.at).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}

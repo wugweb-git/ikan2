@@ -72,8 +72,8 @@ function WelcomePage() {
   const name = displayName(user).split(" ")[0];
 
   return (
-    <div className="min-h-screen bg-canvas" style={accentStyle("calm")}>
-      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-background shadow-app">
+    <div className="min-h-dvh bg-canvas" style={accentStyle("calm")}>
+      <div className="mx-auto flex min-h-dvh w-full max-w-app flex-col bg-background shadow-app">
         <header className="flex h-16 items-center gap-1 px-1">
           {step > 0 ? (
             <IconButton label="Back" onClick={() => setStep(0)}>

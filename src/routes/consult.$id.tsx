@@ -12,6 +12,8 @@ import {
   Monitor,
   Phone,
   Quote,
+  GraduationCap,
+  Sparkles,
   Star,
   ThumbsUp,
   Video,
@@ -84,7 +86,7 @@ function ConsultantPage() {
         />
         <header className="bg-[var(--accent-container)] px-4 pb-6 text-[var(--on-accent-container)]">
           <div className="flex items-center gap-4">
-            <Avatar text={initials(c.name)} hue={c.hue} size={88} />
+            <Avatar text={initials(c.name)} hue={c.hue} size={88} photo={c.photo} />
             <div className="min-w-0">
               <h1 className="font-display text-[24px] font-semibold leading-7">{c.name}</h1>
               <p className="mt-1 text-[14px] opacity-80">{c.credentials}</p>
@@ -155,18 +157,54 @@ function ConsultantPage() {
           <p className="mt-2 text-[15px] leading-6 text-muted-foreground">{c.about}</p>
         </section>
 
+        {c.approaches.length ? (
+          <section className="mt-7 px-4">
+            <h2 className="font-display text-[16px] font-semibold">Approaches</h2>
+            <ul className="mt-3 space-y-2">
+              {c.approaches.map((a) => (
+                <li
+                  key={a}
+                  className="flex items-center gap-3 rounded-[14px] bg-secondary px-4 py-3 text-[15px]"
+                >
+                  <Sparkles className="h-4 w-4 shrink-0 text-[var(--accent-strong)]" /> {a}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {c.qualifications.length ? (
+          <section className="mt-7 px-4">
+            <h2 className="font-display text-[16px] font-semibold">Qualifications</h2>
+            <ul className="mt-3 space-y-2">
+              {c.qualifications.map((q) => (
+                <li key={q} className="flex items-start gap-3 text-[15px] leading-6">
+                  <GraduationCap className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" /> {q}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         {c.review ? (
           <section className="mt-7 px-4">
             <h2 className="font-display text-[16px] font-semibold">Reviews ({c.reviews})</h2>
             <figure className="mt-3 rounded-[20px] border border-foreground/10 p-4">
               <div className="flex items-center gap-2 text-[13px]">
-                <span className="flex">
+                <span className="flex" aria-label={`${c.review.rating} out of 5`}>
                   {[0, 1, 2, 3, 4].map((i) => (
-                    <Star key={i} className="h-3.5 w-3.5 fill-[#E3A008] text-[#E3A008]" />
+                    <Star
+                      key={i}
+                      className={
+                        i < c.review!.rating
+                          ? "h-3.5 w-3.5 fill-[#E3A008] text-[#E3A008]"
+                          : "h-3.5 w-3.5 text-foreground/20"
+                      }
+                    />
                   ))}
                 </span>
-                <span className="font-semibold">Anonymous</span>
-                <span className="text-muted-foreground">Verified</span>
+                <span className="font-semibold">{c.review.name}</span>
+                {c.review.verified ? <span className="text-muted-foreground">Verified</span> : null}
               </div>
               <blockquote className="mt-2 text-[15px] leading-6">{c.review.text}</blockquote>
               <figcaption className="mt-2 flex items-center gap-1.5 text-[12px] text-muted-foreground">
@@ -269,7 +307,11 @@ function Booking({ c }: { c: Consultant }) {
       ) : null}
 
       <p className="mt-4 text-[13px] font-semibold text-muted-foreground">Session type</p>
-      <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup" aria-label="Session type">
+      <div
+        className={cn("mt-2 grid gap-2", c.sessions.length === 4 ? "grid-cols-2" : "grid-cols-3")}
+        role="radiogroup"
+        aria-label="Session type"
+      >
         {c.sessions.map((s) => {
           const on = s.mode === mode;
           const Icon = formatIcon[s.mode] ?? Monitor;
@@ -407,7 +449,7 @@ function Booking({ c }: { c: Consultant }) {
         ) : (
           <div>
             <div className="flex items-center gap-3 rounded-[20px] bg-secondary p-4">
-              <Avatar text={initials(c.name)} hue={c.hue} size={48} />
+              <Avatar text={initials(c.name)} hue={c.hue} size={48} photo={c.photo} />
               <div className="min-w-0">
                 <p className="font-semibold">{c.name}</p>
                 <p className="text-[14px] text-muted-foreground">

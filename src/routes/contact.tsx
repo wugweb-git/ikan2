@@ -5,7 +5,7 @@ import { InfoShell } from "@/components/info-shell";
 import { Illustration } from "@/components/art";
 import { pageMeta } from "@/components/equip/program-header";
 import { Field, FormError, PrimaryButton } from "@/components/auth-ui";
-import { useAuth, SUPABASE_ANON_KEY, SUPABASE_URL, displayName } from "@/lib/auth";
+import { useAuth, LEGACY_ANON_KEY, LEGACY_API, displayName } from "@/lib/auth";
 import { contactPage as c } from "@/lib/content";
 
 export const Route = createFileRoute("/contact")({
@@ -32,11 +32,11 @@ function ContactPage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/make-server-cc205da9/contact/submit`, {
+      const res = await fetch(`${LEGACY_API}/contact/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${LEGACY_ANON_KEY}`,
         },
         body: JSON.stringify({
           name: name.trim(),

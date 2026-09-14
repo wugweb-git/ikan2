@@ -16,6 +16,7 @@ import {
   LayoutGrid,
   LifeBuoy,
   LogOut,
+  NotebookPen,
   Settings,
   Smile,
   Sparkles,
@@ -36,13 +37,13 @@ import type { LegalSlug } from "@/lib/content";
 const navItems = [
   { to: "/", label: "Home", icon: House },
   { to: "/program", label: "Programs", icon: Sparkles },
-  { to: "/assessment", label: "Assess", icon: ChartNoAxesColumn },
+  { to: "/assessments", label: "Assess", icon: ChartNoAxesColumn },
   { to: "/journal", label: "Journal", icon: BookOpen },
 ] as const;
 
 /** Routes that live behind More rather than on a tab. */
 const moreRoutes =
-  /^\/(wellness|history|assessments|resources|consult|profile|notifications|settings|support)/;
+  /^\/(wellness|history|diaries|resources|consult|profile|notifications|settings|support)/;
 
 export function IkanShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -59,13 +60,16 @@ export function IkanShell({ children }: { children: ReactNode }) {
   const moreActive = moreOpen || moreRoutes.test(pathname);
 
   return (
-    <div className="min-h-screen bg-canvas text-foreground">
-      <main className="mx-auto min-h-screen w-full max-w-md bg-background pb-28 shadow-app">
+    <div className="min-h-dvh bg-canvas text-foreground">
+      <main className="mx-auto min-h-dvh w-full max-w-app bg-background pb-[calc(7rem+env(safe-area-inset-bottom))] lg:shadow-app">
         {children}
       </main>
       {moreOpen ? <MoreSheet onClose={() => setMoreOpen(false)} /> : null}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center">
-        <nav aria-label="Main navigation" className="pointer-events-auto mb-3 w-full max-w-md px-3">
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center print:hidden">
+        <nav
+          aria-label="Main navigation"
+          className="pointer-events-auto mb-[max(12px,env(safe-area-inset-bottom))] w-full max-w-app px-3"
+        >
           <div className="grid grid-cols-5 rounded-[24px] border border-border/80 bg-background/92 p-2 shadow-dock backdrop-blur-xl">
             {navItems.map((item, index) => {
               const active =
@@ -73,7 +77,7 @@ export function IkanShell({ children }: { children: ReactNode }) {
                 (index === 0
                   ? pathname === "/"
                   : pathname.startsWith(item.to) ||
-                    (item.to === "/assessment" && pathname.startsWith("/result")));
+                    (item.to === "/assessments" && pathname.startsWith("/result")));
               const Icon = item.icon;
               return (
                 <Link
@@ -122,7 +126,9 @@ type Row = { label: string; sub: string; icon: LucideIcon } & (
       to:
         | "/wellness"
         | "/history"
-        | "/assessments"
+        | "/history/program"
+        | "/diaries"
+        | "/history/assessments"
         | "/journal"
         | "/program"
         | "/resources"
@@ -174,12 +180,26 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
           icon: History,
         },
         {
-          to: "/assessments",
+          to: "/history/assessments",
           label: "Assessment history",
           sub: hydrated
             ? `${n(data.results.length, "result", "results")} · grouped by assessment`
             : "Grouped by assessment",
           icon: ClipboardList,
+        },
+        {
+          to: "/history/program",
+          label: "Program history",
+          sub: hydrated
+            ? `${n(data.archive.filter((e) => e.type === "program").length, "program", "programs")} completed`
+            : "Completed programs",
+          icon: Sparkles,
+        },
+        {
+          to: "/diaries",
+          label: "Learning diaries",
+          sub: "One for each program",
+          icon: NotebookPen,
         },
         {
           to: "/journal",
@@ -298,7 +318,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
         onClick={onClose}
         className="animate-fade absolute inset-0 bg-foreground/40"
       />
-      <div className="animate-sheet relative max-h-[calc(100vh-24px)] w-full max-w-md overflow-y-auto rounded-t-[28px] bg-background pb-28 pt-3">
+      <div className="animate-sheet relative max-h-[calc(100vh-24px)] w-full max-w-app overflow-y-auto rounded-t-[28px] bg-background pb-28 pt-3">
         <div className="mx-auto h-1 w-8 rounded-full bg-foreground/30" />
         <div className="flex items-center justify-between px-5 pt-4">
           <p className="font-display text-[24px] font-semibold">More</p>

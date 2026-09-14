@@ -9,6 +9,7 @@ import {
   Download,
   HeartPulse,
   History,
+  NotebookPen,
   Settings,
   ShieldPlus,
   Smile,
@@ -17,6 +18,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
+import { ProfilePhoto } from "@/components/profile-photo";
 import { Illustration } from "@/components/art";
 import {
   accentStyle,
@@ -68,10 +70,13 @@ function ProfilePage() {
 
   const finished = programmes.filter((pr) => {
     const s = data.programmeStates[pr.slug];
-    return hydrated && s && new Set(s.completed).size >= pr.days.length;
+    return hydrated && Boolean(s?.runs?.length);
   });
   const started = programmes.filter(
-    (pr) => hydrated && (data.programmeStates[pr.slug]?.completed.length ?? 0) > 0,
+    (pr) =>
+      hydrated &&
+      ((data.programmeStates[pr.slug]?.completed.length ?? 0) > 0 ||
+        Boolean(data.programmeStates[pr.slug]?.runs?.length)),
   );
   const firstResult = hydrated
     ? [...data.results].sort((a, b) => a.completedAt.localeCompare(b.completedAt))[0]
@@ -115,13 +120,13 @@ function ProfilePage() {
   ];
 
   const archive: {
-    to: "/assessments" | "/program" | "/journal" | "/history";
+    to: "/history/assessments" | "/history/program" | "/diaries" | "/journal" | "/history";
     label: string;
     sub: string;
     icon: LucideIcon;
   }[] = [
     {
-      to: "/assessments",
+      to: "/history/assessments",
       label: "Assessment history",
       sub:
         hydrated && data.results.length
@@ -130,12 +135,20 @@ function ProfilePage() {
       icon: ClipboardList,
     },
     {
-      to: "/program",
-      label: "Finished programmes",
+      to: "/history/program",
+      label: "Program history",
       sub: finished.length
-        ? finished.map((f) => `${f.name} · ${f.days.length} of ${f.days.length} days`).join(", ")
+        ? `Finished: ${finished.map((f) => f.name).join(", ")}`
         : "None finished yet",
       icon: Sparkles,
+    },
+    {
+      to: "/diaries",
+      label: "Learning diaries",
+      sub: finished.length
+        ? `${finished.length} ${finished.length === 1 ? "diary" : "diaries"} from finished programs`
+        : "Diaries move here when a program is finished",
+      icon: NotebookPen,
     },
     {
       to: "/journal",
@@ -183,15 +196,15 @@ function ProfilePage() {
             to="/settings"
             aria-label="Settings"
             className={cn(
-              "absolute right-3 top-3 grid h-12 w-12 place-items-center rounded-full bg-background/80 backdrop-blur",
               stateLayer,
+              "absolute right-3 top-3 grid h-12 w-12 place-items-center rounded-full bg-background/80 backdrop-blur",
             )}
           >
             <Settings className="h-6 w-6" />
           </Link>
           <div className="-mt-12 flex flex-col items-center px-4 text-center">
-            <span className="grid h-24 w-24 place-items-center rounded-full border-4 border-background bg-[var(--accent-strong)] font-display text-[32px] font-semibold text-background">
-              {profileInitials(p)}
+            <span className="grid h-24 w-24 place-items-center overflow-hidden rounded-full border-4 border-background bg-[var(--accent-strong)] font-display text-[32px] font-semibold text-background">
+              <ProfilePhoto src={p.avatar}>{profileInitials(p)}</ProfilePhoto>
             </span>
             <h1 className="mt-3 font-display text-[26px] font-semibold leading-8">
               {p.name || "Your name"}

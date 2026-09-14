@@ -19,9 +19,10 @@ export type ActivityEvent = {
   emoji?: string;
   tone?: "success" | "warning" | "error";
   link:
-    | { to: "/result/$slug"; params: { slug: string }; search: { r: string } }
+    | { to: "/assessments/$slug/result/$id"; params: { slug: string; id: string } }
     | { to: "/journal" }
     | { to: "/program/$slug"; params: { slug: string } }
+    | { to: "/program/$slug/result"; params: { slug: string } }
     | { to: "/consult/$id"; params: { id: string } }
     | { to: "/resources" };
 };
@@ -97,7 +98,7 @@ export function useEverything() {
         ? `${head.band.label} · ${a.title}`
         : `${a.scores.length} scores · ${a.title}`,
       ...(head?.band ? { tone: head.band.tone } : {}),
-      link: { to: "/result/$slug", params: { slug: a.slug }, search: { r: r.id } },
+      link: { to: "/assessments/$slug/result/$id", params: { slug: a.slug, id: r.id } },
     });
   }
   for (const e of journal.entries) {
@@ -115,16 +116,19 @@ export function useEverything() {
     });
   }
   for (const p of programmes) {
-    const s = programmeStates[p.slug]!;
-    for (const [day, at] of Object.entries(s.completedAt ?? {})) {
-      events.push({
-        id: `${p.slug}-${day}`,
-        type: "program",
-        at,
-        title: `${p.name} · Day ${day}`,
-        detail: `Day complete · ${Math.min(p.days.length, new Set(s.completed).size)} of ${p.days.length} done`,
-        link: { to: "/program/$slug", params: { slug: p.slug } },
-      });
+    const current = programmeStates[p.slug]!;
+    // the run in progress and every finished run
+    for (const [ri, s] of [current, ...(current.runs ?? [])].entries()) {
+      for (const [day, at] of Object.entries(s.completedAt ?? {})) {
+        events.push({
+          id: `${p.slug}-${ri}-${day}`,
+          type: "program",
+          at,
+          title: `${p.name} · Day ${day}`,
+          detail: `Day complete · ${Math.min(p.days.length, new Set(s.completed).size)} of ${p.days.length} done`,
+          link: { to: "/program/$slug", params: { slug: p.slug } },
+        });
+      }
     }
   }
   for (const b of bookings) {
@@ -241,7 +245,30 @@ export function useEverything() {
     }))
     .filter((d) => d.assessment && d.answered > 0);
 
+  /* History and archives hold finished things only: completed assessments, journal check-ins and
+   * programmes whose every day is done. Days of a programme still running stay with the programme. */
+  const archive: ActivityEvent[] = events.filter(
+    (e) => e.type === "assessment" || e.type === "mood",
+  );
+  for (const p of programmes) {
+    for (const [ri, s] of (programmeStates[p.slug]!.runs ?? []).entries()) {
+      const stamps = Object.values(s.completedAt ?? {}).sort();
+      const at = s.archivedAt || stamps.at(-1);
+      if (!at) continue;
+      archive.push({
+        id: `${p.slug}-completed-${ri}`,
+        type: "program",
+        at,
+        title: `${p.name} completed`,
+        detail: `All ${p.days.length} days done${stamps[0] ? ` · started ${new Date(stamps[0]).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}` : ""}`,
+        link: { to: "/program/$slug/result", params: { slug: p.slug } },
+      });
+    }
+  }
+  archive.sort((a, b) => b.at.localeCompare(a.at));
+
   return {
+    archive,
     drafts,
     events,
     parts,

@@ -81,9 +81,8 @@ function AssessmentFlowPage() {
   const finish = (final: Answers) => {
     const result = store.saveResult(a.slug, final, seconds.current);
     navigate({
-      to: "/result/$slug",
-      params: { slug: a.slug },
-      search: { r: result.id },
+      to: "/assessments/$slug/result/$id",
+      params: { slug: a.slug, id: result.id },
       replace: true,
     });
   };
@@ -103,7 +102,7 @@ function AssessmentFlowPage() {
   };
 
   const firstUnanswered = a.questions.findIndex((qq) => answers[qq.id] === undefined);
-  const exit = () => navigate({ to: "/assessment/$slug", params: { slug: a.slug } });
+  const exit = () => navigate({ to: "/assessments/$slug", params: { slug: a.slug } });
 
   // keyboard: 1–6 picks an answer, ← goes back, → or Enter moves on once answered
   useEffect(() => {
@@ -134,8 +133,8 @@ function AssessmentFlowPage() {
   });
 
   return (
-    <div className="min-h-screen bg-canvas" style={accentStyle("mind")}>
-      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-background shadow-app">
+    <div className="min-h-dvh bg-canvas" style={accentStyle("mind")}>
+      <div className="mx-auto flex min-h-dvh w-full max-w-app flex-col bg-background shadow-app">
         <header className="sticky top-0 z-30 bg-background">
           <div className="flex h-16 items-center gap-1 px-1">
             <IconButton
@@ -191,7 +190,7 @@ function AssessmentFlowPage() {
         </main>
 
         <footer className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
-          <div className="flex w-full max-w-md items-center gap-3 border-t border-foreground/10 bg-background px-4 pb-6 pt-3">
+          <div className="flex w-full max-w-app items-center gap-3 border-t border-foreground/10 bg-background px-4 pb-[max(24px,env(safe-area-inset-bottom))] pt-3">
             <Button
               variant="outlined"
               className="w-12 px-0"
@@ -236,8 +235,8 @@ function AssessmentFlowPage() {
           title="Leave this assessment?"
         >
           <p className="text-[15px] leading-6 text-muted-foreground">
-            Your {answeredCount} {answeredCount === 1 ? "answer is" : "answers are"} saved on this
-            device. You can pick up where you left off.
+            Your {answeredCount} {answeredCount === 1 ? "answer is" : "answers are"} saved. You can
+            finish this assessment later.
           </p>
           <div className="mt-6 flex flex-col gap-2">
             <Button onClick={() => setLeaving(false)}>Keep going</Button>

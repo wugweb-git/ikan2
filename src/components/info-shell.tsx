@@ -32,8 +32,8 @@ export function InfoShell({ title, children }: { title?: string; children: React
     );
   }
   return (
-    <div className="min-h-screen bg-canvas text-foreground">
-      <main className="mx-auto min-h-screen w-full max-w-md bg-background pb-12 shadow-app">
+    <div className="min-h-dvh bg-canvas text-foreground">
+      <main className="mx-auto min-h-dvh w-full max-w-app bg-background pb-12 shadow-app">
         {bar}
         {children}
       </main>

@@ -20,6 +20,18 @@ const store = createLocalStore<State>("ikan.assessments.v1", { results: [], draf
 /** Direct read, for effects that run before the hook's post-hydration render. */
 export const readAssessmentState = () => store.read();
 
+/** Add results that aren't here yet (matched by id); used by the import from the old iKan app. */
+export const mergeResults = (incoming: StoredResult[]) =>
+  store.update((s) => {
+    const have = new Set(s.results.map((r) => r.id));
+    const fresh = incoming.filter((r) => !have.has(r.id));
+    return fresh.length ? { ...s, results: [...s.results, ...fresh] } : s;
+  });
+
+/** Result ids are UUIDs, as in the old iKan records. */
+const resultId = () =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : newId("r");
+
 export function useAssessmentStore() {
   const state = store.use();
   return {
@@ -43,7 +55,7 @@ export function useAssessmentStore() {
       }),
     saveResult: (slug: string, answers: Answers, seconds: number) => {
       const result: StoredResult = {
-        id: newId("r"),
+        id: resultId(),
         slug,
         completedAt: new Date().toISOString(),
         seconds,

@@ -35,7 +35,7 @@ export function Footer({
 }) {
   return (
     <footer className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
-      <div className="flex w-full max-w-md items-center gap-3 border-t border-foreground/[0.08] bg-background px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
+      <div className="flex w-full max-w-app items-center gap-3 border-t border-foreground/[0.08] bg-background px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {onBack ? (
           <IconButton label="Back" onClick={onBack} className="h-14 w-14 bg-secondary">
             <ArrowLeft className="h-6 w-6" />
@@ -49,7 +49,8 @@ export function Footer({
   );
 }
 
-const nextLabel = (ctx: StepCtx) => ctx.finishLabel ?? (ctx.isLast ? `Finish day ${ctx.day}` : "Next");
+const nextLabel = (ctx: StepCtx) =>
+  ctx.finishLabel ?? (ctx.isLast ? `Finish day ${ctx.day}` : "Next");
 
 /** Block title (Notion) and its body text. With no prompt, the title is the headline. */
 function BlockText({
@@ -69,14 +70,21 @@ function BlockText({
     <div>
       <div className={cn("flex gap-3", headline ? "items-center" : "flex-col items-start")}>
         {icon ? (
-          <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--accent-container)] text-[var(--on-accent-container)] [&_svg]:h-5 [&_svg]:w-5">
+          <span
+            aria-hidden="true"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--accent-container)] text-[var(--on-accent-container)] [&_svg]:h-5 [&_svg]:w-5"
+          >
             {icon}
           </span>
         ) : null}
         {headline ? (
-          <p className="text-[14px] font-semibold leading-5 text-[var(--accent-strong)]">{block.title}</p>
+          <p className="text-[14px] font-semibold leading-5 text-[var(--accent-strong)]">
+            {block.title}
+          </p>
         ) : (
-          <h2 className="font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">{block.title}</h2>
+          <h2 className="font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">
+            {block.title}
+          </h2>
         )}
       </div>
       {body.length ? (
@@ -88,7 +96,11 @@ function BlockText({
               </p>
             ) : (
               <p key={i} className="flex gap-3 pl-1">
-                <span className="w-5 shrink-0 text-muted-foreground">{item.kind === "ol" || ordered ? `${body.slice(0, i + 1).filter((x) => x.kind !== "p").length}.` : "•"}</span>
+                <span className="w-5 shrink-0 text-muted-foreground">
+                  {item.kind === "ol" || ordered
+                    ? `${body.slice(0, i + 1).filter((x) => x.kind !== "p").length}.`
+                    : "•"}
+                </span>
                 <span>{item.text}</span>
               </p>
             ),
@@ -96,7 +108,9 @@ function BlockText({
         </div>
       ) : null}
       {headline ? (
-        <h2 className="mt-4 font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">{headline}</h2>
+        <h2 className="mt-4 font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">
+          {headline}
+        </h2>
       ) : null}
     </div>
   );
@@ -104,7 +118,15 @@ function BlockText({
 
 /* --------------------------------- steps --------------------------------- */
 
-function LessonStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "lesson" }>; ctx: StepCtx }) {
+function LessonStep({
+  step,
+  view,
+  ctx,
+}: {
+  step: Step;
+  view: Extract<UI, { ui: "lesson" }>;
+  ctx: StepCtx;
+}) {
   // Notion writes some lists inline: "No idea is wrong • Don't critique while writing • …"
   const bullets = Boolean(step.block.body[0]?.text.includes(" • "));
   return (
@@ -131,7 +153,9 @@ function LessonStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
       {view.cards ? (
         <div className="no-scrollbar -mx-4 mt-6 flex snap-x items-start gap-3 overflow-x-auto px-4">
           {view.cards.map((c) => (
-            <section key={c.title} className={cn(
+            <section
+              key={c.title}
+              className={cn(
                 view.cards!.length > 1 ? "w-[85%]" : "w-full",
                 "shrink-0 snap-start rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]",
               )}
@@ -160,13 +184,22 @@ function LessonStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
   );
 }
 
-function ChoiceStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "choice" }>; ctx: StepCtx }) {
+function ChoiceStep({
+  step,
+  view,
+  ctx,
+}: {
+  step: Step;
+  view: Extract<UI, { ui: "choice" }>;
+  ctx: StepCtx;
+}) {
   const { state, setAnswer } = useProgramme(ctx.slug);
   const key = answerKey(step.block, ctx.day);
   const raw = state.answers[key];
   const picked = Array.isArray(raw) ? raw : typeof raw === "string" ? [raw] : [];
   const otherKey = `${key}#other`;
-  const otherText = typeof state.answers[otherKey] === "string" ? (state.answers[otherKey] as string) : "";
+  const otherText =
+    typeof state.answers[otherKey] === "string" ? (state.answers[otherKey] as string) : "";
 
   const toggle = (label: string) => {
     if (!view.multi) return setAnswer(key, label);
@@ -184,7 +217,11 @@ function ChoiceStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
       {view.table ? <DataTable rows={view.table} /> : null}
       {view.cards ? (
         // Notion "UI hints: cards"
-        <div role={view.multi ? "group" : "radiogroup"} aria-label={view.prompt} className="mt-6 grid grid-cols-2 gap-3">
+        <div
+          role={view.multi ? "group" : "radiogroup"}
+          aria-label={view.prompt}
+          className="mt-6 grid grid-cols-2 gap-3"
+        >
           {view.options.map((o) => {
             const on = picked.includes(o.label);
             return (
@@ -197,10 +234,17 @@ function ChoiceStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
                 className={cn(
                   "flex min-h-[88px] flex-col justify-between rounded-[16px] border p-4 text-left text-[16px] font-medium transition-colors",
                   stateLayer,
-                  on ? "border-transparent bg-[var(--accent-container)] text-[var(--on-accent-container)]" : "border-foreground/15",
+                  on
+                    ? "border-transparent bg-[var(--accent-container)] text-[var(--on-accent-container)]"
+                    : "border-foreground/15",
                 )}
               >
-                <span className={cn("grid h-6 w-6 place-items-center rounded-full", on ? "bg-foreground text-background" : "border-2 border-foreground/40")}>
+                <span
+                  className={cn(
+                    "grid h-6 w-6 place-items-center rounded-full",
+                    on ? "bg-foreground text-background" : "border-2 border-foreground/40",
+                  )}
+                >
                   {on ? <Check className="h-4 w-4" strokeWidth={3} /> : null}
                 </span>
                 {o.label}
@@ -209,9 +253,19 @@ function ChoiceStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
           })}
         </div>
       ) : (
-        <div role={view.multi ? "group" : "radiogroup"} aria-label={view.prompt} className="-mx-4 mt-5">
+        <div
+          role={view.multi ? "group" : "radiogroup"}
+          aria-label={view.prompt}
+          className="-mx-4 mt-5"
+        >
           {view.options.map((o) => (
-            <SelectRow key={o.label} multi={view.multi} selected={picked.includes(o.label)} glyph={o.glyph} onClick={() => toggle(o.label)}>
+            <SelectRow
+              key={o.label}
+              multi={view.multi}
+              selected={picked.includes(o.label)}
+              glyph={o.glyph}
+              onClick={() => toggle(o.label)}
+            >
               {o.label}
             </SelectRow>
           ))}
@@ -219,10 +273,20 @@ function ChoiceStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "
       )}
       {view.otherOption && picked.includes(view.otherOption) ? (
         <div className="mt-3">
-          <TextField label={view.otherOption} value={otherText} onChange={(v) => setAnswer(otherKey, v)} autoFocus />
+          <TextField
+            label={view.otherOption}
+            value={otherText}
+            onChange={(v) => setAnswer(otherKey, v)}
+            autoFocus
+          />
         </div>
       ) : null}
-      <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} disabled={picked.length === 0} />
+      <Footer
+        onBack={ctx.onBack}
+        onNext={ctx.onNext}
+        label={nextLabel(ctx)}
+        disabled={picked.length === 0}
+      />
     </>
   );
 }
@@ -257,7 +321,15 @@ function DataTable({ rows }: { rows: string[][] }) {
   );
 }
 
-function ScaleStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "scale" }>; ctx: StepCtx }) {
+function ScaleStep({
+  step,
+  view,
+  ctx,
+}: {
+  step: Step;
+  view: Extract<UI, { ui: "scale" }>;
+  ctx: StepCtx;
+}) {
   const { state, setAnswer } = useProgramme(ctx.slug);
   const key = answerKey(step.block, ctx.day);
   const value = typeof state.answers[key] === "number" ? (state.answers[key] as number) : undefined;
@@ -267,11 +339,16 @@ function ScaleStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "s
   return (
     <>
       <BlockText block={step.block} headline={view.prompt} />
-      <p className="mt-10 text-center font-display text-[57px] font-semibold leading-none tabular-nums">{value ?? "–"}</p>
+      <p className="mt-10 text-center font-display text-[57px] font-semibold leading-none tabular-nums">
+        {value ?? "–"}
+      </p>
       <div className="relative mt-10 px-2">
         <div className="relative h-4">
           <div className="absolute inset-y-0 left-0 right-0 my-auto h-4 rounded-full bg-[var(--accent-container)]" />
-          <div className="absolute inset-y-0 left-0 my-auto h-4 rounded-full bg-[var(--accent)]" style={{ width: `${pct}%` }} />
+          <div
+            className="absolute inset-y-0 left-0 my-auto h-4 rounded-full bg-[var(--accent)]"
+            style={{ width: `${pct}%` }}
+          />
         </div>
         <input
           type="range"
@@ -286,18 +363,34 @@ function ScaleStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "s
         />
         <div className="mt-3 flex justify-between text-[13px] tabular-nums text-muted-foreground">
           {ticks.map((t) => (
-            <span key={t} className={cn("w-6 text-center", value === t && "font-semibold text-foreground")}>
+            <span
+              key={t}
+              className={cn("w-6 text-center", value === t && "font-semibold text-foreground")}
+            >
               {t}
             </span>
           ))}
         </div>
       </div>
-      <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} disabled={value === undefined} />
+      <Footer
+        onBack={ctx.onBack}
+        onNext={ctx.onNext}
+        label={nextLabel(ctx)}
+        disabled={value === undefined}
+      />
     </>
   );
 }
 
-function TextStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "text" }>; ctx: StepCtx }) {
+function TextStep({
+  step,
+  view,
+  ctx,
+}: {
+  step: Step;
+  view: Extract<UI, { ui: "text" }>;
+  ctx: StepCtx;
+}) {
   const { state, setAnswer } = useProgramme(ctx.slug);
   const key = answerKey(step.block, ctx.day);
   const value = typeof state.answers[key] === "string" ? (state.answers[key] as string) : "";
@@ -314,14 +407,29 @@ function TextStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "te
     <>
       <BlockText block={step.block} headline={view.prompt || undefined} icon={<PencilLine />} />
       <div className="mt-6">
-        <TextField label="" ariaLabel={view.prompt || step.block.title} placeholder="Write here" value={value} onChange={(v) => setAnswer(key, v)} multiline />
+        <TextField
+          label=""
+          ariaLabel={view.prompt || step.block.title}
+          placeholder="Write here"
+          value={value}
+          onChange={(v) => setAnswer(key, v)}
+          multiline
+        />
       </div>
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
     </>
   );
 }
 
-function ConcludeStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "conclude" }>; ctx: StepCtx }) {
+function ConcludeStep({
+  step,
+  view,
+  ctx,
+}: {
+  step: Step;
+  view: Extract<UI, { ui: "conclude" }>;
+  ctx: StepCtx;
+}) {
   const { state, setAnswer } = useProgramme(ctx.slug);
   const key = `${answerKey(step.block, ctx.day)}@${ctx.day}`;
   const value = typeof state.answers[key] === "string" ? (state.answers[key] as string) : "";
@@ -334,17 +442,29 @@ function ConcludeStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui:
   return (
     <>
       <div className="flex flex-col items-center pt-4 text-center">
-        <span className="relative grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-[var(--accent)]" aria-hidden="true">
+        <span
+          className="relative grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-[var(--accent)]"
+          aria-hidden="true"
+        >
           <span
             className="absolute inset-0 rounded-full bg-background transition-transform duration-[1400ms] ease-[cubic-bezier(.05,.7,.1,1)] motion-reduce:transition-none"
             style={{ transform: full ? "translateX(105%)" : "translateX(30%)" }}
           />
-          <Check className="relative h-10 w-10 text-background transition-opacity delay-500 duration-500" style={{ opacity: full ? 1 : 0 }} strokeWidth={2.5} />
+          <Check
+            className="relative h-10 w-10 text-background transition-opacity delay-500 duration-500"
+            style={{ opacity: full ? 1 : 0 }}
+            strokeWidth={2.5}
+          />
         </span>
-        <p className="mt-6 text-[14px] font-semibold text-[var(--accent-strong)]">{step.block.title}</p>
+        <p className="mt-6 text-[14px] font-semibold text-[var(--accent-strong)]">
+          {step.block.title}
+        </p>
         <div className="mt-2 space-y-2">
           {visibleBody(step.block).map((b) => (
-            <p key={b.text} className="font-display text-[22px] font-semibold leading-8 text-balance">
+            <p
+              key={b.text}
+              className="font-display text-[22px] font-semibold leading-8 text-balance"
+            >
               {b.text}
             </p>
           ))}
@@ -353,7 +473,13 @@ function ConcludeStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui:
       {view.prompt ? (
         <div className="mt-8">
           <p className="mb-2 text-[16px] font-semibold">{view.prompt}</p>
-          <TextField label="" ariaLabel={view.prompt} value={value} onChange={(v) => setAnswer(key, v)} multiline />
+          <TextField
+            label=""
+            ariaLabel={view.prompt}
+            value={value}
+            onChange={(v) => setAnswer(key, v)}
+            multiline
+          />
         </div>
       ) : null}
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
@@ -364,13 +490,26 @@ function ConcludeStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui:
 /* ------------------------------ matrix sort ------------------------------ */
 
 /** Notion comparison-matrix blocks, "showing 2 at a time on 1 card". */
-function SortStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "sort" }>; ctx: StepCtx }) {
+function SortStep({
+  step,
+  view,
+  ctx,
+}: {
+  step: Step;
+  view: Extract<UI, { ui: "sort" }>;
+  ctx: StepCtx;
+}) {
   const { state, setAnswer } = useProgramme(ctx.slug);
   const pages: (typeof view.items)[] = [];
-  for (let i = 0; i < view.items.length; i += view.perCard) pages.push(view.items.slice(i, i + view.perCard));
+  for (let i = 0; i < view.items.length; i += view.perCard)
+    pages.push(view.items.slice(i, i + view.perCard));
   const [page, setPage] = useState(0);
-  const keyOf = (situation: string, line: string) => `${answerKey(step.block, ctx.day)}:${situation}:${line}`;
-  const pageDone = (p: typeof view.items) => p.every((it) => it.lines.every((l) => typeof state.answers[keyOf(it.situation, l)] === "string"));
+  const keyOf = (situation: string, line: string) =>
+    `${answerKey(step.block, ctx.day)}:${situation}:${line}`;
+  const pageDone = (p: typeof view.items) =>
+    p.every((it) =>
+      it.lines.every((l) => typeof state.answers[keyOf(it.situation, l)] === "string"),
+    );
 
   return (
     <>
@@ -383,7 +522,11 @@ function SortStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "so
             <div key={pi} className="space-y-3">
               {p.map((it, ii) => (
                 <section key={ii} className="rounded-[16px] bg-secondary p-4">
-                  {it.situation ? <p className="font-display text-[18px] font-semibold leading-6">{it.situation}</p> : null}
+                  {it.situation ? (
+                    <p className="font-display text-[18px] font-semibold leading-6">
+                      {it.situation}
+                    </p>
+                  ) : null}
                   <div className="mt-3 space-y-4">
                     {it.lines.map((line) => (
                       <div key={line}>
@@ -417,7 +560,15 @@ function SortStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "so
 
 /* ------------------------------ statements ------------------------------ */
 
-function StatementsStep({ step, view, ctx }: { step: Step; view: Extract<UI, { ui: "statements" }>; ctx: StepCtx }) {
+function StatementsStep({
+  step,
+  view,
+  ctx,
+}: {
+  step: Step;
+  view: Extract<UI, { ui: "statements" }>;
+  ctx: StepCtx;
+}) {
   const { state, setAnswer } = useProgramme(ctx.slug);
   const [page, setPage] = useState(0);
   const keyOf = (s: string) => `${answerKey(step.block, ctx.day)}:${s}`;
@@ -431,10 +582,18 @@ function StatementsStep({ step, view, ctx }: { step: Step; view: Extract<UI, { u
           index={page}
           onIndex={setPage}
           pages={view.statements.map((s) => (
-            <section key={s} className="flex min-h-48 flex-col justify-between rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
+            <section
+              key={s}
+              className="flex min-h-48 flex-col justify-between rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]"
+            >
               <p className="font-display text-[20px] font-semibold leading-7">{s}</p>
               <div className="mt-6">
-                <Segmented label={s} options={view.options} value={state.answers[keyOf(s)] as string | undefined} onChange={(v) => setAnswer(keyOf(s), v)} />
+                <Segmented
+                  label={s}
+                  options={view.options}
+                  value={state.answers[keyOf(s)] as string | undefined}
+                  onChange={(v) => setAnswer(keyOf(s), v)}
+                />
               </div>
             </section>
           ))}
@@ -474,7 +633,10 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
     .sort((a, b) => Number(b[0]) - Number(a[0]))[0]?.[1];
   const [entry, setEntry] = useState<DiaryEntry>(() => saved ?? {});
   const [q, setQ] = useState(0);
-  const questions = diaryKinds.map((k, i) => ({ ...k, label: (rows[i] ?? "").replace(/:\s*\[.*$/, "").trim() }));
+  const questions = diaryKinds.map((k, i) => ({
+    ...k,
+    label: (rows[i] ?? "").replace(/:\s*\[.*$/, "").trim(),
+  }));
   const question = questions[q];
 
   const set = (patch: DiaryEntry) => {
@@ -493,11 +655,15 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-[13px]">Asleep</p>
-                <p className="font-display text-[32px] font-semibold leading-10 tabular-nums">{formatDuration(m.asleep)}</p>
+                <p className="font-display text-[32px] font-semibold leading-10 tabular-nums">
+                  {formatDuration(m.asleep)}
+                </p>
               </div>
               <div>
                 <p className="text-[13px]">In bed</p>
-                <p className="font-display text-[32px] font-semibold leading-10 tabular-nums">{formatDuration(m.inBed)}</p>
+                <p className="font-display text-[32px] font-semibold leading-10 tabular-nums">
+                  {formatDuration(m.inBed)}
+                </p>
               </div>
             </div>
             <p className="mt-3 text-[14px]">
@@ -508,19 +674,34 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
         <ul className="-mx-4 mt-4">
           {questions.map((qq, i) => (
             <li key={qq.key}>
-              <button type="button" onClick={() => setQ(i)} className="flex min-h-14 w-full items-center justify-between gap-4 px-4 py-2 text-left">
+              <button
+                type="button"
+                onClick={() => setQ(i)}
+                className="flex min-h-14 w-full items-center justify-between gap-4 px-4 py-2 text-left"
+              >
                 <span className="text-[15px] text-muted-foreground">{qq.label}</span>
-                <span className="shrink-0 text-[15px] font-semibold tabular-nums">{answerText(qq, entry)}</span>
+                <span className="shrink-0 text-[15px] font-semibold tabular-nums">
+                  {answerText(qq, entry)}
+                </span>
               </button>
             </li>
           ))}
         </ul>
-        <Footer onBack={() => setQ(questions.length - 1)} onNext={ctx.onNext} label={ctx.isLast ? `Finish day ${ctx.day}` : "Save diary"} />
+        <Footer
+          onBack={() => setQ(questions.length - 1)}
+          onNext={ctx.onNext}
+          label={ctx.isLast ? `Finish day ${ctx.day}` : "Save diary"}
+        />
       </>
     );
   }
 
-  const answered = question.kind === "time" ? Boolean(entry[question.key]) : question.kind === "rating" ? entry.quality !== undefined : true;
+  const answered =
+    question.kind === "time"
+      ? Boolean(entry[question.key])
+      : question.kind === "rating"
+        ? entry.quality !== undefined
+        : true;
 
   return (
     <>
@@ -530,7 +711,10 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
           {q + 1} of {questions.length}
         </p>
       </div>
-      <h2 key={question.key} className="animate-fade mt-2 font-display text-[28px] font-semibold leading-9 text-balance">
+      <h2
+        key={question.key}
+        className="animate-fade mt-2 font-display text-[28px] font-semibold leading-9 text-balance"
+      >
         {question.label}
       </h2>
       <div className="mt-8">
@@ -548,7 +732,10 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
             </label>
             {!entry[question.key] && previous?.[question.key] ? (
               <div className="mt-3">
-                <Button variant="tonal" onClick={() => set({ [question.key]: previous[question.key] })}>
+                <Button
+                  variant="tonal"
+                  onClick={() => set({ [question.key]: previous[question.key] })}
+                >
                   Same as last time, {formatTime(previous[question.key] as string)}
                 </Button>
               </div>
@@ -564,13 +751,22 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
           />
         ) : null}
         {question.kind === "rating" ? (
-          <Segmented label={question.label} options={["1", "2", "3", "4", "5"]} value={entry.quality?.toString()} onChange={(v) => set({ quality: Number(v) })} />
+          <Segmented
+            label={question.label}
+            options={["1", "2", "3", "4", "5"]}
+            value={entry.quality?.toString()}
+            onChange={(v) => set({ quality: Number(v) })}
+          />
         ) : null}
       </div>
       <Footer
         onBack={q === 0 ? ctx.onBack : () => setQ(q - 1)}
         onNext={() => {
-          if ((question.kind === "minutes" || question.kind === "count") && entry[question.key] === undefined) set({ [question.key]: 0 });
+          if (
+            (question.kind === "minutes" || question.kind === "count") &&
+            entry[question.key] === undefined
+          )
+            set({ [question.key]: 0 });
           setQ(q + 1);
         }}
         label="Next"
@@ -580,18 +776,36 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
   );
 }
 
-function Counter({ value, onChange, unit, step }: { value: number | undefined; onChange: (v: number) => void; unit: string; step: number }) {
+function Counter({
+  value,
+  onChange,
+  unit,
+  step,
+}: {
+  value: number | undefined;
+  onChange: (v: number) => void;
+  unit: string;
+  step: number;
+}) {
   const v = value ?? 0;
   return (
     <div className="flex items-center justify-between rounded-[16px] bg-secondary p-3">
-      <Button variant="tonal" className="h-14 w-14 px-0 text-2xl" onClick={() => onChange(Math.max(0, v - step))}>
+      <Button
+        variant="tonal"
+        className="h-14 w-14 px-0 text-2xl"
+        onClick={() => onChange(Math.max(0, v - step))}
+      >
         <span aria-label={`Fewer ${unit}`}>−</span>
       </Button>
       <p className="text-center" aria-live="polite">
         <span className="font-display text-[40px] font-semibold tabular-nums">{v}</span>
         <span className="ml-2 text-[15px] text-muted-foreground">{unit}</span>
       </p>
-      <Button variant="tonal" className="h-14 w-14 px-0 text-2xl" onClick={() => onChange(v + step)}>
+      <Button
+        variant="tonal"
+        className="h-14 w-14 px-0 text-2xl"
+        onClick={() => onChange(v + step)}
+      >
         <span aria-label={`More ${unit}`}>+</span>
       </Button>
     </div>
@@ -608,7 +822,15 @@ function answerText(q: DiaryQ, e: DiaryEntry) {
 
 /* -------------------------------- renderer -------------------------------- */
 
-export function StepView({ step, ctx, diaryRows }: { step: Step; ctx: StepCtx; diaryRows: string[] }): ReactNode {
+export function StepView({
+  step,
+  ctx,
+  diaryRows,
+}: {
+  step: Step;
+  ctx: StepCtx;
+  diaryRows: string[];
+}): ReactNode {
   const v = step.view;
   switch (v.ui) {
     case "lesson":

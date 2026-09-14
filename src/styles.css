@@ -281,3 +281,10 @@ html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after 
 .prose-ikan table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 14px; line-height: 1.45; }
 .prose-ikan td, .prose-ikan th { border: 1px solid var(--border); padding: 8px 10px; vertical-align: top; min-width: 110px; }
 .prose-ikan tr:first-child td, .prose-ikan th { background: var(--secondary); font-weight: 600; color: var(--foreground); }
+
+/* The app fills the screen on phones, foldables and tablets (installed as an Android app / PWA).
+ * Only on laptop-size screens does it sit in a phone-width column. */
+@utility max-w-app { max-width: 100%; @media (min-width: 1024px) { max-width: 30rem; } }
+@utility pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+html, body { background: var(--background); overscroll-behavior-y: none; }
+@media (min-width: 1024px) { html, body { background: var(--canvas); } }

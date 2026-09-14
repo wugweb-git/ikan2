@@ -1,24 +1,87 @@
 import { createClient, type Session, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { startCloudSync, stopCloudSync } from "@/lib/cloud-sync";
+import { importLegacyData, resetLegacyImport } from "@/lib/legacy-import";
 import { claimGuestData, getScope, setScope } from "@/lib/storage-scope";
 
-/* Sign-in against the existing iKan Supabase project ("Ikan - App"), the same way the live app
- * does it: password sign-in and OAuth through Supabase Auth, and sign-up through the app's edge
- * function, which creates the auth user and the iKan profile together.
- * The anon key is the public client key already shipped in the live app. */
+/* Accounts live in ikan2's Lovable Cloud backend. Every iKan account was copied there with its
+ * id and password, so people sign in with the details they already have.
+ * Connection settings come from VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY. Until they
+ * are set, sign-in falls back to the old iKan project ("Ikan - App") so the app keeps working. */
 
-export const SUPABASE_PROJECT = "jpfvoevxegnknxoqmwye";
-export const SUPABASE_URL = `https://${SUPABASE_PROJECT}.supabase.co`;
-export const SUPABASE_ANON_KEY =
+const CLOUD_URL = (import.meta.env["VITE_SUPABASE_URL"] as string | undefined)?.replace(/\/$/, "");
+const CLOUD_KEY = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as string | undefined;
+/** true when sign-in and saving go through Lovable Cloud */
+export const usingLovableCloud = Boolean(CLOUD_URL && CLOUD_KEY);
+
+const LEGACY_URL = "https://jpfvoevxegnknxoqmwye.supabase.co";
+const LEGACY_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwZnZvZXZ4ZWdua254b3Ftd3llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMjIyNDIsImV4cCI6MjA3MzY5ODI0Mn0.VGYSE8LqBEggrQcUHJH9NcvursaoNfQK9K8-ESCo-rc";
-const API_BASE = `${SUPABASE_URL}/functions/v1/make-server-cc205da9`;
+
+export const SUPABASE_URL = usingLovableCloud ? CLOUD_URL! : LEGACY_URL;
+export const SUPABASE_ANON_KEY = usingLovableCloud ? CLOUD_KEY! : LEGACY_KEY;
+/** the old iKan edge function (legacy sign-up and the contact form) */
+export const LEGACY_API = `${LEGACY_URL}/functions/v1/make-server-cc205da9`;
+export const LEGACY_ANON_KEY = LEGACY_KEY;
+
+/* "Keep me signed in": when off, the session lives only until the app is closed. */
+const REMEMBER_KEY = "ikan.remember";
+export const rememberLogin = () => {
+  try {
+    return window.localStorage.getItem(REMEMBER_KEY) !== "0";
+  } catch {
+    return true;
+  }
+};
+export const setRememberLogin = (on: boolean) => {
+  try {
+    window.localStorage.setItem(REMEMBER_KEY, on ? "1" : "0");
+  } catch {
+    /* storage unavailable */
+  }
+};
+const sessionStorageAdapter = {
+  getItem: (k: string) => {
+    try {
+      return window.localStorage.getItem(k) ?? window.sessionStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (k: string, v: string) => {
+    try {
+      if (rememberLogin()) {
+        window.localStorage.setItem(k, v);
+        window.sessionStorage.removeItem(k);
+      } else {
+        window.sessionStorage.setItem(k, v);
+        window.localStorage.removeItem(k);
+      }
+    } catch {
+      /* storage unavailable */
+    }
+  },
+  removeItem: (k: string) => {
+    try {
+      window.localStorage.removeItem(k);
+      window.sessionStorage.removeItem(k);
+    } catch {
+      /* storage unavailable */
+    }
+  },
+};
 
 let client: SupabaseClient | null = null;
 export function supabase() {
   if (!client) {
     client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        ...(usingLovableCloud ? { flowType: "pkce" as const } : {}),
+        ...(typeof window !== "undefined" ? { storage: sessionStorageAdapter } : {}),
+      },
     });
   }
   return client;
@@ -83,13 +146,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       claimGuestData(s.user.id);
       setScope(s.user.id);
       if (changed) {
-        void startCloudSync(s.user.id, async () => {
+        const token = async () => {
           const { data } = await supabase().auth.getSession();
           return data.session?.access_token ?? null;
-        });
+        };
+        const sync = startCloudSync(s.user.id, token);
+        // accounts already moved to Lovable Cloud carry their iKan data; only the old
+        // sign-in still needs to fetch it from the iKan app
+        if (!usingLovableCloud) void sync.finally(() => importLegacyData(s.user.id, token));
       }
     } else {
-      if (getScope() !== "guest") stopCloudSync();
+      if (getScope() !== "guest") {
+        stopCloudSync();
+        resetLegacyImport();
+      }
       setScope("guest");
     }
     setSession(s);
@@ -125,11 +195,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw new Error(friendly(error.message));
     },
     signUp: async ({ name, email, password, phone }) => {
-      const res = await fetch(`${API_BASE}/auth/signup`, {
+      if (usingLovableCloud) {
+        const { data, error } = await supabase().auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            emailRedirectTo: `${origin()}/login`,
+            data: { name: name.trim(), full_name: name.trim(), ...(phone ? { phone } : {}) },
+          },
+        });
+        if (error) throw new Error(friendly(error.message));
+        // an existing, confirmed email comes back with no identities
+        if (data.user && !data.user.identities?.length)
+          throw new Error(friendly("user_already_exists"));
+        return data.session ? "signedIn" : "confirm";
+      }
+      const res = await fetch(`${LEGACY_API}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${LEGACY_KEY}`,
         },
         body: JSON.stringify({
           email: email.trim(),

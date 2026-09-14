@@ -1,11 +1,11 @@
 import { addDays } from "@/lib/journal";
 import { createLocalStore, newId } from "@/lib/local-store";
 
-/* The five consultants on ikanhealth.in/consultation (as listed on 13 Sep 2026): names,
- * credentials, ratings, experience, cities, languages, modes, concerns, therapy areas, about
- * text and session prices are copied from the site. "From" is the lowest session price, because
- * the site's "Starting at" figure disagrees with the session prices for three of the five.
- * Next-available slots are relative to today, since the site's are fixed demo dates. */
+/* The five consultants from the live iKan consultants API (14 Sep 2026): names, photos,
+ * credentials, ratings, experience, cities, languages, session modes and prices, concerns, therapy
+ * areas, approaches, qualifications, about text, review and FAQ. "From" is the lowest session
+ * price, which matches the site's "Starting at". Next-available slots are relative to today,
+ * since the site's are fixed demo dates. Bookings stay in ikan2 (not sent to the live backend). */
 
 export type SessionMode = "Offline" | "Call" | "Chat" | "Video";
 export type Role = "Therapist" | "Psychiatrist" | "Counselor" | "Family Therapist";
@@ -25,11 +25,21 @@ export type Consultant = {
   concerns: string[];
   therapyFor: string[];
   about: string;
+  photo: string;
+  approaches: string[];
+  qualifications: string[];
   sessions: { mode: SessionMode; price: number }[];
   /** days from today and hour of the next open slot */
   next: { inDays: number; hour: number };
   hue: number;
-  review?: { text: string; date: string; helpful: number };
+  review?: {
+    text: string;
+    date: string;
+    helpful: number;
+    rating: number;
+    name: string;
+    verified: boolean;
+  };
   faq?: { q: string; a: string };
 };
 
@@ -39,6 +49,7 @@ export const consultants: Consultant[] = [
     name: "Dr. Sarah Johnson",
     credentials: "M.Phil (Clinical Psychology), M.Sc",
     role: "Therapist",
+    photo: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=400&fit=crop",
     rating: 4.8,
     reviews: 142,
     years: 15,
@@ -60,19 +71,49 @@ export const consultants: Consultant[] = [
       "Stress Management",
       "Cognitive Behavioral Therapy",
     ],
+    approaches: [
+      "Cognitive Behavioral Therapy (CBT)",
+      "Trauma-Informed Care",
+      "Mindfulness-Based Therapy",
+    ],
+    qualifications: [
+      "M.Phil in Clinical Psychology, NIMHANS",
+      "M.Sc in Psychology, Delhi University",
+      "Certified CBT Practitioner",
+      "Trauma-Informed Care Specialist",
+    ],
     about:
       "Dr. Johnson has over 15 years of experience helping individuals overcome anxiety, depression, and trauma. She specializes in cognitive behavioral therapy and trauma-informed care, creating a safe and supportive environment for healing.",
     sessions: [
-      { mode: "Offline", price: 2000 },
-      { mode: "Call", price: 1200 },
-      { mode: "Chat", price: 800 },
+      {
+        mode: "Video",
+        price: 1500,
+      },
+      {
+        mode: "Call",
+        price: 1200,
+      },
+      {
+        mode: "Chat",
+        price: 800,
+      },
+      {
+        mode: "Offline",
+        price: 2000,
+      },
     ],
-    next: { inDays: 0, hour: 16 },
+    next: {
+      inDays: 0,
+      hour: 16,
+    },
     hue: 262,
     review: {
       text: "Dr. Johnson helped me overcome my anxiety. Her CBT techniques really work. Highly recommended!",
       date: "2025-10-10",
       helpful: 23,
+      rating: 5,
+      name: "Anonymous",
+      verified: true,
     },
     faq: {
       q: "What is your approach to therapy?",
@@ -84,6 +125,7 @@ export const consultants: Consultant[] = [
     name: "Dr. Priya Sharma",
     credentials: "M.Phil, RCI Registered",
     role: "Therapist",
+    photo: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop",
     rating: 4.9,
     reviews: 67,
     years: 8,
@@ -104,13 +146,33 @@ export const consultants: Consultant[] = [
       "Self-Esteem",
       "Young Adults",
     ],
+    approaches: ["Affirmative Therapy", "Person-Centered Therapy", "ACT"],
+    qualifications: [
+      "M.Phil in Clinical Psychology",
+      "RCI Registered Psychologist",
+      "LGBTQ+ Affirmative Therapy Certification",
+      "ACT Practitioner",
+    ],
     about:
       "Dr. Sharma provides LGBTQIA+ affirmative therapy, helping individuals with identity exploration, coming out processes, and dealing with discrimination. She creates a safe, affirming space for all clients and is passionate about queer mental health.",
     sessions: [
-      { mode: "Chat", price: 900 },
-      { mode: "Call", price: 1100 },
+      {
+        mode: "Video",
+        price: 1300,
+      },
+      {
+        mode: "Call",
+        price: 1100,
+      },
+      {
+        mode: "Chat",
+        price: 900,
+      },
     ],
-    next: { inDays: 0, hour: 18 },
+    next: {
+      inDays: 0,
+      hour: 18,
+    },
     hue: 330,
   },
   {
@@ -118,6 +180,7 @@ export const consultants: Consultant[] = [
     name: "Dr. Michael Chen",
     credentials: "M.Phil, LCSW",
     role: "Counselor",
+    photo: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop",
     rating: 4.6,
     reviews: 89,
     years: 10,
@@ -138,10 +201,37 @@ export const consultants: Consultant[] = [
       "Relationship Skills",
       "Mindfulness",
     ],
+    approaches: [
+      "Mindfulness-Based Stress Reduction",
+      "Solution-Focused Therapy",
+      "Positive Psychology",
+    ],
+    qualifications: [
+      "M.Phil in Clinical Social Work",
+      "Licensed Clinical Social Worker (LCSW)",
+      "Certified Mindfulness Teacher",
+      "Corporate Wellness Consultant",
+    ],
     about:
       "Dr. Chen focuses on helping professionals manage stress and prevent burnout through evidence-based interventions and mindfulness practices. He has extensive experience in workplace mental health and corporate wellness programs.",
-    sessions: [{ mode: "Call", price: 1000 }],
-    next: { inDays: 1, hour: 10 },
+    sessions: [
+      {
+        mode: "Video",
+        price: 1200,
+      },
+      {
+        mode: "Call",
+        price: 1000,
+      },
+      {
+        mode: "Chat",
+        price: 700,
+      },
+    ],
+    next: {
+      inDays: 1,
+      hour: 10,
+    },
     hue: 168,
   },
   {
@@ -149,6 +239,7 @@ export const consultants: Consultant[] = [
     name: "Dr. Emily Rodriguez",
     credentials: "Ph.D., LMFT",
     role: "Family Therapist",
+    photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
     rating: 4.9,
     reviews: 156,
     years: 12,
@@ -169,13 +260,33 @@ export const consultants: Consultant[] = [
       "Life Transitions",
       "Couples Therapy",
     ],
+    approaches: ["Emotionally Focused Therapy (EFT)", "Gottman Method", "Attachment-Based Therapy"],
+    qualifications: [
+      "Ph.D. in Marriage and Family Therapy",
+      "Licensed Marriage and Family Therapist (LMFT)",
+      "Certified EFT Therapist",
+      "Gottman Level 3 Trained",
+    ],
     about:
       "Dr. Rodriguez specializes in helping couples and families improve their relationships and communication. She uses evidence-based approaches like EFT and Gottman Method to address attachment issues and relationship challenges.",
     sessions: [
-      { mode: "Offline", price: 2500 },
-      { mode: "Video", price: 2000 },
+      {
+        mode: "Video",
+        price: 2000,
+      },
+      {
+        mode: "Call",
+        price: 1500,
+      },
+      {
+        mode: "Offline",
+        price: 2500,
+      },
     ],
-    next: { inDays: 5, hour: 14 },
+    next: {
+      inDays: 5,
+      hour: 14,
+    },
     hue: 24,
   },
   {
@@ -183,6 +294,7 @@ export const consultants: Consultant[] = [
     name: "Dr. James Thompson",
     credentials: "MD, Psychiatrist",
     role: "Psychiatrist",
+    photo: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop",
     rating: 4.7,
     reviews: 203,
     years: 18,
@@ -203,10 +315,29 @@ export const consultants: Consultant[] = [
       "Anxiety Disorders",
       "Medication Management",
     ],
+    approaches: ["Medication Management", "Psychopharmacology", "Integrated Care"],
+    qualifications: [
+      "MD, Psychiatry, AIIMS Delhi",
+      "Board Certified Psychiatrist",
+      "Fellowship in Mood Disorders",
+      "20+ research publications",
+    ],
     about:
       "Dr. Thompson is a board-certified psychiatrist with expertise in medication management for complex mental health conditions. He takes a collaborative approach to treatment planning, working closely with patients to find the right medication and dosage.",
-    sessions: [{ mode: "Offline", price: 3000 }],
-    next: { inDays: 6, hour: 11 },
+    sessions: [
+      {
+        mode: "Video",
+        price: 2500,
+      },
+      {
+        mode: "Offline",
+        price: 3000,
+      },
+    ],
+    next: {
+      inDays: 6,
+      hour: 11,
+    },
     hue: 212,
   },
 ];

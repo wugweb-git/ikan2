@@ -27,6 +27,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
         name: displayName(user),
         email: user.email ?? "",
         phone: (user.user_metadata?.["phone"] as string | undefined) ?? "",
+        avatar:
+          (user.user_metadata?.["avatar_url"] as string | undefined) ??
+          (user.user_metadata?.["picture"] as string | undefined),
       });
       if (AUTH_ONLY.test(path)) {
         const redirect = new URLSearchParams(location.searchStr).get("redirect");
@@ -53,7 +56,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
 function Splash() {
   return (
-    <div className="grid min-h-screen place-items-center bg-canvas">
+    <div className="grid min-h-dvh place-items-center bg-canvas">
       <div className="flex flex-col items-center gap-4">
         <img src="/favicon.svg" alt="" className="h-16 w-16 animate-pulse rounded-[18px]" />
         <p className="text-[14px] text-muted-foreground">Opening iKAN…</p>
@@ -76,8 +79,8 @@ export function AuthLayout({
   footer?: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-canvas">
-      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-background shadow-app">
+    <div className="min-h-dvh bg-canvas">
+      <div className="mx-auto flex min-h-dvh w-full max-w-app flex-col bg-background shadow-app">
         <div className="relative h-44 overflow-hidden">
           <Illustration art={art} />
           <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent" />

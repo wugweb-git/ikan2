@@ -26,6 +26,8 @@ const valueIcon: Record<string, LucideIcon> = {
   handshake: Handshake,
 };
 const stepIcon = [ClipboardList, UserRoundSearch, Sparkles];
+/** Team photos copied from the old iKan repo (public/team), named by first name. */
+const photoOf = (name: string) => `/team/${name.split(" ")[0]!.toLowerCase()}.jpg`;
 const hue = (name: string) => [...name].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 360, 7);
 const initialsOf = (name: string) =>
   name
@@ -120,7 +122,7 @@ function AboutPage() {
           })}
         </ol>
         <Link
-          to="/assessment"
+          to="/assessments"
           className="mt-4 flex h-12 items-center justify-center rounded-full bg-foreground text-[15px] font-semibold text-background"
         >
           Get started
@@ -155,7 +157,12 @@ function AboutPage() {
           {a.founders.map((f) => (
             <li key={f.name} className="rounded-[24px] bg-secondary p-4">
               <div className="flex items-center gap-3">
-                <Avatar text={initialsOf(f.name)} hue={hue(f.name)} size={52} />
+                <Avatar
+                  text={initialsOf(f.name)}
+                  hue={hue(f.name)}
+                  size={64}
+                  photo={photoOf(f.name)}
+                />
                 <div>
                   <p className="font-display text-[17px] font-semibold">{f.name}</p>
                   <p className="text-[13px] text-muted-foreground">{f.role}</p>
@@ -171,7 +178,12 @@ function AboutPage() {
               key={t.name}
               className="flex flex-col items-center rounded-[20px] border border-foreground/10 p-3 text-center"
             >
-              <Avatar text={initialsOf(t.name)} hue={hue(t.name)} size={44} />
+              <Avatar
+                text={initialsOf(t.name)}
+                hue={hue(t.name)}
+                size={56}
+                photo={photoOf(t.name)}
+              />
               <p className="mt-2 text-[13px] font-semibold leading-4">{t.name}</p>
               <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{t.role}</p>
             </li>

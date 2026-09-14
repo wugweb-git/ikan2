@@ -9,12 +9,19 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { getAssessment } from "@/lib/assessment/instruments";
 import { articles } from "@/lib/content";
-import { getResource, resources, useResourceStore } from "@/lib/resources";
+import {
+  getResource,
+  getResourceBySlug,
+  resources,
+  slugOf,
+  useResourceStore,
+} from "@/lib/resources";
 
-export const Route = createFileRoute("/resources/$id")({
+export const Route = createFileRoute("/resources/$slug")({
   loader: ({ params }) => {
-    if (!getResource(params.id) || !articles[params.id]) throw notFound();
-    return { id: params.id };
+    const r = getResourceBySlug(params.slug);
+    if (!r || !articles[r.id]) throw notFound();
+    return { id: r.id };
   },
   head: ({ loaderData }) => {
     const r = loaderData ? getResource(loaderData.id) : undefined;
@@ -105,7 +112,7 @@ function ArticlePage() {
 
           {assessment ? (
             <Link
-              to="/assessment/$slug"
+              to="/assessments/$slug"
               params={{ slug: assessment.slug }}
               className={cn(
                 "mt-10 flex items-center gap-4 rounded-[24px] bg-foreground p-5 text-background",
@@ -134,8 +141,8 @@ function ArticlePage() {
                 {more.map((m) => (
                   <li key={m.id}>
                     <Link
-                      to="/resources/$id"
-                      params={{ id: m.id }}
+                      to="/resources/$slug"
+                      params={{ slug: slugOf(m) }}
                       className={cn("flex items-center gap-3 rounded-[16px]", stateLayer)}
                     >
                       <span className="h-16 w-16 shrink-0 overflow-hidden rounded-[14px]">
@@ -145,7 +152,7 @@ function ArticlePage() {
                         <span className="block text-[12px] font-semibold text-muted-foreground">
                           {m.category}, {m.minutes} min read
                         </span>
-                        <span className="line-clamp-2 block text-[15px] font-semibold leading-5">
+                        <span className="line-clamp-2 text-[15px] font-semibold leading-5">
                           {m.title}
                         </span>
                       </span>

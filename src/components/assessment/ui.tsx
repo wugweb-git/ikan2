@@ -10,7 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Assessment, Tone } from "@/lib/assessment/instruments";
+import type { Assessment, Band, Severity, Tone } from "@/lib/assessment/instruments";
 import { formatValue, percentOfRange, type ScoreResult } from "@/lib/assessment/scoring";
 
 export const categoryIcon: Record<Assessment["category"], LucideIcon> = {
@@ -30,6 +30,60 @@ export const toneColors: Record<Tone, { fg: string; container: string; bar: stri
   error: { fg: "#9E2A2A", container: "#FBE2E0", bar: "#D2544F" },
 };
 
+/* Severity scale, as the old iKan app showed it (green, blue, yellow, orange, red), mapped onto
+ * this app's theme families so it sits with the rest of the UI: calm, mind, rest, an orange
+ * between rest and alert, then alert. Each step gets a bar colour, a soft container and a text
+ * shade that stays readable on that container. */
+export const severityColors: Record<Severity, { fg: string; container: string; bar: string }> = {
+  minimal: {
+    fg: "oklch(0.44 0.09 165)",
+    container: "oklch(0.95 0.035 165)",
+    bar: "oklch(0.68 0.12 165)",
+  },
+  mild: {
+    fg: "oklch(0.45 0.1 245)",
+    container: "oklch(0.95 0.03 245)",
+    bar: "oklch(0.68 0.11 245)",
+  },
+  moderate: {
+    fg: "oklch(0.47 0.1 75)",
+    container: "oklch(0.96 0.05 85)",
+    bar: "oklch(0.8 0.14 83)",
+  },
+  "moderately-severe": {
+    fg: "oklch(0.47 0.14 45)",
+    container: "oklch(0.95 0.04 50)",
+    bar: "oklch(0.72 0.15 50)",
+  },
+  severe: {
+    fg: "oklch(0.45 0.17 25)",
+    container: "oklch(0.95 0.035 25)",
+    bar: "oklch(0.6 0.19 25)",
+  },
+};
+
+/** Plain wording for each severity step, rewritten from the old app's catalog descriptions. */
+export const severityContent: Record<Severity, { label: string; description: string }> = {
+  minimal: { label: "Minimal", description: "Nothing of concern right now" },
+  mild: { label: "Mild", description: "A few signs worth keeping an eye on" },
+  moderate: { label: "Moderate", description: "Noticeable symptoms. Guided support can help" },
+  "moderately-severe": {
+    label: "Moderately severe",
+    description: "Significant symptoms. A guided program is recommended",
+  },
+  severe: { label: "Severe", description: "Serious symptoms. Please talk to a professional soon" },
+};
+
+/** Colours for a band: by its severity, as the old app showed them. */
+export const bandStyle = (band: Pick<Band, "severity"> | null | undefined): CSSProperties =>
+  band
+    ? ({
+        "--tone": severityColors[band.severity].fg,
+        "--tone-container": severityColors[band.severity].container,
+        "--tone-bar": severityColors[band.severity].bar,
+      } as CSSProperties)
+    : toneStyle(undefined);
+
 export const toneStyle = (tone: Tone | undefined): CSSProperties =>
   tone
     ? ({
@@ -46,15 +100,18 @@ export const toneStyle = (tone: Tone | undefined): CSSProperties =>
 export function BandChip({
   label,
   tone,
+  severity,
   className,
 }: {
   label: string;
   tone: Tone;
+  /** when given, the chip takes the severity colour instead of the tone */
+  severity?: Severity | undefined;
   className?: string;
 }) {
   return (
     <span
-      style={toneStyle(tone)}
+      style={severity ? bandStyle({ severity }) : toneStyle(tone)}
       className={cn(
         "inline-flex min-h-7 items-center rounded-[8px] bg-[var(--tone-container)] px-2.5 text-[13px] font-semibold leading-4 text-[var(--tone)]",
         className,
@@ -80,7 +137,7 @@ export function RangeBar({ result, large }: { result: ScoreResult; large?: boole
               className="h-full rounded-full"
               style={{
                 width: `${((band.max - band.min) / span) * 100}%`,
-                background: toneColors[band.tone].bar,
+                background: severityColors[band.severity].bar,
                 opacity: on ? 1 : 0.22,
               }}
             />

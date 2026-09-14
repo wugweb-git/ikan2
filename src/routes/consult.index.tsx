@@ -1,5 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   BadgeCheck,
   CalendarClock,
@@ -31,7 +30,21 @@ import {
   type Consultant,
 } from "@/lib/consultants";
 
+const roles = ["All", "Therapist", "Psychiatrist", "Counselor", "Family Therapist"] as const;
+const when = ["Any time", "Today", "Tomorrow", "This week"] as const;
+const param = (v: string) => v.toLowerCase().replace(/\s+/g, "-");
+
+/* Filters live in the URL: /consult?role=therapist&when=today */
 export const Route = createFileRoute("/consult/")({
+  validateSearch: (s: Record<string, unknown>): { role?: string; when?: string } => ({
+    ...(typeof s["role"] === "string" && roles.some((r) => r !== "All" && param(r) === s["role"])
+      ? { role: s["role"] }
+      : {}),
+    ...(typeof s["when"] === "string" &&
+    when.some((w) => w !== "Any time" && param(w) === s["when"])
+      ? { when: s["when"] }
+      : {}),
+  }),
   head: () =>
     pageMeta(
       "Find your consultant",
@@ -40,15 +53,26 @@ export const Route = createFileRoute("/consult/")({
   component: ConsultPage,
 });
 
-const roles = ["All", "Therapist", "Psychiatrist", "Counselor", "Family Therapist"] as const;
-const when = ["Any time", "Today", "Tomorrow", "This week"] as const;
-
 function ConsultPage() {
   const hydrated = useHydrated();
   const { results } = useAssessmentStore();
   const { bookings } = useBookings();
-  const [role, setRole] = useState<(typeof roles)[number]>("All");
-  const [time, setTime] = useState<(typeof when)[number]>("Any time");
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  const role = roles.find((r) => param(r) === search.role) ?? "All";
+  const time = when.find((w) => param(w) === search.when) ?? "Any time";
+  const setFilters = (next: { role?: string; when?: string }) =>
+    navigate({ to: "/consult", search: next, replace: true, resetScroll: false });
+  const setRole = (r: (typeof roles)[number]) =>
+    setFilters({
+      ...(r === "All" ? {} : { role: param(r) }),
+      ...(search.when ? { when: search.when } : {}),
+    });
+  const setTime = (w: (typeof when)[number]) =>
+    setFilters({
+      ...(search.role ? { role: search.role } : {}),
+      ...(w === "Any time" ? {} : { when: param(w) }),
+    });
 
   const latest = hydrated
     ? [...results].sort((a, b) => b.completedAt.localeCompare(a.completedAt))[0]
@@ -94,7 +118,12 @@ function ConsultPage() {
               stateLayer,
             )}
           >
-            <Avatar text={initials(upcomingWith.name)} hue={upcomingWith.hue} size={48} />
+            <Avatar
+              text={initials(upcomingWith.name)}
+              hue={upcomingWith.hue}
+              size={48}
+              photo={upcomingWith.photo}
+            />
             <span className="min-w-0 flex-1">
               <span className="block text-[12px] opacity-75">Upcoming session</span>
               <span className="block truncate font-display text-[16px] font-semibold">
@@ -126,7 +155,7 @@ function ConsultPage() {
           </div>
         ) : (
           <Link
-            to="/assessment"
+            to="/assessments"
             className={cn(
               "mx-4 mt-4 flex items-center gap-3 rounded-[20px] bg-secondary p-4",
               stateLayer,
@@ -224,7 +253,7 @@ function ConsultantCard({ c, recommended }: { c: Consultant; recommended: boolea
       )}
     >
       <div className="flex gap-3">
-        <Avatar text={initials(c.name)} hue={c.hue} size={64} />
+        <Avatar text={initials(c.name)} hue={c.hue} size={64} photo={c.photo} />
         <div className="min-w-0 flex-1">
           {recommended ? (
             <span className="mb-1 inline-flex h-6 items-center gap-1 rounded-full bg-[var(--accent-container)] px-2 text-[12px] font-semibold text-[var(--on-accent-container)]">

@@ -31,7 +31,7 @@ export type Notice = {
     | { to: "/settings" }
     | { to: "/consult/$id"; params: { id: string } }
     | { to: "/wellness" }
-    | { to: "/assessment/$slug"; params: { slug: string } }
+    | { to: "/assessments/$slug"; params: { slug: string } }
     | { to: "/program/$slug"; params: { slug: string } };
 };
 
@@ -95,7 +95,7 @@ export function useNotifications() {
         body: "It’s been two weeks. Retaking shows how things have changed.",
         at: new Date(due).toISOString(),
         icon: "assessment",
-        link: { to: "/assessment/$slug", params: { slug: a.slug } },
+        link: { to: "/assessments/$slug", params: { slug: a.slug } },
       });
     }
   }

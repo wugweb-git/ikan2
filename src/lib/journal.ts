@@ -89,6 +89,14 @@ export type Draft = Omit<JournalEntry, "id" | "date" | "createdAt">;
 
 const store = createLocalStore<{ entries: JournalEntry[] }>("ikan.journal.v1", { entries: [] });
 
+/** Add entries that aren't here yet (matched by id); used by the import from the old iKan app. */
+export const mergeJournalEntries = (incoming: JournalEntry[]) =>
+  store.update((s) => {
+    const have = new Set(s.entries.map((e) => e.id));
+    const fresh = incoming.filter((e) => !have.has(e.id));
+    return fresh.length ? { entries: [...s.entries, ...fresh] } : s;
+  });
+
 export const dayKey = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 

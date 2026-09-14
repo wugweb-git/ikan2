@@ -4,13 +4,15 @@ import { getScope, refreshStores, setWriteHook } from "@/lib/storage-scope";
 /* Saves each account's app data to ikan2's Lovable Cloud database (public.user_state), one row per
  * store. The device copy stays the working copy: screens read and write localStorage as before,
  * every save is pushed a moment later, and on sign-in the account's rows are pulled and merged in.
+ * Rows are read and written with the signed-in user's token; row level security keeps each
+ * account to its own rows.
  *
- * Connection settings come from VITE_IKAN2_DB_URL and VITE_IKAN2_DB_KEY (the Lovable Cloud
- * project URL and its publishable key). Until they are set, saving stays on the device. */
+ * Connection settings come from VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY (the same
+ * Lovable Cloud project that handles sign-in). Until they are set, saving stays on the device. */
 
 const DB_URL =
-  (import.meta.env["VITE_IKAN2_DB_URL"] as string | undefined)?.replace(/\/$/, "") ?? "";
-const DB_KEY = (import.meta.env["VITE_IKAN2_DB_KEY"] as string | undefined) ?? "";
+  (import.meta.env["VITE_SUPABASE_URL"] as string | undefined)?.replace(/\/$/, "") ?? "";
+const DB_KEY = (import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as string | undefined) ?? "";
 export const cloudConfigured = Boolean(DB_URL && DB_KEY);
 
 /** Store names as saved in the database (the part after `ikan.u.<userId>.`). */
@@ -76,15 +78,20 @@ const readLocal = (uid: string, name: string): unknown => {
   }
 };
 
-async function rpc<T>(fn: string, body: Record<string, unknown>): Promise<T> {
-  const res = await fetch(`${DB_URL}/rest/v1/rpc/${fn}`, {
-    method: "POST",
+async function rest<T>(
+  path: string,
+  token: string,
+  init: { method?: string; body?: unknown; prefer?: string } = {},
+): Promise<T> {
+  const res = await fetch(`${DB_URL}/rest/v1/${path}`, {
+    method: init.method ?? "GET",
     headers: {
       apikey: DB_KEY,
-      Authorization: `Bearer ${DB_KEY}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
+      ...(init.prefer ? { Prefer: init.prefer } : {}),
     },
-    body: JSON.stringify(body),
+    ...(init.body !== undefined ? { body: JSON.stringify(init.body) } : {}),
   });
   if (!res.ok) {
     let message = `Saving failed (${res.status})`;
@@ -204,9 +211,9 @@ async function pull() {
   if (!token) return;
   setStatus({ state: "syncing" });
   try {
-    const rows = await rpc<{ key: string; value: unknown; updated_at: string }[]>(
-      "ikan_state_pull",
-      { token },
+    const rows = await rest<{ key: string; value: unknown; updated_at: string }[]>(
+      `user_state?select=key,value,updated_at&user_id=eq.${s.uid}`,
+      token,
     );
     if (session?.uid !== s.uid || getScope() !== s.uid) return;
     const meta = readMeta(s.uid);
@@ -266,7 +273,12 @@ async function push() {
     const items = dirty
       .map((key) => ({ key, value: readLocal(s.uid, key), updated_at: meta[key]!.changed }))
       .filter((i) => i.value !== undefined);
-    if (items.length) await rpc<number>("ikan_state_push", { token, items });
+    if (items.length)
+      await rest("user_state?on_conflict=user_id,key", token, {
+        method: "POST",
+        prefer: "resolution=merge-duplicates,return=minimal",
+        body: items.map((i) => ({ user_id: s.uid, ...i })),
+      });
     const after = readMeta(s.uid);
     for (const i of items)
       if (after[i.key]?.changed === i.updated_at)
@@ -293,7 +305,7 @@ export async function clearCloudData() {
   if (!s || !cloudConfigured) return;
   const token = await s.token();
   if (!token) return;
-  await rpc("ikan_state_clear", { token });
+  await rest(`user_state?user_id=eq.${s.uid}`, token, { method: "DELETE" });
   try {
     localStorage.removeItem(metaKey(s.uid));
   } catch {
