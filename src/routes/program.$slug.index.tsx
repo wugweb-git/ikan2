@@ -92,7 +92,9 @@ function ProgrammePage() {
       const flag = sessionStorage.getItem("ikan.equip.finished");
       if (flag?.startsWith(`${slug}:`)) {
         sessionStorage.removeItem("ikan.equip.finished");
-        snack.show(`Day ${flag.split(":")[1]} complete`);
+        snack.show(
+          flag.split(":")[1] === "0" ? "Onboarding complete" : `Day ${flag.split(":")[1]} complete`,
+        );
       }
     } catch {
       /* storage unavailable */
@@ -208,7 +210,7 @@ function ProgrammePage() {
                 <p className="text-[13px] font-medium">About {minutesOf(today)} min</p>
               </div>
               <p className="mt-1 font-display text-[26px] font-semibold leading-8 tabular-nums">
-                Day {today.day}
+                {today.day === 0 ? "Onboarding" : `Day ${today.day}`}
               </p>
               <p className="font-display text-[18px] font-semibold leading-6">{today.title}</p>
               <AddToCalendar
@@ -267,7 +269,7 @@ function ProgrammePage() {
               const range =
                 days.length === 1
                   ? days[0] === 0
-                    ? "Intro"
+                    ? "Onboarding"
                     : `Day ${days[0]}`
                   : `Days ${days[0] === 0 ? 1 : days[0]}–${days.at(-1)}`;
               return (
@@ -436,7 +438,7 @@ function DayGrid({
                 <Link
                   to="/program/$slug/day/$day"
                   params={{ slug: programme.slug, day: String(d.day) }}
-                  aria-label={`${d.day === 0 ? "Intro" : `Day ${d.day}`}: ${d.title}${done ? ", done" : ", up next"}`}
+                  aria-label={`${d.day === 0 ? "Onboarding" : `Day ${d.day}`}: ${d.title}${done ? ", done" : ", up next"}`}
                   className="block rounded-full focus-visible:outline-2"
                 >
                   {cell}
@@ -480,7 +482,7 @@ function Tools({ programme, reached }: { programme: Programme; reached: number }
                 <p className="flex min-h-14 items-center gap-4 px-4 text-muted-foreground">
                   <Lock className="h-5 w-5" />
                   <span className="flex-1 text-[16px]">{t.title}</span>
-                  <span className="text-[13px]">Day {t.day}</span>
+                  <span className="text-[13px]">{t.day === 0 ? "Onboarding" : `Day ${t.day}`}</span>
                 </p>
               )}
             </li>

@@ -857,6 +857,10 @@ html.reduce-motion *::after {
   outline: 2px solid var(--foreground);
   outline-offset: 2px;
 }
+/* text fields show focus with their own underline */
+:is(input, textarea, select):focus-visible {
+  outline: none;
+}
 
 /* Article and legal text copied from ikanhealth.in, rendered as plain HTML */
 .prose-ikan {

@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 /* Material 3 building blocks for the Equip screens, in iKAN's monochrome palette.
  * Sizes follow M3: 64dp app bars, 48dp touch targets, 56dp list rows, 28dp sheet corners. */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { Check } from "lucide-react";
+import { Brain, Check, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBackToClose } from "@/hooks/use-back-close";
 
@@ -238,6 +238,8 @@ export function Label({ text }: { text: string }) {
 }
 
 /** M3 segmented button, e.g. ✅Yes / ❌No. */
+const optionIcons: Record<string, typeof Brain> = { thought: Brain, feeling: Heart };
+
 export function Segmented({
   options,
   value,
@@ -253,10 +255,12 @@ export function Segmented({
     <div
       role="radiogroup"
       aria-label={label}
-      className="flex h-12 w-full overflow-hidden rounded-full border border-foreground/25"
+      className="grid gap-2"
+      style={{ gridTemplateColumns: `repeat(${Math.min(options.length, 5)}, minmax(0, 1fr))` }}
     >
-      {options.map((o, i) => {
+      {options.map((o) => {
         const on = value === o;
+        const Icon = optionIcons[o.trim().toLowerCase()];
         return (
           <button
             key={o}
@@ -265,13 +269,18 @@ export function Segmented({
             aria-checked={on}
             onClick={() => onChange(o)}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 px-3 text-[14px] font-semibold transition-colors",
+              "flex min-h-12 items-center justify-center gap-2 rounded-[14px] border px-3 py-2 text-[15px] font-semibold transition-colors",
               stateLayer,
-              i > 0 && "border-l border-foreground/25",
-              on && "bg-[var(--accent-container)] text-[var(--on-accent-container)]",
+              on
+                ? "border-transparent bg-[var(--accent-strong)] text-background"
+                : "border-foreground/10 bg-background",
             )}
           >
-            {on ? <Check className="h-4 w-4" strokeWidth={3} /> : null}
+            {on ? (
+              <Check className="h-4 w-4 shrink-0" strokeWidth={3} />
+            ) : Icon ? (
+              <Icon className="h-4 w-4 shrink-0 text-[var(--accent-strong)]" />
+            ) : null}
             <Label text={o} />
           </button>
         );

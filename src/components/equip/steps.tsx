@@ -1,5 +1,14 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { ArrowLeft, BookOpen, Check, CircleCheckBig, PencilLine } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpen,
+  Check,
+  CircleCheckBig,
+  Clock3,
+  Minus,
+  PencilLine,
+  Plus,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDuration, formatTime, nightMetrics, type DiaryEntry } from "@/lib/equip/metrics";
 import { visibleBody, type NBlock } from "@/lib/equip/notion";
@@ -7,6 +16,7 @@ import { useProgramme } from "@/lib/equip/store";
 import type { Step, UI } from "@/lib/equip/types";
 import { Button, IconButton, Pager, Segmented, SelectRow, TextField, stateLayer } from "./m3";
 import { EntriesStep, ReviewStep, TrackerStep } from "./cards";
+import { DayCheckIn } from "./day-check-in";
 
 export type StepCtx = {
   slug: string;
@@ -50,7 +60,8 @@ export function Footer({
 }
 
 const nextLabel = (ctx: StepCtx) =>
-  ctx.finishLabel ?? (ctx.isLast ? `Finish day ${ctx.day}` : "Next");
+  ctx.finishLabel ??
+  (ctx.isLast ? (ctx.day === 0 ? "Finish onboarding" : `Finish day ${ctx.day}`) : "Next");
 
 /** Block title (Notion) and its body text. With no prompt, the title is the headline. */
 function BlockText({
@@ -472,19 +483,13 @@ function ConcludeStep({
           ))}
         </div>
       </div>
-      {view.prompt ? (
-        <div className="mt-8">
-          <p className="mb-2 text-[16px] font-semibold">{view.prompt}</p>
-          <TextField
-            label=""
-            ariaLabel={view.prompt}
-            value={value}
-            onChange={(v) => setAnswer(key, v)}
-            multiline
-            maxLength={2000}
-          />
-        </div>
-      ) : null}
+      <DayCheckIn
+        slug={ctx.slug}
+        day={ctx.day}
+        prompt={view.prompt}
+        text={value}
+        onText={(v) => setAnswer(key, v)}
+      />
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
     </>
   );
@@ -635,6 +640,14 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
     .filter(([d]) => Number(d) < ctx.day)
     .sort((a, b) => Number(b[0]) - Number(a[0]))[0]?.[1];
   const [entry, setEntry] = useState<DiaryEntry>(() => saved ?? {});
+  /** earlier nights' answers for one question, newest first, without repeats */
+  const recentValues = (key: keyof DiaryEntry) =>
+    Object.entries(state.diary)
+      .filter(([d]) => Number(d) < ctx.day)
+      .sort((a, b) => Number(b[0]) - Number(a[0]))
+      .map(([, e]) => e[key])
+      .filter((v, i, all) => v !== undefined && v !== "" && all.indexOf(v) === i)
+      .slice(0, 3);
   const [q, setQ] = useState(0);
   const questions = diaryKinds.map((k, i) => ({
     ...k,
@@ -693,7 +706,13 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
         <Footer
           onBack={() => setQ(questions.length - 1)}
           onNext={ctx.onNext}
-          label={ctx.isLast ? `Finish day ${ctx.day}` : "Save diary"}
+          label={
+            ctx.isLast
+              ? ctx.day === 0
+                ? "Finish onboarding"
+                : `Finish day ${ctx.day}`
+              : "Save diary"
+          }
         />
       </>
     );
@@ -720,46 +739,31 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
       >
         {question.label}
       </h2>
-      <div className="mt-8">
+      <div className="mt-6">
         {question.kind === "time" ? (
-          <>
-            <label className="block rounded-[16px] bg-secondary px-5 py-4">
-              <span className="text-[12px] text-muted-foreground">Time</span>
-              <input
-                type="time"
-                aria-label={question.label}
-                value={(entry[question.key] as string | undefined) ?? ""}
-                onChange={(e) => set({ [question.key]: e.target.value })}
-                className="block w-full bg-transparent font-display text-[40px] font-semibold tabular-nums outline-none"
-              />
-            </label>
-            {!entry[question.key] && previous?.[question.key] ? (
-              <div className="mt-3">
-                <Button
-                  variant="tonal"
-                  onClick={() => set({ [question.key]: previous[question.key] })}
-                >
-                  Same as last time, {formatTime(previous[question.key] as string)}
-                </Button>
-              </div>
-            ) : null}
-          </>
+          <TimeAnswer
+            label={question.label}
+            value={entry[question.key] as string | undefined}
+            recent={recentValues(question.key) as string[]}
+            onChange={(v) => set({ [question.key]: v })}
+          />
         ) : null}
         {question.kind === "minutes" || question.kind === "count" ? (
-          <Counter
+          <AmountAnswer
             unit={question.kind === "minutes" ? "minutes" : "times"}
             step={question.kind === "minutes" ? 5 : 1}
             max={question.kind === "minutes" ? 720 : 30}
+            quick={question.kind === "minutes" ? [5, 10, 15, 20, 30, 45, 60] : [0, 1, 2, 3, 4, 5]}
+            last={previous?.[question.key] as number | undefined}
             value={entry[question.key] as number | undefined}
             onChange={(v) => set({ [question.key]: v })}
           />
         ) : null}
         {question.kind === "rating" ? (
-          <Segmented
-            label={question.label}
-            options={["1", "2", "3", "4", "5"]}
-            value={entry.quality?.toString()}
-            onChange={(v) => set({ quality: Number(v) })}
+          <QualityAnswer
+            value={entry.quality}
+            last={previous?.quality}
+            onChange={(v) => set({ quality: v })}
           />
         ) : null}
       </div>
@@ -780,42 +784,174 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
   );
 }
 
-function Counter({
+const chip = (on: boolean) =>
+  cn(
+    "inline-flex h-10 items-center justify-center rounded-full px-4 text-[14px] font-semibold tabular-nums transition-colors",
+    stateLayer,
+    on ? "bg-foreground text-background" : "bg-secondary",
+  );
+
+function TimeAnswer({
+  label,
+  value,
+  recent,
+  onChange,
+}: {
+  label: string;
+  value: string | undefined;
+  recent: string[];
+  onChange: (v: string) => void;
+}) {
+  return (
+    <>
+      <label className="flex items-center gap-4 rounded-[24px] bg-[var(--accent-container)] px-5 py-5 text-[var(--on-accent-container)]">
+        <Clock3 className="h-7 w-7 shrink-0" aria-hidden="true" />
+        <input
+          type="time"
+          aria-label={label}
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          className="min-w-0 flex-1 bg-transparent font-display text-[40px] font-semibold tabular-nums outline-none"
+        />
+      </label>
+      {recent.length ? (
+        <>
+          <p className="mt-4 text-[13px] text-muted-foreground">From your earlier nights</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {recent.map((t, i) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => onChange(t)}
+                className={chip(value === t)}
+              >
+                {i === 0 ? "Last time, " : ""}
+                {formatTime(t)}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : null}
+    </>
+  );
+}
+
+function AmountAnswer({
   value,
   onChange,
   unit,
   step,
   max,
+  quick,
+  last,
 }: {
   value: number | undefined;
   onChange: (v: number) => void;
   unit: string;
   step: number;
   max: number;
+  quick: number[];
+  last: number | undefined;
 }) {
   const v = value ?? 0;
+  const short = unit === "minutes" ? "min" : unit;
   return (
-    <div className="flex items-center justify-between rounded-[16px] bg-secondary p-3">
-      <Button
-        variant="tonal"
-        className="h-14 w-14 px-0 text-2xl"
-        onClick={() => onChange(Math.max(0, v - step))}
-      >
-        <span aria-label={`Fewer ${unit}`}>−</span>
-      </Button>
-      <p className="text-center" aria-live="polite">
-        <span className="font-display text-[40px] font-semibold tabular-nums">{v}</span>
-        <span className="ml-2 text-[15px] text-muted-foreground">{unit}</span>
-      </p>
-      <Button
-        variant="tonal"
-        className="h-14 w-14 px-0 text-2xl"
-        onClick={() => onChange(Math.min(max, v + step))}
-        disabled={v >= max}
-      >
-        <span aria-label={`More ${unit}`}>+</span>
-      </Button>
-    </div>
+    <>
+      <div className="flex items-center justify-between rounded-[24px] bg-[var(--accent-container)] p-3 text-[var(--on-accent-container)]">
+        <IconButton
+          label={`Fewer ${unit}`}
+          className="h-14 w-14 bg-background/70"
+          onClick={() => onChange(Math.max(0, v - step))}
+        >
+          <Minus className="h-6 w-6" />
+        </IconButton>
+        <p className="text-center" aria-live="polite">
+          <span className="font-display text-[44px] font-semibold tabular-nums">{v}</span>
+          <span className="ml-2 text-[15px]">{unit}</span>
+        </p>
+        <IconButton
+          label={`More ${unit}`}
+          className="h-14 w-14 bg-background/70"
+          onClick={() => onChange(Math.min(max, v + step))}
+        >
+          <Plus className="h-6 w-6" />
+        </IconButton>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {quick.map((n) => (
+          <button key={n} type="button" onClick={() => onChange(n)} className={chip(value === n)}>
+            {n === quick[quick.length - 1] && unit === "times" ? `${n}+` : n}{" "}
+            {unit === "minutes" ? short : ""}
+          </button>
+        ))}
+      </div>
+      {last !== undefined ? (
+        <button
+          type="button"
+          onClick={() => onChange(last)}
+          className="mt-3 text-[14px] font-semibold text-[var(--accent-strong)] underline-offset-4 hover:underline"
+        >
+          Same as last time: {last} {short}
+        </button>
+      ) : null}
+    </>
+  );
+}
+
+const qualityScale = [
+  { label: "Very poor", emoji: "😩", tone: "#E8594A" },
+  { label: "Poor", emoji: "😴", tone: "#F08A4B" },
+  { label: "Okay", emoji: "😐", tone: "#E8B53A" },
+  { label: "Good", emoji: "🙂", tone: "#6DB36F" },
+  { label: "Great", emoji: "🌟", tone: "#3F9D7A" },
+];
+
+function QualityAnswer({
+  value,
+  last,
+  onChange,
+}: {
+  value: number | undefined;
+  last: number | undefined;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <>
+      <div role="radiogroup" aria-label="Sleep quality" className="space-y-2">
+        {[...qualityScale].reverse().map((q) => {
+          const n = qualityScale.indexOf(q) + 1;
+          const on = value === n;
+          return (
+            <button
+              key={q.label}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              onClick={() => onChange(n)}
+              className={cn(
+                "flex min-h-14 w-full items-center gap-3 rounded-[18px] px-4 text-left transition-colors",
+                stateLayer,
+                on ? "text-foreground" : "bg-secondary",
+              )}
+              style={
+                on
+                  ? { background: `${q.tone}26`, boxShadow: `inset 0 0 0 2px ${q.tone}` }
+                  : undefined
+              }
+            >
+              <span className="text-[24px] leading-none" aria-hidden="true">
+                {q.emoji}
+              </span>
+              <span className="flex-1 text-[16px] font-semibold">{q.label}</span>
+              <span className="text-[13px] tabular-nums text-muted-foreground">
+                {last === n ? "Last night · " : ""}
+                {n} of 5
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </>
   );
 }
 

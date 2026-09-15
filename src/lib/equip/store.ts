@@ -8,7 +8,13 @@ import { onScopeChange, reportWrite, scopedKey } from "@/lib/storage-scope";
 
 export type Entry = { id: string; day: number; createdAt: string; values: EntryValues };
 
-export type SessionFeedback = { helpful?: number; feel?: number; note?: string; at: string };
+export type SessionFeedback = {
+  helpful?: number;
+  feel?: number;
+  tags?: string[];
+  note?: string;
+  at: string;
+};
 
 /** A finished run, kept whole so history, results and diaries can show it after the programme
  * goes back to its default state. */

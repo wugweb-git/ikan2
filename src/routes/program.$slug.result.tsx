@@ -312,7 +312,7 @@ function ResultPage() {
                     }
                   : null,
                 ...sum.mostHelpful.map((d) => ({
-                  label: `Day ${d.day}: ${d.title}`,
+                  label: d.day === 0 ? "Onboarding" : `Day ${d.day}: ${d.title}`,
                   value: `${d.rating} / 5`,
                   note: "one of your most helpful days",
                 })),

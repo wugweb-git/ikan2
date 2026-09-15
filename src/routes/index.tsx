@@ -1177,7 +1177,8 @@ function CurrentProgram({ data, hydrated }: { data: Data; hydrated: boolean }) {
                 {cur.p.name}
               </h2>
               <p className="mt-1 text-[13px] opacity-75">
-                Day {cur.next} · {cur.day!.title} · {done} of {cur.p.days.length} days done
+                {cur.next === 0 ? "Onboarding" : `Day ${cur.next} · ${cur.day!.title}`} · {done} of{" "}
+                {cur.p.days.length} days done
               </p>
             </div>
             <div

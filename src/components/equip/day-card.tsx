@@ -31,7 +31,7 @@ export function DayCard({
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] font-semibold">
-            Day {day} · {title}
+            {day === 0 ? "Onboarding" : `Day ${day} · ${title}`}
           </span>
           <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px] text-muted-foreground">
             {at ? <DateText>{shortDate(at)}</DateText> : <span>Completed</span>}

@@ -1,8 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useActiveTime, formatSeconds } from "@/hooks/use-active-time";
-import { moodScale } from "@/lib/journal";
-import { cn } from "@/lib/utils";
+import { useActiveTime } from "@/hooks/use-active-time";
+import { DayCheckIn } from "@/components/equip/day-check-in";
 import { LifeBuoy, Lock, X } from "lucide-react";
 import {
   accentStyle,
@@ -29,7 +28,12 @@ export const Route = createFileRoute("/program/$slug/day/$day")({
     const d = p && loaderData ? getDay(p, loaderData.day) : undefined;
     return {
       meta: [
-        { title: p && d ? `Day ${d.day}: ${d.title} — ${p.name} — iKAN` : "Day — iKAN" },
+        {
+          title:
+            p && d
+              ? `${d.day === 0 ? "Onboarding" : `Day ${d.day}: ${d.title}`} — ${p.name} — iKAN`
+              : "Day — iKAN",
+        },
         { name: "robots", content: "noindex" },
       ],
     };
@@ -60,7 +64,7 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
   const programme = getProgramme(slug)!;
   const day = getDay(programme, dayNumber)!;
   const navigate = useNavigate();
-  const { state, nextDay, complete, addTime, saveFeedback } = useProgramme(slug);
+  const { state, nextDay, complete, addTime } = useProgramme(slug);
   const [index, setIndex] = useState(0);
   const [asking, setAsking] = useState(false);
 
@@ -133,7 +137,7 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
                 <X className="h-6 w-6" />
               </IconButton>
             }
-            title={`Day ${day.day}`}
+            title={day.day === 0 ? "Onboarding" : `Day ${day.day}`}
             subtitle={day.title}
             trailing={
               <Link
@@ -157,13 +161,14 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
 
         <main className="px-4 pb-36 pt-4">
           {asking ? (
-            <SessionCheck
-              seconds={state.time?.[String(day.day)]?.total ?? 0}
-              onDone={(fb) => {
-                if (fb) saveFeedback(day.day, fb);
-                finish();
-              }}
-            />
+            <div className="animate-fade">
+              <DayCheckIn slug={slug} day={day.day} />
+              <div className="mt-6">
+                <Button className="h-14 w-full text-[16px]" onClick={finish}>
+                  Finish day {day.day}
+                </Button>
+              </div>
+            </div>
           ) : (
             <div key={step.id} className="animate-fade">
               <StepView
@@ -176,8 +181,12 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
                   onBack: index > 0 ? () => go(index - 1) : undefined,
                   onNext: () => {
                     if (index + 1 < day.steps.length) return go(index + 1);
-                    // ask how the session went, once per day
-                    if (!state.feedback?.[String(day.day)]) {
+                    // days that end with a conclusion ask there; others get the same check-in
+                    if (
+                      step.view.ui !== "conclude" &&
+                      day.day > 0 &&
+                      !state.feedback?.[String(day.day)]
+                    ) {
                       setAsking(true);
                       window.scrollTo({ top: 0 });
                       return;
@@ -189,116 +198,6 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
             </div>
           )}
         </main>
-      </div>
-    </div>
-  );
-}
-
-const helpfulScale = ["Not at all", "A little", "Somewhat", "Very", "Extremely"];
-
-/** End of a day: how helpful the session was and how the person feels now. Both optional. */
-function SessionCheck({
-  seconds,
-  onDone,
-}: {
-  seconds: number;
-  onDone: (fb: { helpful?: number; feel?: number; note?: string } | null) => void;
-}) {
-  const [helpful, setHelpful] = useState<number>();
-  const [feel, setFeel] = useState<number>();
-  const [note, setNote] = useState("");
-  return (
-    <div className="animate-fade">
-      <p className="text-[14px] font-semibold text-[var(--accent-strong)]">Before you go</p>
-      <h1 className="mt-1 font-display text-[26px] font-semibold leading-8">How was today?</h1>
-      {seconds >= 30 ? (
-        <p className="mt-1 text-[14px] text-muted-foreground">
-          You spent {formatSeconds(seconds)} on today’s session.
-        </p>
-      ) : null}
-
-      <section className="mt-6">
-        <h2 className="text-[16px] font-semibold">How helpful was this session?</h2>
-        <div className="mt-3 grid grid-cols-5 gap-2" role="radiogroup">
-          {helpfulScale.map((label, i) => {
-            const v = i + 1;
-            const on = helpful === v;
-            return (
-              <button
-                key={label}
-                type="button"
-                role="radio"
-                aria-checked={on}
-                onClick={() => setHelpful(v)}
-                className={cn(
-                  "flex h-[72px] flex-col items-center justify-center gap-1 rounded-[16px] text-center",
-                  stateLayer,
-                  on ? "bg-foreground text-background" : "bg-secondary",
-                )}
-              >
-                <span className="font-display text-[20px] font-semibold leading-6">{v}</span>
-                <span className="px-1 text-[10px] leading-3">{label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="mt-6">
-        <h2 className="text-[16px] font-semibold">How do you feel now?</h2>
-        <div className="mt-3 grid grid-cols-5 gap-2" role="radiogroup">
-          {moodScale.map((m) => {
-            const on = feel === m.value;
-            return (
-              <button
-                key={m.value}
-                type="button"
-                role="radio"
-                aria-checked={on}
-                aria-label={m.label}
-                onClick={() => setFeel(m.value)}
-                className={cn(
-                  "flex h-[72px] flex-col items-center justify-center gap-1 rounded-[16px]",
-                  stateLayer,
-                  on ? "bg-[var(--accent-container)] ring-2 ring-[var(--accent)]" : "bg-secondary",
-                )}
-              >
-                <span className="text-[26px] leading-none" aria-hidden="true">
-                  {m.emoji}
-                </span>
-                <span className="text-[10px]">{m.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <div className="mt-6">
-        <TextField
-          label="Anything you’d like to add? (optional)"
-          value={note}
-          onChange={setNote}
-          multiline
-          maxLength={500}
-        />
-      </div>
-
-      <div className="mt-8 flex flex-col gap-2">
-        <Button
-          onClick={() =>
-            onDone({
-              ...(helpful ? { helpful } : {}),
-              ...(feel ? { feel } : {}),
-              ...(note.trim() ? { note: note.trim() } : {}),
-            })
-          }
-          disabled={!helpful && !feel && !note.trim()}
-        >
-          Finish day
-        </Button>
-        <Button variant="text" onClick={() => onDone(null)}>
-          Skip
-        </Button>
       </div>
     </div>
   );

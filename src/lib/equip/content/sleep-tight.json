@@ -637,7 +637,7 @@
             },
             {
               "n": 4,
-              "title": "Small Task!",
+              "title": "Thought or feeling?",
               "type": "lesson",
               "minutes": 5,
               "body": [
@@ -650,7 +650,7 @@
             },
             {
               "n": 5,
-              "title": "Small Task!",
+              "title": "Thought or feeling?",
               "type": "exercise",
               "interaction": "comparison-matrix",
               "key": "sleep_small_task",
@@ -665,7 +665,7 @@
             },
             {
               "n": 6,
-              "title": "Small Task!",
+              "title": "Thought or feeling?",
               "type": "exercise",
               "interaction": "comparison-matrix",
               "minutes": 5,
@@ -679,7 +679,7 @@
             },
             {
               "n": 7,
-              "title": "Small Task!",
+              "title": "Thought or feeling?",
               "type": "exercise",
               "interaction": "comparison-matrix",
               "minutes": 5,
@@ -697,7 +697,7 @@
             },
             {
               "n": 8,
-              "title": "Small Task!",
+              "title": "Thought or feeling?",
               "type": "exercise",
               "interaction": "comparison-matrix",
               "minutes": 5,
@@ -715,7 +715,7 @@
             },
             {
               "n": 9,
-              "title": "Small Task!",
+              "title": "Thought or feeling?",
               "type": "exercise",
               "interaction": "comparison-matrix",
               "minutes": 5,

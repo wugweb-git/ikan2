@@ -103,7 +103,7 @@ function JournalPage() {
                 .reverse()
                 .map(({ day, m }) => (
                   <li key={day} className="flex min-h-14 items-center justify-between px-4">
-                    <span className="text-[16px]">Day {day}</span>
+                    <span className="text-[16px]">{day === 0 ? "Onboarding" : `Day ${day}`}</span>
                     <span className="text-[14px] tabular-nums text-muted-foreground">
                       {formatDuration(m!.asleep)} asleep, {m!.efficiency}%
                     </span>
