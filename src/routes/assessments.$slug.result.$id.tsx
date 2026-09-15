@@ -1,5 +1,14 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { History, LifeBuoy, LoaderCircle, TrendingDown, TrendingUp, X } from "lucide-react";
+import {
+  Clock3,
+  History,
+  LifeBuoy,
+  ListChecks,
+  LoaderCircle,
+  TrendingDown,
+  TrendingUp,
+  X,
+} from "lucide-react";
 import { DateText } from "@/components/date-text";
 import { IkanShell } from "@/components/ikan-shell";
 import { BrandTitle, PrintHeader, ShareButton } from "@/components/result-share";
@@ -215,9 +224,15 @@ function ResultBody({
         </p>
         <h1 className="mt-1 font-display text-[26px] font-semibold leading-8">{a.title}</h1>
         <p className="mt-1 flex flex-wrap gap-x-3 text-[14px] text-muted-foreground">
-          <span>{a.questions.length} questions</span>
+          <span className="inline-flex items-center gap-1">
+            <ListChecks className="h-4 w-4" aria-hidden="true" /> {a.questions.length} questions
+          </span>
           {a.scores.length > 1 ? <span>{a.scores.length} scores</span> : null}
-          {time ? <span>{time}</span> : null}
+          {time ? (
+            <span className="inline-flex items-center gap-1">
+              <Clock3 className="h-4 w-4" aria-hidden="true" /> {time}
+            </span>
+          ) : null}
         </p>
       </header>
 

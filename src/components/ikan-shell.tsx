@@ -20,6 +20,7 @@ import {
   NotebookPen,
   Settings,
   Sparkles,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
@@ -134,6 +135,7 @@ type Row = { label: string; sub: string; icon: LucideIcon } & {
     | "/resources"
     | "/consult"
     | "/notifications"
+    | "/profile"
     | "/settings"
     | "/about"
     | "/faq"
@@ -230,6 +232,12 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
     {
       title: "App",
       rows: [
+        {
+          to: "/profile",
+          label: "Profile",
+          sub: "Your details, photo and emergency contact",
+          icon: UserRound,
+        },
         {
           to: "/notifications",
           label: "Notifications",

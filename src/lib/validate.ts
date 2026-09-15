@@ -147,3 +147,20 @@ export const maritalStatuses = [
   "Widowed",
   "Prefer not to say",
 ];
+
+export const relationships = [
+  "Parent",
+  "Spouse or partner",
+  "Sibling",
+  "Child",
+  "Friend",
+  "Relative",
+  "Guardian",
+  "Colleague",
+  "Other",
+];
+
+export const oneOf =
+  (options: readonly string[], message: string): Check =>
+  (v) =>
+    options.includes(v) ? undefined : message;

@@ -83,3 +83,14 @@ create policy "own health delete" on public.ikan2_health_daily for delete to aut
 
 -- 2026-09-15 "ikan2_drop_google_health": Google Health (web) replaced by Health Connect.
 drop table if exists public.ikan2_health_connections;
+
+-- 2026-09-15 "ikan2_avatars_bucket": public profile photos, writable only in the owner folder.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('ikan2-avatars', 'ikan2-avatars', true, 2097152, array['image/jpeg','image/png','image/webp'])
+on conflict (id) do update set public = true, file_size_limit = 2097152;
+create policy "ikan2 avatars insert own" on storage.objects for insert to authenticated
+  with check (bucket_id = 'ikan2-avatars' and (storage.foldername(name))[1] = (select auth.uid())::text);
+create policy "ikan2 avatars update own" on storage.objects for update to authenticated
+  using (bucket_id = 'ikan2-avatars' and (storage.foldername(name))[1] = (select auth.uid())::text);
+create policy "ikan2 avatars delete own" on storage.objects for delete to authenticated
+  using (bucket_id = 'ikan2-avatars' and (storage.foldername(name))[1] = (select auth.uid())::text);

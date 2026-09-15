@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bell,
   BookOpen,
+  CalendarDays,
+  Camera,
+  ImageUp,
   CalendarCheck,
   ChevronRight,
   ClipboardList,
@@ -22,6 +25,7 @@ import { ProfilePhoto } from "@/components/profile-photo";
 import { Illustration } from "@/components/art";
 import {
   accentStyle,
+  BottomSheet,
   Button,
   SelectField,
   Snackbar,
@@ -31,6 +35,8 @@ import {
 } from "@/components/equip/m3";
 import { PhoneField } from "@/components/phone-field";
 import * as v from "@/lib/validate";
+import { providerPhoto, uploadAvatar } from "@/lib/avatar";
+import { fillFromGoogle, preloadGoogle } from "@/lib/google-people";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
@@ -59,6 +65,11 @@ function ProfilePage() {
   const { unreadCount } = useNotifications();
   const snack = useSnack();
   const [draft, setDraft] = useState<Profile>(defaultProfile);
+  const [photoSheet, setPhotoSheet] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
+  useEffect(() => preloadGoogle(), []);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (hydrated) setDraft(profile);
@@ -77,7 +88,7 @@ function ProfilePage() {
     zip: v.optional(v.pin),
     emergencyName: v.optional(v.personName),
     emergencyPhone: v.optional(v.phone10),
-    emergencyRelation: v.maxLength(40, "this"),
+    emergencyRelation: v.optional(v.oneOf(v.relationships, "Choose a relationship.")),
   });
   const field = (key: keyof Profile) => ({
     value: draft[key],
@@ -220,16 +231,59 @@ function ProfilePage() {
             <Settings className="h-6 w-6" />
           </Link>
           <div className="-mt-12 flex flex-col items-center px-4 text-center">
-            <span className="grid h-24 w-24 place-items-center overflow-hidden rounded-full border-4 border-background bg-[var(--accent-strong)] font-display text-[32px] font-semibold text-background">
-              <ProfilePhoto src={p.avatar}>{profileInitials(p)}</ProfilePhoto>
-            </span>
+            <button
+              type="button"
+              onClick={() => setPhotoSheet(true)}
+              aria-label="Change profile photo"
+              className="relative"
+            >
+              <span className="grid h-24 w-24 place-items-center overflow-hidden rounded-full border-4 border-background bg-[var(--accent-strong)] font-display text-[32px] font-semibold text-background">
+                <ProfilePhoto src={p.avatar}>{profileInitials(p)}</ProfilePhoto>
+              </span>
+              <span className="absolute bottom-0 right-0 grid h-8 w-8 place-items-center rounded-full border-2 border-background bg-foreground text-background">
+                <Camera className="h-4 w-4" />
+              </span>
+            </button>
+            <input
+              ref={fileInput}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (!file) return;
+                setPhotoSheet(false);
+                setPhotoBusy(true);
+                try {
+                  const url = await uploadAvatar(file);
+                  save({ avatar: url });
+                  setDraft((d) => ({ ...d, avatar: url }));
+                  snack.show("Photo updated");
+                } catch (err) {
+                  snack.show((err as Error).message);
+                } finally {
+                  setPhotoBusy(false);
+                }
+              }}
+            />
             <h1 className="mt-3 font-display text-[26px] font-semibold leading-8">
               {p.name || "Your name"}
             </h1>
-            <p className="mt-1 text-[14px] text-muted-foreground">
-              {p.email ||
-                `Member since ${new Date(p.memberSince).toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`}
+            {p.email ? <p className="mt-1 text-[14px] text-muted-foreground">{p.email}</p> : null}
+            <p className="mt-0.5 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground">
+              <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
+              Member since{" "}
+              {new Date(p.memberSince).toLocaleDateString("en-IN", {
+                month: "long",
+                year: "numeric",
+              })}
             </p>
+            {photoBusy ? (
+              <p role="status" className="mt-1 text-[13px] text-muted-foreground">
+                Uploading photo…
+              </p>
+            ) : null}
           </div>
         </header>
 
@@ -282,7 +336,40 @@ function ProfilePage() {
         </section>
 
         <section className="mt-8 px-4">
-          <h2 className="font-display text-[18px] font-semibold">Personal details</h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-display text-[18px] font-semibold">Personal details</h2>
+            <button
+              type="button"
+              disabled={googleBusy}
+              onClick={async () => {
+                setGoogleBusy(true);
+                try {
+                  const g = await fillFromGoogle(profile.email || undefined);
+                  const next = {
+                    ...(g.birthday ? { birthday: g.birthday } : {}),
+                    ...(g.gender ? { gender: g.gender } : {}),
+                    ...(g.city ? { city: g.city } : {}),
+                    ...(g.zip ? { zip: g.zip } : {}),
+                    ...(g.phone && !draft.phone ? { phone: g.phone } : {}),
+                    ...(g.avatar && !draft.avatar ? { avatar: g.avatar } : {}),
+                  };
+                  setDraft((d) => ({ ...d, ...next }));
+                  snack.show(
+                    Object.keys(next).length
+                      ? "Filled in from Google. Check it, then save."
+                      : "Your Google account doesn’t have these details",
+                  );
+                } catch (e) {
+                  snack.show((e as Error).message);
+                } finally {
+                  setGoogleBusy(false);
+                }
+              }}
+              className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-foreground/15 px-3 text-[13px] font-semibold disabled:opacity-50"
+            >
+              {googleBusy ? "Asking Google…" : "Fill from Google"}
+            </button>
+          </div>
           <div className="mt-3 space-y-3">
             <TextField
               label="Date of birth"
@@ -329,10 +416,13 @@ function ProfilePage() {
               autoComplete="off"
               {...field("emergencyPhone")}
             />
-            <TextField
+            <SelectField
               label="Relationship"
+              options={v.relationships}
               {...field("emergencyRelation")}
-              placeholder="Parent, partner, friend"
+              value={
+                v.relationships.includes(draft.emergencyRelation) ? draft.emergencyRelation : ""
+              }
             />
           </div>
         </section>
@@ -422,6 +512,43 @@ function ProfilePage() {
           <span className="flex-1 text-[15px] font-medium">Settings</span>
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </Link>
+        <BottomSheet open={photoSheet} onClose={() => setPhotoSheet(false)} title="Profile photo">
+          <div className="flex flex-col gap-2">
+            <Button
+              icon={<ImageUp className="h-5 w-5" />}
+              onClick={() => fileInput.current?.click()}
+            >
+              Choose a photo
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={async () => {
+                const pic = await providerPhoto();
+                setPhotoSheet(false);
+                if (!pic) return snack.show("Your Google or LinkedIn account has no photo");
+                save({ avatar: pic });
+                setDraft((d) => ({ ...d, avatar: pic }));
+                snack.show("Photo updated");
+              }}
+            >
+              Use my Google or LinkedIn photo
+            </Button>
+            {p.avatar ? (
+              <Button
+                variant="text"
+                className="text-[#B3261E]"
+                onClick={() => {
+                  save({ avatar: "" });
+                  setDraft((d) => ({ ...d, avatar: "" }));
+                  setPhotoSheet(false);
+                  snack.show("Photo removed");
+                }}
+              >
+                Remove photo
+              </Button>
+            ) : null}
+          </div>
+        </BottomSheet>
         <Snackbar message={snack.message} />
       </div>
     </IkanShell>

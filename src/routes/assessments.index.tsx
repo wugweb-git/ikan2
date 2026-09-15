@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, History } from "lucide-react";
+import { ChevronRight, Clock3, History, ListChecks } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { accentStyle, stateLayer } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
@@ -57,10 +57,10 @@ function AssessmentListPage() {
           ))}
         </ul>
 
-        <p className="mx-auto mt-8 max-w-xs px-4 text-center text-[12px] leading-5 text-muted-foreground">
-          These are screenings, not a diagnosis. iKAN supports, but never replaces, care from a
-          qualified professional.
-        </p>
+        <div className="mt-8 px-4 text-center text-[12px] leading-5 text-muted-foreground">
+          <p>These are screenings, not a diagnosis.</p>
+          <p>iKAN supports, but never replaces, care from a qualified professional.</p>
+        </div>
       </div>
     </IkanShell>
   );
@@ -86,22 +86,18 @@ function AssessmentCard({ assessment: a }: { assessment: Assessment }) {
         <span className="block text-[13px] font-medium text-[var(--accent-strong)]">{a.name}</span>
         <span className="block font-display text-[17px] font-semibold leading-6">{a.title}</span>
         <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
-          <span>{a.questions.length} questions</span>
-          <span>{a.minutes} min</span>
+          <span className="inline-flex items-center gap-1">
+            <ListChecks className="h-3.5 w-3.5" aria-hidden="true" /> {a.questions.length} questions
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Clock3 className="h-3.5 w-3.5" aria-hidden="true" /> {a.minutes} min
+          </span>
           {draft ? (
             <span className="font-medium text-foreground">
               {Object.keys(draft.answers).length} of {a.questions.length} answered
             </span>
           ) : null}
         </span>
-        {head?.band ? (
-          <BandChip
-            className="mt-2"
-            label={head.band.label}
-            tone={head.band.tone}
-            severity={head.band.severity}
-          />
-        ) : null}
         {latest && !head ? (
           <span className="mt-2 block text-[13px] font-medium">Result saved</span>
         ) : null}

@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   MapPin,
   CloudSun,
+  Clock3,
   UserRoundPen,
   X,
   Bell,
@@ -222,6 +223,7 @@ function Home() {
         {hydrated && !aboutYouComplete(profile) ? <AboutYouPrompt /> : null}
         <ReassessPrompt data={data} hydrated={hydrated} />
         <ScoreCard score={score} data={data} hydrated={hydrated} />
+        <HealthCard />
         <CurrentProgram data={data} hydrated={hydrated} />
         <PickUp data={data} hydrated={hydrated} />
         <Recommended data={data} hydrated={hydrated} />
@@ -229,7 +231,6 @@ function Home() {
         <MoodCheckin data={data} hydrated={hydrated} />
         <SupportCard city={city} />
         <YourPrograms data={data} hydrated={hydrated} />
-        <HealthCard />
         <ThisWeek data={data} hydrated={hydrated} />
         <Library />
         <RecentResults data={data} hydrated={hydrated} />
@@ -620,24 +621,6 @@ function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
     );
   }
 
-  if (active && !active.doneToday) {
-    const done = Math.min(new Set(active.s.completed).size, active.p.days.length);
-    return (
-      <NextStep
-        label={active.p.name}
-        title={`Day ${active.next}: ${active.day!.title}`}
-        meta={`${done} of ${active.p.days.length} days done`}
-        progress={(done / active.p.days.length) * 100}
-        image={active.p.cover}
-        cta="Start today’s session"
-        link={{
-          to: "/program/$slug/day/$day",
-          params: { slug: active.p.slug, day: String(active.next) },
-        }}
-      />
-    );
-  }
-
   if (data.results.length === 0) {
     const g = getAssessment("unsure-or-general-concern")!;
     return (
@@ -852,7 +835,7 @@ function Recommended({ data, hydrated }: { data: Data; hydrated: boolean }) {
       title="Recommended for you"
       note={`Based on your ${a.name.toLowerCase()} result${head?.band ? `: ${head.band.label}` : ""}`}
     >
-      <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1">
+      <div className="no-scrollbar flex snap-x scroll-px-4 items-stretch gap-3 overflow-x-auto px-4 pb-1">
         {serious ? (
           <Link
             to="/consult"
@@ -948,7 +931,7 @@ function YourPrograms({ data, hydrated }: { data: Data; hydrated: boolean }) {
           })}
         </ul>
       ) : (
-        <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1">
+        <div className="no-scrollbar flex snap-x scroll-px-4 items-stretch gap-3 overflow-x-auto px-4 pb-1">
           {programmes.map((p) => (
             <Link
               key={p.slug}
@@ -1036,26 +1019,31 @@ function Library() {
   ].slice(0, 5);
   return (
     <Section title="From the library" action={{ label: "See all", to: "/resources" }}>
-      <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1">
+      <div className="no-scrollbar flex snap-x scroll-px-4 items-stretch gap-3 overflow-x-auto px-4 pb-1">
         {picks.map((r) => (
           <Link
             key={r.id}
             to="/resources/$slug"
             params={{ slug: slugOf(r) }}
-            className="w-[200px] shrink-0 snap-start"
+            className="flex w-[240px] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] bg-secondary"
           >
-            <span className="block h-[124px] overflow-hidden rounded-[20px]">
+            <span className="block h-[132px] overflow-hidden">
               {covers[r.id] ? (
                 <img src={covers[r.id]} alt="" className="h-full w-full object-cover" />
               ) : (
                 <Illustration art={r.art} />
               )}
             </span>
-            <span className="mt-2 block text-[12px] font-semibold text-muted-foreground">
-              {r.category}, {r.minutes} min read
-            </span>
-            <span className="mt-0.5 line-clamp-2 text-[14px] font-semibold leading-5">
-              {r.title}
+            <span className="flex flex-1 flex-col p-3">
+              <span className="line-clamp-3 text-[15px] font-semibold leading-5">{r.title}</span>
+              <span className="mt-auto flex items-center gap-2 pt-2 text-[12px] text-muted-foreground">
+                <span className="rounded-full bg-background px-2 py-0.5 font-medium">
+                  {r.category}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock3 className="h-3.5 w-3.5" aria-hidden="true" /> {r.minutes} min read
+                </span>
+              </span>
             </span>
           </Link>
         ))}
@@ -1189,7 +1177,7 @@ function CurrentProgram({ data, hydrated }: { data: Data; hydrated: boolean }) {
                 {cur.p.name}
               </h2>
               <p className="mt-1 text-[13px] opacity-75">
-                Day {cur.next} of {cur.p.days.length - 1} · {cur.day!.title}
+                Day {cur.next} · {cur.day!.title} · {done} of {cur.p.days.length} days done
               </p>
             </div>
             <div
@@ -1233,10 +1221,9 @@ function CurrentProgram({ data, hydrated }: { data: Data; hydrated: boolean }) {
 function PickUp({ data, hydrated }: { data: Data; hydrated: boolean }) {
   if (!hydrated) return null;
   const today = dayKey(new Date());
-  const cur = ongoing(data);
   const drafts = data.drafts.slice(0, 2);
   const needsMood = !data.journal.entries.some((e) => e.date === today);
-  if (!cur && !drafts.length && !needsMood) return null;
+  if (!drafts.length && !needsMood) return null;
   const rowClass = cn(
     "grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-4",
     stateLayer,
@@ -1244,22 +1231,6 @@ function PickUp({ data, hydrated }: { data: Data; hydrated: boolean }) {
   return (
     <Section title="Your activity" note="Pick up where you left off">
       <div className="mx-4 divide-y divide-background overflow-hidden rounded-[24px] bg-secondary">
-        {cur ? (
-          <Link
-            to="/program/$slug/day/$day"
-            params={{ slug: cur.p.slug, day: String(cur.next) }}
-            className={rowClass}
-          >
-            <ActivityRow
-              title={`${cur.p.name} · Day ${cur.next} session`}
-              meta={cur.day!.title}
-              progress={Math.round(
-                (Math.min(new Set(cur.s.completed).size, cur.p.days.length) / cur.p.days.length) *
-                  100,
-              )}
-            />
-          </Link>
-        ) : null}
         {drafts.map((d) => (
           <Link
             key={d.assessment!.slug}
