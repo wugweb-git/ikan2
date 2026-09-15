@@ -100,10 +100,10 @@ export function requestLocation(): Promise<DeviceState["location"]> {
         let city = "";
         try {
           const r = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
+            `https://api-bdc.io/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
           );
           const j = (await r.json()) as { city?: string; locality?: string };
-          city = j.city || j.locality || "";
+          city = j.locality || j.city || "";
         } catch {
           /* the city stays empty; weather still works */
         }

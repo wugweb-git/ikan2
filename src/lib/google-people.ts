@@ -90,9 +90,20 @@ const genderFrom = (value?: string) =>
 type Field<T> = T & { metadata?: { primary?: boolean } };
 const pick = <T>(list?: Field<T>[]) => list?.find((x) => x.metadata?.primary) ?? list?.[0];
 
+/** Load Google's script ahead of the tap, so the popup opens straight from the tap
+ * (browsers block pop-ups that open after a delay). */
+export const preloadGoogle = () => {
+  if (typeof window !== "undefined") void loadGsi().catch(() => {});
+};
+
 export async function fillFromGoogle(hint?: string): Promise<GoogleDetails> {
-  const gsi = await loadGsi();
-  const token = await requestToken(gsi, hint);
+  const ready = (window as unknown as { google?: Gsi }).google;
+  // open the popup in the same tick as the tap when the script is ready
+  const tokenPromise = ready?.accounts?.oauth2
+    ? requestToken(ready, hint)
+    : loadGsi().then((g) => requestToken(g, hint));
+  const gsi = ready?.accounts?.oauth2 ? ready : await loadGsi();
+  const token = await tokenPromise;
   try {
     const res = await fetch(
       "https://people.googleapis.com/v1/people/me?personFields=birthdays,genders,phoneNumbers,addresses,photos",

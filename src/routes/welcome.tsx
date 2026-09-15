@@ -27,7 +27,7 @@ import {
 import { profileInitials, useOnboarding, useProfile } from "@/lib/profile";
 import type { Art } from "@/lib/resources";
 import * as v from "@/lib/validate";
-import { fillFromGoogle } from "@/lib/google-people";
+import { fillFromGoogle, preloadGoogle } from "@/lib/google-people";
 import { cn } from "@/lib/utils";
 
 type Search = { step?: "about" };
@@ -266,6 +266,7 @@ function AboutYou({
   });
   const [loaded, setLoaded] = useState(false);
   const [tried, setTried] = useState(false);
+  useEffect(() => preloadGoogle(), []);
   useEffect(() => {
     if (loaded) return;
     // older profiles say "Male"/"Female" and keep the PIN inside the city ("Noida, 201310")
