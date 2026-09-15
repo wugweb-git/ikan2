@@ -58,7 +58,6 @@ import {
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
-import { recentAverage, useGoogleHealth } from "@/lib/google-health";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { enablePush, pushSupported, sendTestPush } from "@/lib/push";
 import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
@@ -249,9 +248,8 @@ function SettingsPage() {
 
         <Group
           title="Health data"
-          note="iKAN collects health and fitness data you choose to connect to show your sleep, steps and heart rate alongside your iKAN Score and programs. It is never sold or shared."
+          note="Sleep, steps and heart rate come from Health Connect in the iKAN Android app. They are shown only to you and never sold or shared."
         >
-          <GoogleHealthRows onMessage={snack.show} />
           {toggle(
             "healthConnect",
             "Health Connect",
@@ -371,89 +369,6 @@ function SettingsPage() {
         <Snackbar message={snack.message} />
       </div>
     </IkanShell>
-  );
-}
-
-function GoogleHealthRows({ onMessage }: { onMessage: (m: string) => void }) {
-  const hydrated = useHydrated();
-  const navigate = useNavigate();
-  const { health } = Route.useSearch();
-  const g = useGoogleHealth();
-
-  useEffect(() => {
-    if (!health) return;
-    onMessage(
-      health === "connected"
-        ? "Google Health is connected"
-        : health === "cancelled"
-          ? "Google Health wasn’t connected"
-          : "Google Health didn’t connect. Try again.",
-    );
-    void navigate({ to: "/settings", search: {}, replace: true });
-  }, [health]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (g.error) onMessage(g.error);
-  }, [g.error]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const connected = hydrated && g.status?.connected;
-  const steps = recentAverage(g.days, "steps");
-  const sleep = recentAverage(g.days, "sleep_minutes");
-  const moodLogs = g.days.slice(-7).reduce((n, d) => n + (d.moods?.length ?? 0), 0);
-  const summary = [
-    steps ? `${Math.round(steps).toLocaleString("en-IN")} steps` : null,
-    sleep ? `${Math.floor(sleep / 60)}h ${Math.round(sleep % 60)}m sleep` : null,
-    moodLogs ? `${moodLogs} mood ${moodLogs === 1 ? "log" : "logs"}` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-  const synced = g.status?.lastSyncedAt
-    ? new Date(g.status.lastSyncedAt).toLocaleString("en-IN", {
-        day: "numeric",
-        month: "short",
-        hour: "numeric",
-        minute: "2-digit",
-      })
-    : null;
-
-  return (
-    <>
-      <Row
-        icon={HeartPulse}
-        label="Google Health"
-        sub={
-          connected
-            ? summary
-              ? `7-day average: ${summary}`
-              : "Connected. Data appears after your device syncs."
-            : "Sleep, steps, heart rate and mood logs from Fitbit and Google devices"
-        }
-      >
-        <button
-          type="button"
-          disabled={g.busy || !hydrated || g.status === null || g.status.configured === false}
-          onClick={() => void (connected ? g.sync() : g.connect())}
-          className={cn(
-            "inline-flex h-9 shrink-0 items-center rounded-full px-4 text-[13px] font-semibold disabled:opacity-50",
-            connected ? "border border-foreground/15" : "bg-foreground text-background",
-          )}
-        >
-          {g.busy ? "…" : connected ? "Sync" : g.status?.configured === false ? "Soon" : "Connect"}
-        </button>
-      </Row>
-      {connected ? (
-        <ActionRow
-          icon={Unlink}
-          label="Disconnect Google Health"
-          sub={
-            synced
-              ? `Last synced ${synced}. Removes the health data iKAN saved.`
-              : "Removes the health data iKAN saved"
-          }
-          onClick={() => void g.disconnect().then(() => onMessage("Google Health disconnected"))}
-        />
-      ) : null}
-    </>
   );
 }
 
