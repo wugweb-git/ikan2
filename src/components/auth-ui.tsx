@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { displayName, useAuth, type Provider } from "@/lib/auth";
 import { markOnboardingDone, onboardingDone, seedProfile } from "@/lib/profile";
 import { MadeBy } from "@/components/made-by";
+import { Splash } from "@/components/splash";
 
 const PUBLIC =
   /^\/(login|phone-login|signup|verify-email|forgot-password|reset-password|support|about|faq|contact|legal)(\/|$)/;
@@ -20,6 +21,37 @@ const isNewAccount = (user: { created_at?: string | undefined }) => {
   return Number.isFinite(created) && Date.now() - created < NEW_ACCOUNT_MS;
 };
 
+/* The launch screen plays once per app session (about 2 seconds), then the app appears.
+ * Moving between pages never shows it again until the app is reopened. */
+const INTRO_KEY = "ikan.splash-seen";
+const INTRO_MS = 2200;
+function useLaunchIntro() {
+  const [show, setShow] = useState(true);
+  useEffect(() => {
+    let seen = false;
+    try {
+      seen = Boolean(window.sessionStorage.getItem(INTRO_KEY));
+    } catch {
+      /* storage unavailable: play it */
+    }
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (seen) return setShow(false);
+    const t = window.setTimeout(
+      () => {
+        try {
+          window.sessionStorage.setItem(INTRO_KEY, "1");
+        } catch {
+          /* storage unavailable */
+        }
+        setShow(false);
+      },
+      reduce ? 900 : INTRO_MS,
+    );
+    return () => window.clearTimeout(t);
+  }, []);
+  return show;
+}
+
 /** Keeps the app behind sign-in. Crisis support and the auth screens stay open to everyone. */
 export function AuthGate({ children }: { children: ReactNode }) {
   const { status, user } = useAuth();
@@ -27,6 +59,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const path = location.pathname;
   const isPublic = PUBLIC.test(path);
+  const intro = useLaunchIntro();
 
   useEffect(() => {
     if (status === "signedOut" && !isPublic) {
@@ -62,27 +95,12 @@ export function AuthGate({ children }: { children: ReactNode }) {
     }
   }, [status, path]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // dev only: /?splash to look at the launch screen
+  if (import.meta.env.DEV && location.searchStr.includes("splash")) return <Splash />;
+  if (intro) return <Splash />;
   if (isPublic) return <>{children}</>;
   if (status !== "signedIn") return <Splash />;
   return <>{children}</>;
-}
-
-function Splash() {
-  return (
-    <div className="flex min-h-dvh flex-col bg-canvas px-8 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[env(safe-area-inset-top)]">
-      <div className="flex flex-1 flex-col items-center justify-center gap-4">
-        <img src="/favicon.svg" alt="" className="h-20 w-20 animate-pulse rounded-[22px]" />
-        <p className="font-display text-[22px] font-semibold">iKAN</p>
-        <p className="text-[14px] text-muted-foreground" role="status">
-          Opening your space…
-        </p>
-      </div>
-      <div className="mx-auto w-full max-w-sm">
-        <TrustList />
-        <MadeBy className="mt-6" />
-      </div>
-    </div>
-  );
 }
 
 export function AuthLayout({
