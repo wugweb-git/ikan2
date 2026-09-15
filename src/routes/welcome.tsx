@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Bell, Check, Clock3, ListChecks, MapPin } from "lucide-react";
+import { ArrowLeft, Bell, Check, Clock3, Footprints, ListChecks, MapPin } from "lucide-react";
 import { Illustration } from "@/components/art";
 import {
   accentStyle,
@@ -26,6 +26,7 @@ import {
 import { profileInitials, useOnboarding, useProfile } from "@/lib/profile";
 import type { Art } from "@/lib/resources";
 import * as v from "@/lib/validate";
+import { useHealthConnect } from "@/lib/health-connect";
 import { fillFromGoogle, preloadGoogle } from "@/lib/google-people";
 import { cn } from "@/lib/utils";
 
@@ -445,6 +446,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
   );
   const [message, setMessage] = useState<string | null>(null);
 
+  const health = useHealthConnect();
   const rows: {
     id: string;
     icon: typeof Bell;
@@ -480,6 +482,27 @@ function Permissions({ onDone }: { onDone: () => void }) {
           setLocationState("denied");
           setMessage((e as Error).message);
         }
+      },
+    },
+    {
+      id: "activity",
+      icon: Footprints,
+      title: "Activity",
+      body: health.native
+        ? "Steps, sleep and heart rate from Health Connect, so they count in your iKAN Score."
+        : "Steps, sleep and heart rate from Health Connect, in the iKAN Android app.",
+      state: !health.native
+        ? "unsupported"
+        : health.busy
+          ? "busy"
+          : health.connected
+            ? "granted"
+            : health.availability === "unavailable"
+              ? "unsupported"
+              : "prompt",
+      allow: async () => {
+        if (health.availability === "update_required") return health.install();
+        await health.connect();
       },
     },
   ];
@@ -527,7 +550,11 @@ function Permissions({ onDone }: { onDone: () => void }) {
                 ) : r.state === "busy" ? (
                   "…"
                 ) : r.state === "unsupported" ? (
-                  "N/A"
+                  r.id === "activity" && !health.native ? (
+                    "In app"
+                  ) : (
+                    "N/A"
+                  )
                 ) : blocked ? (
                   "Blocked"
                 ) : (

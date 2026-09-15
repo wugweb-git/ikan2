@@ -21,6 +21,7 @@ import {
   Trash2,
   TrendingUp,
   Watch,
+  Footprints,
   SlidersHorizontal,
   BellRing,
   HeartPulse,
@@ -466,6 +467,53 @@ function HealthConnectRows({ onMessage }: { onMessage: (m: string) => void }) {
   );
 }
 
+/** Activity (steps, sleep, heart rate) comes from Health Connect, which only the Android app can read. */
+function ActivityRow({ onMessage }: { onMessage: (m: string) => void }) {
+  const hydrated = useHydrated();
+  const h = useHealthConnect();
+  if (!hydrated) return null;
+  if (!h.native)
+    return (
+      <Row
+        icon={Footprints}
+        label="Activity"
+        sub="Steps, sleep and heart rate from Health Connect, in the iKAN Android app"
+      >
+        <span className="inline-flex h-9 shrink-0 items-center rounded-full bg-secondary px-4 text-[13px] font-semibold text-muted-foreground">
+          In app
+        </span>
+      </Row>
+    );
+  return (
+    <Row
+      icon={Footprints}
+      label="Activity"
+      sub={
+        h.availability === "unavailable"
+          ? "Health Connect isn’t available on this phone"
+          : h.availability === "update_required"
+            ? "Install Health Connect to share steps and sleep"
+            : "Steps, sleep and heart rate from Health Connect"
+      }
+    >
+      <Switch
+        label="Activity"
+        checked={h.connected}
+        onChange={async (on) => {
+          if (h.availability === "update_required") return void h.install();
+          if (on) {
+            await h.connect();
+            return;
+          }
+          // Android only lets people remove access in Health Connect itself
+          onMessage("Turn off iKAN’s access in Health Connect");
+          await h.manage();
+        }}
+      />
+    </Row>
+  );
+}
+
 function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
   const hydrated = useHydrated();
   const notifications = useNotificationAccess();
@@ -557,6 +605,7 @@ function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
           }}
         />
       </Row>
+      <ActivityRow onMessage={onMessage} />
       {installed ? null : (
         <Row
           icon={Smartphone}
