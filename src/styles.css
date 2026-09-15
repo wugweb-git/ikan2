@@ -1000,3 +1000,9 @@ body {
 }
 html.reduce-motion .splash * { animation: none !important; opacity: 1 !important; transform: none !important; }
 html.reduce-motion .splash .splash-ring { display: none; }
+
+/* the launch screen is for phones; elsewhere the loading moment is a plain background */
+@media (min-width: 768px), (pointer: fine) {
+  .splash-phone-only { background: var(--canvas) !important; }
+  .splash-phone-only > * { display: none !important; }
+}

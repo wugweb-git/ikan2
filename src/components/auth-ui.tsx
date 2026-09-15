@@ -24,6 +24,14 @@ const isNewAccount = (user: { created_at?: string | undefined }) => {
 /* The launch screen plays once per app session (about 2 seconds), then the app appears.
  * Moving between pages never shows it again until the app is reopened. */
 const INTRO_KEY = "ikan.splash-seen";
+/** Phones and the installed Android app; computers and tablets skip the launch screen. */
+const isPhone = () =>
+  window.matchMedia("(max-width: 767px) and (pointer: coarse)").matches ||
+  Boolean(
+    (
+      window as { Capacitor?: { isNativePlatform?: () => boolean } }
+    ).Capacitor?.isNativePlatform?.(),
+  );
 const INTRO_MS = 2200;
 function useLaunchIntro() {
   const [show, setShow] = useState(true);
@@ -35,7 +43,7 @@ function useLaunchIntro() {
       /* storage unavailable: play it */
     }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (seen) return setShow(false);
+    if (seen || !isPhone()) return setShow(false);
     const t = window.setTimeout(
       () => {
         try {
