@@ -80,3 +80,6 @@ grant insert, update, delete on public.ikan2_health_daily to authenticated;
 create policy "own health insert" on public.ikan2_health_daily for insert to authenticated with check ((select auth.uid()) = user_id);
 create policy "own health update" on public.ikan2_health_daily for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 create policy "own health delete" on public.ikan2_health_daily for delete to authenticated using ((select auth.uid()) = user_id);
+
+-- 2026-09-15 "ikan2_drop_google_health": Google Health (web) replaced by Health Connect.
+drop table if exists public.ikan2_health_connections;
