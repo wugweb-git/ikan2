@@ -14,6 +14,7 @@ export type HealthDay = {
   resting_heart_rate: number | null;
   hrv_ms: number | null;
   active_minutes: number | null;
+  moods: string[] | null;
 };
 
 export type HealthStatus = {
@@ -66,7 +67,7 @@ export async function healthDays(days = 30): Promise<HealthDay[]> {
   const since = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
   const { data, error } = await supabase()
     .from("ikan2_health_daily")
-    .select("date,steps,sleep_minutes,awake_minutes,resting_heart_rate,hrv_ms,active_minutes")
+    .select("date,steps,sleep_minutes,awake_minutes,resting_heart_rate,hrv_ms,active_minutes,moods")
     .gte("date", since)
     .order("date", { ascending: true });
   if (error) throw new Error("Couldn’t load your health data.");
@@ -121,7 +122,11 @@ export function useGoogleHealth() {
 }
 
 /** Averages over the most recent `n` days that have a value. */
-export function recentAverage(days: HealthDay[], key: keyof Omit<HealthDay, "date">, n = 7) {
+export function recentAverage(
+  days: HealthDay[],
+  key: keyof Omit<HealthDay, "date" | "moods">,
+  n = 7,
+) {
   const values = days
     .map((d) => d[key])
     .filter((v): v is number => typeof v === "number" && v > 0)

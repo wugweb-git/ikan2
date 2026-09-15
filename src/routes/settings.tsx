@@ -381,9 +381,11 @@ function GoogleHealthRows({ onMessage }: { onMessage: (m: string) => void }) {
   const connected = hydrated && g.status?.connected;
   const steps = recentAverage(g.days, "steps");
   const sleep = recentAverage(g.days, "sleep_minutes");
+  const moodLogs = g.days.slice(-7).reduce((n, d) => n + (d.moods?.length ?? 0), 0);
   const summary = [
     steps ? `${Math.round(steps).toLocaleString("en-IN")} steps` : null,
     sleep ? `${Math.floor(sleep / 60)}h ${Math.round(sleep % 60)}m sleep` : null,
+    moodLogs ? `${moodLogs} mood ${moodLogs === 1 ? "log" : "logs"}` : null,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -406,7 +408,7 @@ function GoogleHealthRows({ onMessage }: { onMessage: (m: string) => void }) {
             ? summary
               ? `7-day average: ${summary}`
               : "Connected. Data appears after your device syncs."
-            : "Sleep, steps and heart rate from Fitbit and Google devices"
+            : "Sleep, steps, heart rate and mood logs from Fitbit and Google devices"
         }
       >
         <button

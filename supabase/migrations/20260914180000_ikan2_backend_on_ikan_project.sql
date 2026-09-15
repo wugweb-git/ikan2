@@ -65,3 +65,6 @@ create policy "own push delete" on public.ikan2_push_subscriptions for delete to
 
 -- Also applied: pg_cron + pg_net, and a job "ikan2-mood-reminders" every 15 minutes that POSTs to
 -- functions/v1/ikan2-push/reminders with the x-cron-secret header (secret kept out of the repo).
+
+-- 2026-09-15 "ikan2_health_moods": mood logs from Google Health (mindfulness scope)
+alter table public.ikan2_health_daily add column if not exists moods text[];

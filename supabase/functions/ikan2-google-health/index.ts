@@ -24,7 +24,16 @@ const SCOPES = [
   "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly",
   "https://www.googleapis.com/auth/googlehealth.sleep.readonly",
   "https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly",
+  "https://www.googleapis.com/auth/googlehealth.mindfulness.readonly",
 ];
+/* Until Google verifies iKAN, only these accounts can connect (comma-separated emails).
+ * Empty means everyone. */
+const TESTERS = (Deno.env.get("GOOGLE_HEALTH_TESTERS") ?? "")
+  .split(",")
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+const allowed = (email?: string | null) =>
+  !TESTERS.length || (email ? TESTERS.includes(email.toLowerCase()) : false);
 const ALLOWED_RETURN = [
   /^https:\/\/app\.ikanhealth\.in$/,
   /^https:\/\/ikanhealth\.in$/,
@@ -145,6 +154,7 @@ type Day = {
   resting_heart_rate?: number | null;
   hrv_ms?: number | null;
   active_minutes?: number | null;
+  moods?: string[] | null;
 };
 
 /** Pull the last DAYS days. Each data type is read on its own so one failure doesn't stop the rest. */
@@ -259,6 +269,29 @@ async function syncUser(uid: string) {
     }
   });
 
+  await attempt("moods", async () => {
+    let pageToken: string | undefined;
+    do {
+      const q = new URLSearchParams({
+        filter: `moods.sample_time.civil_time >= "${ymd(start)}"`,
+        pageSize: "500",
+        ...(pageToken ? { pageToken } : {}),
+      });
+      const r = await api(`/dataTypes/moods/dataPoints?${q}`, access_token);
+      for (const p of r.dataPoints ?? []) {
+        const m = p.moods;
+        const at = m?.sampleTime?.physicalTime ?? m?.sampleTime?.civilTime;
+        const date = typeof at === "string" ? at.slice(0, 10) : civilYmd(m?.sampleTime?.civilTime);
+        if (!date) continue;
+        const labels = ((m?.moods ?? []) as string[])
+          .filter((x) => x && x !== "MOOD_UNSPECIFIED")
+          .map((x) => x.toLowerCase().replace(/_/g, " "));
+        if (labels.length) put(date, { moods: [...(days.get(date)?.moods ?? []), ...labels] });
+      }
+      pageToken = r.nextPageToken || undefined;
+    } while (pageToken);
+  });
+
   const rows = [...days.entries()].map(([date, d]) => ({
     user_id: uid,
     date,
@@ -272,7 +305,7 @@ async function syncUser(uid: string) {
     if (error) throw new Error(`save_${error.message}`);
   }
   // every type failing means the connection itself is broken
-  const allFailed = errors.length === 5;
+  const allFailed = errors.length === 6;
   await admin
     .from("ikan2_health_connections")
     .update({
@@ -339,7 +372,8 @@ Deno.serve(async (req) => {
     if (!user) return json({ error: "sign_in_required" }, 401, origin);
 
     if (route === "start") {
-      if (!CLIENT_ID || !CLIENT_SECRET) return json({ error: "not_configured" }, 503, origin);
+      if (!CLIENT_ID || !CLIENT_SECRET || !allowed(user.email))
+        return json({ error: "not_configured" }, 503, origin);
       const body = (await req.json().catch(() => ({}))) as { returnTo?: string };
       const ret =
         body.returnTo && ALLOWED_RETURN.some((r) => r.test(body.returnTo!))
@@ -369,7 +403,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
       return json(
         {
-          configured: Boolean(CLIENT_ID && CLIENT_SECRET),
+          configured: Boolean(CLIENT_ID && CLIENT_SECRET) && allowed(user.email),
           connected: Boolean(data),
           connectedAt: data?.connected_at ?? null,
           lastSyncedAt: data?.last_synced_at ?? null,
