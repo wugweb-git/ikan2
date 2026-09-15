@@ -38,8 +38,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
         email: user.email ?? "",
         phone: (user.user_metadata?.["phone"] as string | undefined) ?? "",
         avatar:
-          (user.user_metadata?.["avatar_url"] as string | undefined) ??
-          (user.user_metadata?.["picture"] as string | undefined),
+          (user.user_metadata?.["avatar_url"] as string | undefined) ||
+          (user.user_metadata?.["picture"] as string | undefined) ||
+          (user.identities?.find((i) => i.provider === "google")?.identity_data?.["picture"] as
+            string | undefined),
       });
       const needsWelcome = !onboardingDone() && isNewAccount(user);
       if (!needsWelcome) markOnboardingDone();

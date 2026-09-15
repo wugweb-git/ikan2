@@ -17,6 +17,7 @@ export function ProfilePhoto({
       <img
         src={src}
         alt=""
+        referrerPolicy="no-referrer"
         onError={() => setFailed(src)}
         className={cn("h-full w-full rounded-full object-cover", className)}
       />
