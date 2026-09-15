@@ -13,8 +13,6 @@ import { cn } from "@/lib/utils";
 import { formatDuration, formatTime, nightMetrics, type DiaryEntry } from "@/lib/equip/metrics";
 import { visibleBody, type NBlock } from "@/lib/equip/notion";
 import { useProgramme } from "@/lib/equip/store";
-import { Illustration } from "@/components/art";
-import type { Art } from "@/lib/resources";
 import type { Step, UI } from "@/lib/equip/types";
 import {
   Button,
@@ -49,23 +47,33 @@ export function Footer({
   onNext,
   label,
   disabled,
+  hint,
 }: {
   onBack: (() => void) | undefined;
   onNext: () => void;
   label: string;
   disabled?: boolean | undefined;
+  /** shown above the buttons while Next is disabled, saying what's needed */
+  hint?: string | undefined;
 }) {
   return (
     <footer className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
-      <div className="flex w-full max-w-app items-center gap-3 border-t border-foreground/[0.08] bg-background px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
-        {onBack ? (
-          <IconButton label="Back" onClick={onBack} className="h-14 w-14 bg-secondary">
-            <ArrowLeft className="h-6 w-6" />
-          </IconButton>
+      <div className="w-full max-w-app border-t border-foreground/[0.08] bg-background">
+        {disabled && hint ? (
+          <p className="px-4 pt-2 text-center text-[13px] text-muted-foreground" role="status">
+            {hint}
+          </p>
         ) : null}
-        <Button onClick={onNext} disabled={disabled} className="h-14 flex-1 text-[16px]">
-          {label}
-        </Button>
+        <div className="flex w-full items-center gap-3 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
+          {onBack ? (
+            <IconButton label="Back" onClick={onBack} className="h-14 w-14 bg-secondary">
+              <ArrowLeft className="h-6 w-6" />
+            </IconButton>
+          ) : null}
+          <Button onClick={onNext} disabled={disabled} className="h-14 flex-1 text-[16px]">
+            {label}
+          </Button>
+        </div>
       </div>
     </footer>
   );
@@ -141,12 +149,6 @@ function BlockText({
 
 /* --------------------------------- steps --------------------------------- */
 
-const lessonArt: Record<string, Art> = {
-  "sleep-tight": "sleep",
-  unburn: "burnout",
-  "stress-buster": "stress",
-};
-
 function LessonStep({
   step,
   view,
@@ -158,14 +160,6 @@ function LessonStep({
 }) {
   // Notion writes some lists inline: "No idea is wrong • Don't critique while writing • …"
   const bullets = Boolean(step.block.body[0]?.text.includes(" • "));
-  // text-only lessons get the program's artwork so the screen isn't half empty
-  const art = lessonArt[ctx.slug] ?? "checkup";
-  const textOnly = !view.cards && !bullets;
-  const short =
-    !view.cards &&
-    step.block.body.length > 0 &&
-    step.block.body.every((b) => b.kind === "p") &&
-    step.block.body.reduce((n, b) => n + b.text.length, 0) <= 60;
   return (
     <>
       {bullets ? (
@@ -184,34 +178,6 @@ function LessonStep({
             </p>
           ))}
         </div>
-      ) : short ? (
-        // a one-line lesson ("Welcome back! Let's keep logging.") reads as a pause, not a page
-        <div className="flex flex-col items-center text-center">
-          <div className="-mx-4 h-56 w-[calc(100%+2rem)] overflow-hidden rounded-b-[32px]">
-            <Illustration art={art} />
-          </div>
-          <p className="mt-6 text-[14px] font-semibold text-[var(--accent-strong)]">
-            {ctx.day === 0 ? "Onboarding" : `Day ${ctx.day}`}
-          </p>
-          <h2 className="mt-1 font-display text-[30px] font-semibold leading-9">
-            {step.block.title}
-          </h2>
-          {step.block.body.map((b) => (
-            <p
-              key={b.text}
-              className="mt-2 max-w-[28ch] text-[17px] leading-6 text-muted-foreground"
-            >
-              {b.text}
-            </p>
-          ))}
-        </div>
-      ) : textOnly ? (
-        <>
-          <div className="-mx-4 -mt-4 mb-5 h-44 overflow-hidden">
-            <Illustration art={art} />
-          </div>
-          <BlockText block={step.block} />
-        </>
       ) : (
         <BlockText block={step.block} icon={<BookOpen />} />
       )}
@@ -411,6 +377,7 @@ function ChoiceStep({
         onNext={ctx.onNext}
         label={nextLabel(ctx)}
         disabled={picked.length === 0}
+        hint="Choose an answer to continue"
       />
     </>
   );
@@ -510,6 +477,7 @@ function ScaleStep({
         onNext={ctx.onNext}
         label={nextLabel(ctx)}
         disabled={value === undefined}
+        hint="Pick a number to continue"
       />
     </>
   );
@@ -557,7 +525,13 @@ function TextStep({
           onPick={(v) => setAnswer(key, v)}
         />
       </div>
-      <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
+      <Footer
+        onBack={ctx.onBack}
+        onNext={ctx.onNext}
+        label={nextLabel(ctx)}
+        disabled={!value.trim()}
+        hint="Write your answer to continue"
+      />
     </>
   );
 }
@@ -652,6 +626,7 @@ function SortStep({
       <p className="text-[14px] font-semibold text-[var(--accent-strong)]">{step.block.title}</p>
       <div className="mt-4">
         <Pager
+          peek={false}
           index={page}
           onIndex={setPage}
           pages={pages.map((p, pi) => (

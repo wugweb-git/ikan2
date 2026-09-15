@@ -77,7 +77,22 @@ const hints: Record<string, string> = {
   "my alternate thoughts": "A kinder, more balanced way to see it",
   "how they make me feel now": "How do you feel after rethinking it?",
 };
-const hintFor = (f: Field) => hints[f.label.trim().toLowerCase()];
+/** Fields Notion left without a label get one from what the list collects. */
+const collectionLabels: Record<string, { label: string; hint: string }> = {
+  demands: { label: "The demand", hint: "e.g. A deadline at work" },
+  resources: { label: "The resource", hint: "e.g. Time with friends" },
+  recent_stressors: { label: "What’s been stressing you", hint: "e.g. Exams next week" },
+  relaxed_self: { label: "When you felt relaxed", hint: "e.g. A walk on Sunday" },
+  relax_methods: { label: "What helps you relax", hint: "e.g. Music, a warm shower" },
+  bugging: { label: "What’s bugging you", hint: "e.g. Too many meetings" },
+  stressful_activities: { label: "Stressful activity", hint: "e.g. Commuting" },
+  joy: { label: "Something that brings you joy", hint: "e.g. Cooking dinner" },
+};
+const labelFor = (f: Field, collection?: string) =>
+  f.label.trim() || (collection ? collectionLabels[collection]?.label : undefined) || "Your entry";
+const hintFor = (f: Field, collection?: string) =>
+  hints[f.label.trim().toLowerCase()] ??
+  (!f.label.trim() && collection ? collectionLabels[collection]?.hint : undefined);
 
 const nowTime = () => {
   const d = new Date();
@@ -90,12 +105,14 @@ function FieldInput({
   onChange,
   hideLabel,
   error,
+  collection,
 }: {
   field: Field;
   value: EntryValues[string] | undefined;
   onChange: (v: string) => void;
   hideLabel?: boolean;
   error?: string | undefined;
+  collection?: string | undefined;
 }) {
   if (field.type === "yesno" || field.type === "select") {
     return (
@@ -122,14 +139,14 @@ function FieldInput({
           : "text";
   return (
     <TextField
-      label={field.label}
-      ariaLabel={field.label || "Write here"}
+      label={hideLabel ? field.label : labelFor(field, collection)}
+      ariaLabel={labelFor(field, collection)}
       type={type}
       value={typeof value === "string" ? value : ""}
       onChange={onChange}
       multiline={field.type === "longtext"}
       rows={field.type === "longtext" ? 2 : undefined}
-      placeholder={hintFor(field)}
+      placeholder={hintFor(field, collection)}
       maxLength={field.type === "longtext" ? 2000 : field.type === "text" ? 200 : undefined}
       error={error}
     />
@@ -160,11 +177,13 @@ function EntryForm({
   submitLabel,
   history = [],
   initial,
+  collection,
 }: {
   fields: Field[];
   onSubmit: (v: EntryValues) => void;
   submitLabel: string;
   initial?: EntryValues;
+  collection?: string;
   /** earlier entries in the same collection, offered back per field */
   history?: Entry[];
 }) {
@@ -196,18 +215,14 @@ function EntryForm({
             value={values[f.key]}
             onChange={(v) => setValues((p) => ({ ...p, [f.key]: v }))}
             error={tried ? errors[f.key] : undefined}
+            collection={collection}
           />
-          {f.type === "text" || f.type === "longtext" || f.type === "time" ? (
-            <QuickPicks
-              title="Used before"
-              items={earlierFieldValues(history, f.key).map((v) => ({
-                label: f.type === "time" ? formatTime(v) : v,
-                value: v,
-              }))}
-              selected={typeof values[f.key] === "string" ? (values[f.key] as string) : undefined}
-              onPick={(v) => setValues((p) => ({ ...p, [f.key]: v }))}
-            />
-          ) : null}
+          <FieldSuggestions
+            field={f}
+            value={values[f.key]}
+            history={history}
+            onPick={(v) => setValues((p) => ({ ...p, [f.key]: v }))}
+          />
         </div>
       ))}
       <Button type="submit" disabled={!ready} className="w-full">
@@ -215,6 +230,40 @@ function EntryForm({
       </Button>
     </form>
   );
+}
+
+/** Suggestions under a field. Times offer moments relative to now; text offers earlier
+ * answers only while the field is empty, since a filled field no longer needs them. */
+function FieldSuggestions({
+  field,
+  value,
+  history,
+  onPick,
+}: {
+  field: Field;
+  value: EntryValues[string] | undefined;
+  history: Entry[];
+  onPick: (v: string) => void;
+}) {
+  const current = typeof value === "string" ? value : "";
+  if (field.type === "time") {
+    const at = (minsAgo: number) => {
+      const d = new Date(Date.now() - minsAgo * 60_000);
+      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    };
+    const items = [
+      { label: "Now", value: at(0) },
+      { label: "30 min ago", value: at(30) },
+      { label: "1 hour ago", value: at(60) },
+    ];
+    return <QuickPicks title="When was it?" items={items} selected={current} onPick={onPick} />;
+  }
+  if (field.type !== "text" && field.type !== "longtext") return null;
+  if (current.trim()) return null;
+  const items = earlierFieldValues(history, field.key)
+    .filter((v) => v.trim().length > 2)
+    .map((v) => ({ label: v, value: v }));
+  return <QuickPicks title="Tap to reuse an earlier answer" items={items} onPick={onPick} />;
 }
 
 /** Cards older than a retention window (Notion: "deleted after 24 hours") are removed. */
@@ -274,10 +323,47 @@ function Values({ entry, fields }: { entry: Entry | { values: EntryValues }; fie
   );
 }
 
-function EmptyCards({ onAdd, canAdd }: { onAdd: () => void; canAdd: boolean }) {
+/** What one entry is, shown before the first one exists. */
+const emptyHelp: Record<string, string> = {
+  thought_log:
+    "Note a moment that upset you: when it was, what happened, what you thought and how you felt.",
+  tf_log: "Note a moment from today and split it into what you thought and what you felt.",
+  thoughts: "Write down a thought that keeps coming back.",
+  worries: "Write down one worry, in a few words.",
+  mind_dump: "Empty your head. Anything on your mind counts.",
+  demands: "List what’s asking for your time and energy right now.",
+  resources: "List what helps you cope, like people, time or habits.",
+  distractors: "Note what pulls your attention away and one way to cut it down.",
+  rituals: "Add something you do to wind down before bed.",
+  activities: "Add an activity you’d like to do, even a small one.",
+  habits: "Add a habit you want to build.",
+  goals: "Set a goal you can realistically reach.",
+  tasks: "Add one task you’ll take up today.",
+  efforts: "Note what you put in and what you hoped to get back.",
+  perfectionism: "Note a task where you aimed for perfect.",
+  ideas: "Jot down an idea, however rough.",
+};
+const helpFor = (collection: string, fields: Field[]) => {
+  if (emptyHelp[collection]) return emptyHelp[collection];
+  const labels = fields.map((f) => f.label.trim().toLowerCase()).filter(Boolean);
+  return labels.length ? `Each entry notes ${labels.join(", ")}.` : undefined;
+};
+
+function EmptyCards({
+  onAdd,
+  canAdd,
+  help,
+}: {
+  onAdd: () => void;
+  canAdd: boolean;
+  help?: string | undefined;
+}) {
   return (
     <div className="flex flex-col items-center rounded-[16px] border border-dashed border-foreground/25 px-6 py-8 text-center">
       <p className="text-[16px] font-medium">No entries yet</p>
+      {help ? (
+        <p className="mt-1.5 max-w-72 text-[14px] leading-5 text-muted-foreground">{help}</p>
+      ) : null}
       {canAdd ? (
         <Button
           variant="tonal"
@@ -382,7 +468,11 @@ export function EntriesStep({
         {pages.length ? (
           <Pager pages={pages} index={Math.min(page, pages.length - 1)} onIndex={setPage} />
         ) : (
-          <EmptyCards canAdd={!full} onAdd={() => setSheet(true)} />
+          <EmptyCards
+            canAdd={!full}
+            onAdd={() => setSheet(true)}
+            help={helpFor(view.collection, view.fields)}
+          />
         )}
       </div>
       {full || !pages.length ? null : (
@@ -416,6 +506,7 @@ export function EntriesStep({
           fields={view.fields}
           submitLabel="Add entry"
           history={entries(view.collection)}
+          collection={view.collection}
           onSubmit={(v) => {
             addEntry(view.collection, v, ctx.day);
             setSheet(false);
@@ -425,7 +516,13 @@ export function EntriesStep({
         />
       </BottomSheet>
       <Snackbar message={snack.message} />
-      <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
+      <Footer
+        onBack={ctx.onBack}
+        onNext={ctx.onNext}
+        label={nextLabel(ctx)}
+        disabled={!full && !list.some((e) => e.day === ctx.day)}
+        hint="Add an entry for today to continue"
+      />
     </>
   );
 }
@@ -518,7 +615,13 @@ function ListEntries({
           </p>
         ) : null}
       </div>
-      <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
+      <Footer
+        onBack={ctx.onBack}
+        onNext={ctx.onNext}
+        label={nextLabel(ctx)}
+        disabled={filled === 0 && carried.length < max}
+        hint="Write at least one to continue"
+      />
     </>
   );
 }
@@ -729,7 +832,11 @@ export function ReviewStep({
         {pages.length ? (
           <Pager pages={pages} index={Math.min(page, pages.length - 1)} onIndex={setPage} />
         ) : (
-          <EmptyCards canAdd={Boolean(view.addFields)} onAdd={() => setSheet(true)} />
+          <EmptyCards
+            canAdd={Boolean(view.addFields)}
+            onAdd={() => setSheet(true)}
+            help={helpFor(view.collection, [...(view.addFields ?? []), ...view.fields])}
+          />
         )}
       </div>
       {view.addFields && pages.length ? (
@@ -748,6 +855,7 @@ export function ReviewStep({
           fields={[...(view.addFields ?? []), ...view.fields]}
           submitLabel="Add entry"
           history={entries(view.collection)}
+          collection={view.collection}
           onSubmit={(v) => {
             addEntry(view.collection, v, ctx.day);
             setSheet(false);
@@ -757,7 +865,20 @@ export function ReviewStep({
         />
       </BottomSheet>
       <Snackbar message={snack.message} />
-      <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
+      <Footer
+        onBack={ctx.onBack}
+        onNext={ctx.onNext}
+        label={nextLabel(ctx)}
+        disabled={
+          !list.some((e) =>
+            view.fields.some((f) => {
+              const v = e.values[f.key];
+              return typeof v === "boolean" || (typeof v === "string" && v.trim() !== "");
+            }),
+          )
+        }
+        hint="Fill in at least one entry to continue"
+      />
     </>
   );
 }
@@ -833,13 +954,20 @@ export function TrackerStep({
           fields={[{ key: view.field, label: "Habit I want to inculcate", type: "text" }]}
           submitLabel="Add entry"
           history={entries(view.collection)}
+          collection={view.collection}
           onSubmit={(v) => {
             addEntry(view.collection, v, ctx.day);
             setSheet(false);
           }}
         />
       </BottomSheet>
-      <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
+      <Footer
+        onBack={ctx.onBack}
+        onNext={ctx.onNext}
+        label={nextLabel(ctx)}
+        disabled={habits.length === 0}
+        hint="Add a habit to continue"
+      />
     </>
   );
 }

@@ -76,7 +76,12 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
   const done = state.completed.includes(day.day);
   const toProgramme = () => navigate({ to: "/program/$slug", params: { slug } });
 
-  if (!done && day.day > nextDay) {
+  // local builds can open any day with ?preview to check its screens
+  const preview =
+    import.meta.env.DEV &&
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("preview");
+  if (!done && !preview && day.day > nextDay) {
     return (
       <div
         style={accentStyle(programme.accent)}

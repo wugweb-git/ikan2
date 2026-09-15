@@ -421,13 +421,16 @@ export function QuickPicks({
           <button
             key={it.value}
             type="button"
+            // keep focus where it is: blurring first closes the keyboard, the sheet jumps and
+            // the tap lands on whatever moved under the finger
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => onPick(it.value)}
             className={cn(
               "inline-flex min-h-9 max-w-full items-center rounded-full px-3 py-1.5 text-left text-[13px] font-medium",
               stateLayer,
               selected === it.value
                 ? "bg-foreground text-background"
-                : "bg-[var(--accent-container)] text-[var(--on-accent-container)]",
+                : "border border-foreground/10 bg-secondary text-foreground",
             )}
           >
             <span className="line-clamp-1">{it.label}</span>
@@ -582,15 +585,18 @@ export function Pager({
   pages,
   index,
   onIndex,
+  peek = true,
 }: {
   pages: ReactNode[];
   index: number;
   onIndex: (i: number) => void;
+  /** show the edge of the next card; off when each page is a full screen of its own */
+  peek?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const programmatic = useRef(false);
 
-  const many = pages.length > 1;
+  const many = peek && pages.length > 1;
   const offsetOf = (el: HTMLDivElement, i: number) => {
     const child = el.children[i] as HTMLElement | undefined;
     return child ? child.offsetLeft - el.offsetLeft : 0;

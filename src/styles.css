@@ -987,27 +987,111 @@ body {
 }
 
 /* splash: the disc opens, the mark blooms, the words rise, then a slow pulse while loading */
-@keyframes splash-disc { 0% { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-@keyframes splash-mark { 0% { transform: rotate(-120deg) scale(0.3); opacity: 0; } 100% { transform: rotate(0) scale(1); opacity: 1; } }
-@keyframes splash-rise { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes splash-ring { 0% { transform: scale(0.6); opacity: 0.4; } 100% { transform: scale(1.5); opacity: 0; } }
-@keyframes splash-progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
-@keyframes splash-hills { from { transform: translateY(40px); } to { transform: translateY(0); } }
-@utility splash-disc { animation: splash-disc 700ms cubic-bezier(.2,.8,.2,1) both; }
-@utility splash-mark { animation: splash-mark 900ms cubic-bezier(.2,.8,.2,1) 150ms both; }
-@utility splash-rise { animation: splash-rise 600ms cubic-bezier(.2,.8,.2,1) both; }
-@utility splash-ring { opacity: 0; animation: splash-ring 3.2s cubic-bezier(.33,0,.2,1) infinite; }
-@utility splash-progress { animation: splash-progress 1.4s ease-in-out infinite; }
-@utility splash-hills { animation: splash-hills 1s cubic-bezier(.2,.8,.2,1) both; }
-@media (prefers-reduced-motion: reduce) {
-  .splash *, .splash { animation: none !important; opacity: 1 !important; transform: none !important; }
-  .splash .splash-ring { display: none; }
+@keyframes splash-disc {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
-html.reduce-motion .splash * { animation: none !important; opacity: 1 !important; transform: none !important; }
-html.reduce-motion .splash .splash-ring { display: none; }
+@keyframes splash-mark {
+  0% {
+    transform: rotate(-120deg) scale(0.3);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes splash-rise {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes splash-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+@keyframes splash-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+@keyframes splash-hills {
+  from {
+    transform: translateY(40px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@utility splash-disc {
+  animation: splash-disc 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@utility splash-mark {
+  animation: splash-mark 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms both;
+}
+@utility splash-rise {
+  animation: splash-rise 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@utility splash-ring {
+  opacity: 0;
+  animation: splash-ring 3.2s cubic-bezier(0.33, 0, 0.2, 1) infinite;
+}
+@utility splash-progress {
+  animation: splash-progress 1.4s ease-in-out infinite;
+}
+@utility splash-hills {
+  animation: splash-hills 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash *,
+  .splash {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .splash .splash-ring {
+    display: none;
+  }
+}
+html.reduce-motion .splash * {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+html.reduce-motion .splash .splash-ring {
+  display: none;
+}
 
 /* the launch screen is for phones; elsewhere the loading moment is a plain background */
 @media (min-width: 768px), (pointer: fine) {
-  .splash-phone-only { background: var(--canvas) !important; }
-  .splash-phone-only > * { display: none !important; }
+  .splash-phone-only {
+    background: var(--canvas) !important;
+  }
+  .splash-phone-only > * {
+    display: none !important;
+  }
 }
