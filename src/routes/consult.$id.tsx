@@ -32,6 +32,7 @@ import {
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
+import { AddToCalendar } from "@/components/add-to-calendar";
 import {
   getConsultant,
   hourLabel,
@@ -250,6 +251,7 @@ function Booking({ c }: { c: Consultant }) {
   const [dayOffset, setDayOffset] = useState(c.next.inDays);
   const [hour, setHour] = useState<number | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [booked, setBooked] = useState<{ mode: string; startsAt: string } | null>(null);
   const [done, setDone] = useState(false);
 
   const price = c.sessions.find((s) => s.mode === mode)!.price;
@@ -428,7 +430,22 @@ function Booking({ c }: { c: Consultant }) {
               Your request with {c.name} is saved in My history. Booking and payment aren’t
               connected in this preview yet.
             </p>
-            <div className="mt-6 flex flex-col gap-2">
+            {booked ? (
+              <AddToCalendar
+                className="mt-5 w-full"
+                label="Add to calendar"
+                filename="ikan-consultation"
+                event={{
+                  title: `iKAN consultation with ${c.name}`,
+                  details: `${booked.mode} session. Requested in iKAN; you’ll get a confirmation before it’s final.`,
+                  start: new Date(booked.startsAt),
+                  minutes: 50,
+                  url: "https://app.ikanhealth.in/history",
+                  alertBefore: 30,
+                }}
+              />
+            ) : null}
+            <div className="mt-3 flex flex-col gap-2">
               <Link
                 to="/history"
                 className="inline-flex h-12 items-center justify-center rounded-full bg-foreground text-[15px] font-semibold text-background"
@@ -468,7 +485,9 @@ function Booking({ c }: { c: Consultant }) {
             <div className="mt-6 flex flex-col gap-2">
               <Button
                 onClick={() => {
-                  book({ consultantId: c.id, mode, price, startsAt: startsAt().toISOString() });
+                  const at = startsAt().toISOString();
+                  book({ consultantId: c.id, mode, price, startsAt: at });
+                  setBooked({ mode, startsAt: at });
                   setHour(null);
                   setDone(true);
                 }}

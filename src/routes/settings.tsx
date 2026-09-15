@@ -59,6 +59,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
 import { recentAverage, useGoogleHealth } from "@/lib/google-health";
+import { AddToCalendar } from "@/components/add-to-calendar";
 import { enablePush, pushSupported, sendTestPush } from "@/lib/push";
 import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
 import type { LegalSlug } from "@/lib/content";
@@ -193,15 +194,32 @@ function SettingsPage() {
             />
           </Row>
           {settings.moodReminders ? (
-            <label className="flex min-h-14 items-center gap-4 px-4 py-2 pl-[72px]">
-              <span className="flex-1 text-[14px] text-muted-foreground">Remind me at</span>
-              <input
-                type="time"
-                value={settings.moodReminderTime}
-                onChange={(e) => set("moodReminderTime", e.target.value)}
-                className="h-10 rounded-[10px] bg-secondary px-3 text-[15px] font-semibold tabular-nums"
+            <>
+              <label className="flex min-h-14 items-center gap-4 px-4 py-2 pl-[72px]">
+                <span className="flex-1 text-[14px] text-muted-foreground">Remind me at</span>
+                <input
+                  type="time"
+                  value={settings.moodReminderTime}
+                  onChange={(e) => set("moodReminderTime", e.target.value)}
+                  className="h-10 rounded-[10px] bg-secondary px-3 text-[15px] font-semibold tabular-nums"
+                />
+              </label>
+              <AddToCalendar
+                variant="row"
+                className="pl-[72px]"
+                label="Add daily reminder to my calendar"
+                filename="ikan-mood-check-in"
+                time={settings.moodReminderTime}
+                event={{
+                  title: "iKAN mood check-in",
+                  details: "A 30-second check-in on how you feel today.",
+                  start: new Date(),
+                  minutes: 5,
+                  daily: true,
+                  url: "https://app.ikanhealth.in/journal",
+                }}
               />
-            </label>
+            </>
           ) : null}
           {toggle(
             "assessmentReminders",

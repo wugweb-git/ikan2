@@ -49,6 +49,7 @@ import {
 import { dedupe, programmeAbout, type ProgrammeAbout } from "@/lib/content/about";
 import { useScrollY } from "@/hooks/use-personal-context";
 import { cn } from "@/lib/utils";
+import { AddToCalendar } from "@/components/add-to-calendar";
 import { focusOf, getProgramme, minutesOf } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 import type { Programme } from "@/lib/equip/types";
@@ -210,6 +211,21 @@ function ProgrammePage() {
                 Day {today.day}
               </p>
               <p className="font-display text-[18px] font-semibold leading-6">{today.title}</p>
+              <AddToCalendar
+                className="mt-3"
+                label="Daily reminder"
+                filename={`ikan-${programme.slug}`}
+                time="20:00"
+                event={{
+                  title: `${programme.name}: today’s session`,
+                  details: `About ${minutesOf(today)} minutes. Open iKAN to continue your program.`,
+                  start: new Date(),
+                  minutes: Math.max(10, minutesOf(today)),
+                  daily: Math.max(1, programme.days.length - state.completed.length),
+                  url: `https://app.ikanhealth.in/program/${programme.slug}`,
+                  alertBefore: 0,
+                }}
+              />
               {shown.length ? (
                 <ol className="mt-4 space-y-1.5 text-[15px]">
                   {shown.map((t, i) => (
