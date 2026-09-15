@@ -42,6 +42,48 @@ const display = (f: Field | undefined, v: EntryValues[string] | undefined) => {
   return v;
 };
 
+/** Short examples shown inside empty fields, so people know what kind of answer fits. */
+const hints: Record<string, string> = {
+  situation: "Where were you, what was going on?",
+  "what happened?": "Where were you, what was going on?",
+  event: "What happened, in a few words",
+  thoughts: "What went through your mind?",
+  thought: "What went through your mind?",
+  feelings: "Name the feeling, e.g. anxious, low",
+  feeling: "Name the feeling, e.g. anxious, low",
+  response: "What did you do next?",
+  disturbance: "e.g. Phone notifications",
+  "ways to reduce": "One small change you could try",
+  pros: "What’s good about it?",
+  cons: "What’s hard about it?",
+  ritual: "e.g. Dim the lights, read a few pages",
+  activity: "e.g. A short walk",
+  "habit i want to inculcate": "e.g. No screens after 10 pm",
+  effort: "What did you put in?",
+  "expected reward": "What did you hope to get back?",
+  "general outcome": "What actually happened?",
+  "the ‘why’": "Why does this matter to you?",
+  "things that kept me up": "e.g. Worrying about tomorrow",
+  "how will you get rid of them?": "One step you can take",
+  "perfect outcome": "If everything went perfectly…",
+  "realistic outcome": "What’s likely and good enough?",
+  "realistic goal i’d like to set": "Something you can do this week",
+  "steps i can take towards achieving that goal": "First step, then the next",
+  "task i will take up today": "One task, small enough to finish",
+  timeline: "e.g. By 5 pm",
+  "how can you reduce these demands?": "e.g. Say no to one extra task",
+  "how can you increase your resources?": "e.g. Ask someone for help",
+  "i understand that": "What you can accept about this",
+  "my alternate thoughts": "A kinder, more balanced way to see it",
+  "how they make me feel now": "How do you feel after rethinking it?",
+};
+const hintFor = (f: Field) => hints[f.label.trim().toLowerCase()];
+
+const nowTime = () => {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+};
+
 function FieldInput({
   field,
   value,
@@ -86,6 +128,8 @@ function FieldInput({
       value={typeof value === "string" ? value : ""}
       onChange={onChange}
       multiline={field.type === "longtext"}
+      rows={field.type === "longtext" ? 2 : undefined}
+      placeholder={hintFor(field)}
       maxLength={field.type === "longtext" ? 2000 : field.type === "text" ? 200 : undefined}
       error={error}
     />
@@ -124,9 +168,14 @@ function EntryForm({
   /** earlier entries in the same collection, offered back per field */
   history?: Entry[];
 }) {
-  const [values, setValues] = useState<EntryValues>(initial ?? {});
+  // time fields start at now, since most entries are logged as things happen
+  const [values, setValues] = useState<EntryValues>(
+    () =>
+      initial ??
+      Object.fromEntries(fields.filter((f) => f.type === "time").map((f) => [f.key, nowTime()])),
+  );
   const [tried, setTried] = useState(false);
-  const ready = fields.some((f) => String(values[f.key] ?? "").trim());
+  const ready = fields.some((f) => f.type !== "time" && String(values[f.key] ?? "").trim());
   const errors = entryErrors(fields, values);
   return (
     <form
@@ -229,9 +278,6 @@ function EmptyCards({ onAdd, canAdd }: { onAdd: () => void; canAdd: boolean }) {
   return (
     <div className="flex flex-col items-center rounded-[16px] border border-dashed border-foreground/25 px-6 py-8 text-center">
       <p className="text-[16px] font-medium">No entries yet</p>
-      <p className="mt-1 text-[14px] text-muted-foreground">
-        Each entry gets its own card. Swipe between them.
-      </p>
       {canAdd ? (
         <Button
           variant="tonal"

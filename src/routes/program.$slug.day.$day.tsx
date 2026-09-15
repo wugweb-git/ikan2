@@ -87,7 +87,8 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
             <Lock className="h-7 w-7" />
           </span>
           <h1 className="mt-6 font-display text-[24px] font-semibold">
-            Day {day.day} opens after day {nextDay}
+            {day.day === 0 ? "Onboarding" : `Day ${day.day}`} opens after{" "}
+            {nextDay === 0 ? "onboarding" : `day ${nextDay}`}
           </h1>
           <Button
             className="mt-6"
@@ -95,7 +96,7 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
               navigate({ to: "/program/$slug/day/$day", params: { slug, day: String(nextDay) } })
             }
           >
-            Go to day {nextDay}
+            {nextDay === 0 ? "Start onboarding" : `Go to day ${nextDay}`}
           </Button>
         </div>
       </div>

@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { formatDuration, formatTime, nightMetrics, type DiaryEntry } from "@/lib/equip/metrics";
 import { visibleBody, type NBlock } from "@/lib/equip/notion";
 import { useProgramme } from "@/lib/equip/store";
+import { Illustration } from "@/components/art";
+import type { Art } from "@/lib/resources";
 import type { Step, UI } from "@/lib/equip/types";
 import {
   Button,
@@ -139,6 +141,12 @@ function BlockText({
 
 /* --------------------------------- steps --------------------------------- */
 
+const lessonArt: Record<string, Art> = {
+  "sleep-tight": "sleep",
+  unburn: "burnout",
+  "stress-buster": "stress",
+};
+
 function LessonStep({
   step,
   view,
@@ -150,6 +158,14 @@ function LessonStep({
 }) {
   // Notion writes some lists inline: "No idea is wrong • Don't critique while writing • …"
   const bullets = Boolean(step.block.body[0]?.text.includes(" • "));
+  // text-only lessons get the program's artwork so the screen isn't half empty
+  const art = lessonArt[ctx.slug] ?? "checkup";
+  const textOnly = !view.cards && !bullets;
+  const short =
+    !view.cards &&
+    step.block.body.length > 0 &&
+    step.block.body.every((b) => b.kind === "p") &&
+    step.block.body.reduce((n, b) => n + b.text.length, 0) <= 60;
   return (
     <>
       {bullets ? (
@@ -168,6 +184,34 @@ function LessonStep({
             </p>
           ))}
         </div>
+      ) : short ? (
+        // a one-line lesson ("Welcome back! Let's keep logging.") reads as a pause, not a page
+        <div className="flex flex-col items-center text-center">
+          <div className="-mx-4 h-56 w-[calc(100%+2rem)] overflow-hidden rounded-b-[32px]">
+            <Illustration art={art} />
+          </div>
+          <p className="mt-6 text-[14px] font-semibold text-[var(--accent-strong)]">
+            {ctx.day === 0 ? "Onboarding" : `Day ${ctx.day}`}
+          </p>
+          <h2 className="mt-1 font-display text-[30px] font-semibold leading-9">
+            {step.block.title}
+          </h2>
+          {step.block.body.map((b) => (
+            <p
+              key={b.text}
+              className="mt-2 max-w-[28ch] text-[17px] leading-6 text-muted-foreground"
+            >
+              {b.text}
+            </p>
+          ))}
+        </div>
+      ) : textOnly ? (
+        <>
+          <div className="-mx-4 -mt-4 mb-5 h-44 overflow-hidden">
+            <Illustration art={art} />
+          </div>
+          <BlockText block={step.block} />
+        </>
       ) : (
         <BlockText block={step.block} icon={<BookOpen />} />
       )}
@@ -177,7 +221,7 @@ function LessonStep({
             <section
               key={c.title}
               className={cn(
-                "rounded-[20px] p-4",
+                "min-w-0 rounded-[20px] p-4",
                 i % 2 === 0
                   ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]"
                   : "border border-foreground/10 bg-background",
@@ -189,7 +233,22 @@ function LessonStep({
                   {t}
                 </p>
               ))}
-              {c.items.length ? (
+              {c.items.length &&
+              (view.cards!.length === 1 || c.items.some((x) => x.length > 28)) ? (
+                <ol className="mt-3 divide-y divide-foreground/10 overflow-hidden rounded-[14px] bg-background">
+                  {c.items.map((it, n) => (
+                    <li
+                      key={it}
+                      className="flex gap-3 px-3 py-2.5 text-[15px] leading-5 text-foreground"
+                    >
+                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--accent-container)] text-[12px] font-semibold tabular-nums text-[var(--on-accent-container)]">
+                        {n + 1}
+                      </span>
+                      <span className="min-w-0">{it}</span>
+                    </li>
+                  ))}
+                </ol>
+              ) : c.items.length ? (
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {c.items.map((it) => (
                     <li

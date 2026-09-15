@@ -316,7 +316,7 @@ export function TextField({
   multiline?: boolean;
   autoFocus?: boolean;
   ariaLabel?: string;
-  placeholder?: string;
+  placeholder?: string | undefined;
   error?: string | undefined;
   hint?: string | undefined;
   maxLength?: number | undefined;
