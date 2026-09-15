@@ -68,3 +68,15 @@ create policy "own push delete" on public.ikan2_push_subscriptions for delete to
 
 -- 2026-09-15 "ikan2_health_moods": mood logs from Google Health (mindfulness scope)
 alter table public.ikan2_health_daily add column if not exists moods text[];
+
+-- 2026-09-15 "ikan2_health_connect": the Android app saves Health Connect daily summaries itself.
+alter table public.ikan2_health_daily
+  add column if not exists heart_rate numeric,
+  add column if not exists deep_minutes integer,
+  add column if not exists rem_minutes integer,
+  add column if not exists exercise_minutes integer,
+  add column if not exists source text not null default 'health_connect';
+grant insert, update, delete on public.ikan2_health_daily to authenticated;
+create policy "own health insert" on public.ikan2_health_daily for insert to authenticated with check ((select auth.uid()) = user_id);
+create policy "own health update" on public.ikan2_health_daily for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+create policy "own health delete" on public.ikan2_health_daily for delete to authenticated using ((select auth.uid()) = user_id);

@@ -21,6 +21,7 @@ import {
   Trash2,
   TrendingUp,
   Watch,
+  SlidersHorizontal,
   BellRing,
   HeartPulse,
   Unlink,
@@ -59,6 +60,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
 import { AddToCalendar } from "@/components/add-to-calendar";
+import { PLAY_STORE_URL, recentAverage, useHealthConnect } from "@/lib/health-connect";
 import { enablePush, pushSupported, sendTestPush } from "@/lib/push";
 import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
 import type { LegalSlug } from "@/lib/content";
@@ -248,14 +250,9 @@ function SettingsPage() {
 
         <Group
           title="Health data"
-          note="Sleep, steps and heart rate come from Health Connect in the iKAN Android app. They are shown only to you and never sold or shared."
+          note="iKAN reads sleep, steps, heart rate and exercise from Health Connect, only after you allow it, to show them beside your iKAN Score and programs. Shown only to you, never sold or shared."
         >
-          {toggle(
-            "healthConnect",
-            "Health Connect",
-            "All phone health data, from the iKAN Android app (coming soon)",
-            Watch,
-          )}
+          <HealthConnectRows onMessage={snack.show} />
         </Group>
 
         <Group title="Privacy">
@@ -369,6 +366,108 @@ function SettingsPage() {
         <Snackbar message={snack.message} />
       </div>
     </IkanShell>
+  );
+}
+
+function HealthConnectRows({ onMessage }: { onMessage: (m: string) => void }) {
+  const hydrated = useHydrated();
+  const h = useHealthConnect();
+
+  useEffect(() => {
+    if (h.error) onMessage(h.error);
+  }, [h.error]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const steps = recentAverage(h.days, "steps");
+  const sleep = recentAverage(h.days, "sleep_minutes");
+  const summary = [
+    steps ? `${Math.round(steps).toLocaleString("en-IN")} steps` : null,
+    sleep ? `${Math.floor(sleep / 60)}h ${Math.round(sleep % 60)}m sleep` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const pill = (label: string, onClick: () => void, filled = true) => (
+    <button
+      type="button"
+      disabled={h.busy}
+      onClick={onClick}
+      className={cn(
+        "inline-flex h-9 shrink-0 items-center rounded-full px-4 text-[13px] font-semibold disabled:opacity-50",
+        filled ? "bg-foreground text-background" : "border border-foreground/15",
+      )}
+    >
+      {h.busy ? "…" : label}
+    </button>
+  );
+
+  if (!hydrated) return null;
+
+  if (!h.native) {
+    return (
+      <Row
+        icon={Watch}
+        label="Health Connect"
+        sub={
+          summary
+            ? `From your phone, 7-day average: ${summary}`
+            : "Sleep, steps and heart rate from your phone, in the iKAN Android app"
+        }
+      >
+        <a
+          href={PLAY_STORE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 shrink-0 items-center rounded-full border border-foreground/15 px-4 text-[13px] font-semibold"
+        >
+          Get app
+        </a>
+      </Row>
+    );
+  }
+
+  return (
+    <>
+      <Row
+        icon={Watch}
+        label="Health Connect"
+        sub={
+          h.availability === "unavailable"
+            ? "Not available on this phone"
+            : h.availability === "update_required"
+              ? "Install or update Health Connect first"
+              : h.connected
+                ? summary
+                  ? `7-day average: ${summary}`
+                  : "Connected. Data appears once your phone or watch records it."
+                : "Sleep, steps, heart rate and exercise from your phone and watch"
+        }
+      >
+        {h.availability === "update_required"
+          ? pill("Install", () => void h.install())
+          : h.availability === "available"
+            ? h.connected
+              ? pill("Sync", () => void h.sync().then(() => onMessage("Health data synced")), false)
+              : pill("Connect", () => void h.connect())
+            : null}
+      </Row>
+      {h.connected ? (
+        <>
+          <ActionRow
+            icon={SlidersHorizontal}
+            label="Choose what iKAN can read"
+            sub="Opens Health Connect, where you can change or remove access"
+            onClick={() => void h.manage()}
+          />
+          <ActionRow
+            icon={Trash2}
+            label="Delete synced health data"
+            sub="Removes the daily summaries iKAN saved to your account"
+            danger
+            onClick={() => void h.removeData().then(() => onMessage("Health data deleted"))}
+          />
+        </>
+      ) : null}
+    </>
   );
 }
 

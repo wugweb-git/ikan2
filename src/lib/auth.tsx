@@ -5,6 +5,7 @@ import { importLegacyData, resetLegacyImport } from "@/lib/legacy-import";
 import { claimGuestData, getScope, setScope } from "@/lib/storage-scope";
 
 import { BACKEND_KEY, BACKEND_URL, functionUrl } from "@/lib/backend";
+import { isNativeApp, listenForNativeAuth, nativeOAuth } from "@/lib/native-auth";
 
 /* Accounts live in the iKAN Supabase project (see backend.ts). */
 
@@ -189,9 +190,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === "PASSWORD_RECOVERY") setRecovering(true);
       apply(s);
     });
+    let stopNative = () => {};
+    void listenForNativeAuth(sb).then((stop) => {
+      if (alive) stopNative = stop;
+      else stop();
+    });
     return () => {
       alive = false;
       data.subscription.unsubscribe();
+      stopNative();
     };
   }, []);
 
@@ -263,6 +270,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(friendly(error.message));
     },
     signInWith: async (provider) => {
+      if (isNativeApp()) {
+        try {
+          return await nativeOAuth(supabase(), provider);
+        } catch (e) {
+          throw new Error(friendly((e as Error).message));
+        }
+      }
       const { error } = await supabase().auth.signInWithOAuth({
         provider,
         options: { redirectTo: `${origin()}/` },
