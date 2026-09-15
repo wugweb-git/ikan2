@@ -307,6 +307,7 @@ export function TextField({
   max,
   min,
   onBlur,
+  rows,
 }: {
   label: string;
   value: string;
@@ -324,6 +325,8 @@ export function TextField({
   max?: string | undefined;
   min?: string | undefined;
   onBlur?: (() => void) | undefined;
+  /** visible lines for a multiline field (default 3) */
+  rows?: number | undefined;
 }) {
   const common = {
     value,
@@ -339,7 +342,7 @@ export function TextField({
     className: cn(
       "w-full bg-transparent px-4 text-[16px] leading-6 outline-none placeholder:text-muted-foreground/70",
       label ? "pb-2.5 pt-0.5" : "py-4",
-      multiline && "min-h-24 resize-none",
+      multiline && (rows ? "resize-none" : "min-h-24 resize-none"),
     ),
   };
   return (
@@ -356,7 +359,7 @@ export function TextField({
           </span>
         ) : null}
         {multiline ? (
-          <textarea {...common} rows={3} />
+          <textarea {...common} rows={rows ?? 3} />
         ) : (
           <input {...common} type={type} max={max} min={min} />
         )}
@@ -394,6 +397,44 @@ function FieldMessage({
         </span>
       ) : null}
     </span>
+  );
+}
+
+/** Earlier answers offered back as one-tap picks. */
+export function QuickPicks({
+  title = "From earlier days",
+  items,
+  selected,
+  onPick,
+}: {
+  title?: string;
+  items: { label: string; value: string }[];
+  selected?: string | undefined;
+  onPick: (value: string) => void;
+}) {
+  if (!items.length) return null;
+  return (
+    <div className="mt-3">
+      <p className="text-[12px] text-muted-foreground">{title}</p>
+      <div className="mt-1.5 flex flex-wrap gap-2">
+        {items.map((it) => (
+          <button
+            key={it.value}
+            type="button"
+            onClick={() => onPick(it.value)}
+            className={cn(
+              "inline-flex min-h-9 max-w-full items-center rounded-full px-3 py-1.5 text-left text-[13px] font-medium",
+              stateLayer,
+              selected === it.value
+                ? "bg-foreground text-background"
+                : "bg-[var(--accent-container)] text-[var(--on-accent-container)]",
+            )}
+          >
+            <span className="line-clamp-1">{it.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -549,10 +590,16 @@ export function Pager({
   const ref = useRef<HTMLDivElement>(null);
   const programmatic = useRef(false);
 
+  const many = pages.length > 1;
+  const offsetOf = (el: HTMLDivElement, i: number) => {
+    const child = el.children[i] as HTMLElement | undefined;
+    return child ? child.offsetLeft - el.offsetLeft : 0;
+  };
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const target = index * el.clientWidth;
+    const target = offsetOf(el, index);
     if (Math.abs(el.scrollLeft - target) > 4) {
       programmatic.current = true;
       el.scrollTo({ left: target, behavior: "smooth" });
@@ -567,13 +614,27 @@ export function Pager({
         onScroll={(e) => {
           if (programmatic.current) return;
           const el = e.currentTarget;
-          const i = Math.round(el.scrollLeft / el.clientWidth);
-          if (i !== index) onIndex(i);
+          let best = 0;
+          for (let i = 0; i < pages.length; i++)
+            if (
+              Math.abs(offsetOf(el, i) - el.scrollLeft) <
+              Math.abs(offsetOf(el, best) - el.scrollLeft)
+            )
+              best = i;
+          if (best !== index) onIndex(best);
         }}
-        className="no-scrollbar -mx-4 flex snap-x snap-mandatory overflow-x-auto"
+        className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 overflow-x-auto"
       >
         {pages.map((p, i) => (
-          <div key={i} className="w-full shrink-0 snap-center px-4" aria-hidden={i !== index}>
+          // with more than one card the next one peeks in, so it's clear there is more
+          <div
+            key={i}
+            className={cn(
+              "shrink-0 snap-start pl-4",
+              many ? "w-[82%] last:w-[calc(82%+1rem)] last:pr-4" : "w-full pr-4",
+            )}
+            aria-hidden={i !== index}
+          >
             {p}
           </div>
         ))}

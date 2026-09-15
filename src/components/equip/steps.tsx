@@ -4,17 +4,27 @@ import {
   BookOpen,
   Check,
   CircleCheckBig,
-  Clock3,
   Minus,
   PencilLine,
   Plus,
+  X as XIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDuration, formatTime, nightMetrics, type DiaryEntry } from "@/lib/equip/metrics";
 import { visibleBody, type NBlock } from "@/lib/equip/notion";
 import { useProgramme } from "@/lib/equip/store";
 import type { Step, UI } from "@/lib/equip/types";
-import { Button, IconButton, Pager, Segmented, SelectRow, TextField, stateLayer } from "./m3";
+import {
+  Button,
+  IconButton,
+  Pager,
+  QuickPicks,
+  Segmented,
+  SelectRow,
+  TextField,
+  stateLayer,
+} from "./m3";
+import { earlierAnswers } from "@/lib/equip/earlier";
 import { EntriesStep, ReviewStep, TrackerStep } from "./cards";
 import { DayCheckIn } from "./day-check-in";
 
@@ -263,6 +273,41 @@ function ChoiceStep({
             );
           })}
         </div>
+      ) : !view.multi &&
+        view.options.length === 2 &&
+        view.options.every((o) => /^(yes|no)$/i.test(o.label.trim())) ? (
+        // yes / no on one row
+        <div role="radiogroup" aria-label={view.prompt} className="mt-5 grid grid-cols-2 gap-3">
+          {view.options.map((o) => {
+            const on = picked.includes(o.label);
+            const yes = /^yes$/i.test(o.label.trim());
+            return (
+              <button
+                key={o.label}
+                type="button"
+                role="radio"
+                aria-checked={on}
+                onClick={() => toggle(o.label)}
+                className={cn(
+                  "flex h-14 items-center justify-center gap-2 rounded-[16px] border text-[16px] font-semibold transition-colors",
+                  stateLayer,
+                  on
+                    ? yes
+                      ? "border-transparent bg-[#DFF0E8] text-[#173D2F]"
+                      : "border-transparent bg-[#F9DEDC] text-[#8C1D18]"
+                    : "border-foreground/15",
+                )}
+              >
+                {yes ? (
+                  <Check className="h-5 w-5" strokeWidth={3} />
+                ) : (
+                  <XIcon className="h-5 w-5" strokeWidth={3} />
+                )}
+                {o.label.trim()}
+              </button>
+            );
+          })}
+        </div>
       ) : (
         <div
           role={view.multi ? "group" : "radiogroup"}
@@ -384,6 +429,14 @@ function ScaleStep({
           ))}
         </div>
       </div>
+      {typeof earlierAnswers(ctx.slug, state, step, ctx.day, 1)[0] === "number" ? (
+        <p className="mt-6 text-center text-[13px] text-muted-foreground">
+          Last time you chose{" "}
+          <span className="font-semibold text-foreground">
+            {String(earlierAnswers(ctx.slug, state, step, ctx.day, 1)[0])}
+          </span>
+        </p>
+      ) : null}
       <Footer
         onBack={ctx.onBack}
         onNext={ctx.onNext}
@@ -427,6 +480,13 @@ function TextStep({
           onChange={(v) => setAnswer(key, v)}
           multiline
           maxLength={2000}
+        />
+        <QuickPicks
+          items={earlierAnswers(ctx.slug, state, step, ctx.day)
+            .filter((a): a is string => typeof a === "string")
+            .map((a) => ({ label: a, value: a }))}
+          selected={value}
+          onPick={(v) => setAnswer(key, v)}
         />
       </div>
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
@@ -667,36 +727,37 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
       <>
         <p className="text-[14px] font-semibold text-[var(--accent-strong)]">Sleep Diary</p>
         {m ? (
-          <div className="mt-4 rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-[13px]">Asleep</p>
-                <p className="font-display text-[32px] font-semibold leading-10 tabular-nums">
-                  {formatDuration(m.asleep)}
-                </p>
-              </div>
-              <div>
-                <p className="text-[13px]">In bed</p>
-                <p className="font-display text-[32px] font-semibold leading-10 tabular-nums">
-                  {formatDuration(m.inBed)}
-                </p>
-              </div>
+          <div className="mt-3 grid grid-cols-3 gap-2 rounded-[16px] bg-[var(--accent-container)] p-3 text-[var(--on-accent-container)]">
+            <div>
+              <p className="text-[12px]">Asleep</p>
+              <p className="font-display text-[20px] font-semibold tabular-nums">
+                {formatDuration(m.asleep)}
+              </p>
             </div>
-            <p className="mt-3 text-[14px]">
-              Sleep efficiency <span className="font-semibold tabular-nums">{m.efficiency}%</span>
-            </p>
+            <div>
+              <p className="text-[12px]">In bed</p>
+              <p className="font-display text-[20px] font-semibold tabular-nums">
+                {formatDuration(m.inBed)}
+              </p>
+            </div>
+            <div>
+              <p className="text-[12px]">Efficiency</p>
+              <p className="font-display text-[20px] font-semibold tabular-nums">{m.efficiency}%</p>
+            </div>
           </div>
         ) : null}
-        <ul className="-mx-4 mt-4">
+        <ul className="-mx-4 mt-2 divide-y divide-foreground/5">
           {questions.map((qq, i) => (
             <li key={qq.key}>
               <button
                 type="button"
                 onClick={() => setQ(i)}
-                className="flex min-h-14 w-full items-center justify-between gap-4 px-4 py-2 text-left"
+                className="flex min-h-10 w-full items-center justify-between gap-4 px-4 py-1.5 text-left"
               >
-                <span className="text-[15px] text-muted-foreground">{qq.label}</span>
-                <span className="shrink-0 text-[15px] font-semibold tabular-nums">
+                <span className="text-[14px] leading-5 text-muted-foreground">
+                  {qq.label.replace(/\s*\(1-5, 5 being best\)/, "")}
+                </span>
+                <span className="shrink-0 text-[14px] font-semibold tabular-nums">
                   {answerText(qq, entry)}
                 </span>
               </button>
@@ -745,6 +806,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
             label={question.label}
             value={entry[question.key] as string | undefined}
             recent={recentValues(question.key) as string[]}
+            suggested={suggestTimes(question.key, entry)}
             onChange={(v) => set({ [question.key]: v })}
           />
         ) : null}
@@ -795,38 +857,49 @@ function TimeAnswer({
   label,
   value,
   recent,
+  suggested,
   onChange,
 }: {
   label: string;
   value: string | undefined;
   recent: string[];
+  /** times worked out from tonight's earlier answers, or typical ones */
+  suggested: { label: string; value: string }[];
   onChange: (v: string) => void;
 }) {
+  const picks = [
+    ...recent.map((t, i) => ({
+      label: `${i === 0 ? "Last time, " : ""}${formatTime(t)}`,
+      value: t,
+    })),
+    ...suggested,
+  ].filter((p, i, all) => all.findIndex((x) => x.value === p.value) === i);
   return (
     <>
-      <label className="flex items-center gap-4 rounded-[24px] bg-[var(--accent-container)] px-5 py-5 text-[var(--on-accent-container)]">
-        <Clock3 className="h-7 w-7 shrink-0" aria-hidden="true" />
+      <label className="block rounded-[24px] bg-[var(--accent-container)] px-5 py-4 text-[var(--on-accent-container)]">
+        <span className="text-[12px]">Time</span>
         <input
           type="time"
           aria-label={label}
           value={value ?? ""}
           onChange={(e) => onChange(e.target.value)}
-          className="min-w-0 flex-1 bg-transparent font-display text-[40px] font-semibold tabular-nums outline-none"
+          className="block w-full bg-transparent font-display text-[40px] font-semibold tabular-nums outline-none"
         />
       </label>
-      {recent.length ? (
+      {picks.length ? (
         <>
-          <p className="mt-4 text-[13px] text-muted-foreground">From your earlier nights</p>
+          <p className="mt-4 text-[13px] text-muted-foreground">
+            {recent.length ? "From your earlier nights" : "Suggested"}
+          </p>
           <div className="mt-2 flex flex-wrap gap-2">
-            {recent.map((t, i) => (
+            {picks.slice(0, 5).map((p) => (
               <button
-                key={t}
+                key={p.value}
                 type="button"
-                onClick={() => onChange(t)}
-                className={chip(value === t)}
+                onClick={() => onChange(p.value)}
+                className={chip(value === p.value)}
               >
-                {i === 0 ? "Last time, " : ""}
-                {formatTime(t)}
+                {p.label}
               </button>
             ))}
           </div>
@@ -834,6 +907,50 @@ function TimeAnswer({
       ) : null}
     </>
   );
+}
+
+const addMinutes = (hhmm: string | undefined, minutes: number) => {
+  if (!hhmm || !/^\d{2}:\d{2}$/.test(hhmm)) return undefined;
+  const [h, m] = hhmm.split(":").map(Number);
+  const total = (((h! * 60 + m! + minutes) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+};
+
+/** Suggested times for a diary question, from tonight's earlier answers, else typical times. */
+function suggestTimes(key: keyof DiaryEntry, e: DiaryEntry) {
+  const from = (base: string | undefined, add: number, what: string) => {
+    const t = addMinutes(base, add);
+    return t ? [{ label: `${formatTime(t)} (${what})`, value: t }] : [];
+  };
+  const typical = (times: string[]) => times.map((t) => ({ label: formatTime(t), value: t }));
+  const asleepBy = addMinutes(
+    e.tried as string | undefined,
+    (e.latency as number | undefined) ?? 0,
+  );
+  switch (key) {
+    case "bed":
+      return typical(["22:00", "22:30", "23:00", "23:30"]);
+    case "tried":
+      return [
+        ...from(e.bed as string | undefined, 0, "when you got in bed"),
+        ...from(e.bed as string | undefined, 15, "15 min later"),
+        ...from(e.bed as string | undefined, 30, "30 min later"),
+      ];
+    case "woke":
+      return [
+        ...from(asleepBy, 7 * 60, "7 h after falling asleep"),
+        ...from(asleepBy, 8 * 60, "8 h after falling asleep"),
+        ...(asleepBy ? [] : typical(["06:00", "06:30", "07:00", "07:30"])),
+      ];
+    case "up":
+      return [
+        ...from(e.woke as string | undefined, 0, "when you woke"),
+        ...from(e.woke as string | undefined, 10, "10 min later"),
+        ...from(e.woke as string | undefined, 30, "30 min later"),
+      ];
+    default:
+      return [];
+  }
 }
 
 function AmountAnswer({

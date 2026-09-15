@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { MessageSquareHeart } from "lucide-react";
 import { useProgramme } from "@/lib/equip/store";
 import { cn } from "@/lib/utils";
 import { TextField } from "./m3";
@@ -32,8 +33,13 @@ export function DayCheckIn({
   };
 
   return (
-    <section className="mt-8">
-      <h2 className="text-[16px] font-semibold">How was today’s session?</h2>
+    <section className="mt-8 rounded-[24px] border border-foreground/10 bg-background p-4 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.25)]">
+      <div className="flex items-center gap-2">
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--accent-container)] text-[var(--on-accent-container)]">
+          <MessageSquareHeart className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <h2 className="text-[16px] font-semibold">How was today’s session?</h2>
+      </div>
       <div
         role="radiogroup"
         aria-label="Rate today’s session from 1 to 5"
@@ -52,7 +58,7 @@ export function DayCheckIn({
                 save({ rating: n });
               }}
               className={cn(
-                "h-12 rounded-[14px] font-display text-[18px] font-semibold tabular-nums transition-colors",
+                "h-11 rounded-[14px] font-display text-[18px] font-semibold tabular-nums transition-colors",
                 on ? "bg-[var(--accent-strong)] text-background" : "bg-secondary",
               )}
             >
@@ -66,7 +72,7 @@ export function DayCheckIn({
         <span>Very helpful</span>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-4">
         {prompt && onText ? (
           <>
             <p className="mb-2 text-[16px] font-semibold">{prompt}</p>
@@ -76,6 +82,7 @@ export function DayCheckIn({
               value={text ?? ""}
               onChange={onText}
               multiline
+              rows={2}
               maxLength={2000}
             />
           </>
@@ -88,6 +95,7 @@ export function DayCheckIn({
               save({ note: v });
             }}
             multiline
+            rows={2}
             maxLength={500}
           />
         )}

@@ -606,6 +606,21 @@ function build(
           });
         }
       }
+      // every day after onboarding ends on a conclusion, where the day's check-in lives
+      if (d.day > 0 && steps.at(-1)?.view.ui !== "conclude") {
+        const last = d.blocks.at(-1);
+        steps.push({
+          id: `${d.day}.conclusion`,
+          block: {
+            n: (last?.n ?? 0) + 1,
+            title: "Conclusion",
+            type: "conclude",
+            body: [{ kind: "p", text: `That’s day ${d.day} done. See you tomorrow.` }],
+            notes: [],
+          },
+          view: { ui: "conclude" },
+        });
+      }
       return { ...d, steps };
     }),
   );

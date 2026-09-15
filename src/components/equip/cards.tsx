@@ -3,6 +3,7 @@ import { CalendarCheck, ListChecks, NotebookPen, Plus, Trash2 } from "lucide-rea
 import { cn } from "@/lib/utils";
 import { formatTime } from "@/lib/equip/metrics";
 import { useProgramme, type Entry } from "@/lib/equip/store";
+import { earlierFieldValues } from "@/lib/equip/earlier";
 import type { EntryValues, Field, Step, UI } from "@/lib/equip/types";
 import { BlockText, Footer, type StepCtx } from "./steps";
 import {
@@ -12,12 +13,14 @@ import {
   Pager,
   Segmented,
   Snackbar,
+  QuickPicks,
   TextField,
   useSnack,
 } from "./m3";
 
 const nextLabel = (ctx: StepCtx) =>
-  ctx.finishLabel ?? (ctx.isLast ? `Finish day ${ctx.day}` : "Next");
+  ctx.finishLabel ??
+  (ctx.isLast ? (ctx.day === 0 ? "Finish onboarding" : `Finish day ${ctx.day}`) : "Next");
 
 const display = (f: Field | undefined, v: EntryValues[string] | undefined) => {
   if (v === null || v === undefined || v === "") return null;
@@ -111,10 +114,13 @@ function EntryForm({
   fields,
   onSubmit,
   submitLabel,
+  history = [],
 }: {
   fields: Field[];
   onSubmit: (v: EntryValues) => void;
   submitLabel: string;
+  /** earlier entries in the same collection, offered back per field */
+  history?: Entry[];
 }) {
   const [values, setValues] = useState<EntryValues>({});
   const [tried, setTried] = useState(false);
@@ -133,13 +139,25 @@ function EntryForm({
       }}
     >
       {fields.map((f) => (
-        <FieldInput
-          key={f.key}
-          field={f}
-          value={values[f.key]}
-          onChange={(v) => setValues((p) => ({ ...p, [f.key]: v }))}
-          error={tried ? errors[f.key] : undefined}
-        />
+        <div key={f.key}>
+          <FieldInput
+            field={f}
+            value={values[f.key]}
+            onChange={(v) => setValues((p) => ({ ...p, [f.key]: v }))}
+            error={tried ? errors[f.key] : undefined}
+          />
+          {f.type === "text" || f.type === "longtext" || f.type === "time" ? (
+            <QuickPicks
+              title="Used before"
+              items={earlierFieldValues(history, f.key).map((v) => ({
+                label: f.type === "time" ? formatTime(v) : v,
+                value: v,
+              }))}
+              selected={typeof values[f.key] === "string" ? (values[f.key] as string) : undefined}
+              onPick={(v) => setValues((p) => ({ ...p, [f.key]: v }))}
+            />
+          ) : null}
+        </div>
       ))}
       <Button type="submit" disabled={!ready} className="w-full">
         {submitLabel}
@@ -178,7 +196,7 @@ function CardShell({
   return (
     <article
       className={cn(
-        "min-h-[260px] rounded-[16px] p-5",
+        "h-full rounded-[16px] p-4",
         tone === "surface"
           ? "bg-secondary"
           : "bg-[var(--accent-container)] text-[var(--on-accent-container)]",
@@ -239,7 +257,7 @@ export function EntriesStep({
   view: Extract<UI, { ui: "entries" }>;
   ctx: StepCtx;
 }) {
-  const { addEntry, removeEntry, patchEntry } = useProgramme(ctx.slug);
+  const { addEntry, removeEntry, patchEntry, entries } = useProgramme(ctx.slug);
   const list = useVisibleEntries(
     ctx.slug,
     view.collection,
@@ -322,6 +340,7 @@ export function EntriesStep({
         <EntryForm
           fields={view.fields}
           submitLabel="Add entry"
+          history={entries(view.collection)}
           onSubmit={(v) => {
             addEntry(view.collection, v, ctx.day);
             setSheet(false);
@@ -454,7 +473,7 @@ export function ReviewStep({
   view: Extract<UI, { ui: "review" }>;
   ctx: StepCtx;
 }) {
-  const { state, addEntry, patchEntry } = useProgramme(ctx.slug);
+  const { state, addEntry, patchEntry, entries } = useProgramme(ctx.slug);
   const list = useVisibleEntries(ctx.slug, view.collection, view.scope, ctx.day);
   const [sheet, setSheet] = useState(false);
   const [page, setPage] = useState(0);
@@ -568,6 +587,7 @@ export function ReviewStep({
         <EntryForm
           fields={[...(view.addFields ?? []), ...view.fields]}
           submitLabel="Add entry"
+          history={entries(view.collection)}
           onSubmit={(v) => {
             addEntry(view.collection, v, ctx.day);
             setSheet(false);
@@ -652,6 +672,7 @@ export function TrackerStep({
         <EntryForm
           fields={[{ key: view.field, label: "Habit I want to inculcate", type: "text" }]}
           submitLabel="Add entry"
+          history={entries(view.collection)}
           onSubmit={(v) => {
             addEntry(view.collection, v, ctx.day);
             setSheet(false);
