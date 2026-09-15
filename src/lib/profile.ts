@@ -150,6 +150,9 @@ export function importProfile(
 
 /** Fill a fresh profile from the signed-in account (name, email, phone), once. A photo from
  * Google or LinkedIn fills an empty avatar whenever it arrives. */
+/** Old iKan photos were saved as signed storage links, which stop working after a week. */
+const expiringPhoto = (url: string) => url.includes("/storage/v1/object/sign/");
+
 export function seedProfile(account: {
   name: string;
   email: string;
@@ -158,7 +161,8 @@ export function seedProfile(account: {
 }) {
   const current = profileStore.read();
   if (current.email) {
-    if (account.avatar && !current.avatar)
+    // a photo from the sign-in provider replaces none, or an old iKan link that expires after a week
+    if (account.avatar && (!current.avatar || expiringPhoto(current.avatar)))
       profileStore.update((p) => ({ ...p, avatar: account.avatar! }));
     return;
   }
