@@ -1,5 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import {
+  Play,
+  RotateCcw,
   Activity,
   ArrowLeft,
   Brain,
@@ -75,7 +77,7 @@ export const Route = createFileRoute("/assessments/$slug/")({
 });
 
 /** Each assessment's banner art, in the same illustration style as the library. */
-const bannerArt: Record<Assessment["category"], Art> = {
+export const bannerArt: Record<Assessment["category"], Art> = {
   depression: "mood",
   anxiety: "anxiety",
   stress: "stress",
@@ -247,7 +249,19 @@ function AssessmentDetailPage() {
         {about ? <ImportantNote text={about.importantShort} /> : null}
 
         <div className="sticky bottom-[88px] z-20 mt-6 bg-gradient-to-t from-background via-background to-transparent px-4 pb-3 pt-6">
-          <Button className="w-full" onClick={draft ? begin : before.request}>
+          <Button
+            className="w-full"
+            icon={
+              draft ? (
+                <Play className="h-5 w-5" />
+              ) : past.length ? (
+                <RotateCcw className="h-5 w-5" />
+              ) : (
+                <Play className="h-5 w-5" />
+              )
+            }
+            onClick={draft ? begin : before.request}
+          >
             {draft
               ? `Continue, ${answered} of ${a.questions.length} answered`
               : past.length

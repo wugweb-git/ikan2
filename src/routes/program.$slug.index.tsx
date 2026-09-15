@@ -167,38 +167,38 @@ function ProgrammePage() {
             <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
               <Gauge className="h-4 w-4" /> {level}
             </span>
+            {runs.length || started ? (
+              <>
+                {runs.length ? (
+                  <Link
+                    to="/history/program/$slug"
+                    params={{ slug }}
+                    className={cn(
+                      "inline-flex h-8 items-center gap-1.5 rounded-full bg-[var(--accent-container)] pl-3 pr-2 text-[14px] font-semibold text-[var(--on-accent-container)]",
+                      stateLayer,
+                    )}
+                  >
+                    <History className="h-4 w-4" /> {runs.length} past{" "}
+                    {runs.length === 1 ? "run" : "runs"}
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                ) : null}
+                {started ? (
+                  <Link
+                    to="/diaries/$slug"
+                    params={{ slug }}
+                    className={cn(
+                      "inline-flex h-8 items-center gap-1.5 rounded-full bg-foreground/[0.06] pl-3 pr-2 text-[14px] font-semibold",
+                      stateLayer,
+                    )}
+                  >
+                    <NotebookPen className="h-4 w-4" /> Learning diary
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                ) : null}
+              </>
+            ) : null}
           </div>
-          {runs.length || started ? (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {runs.length ? (
-                <Link
-                  to="/history/program/$slug"
-                  params={{ slug }}
-                  className={cn(
-                    "inline-flex h-8 items-center gap-1.5 rounded-full bg-[var(--accent-container)] pl-3 pr-2 text-[14px] font-semibold text-[var(--on-accent-container)]",
-                    stateLayer,
-                  )}
-                >
-                  <History className="h-4 w-4" /> {runs.length} past{" "}
-                  {runs.length === 1 ? "run" : "runs"}
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              ) : null}
-              {started ? (
-                <Link
-                  to="/diaries/$slug"
-                  params={{ slug }}
-                  className={cn(
-                    "inline-flex h-8 items-center gap-1.5 rounded-full bg-foreground/[0.06] pl-3 pr-2 text-[14px] font-semibold",
-                    stateLayer,
-                  )}
-                >
-                  <NotebookPen className="h-4 w-4" /> Learning diary
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              ) : null}
-            </div>
-          ) : null}
         </section>
 
         {/* enrolled: what today holds (the button lives in the bar at the bottom) */}
@@ -269,7 +269,7 @@ function ProgrammePage() {
               const range =
                 days.length === 1
                   ? days[0] === 0
-                    ? "Onboarding"
+                    ? "First"
                     : `Day ${days[0]}`
                   : `Days ${days[0] === 0 ? 1 : days[0]}–${days.at(-1)}`;
               return (

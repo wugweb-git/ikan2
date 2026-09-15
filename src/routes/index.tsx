@@ -55,12 +55,7 @@ import {
   useSettings,
 } from "@/lib/profile";
 import { checkMoodReminder, refreshWeather, useDevice, weatherWord } from "@/lib/device";
-import {
-  autoSyncHealthConnect,
-  PLAY_STORE_URL,
-  recentAverage,
-  useHealthConnect,
-} from "@/lib/health-connect";
+import { autoSyncHealthConnect, recentAverage, useHealthConnect } from "@/lib/health-connect";
 import { resources, slugOf, type Resource } from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
 import resBurnout from "@/assets/res-burnout.jpg";
@@ -170,7 +165,7 @@ function Home() {
     if (!hydrated) return;
     void refreshWeather();
     void autoSyncHealthConnect();
-    if (Notification?.permission === "granted")
+    if (Notification?.permission === "granted" && !device.notificationsOff)
       void import("@/lib/push").then((m) =>
         m.enablePush({ moodReminder: settings.moodReminders, time: settings.moodReminderTime }),
       );
@@ -289,7 +284,7 @@ function SkyHeader({
 
   return (
     <header
-      className="relative overflow-hidden px-5 pb-14 pt-6 transition-colors duration-1000"
+      className="relative overflow-hidden px-5 pb-14 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.5rem))] transition-colors duration-1000"
       style={{
         background: `linear-gradient(160deg, ${s.from}, ${s.via} 50%, ${s.to})`,
         color: s.ink,
@@ -497,6 +492,8 @@ function HealthCard() {
     );
   }
 
+  // on the website there is nothing to connect yet, so no card
+  if (!h.native) return null;
   const cls = cn(
     "mx-4 flex items-center gap-3 rounded-[24px] border border-dashed border-foreground/20 p-4",
     stateLayer,
@@ -509,22 +506,16 @@ function HealthCard() {
       <span className="min-w-0 flex-1">
         <span className="block text-[15px] font-semibold">Add sleep and steps</span>
         <span className="block text-[13px] text-muted-foreground">
-          {h.native
-            ? "Connect Health Connect to see them next to your score"
-            : "Connect Health Connect in the iKAN Android app"}
+          Connect Health Connect to see them next to your score
         </span>
       </span>
       <ChevronRight className="h-5 w-5 text-muted-foreground" />
     </>
   );
-  return h.native ? (
+  return (
     <Link to="/settings" className={cls}>
       {inner}
     </Link>
-  ) : (
-    <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={cls}>
-      {inner}
-    </a>
   );
 }
 

@@ -1,6 +1,16 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ArrowLeft, Bookmark, BookmarkCheck, ChevronRight, Clock3, UserRound } from "lucide-react";
+import {
+  ArrowLeft,
+  Bookmark,
+  BookmarkCheck,
+  ChevronRight,
+  Clock3,
+  ListChecks,
+  UserRound,
+} from "lucide-react";
+import { categoryIcon } from "@/components/assessment/ui";
+import { bannerArt } from "@/routes/assessments.$slug.index";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { accentStyle, IconButton, stateLayer } from "@/components/equip/m3";
@@ -110,50 +120,77 @@ function ArticlePage() {
 
           <div className="prose-ikan mt-6" dangerouslySetInnerHTML={{ __html: article.html }} />
 
-          {assessment ? (
-            <Link
-              to="/assessments/$slug"
-              params={{ slug: assessment.slug }}
-              className={cn(
-                "mt-10 flex items-center gap-4 rounded-[24px] bg-foreground p-5 text-background",
-                stateLayer,
-              )}
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block text-[13px] opacity-70">
-                  Take the test this article explains
-                </span>
-                <span className="mt-0.5 block font-display text-[18px] font-semibold leading-6">
-                  {assessment.title}
-                </span>
-                <span className="mt-1 block text-[13px] opacity-70">
-                  {assessment.questions.length} questions, about {assessment.minutes} min
-                </span>
-              </span>
-              <ChevronRight className="h-5 w-5" />
-            </Link>
-          ) : null}
+          {assessment
+            ? (() => {
+                const AssessmentIcon = categoryIcon[assessment.category];
+                return (
+                  <Link
+                    to="/assessments/$slug"
+                    params={{ slug: assessment.slug }}
+                    className={cn(
+                      "mt-10 block overflow-hidden rounded-[24px] bg-secondary",
+                      stateLayer,
+                    )}
+                  >
+                    <span className="block h-28">
+                      <Illustration art={bannerArt[assessment.category]} />
+                    </span>
+                    <span className="flex items-center gap-3 p-4">
+                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-background">
+                        <AssessmentIcon className="h-5 w-5" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[12px] font-semibold text-muted-foreground">
+                          {assessment.name} · the test this article explains
+                        </span>
+                        <span className="mt-0.5 block font-display text-[18px] font-semibold leading-6">
+                          {assessment.title}
+                        </span>
+                        <span className="mt-1 flex items-center gap-3 text-[13px] text-muted-foreground">
+                          <span className="inline-flex items-center gap-1">
+                            <ListChecks className="h-3.5 w-3.5" /> {assessment.questions.length}{" "}
+                            questions
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <Clock3 className="h-3.5 w-3.5" /> {assessment.minutes} min
+                          </span>
+                        </span>
+                      </span>
+                      <ChevronRight className="h-5 w-5 shrink-0" />
+                    </span>
+                  </Link>
+                );
+              })()
+            : null}
 
           {more.length ? (
-            <section className="mt-10">
-              <h2 className="font-display text-[18px] font-semibold">Keep reading</h2>
-              <ul className="mt-3 space-y-3">
+            <section className="mt-12">
+              <h2 className="font-display text-[20px] font-semibold">Keep reading</h2>
+              <ul className="mt-4 divide-y divide-foreground/10">
                 {more.map((m) => (
                   <li key={m.id}>
                     <Link
                       to="/resources/$slug"
                       params={{ slug: slugOf(m) }}
-                      className={cn("flex items-center gap-3 rounded-[16px]", stateLayer)}
+                      className={cn(
+                        "-mx-2 flex items-center gap-4 rounded-[16px] px-2 py-4",
+                        stateLayer,
+                      )}
                     >
-                      <span className="h-16 w-16 shrink-0 overflow-hidden rounded-[14px]">
+                      <span className="h-20 w-20 shrink-0 overflow-hidden rounded-[16px]">
                         <Illustration art={m.art} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[12px] font-semibold text-muted-foreground">
-                          {m.category}, {m.minutes} min read
-                        </span>
-                        <span className="line-clamp-2 text-[15px] font-semibold leading-5">
+                        <span className="line-clamp-3 text-[16px] font-semibold leading-[22px]">
                           {m.title}
+                        </span>
+                        <span className="mt-2 flex items-center gap-2 text-[12px] text-muted-foreground">
+                          <span className="rounded-full bg-secondary px-2 py-0.5 font-medium">
+                            {m.category}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <Clock3 className="h-3.5 w-3.5" /> {m.minutes} min read
+                          </span>
                         </span>
                       </span>
                     </Link>

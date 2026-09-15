@@ -10,6 +10,8 @@ type DeviceState = {
   location?: { lat: number; lon: number; city: string; at: string } | undefined;
   weather?: { temp: number; code: number; at: string } | undefined;
   motion?: Access | undefined;
+  /** switched off in Settings (the browser permission itself can only be removed by the phone) */
+  notificationsOff?: boolean | undefined;
   /** yyyy-mm-dd of the last mood reminder shown */
   remindedOn?: string | undefined;
 };
@@ -50,8 +52,16 @@ export async function requestNotifications(): Promise<Access> {
 }
 
 /** Show a notification through the service worker when there is one, so it works installed. */
+export const setNotificationsOff = (off: boolean) =>
+  store.update((s) => ({ ...s, notificationsOff: off }));
+export const notificationsOff = () => Boolean(store.read().notificationsOff);
+
+/** Forget the saved location and weather. */
+export const clearLocation = () =>
+  store.update((s) => ({ ...s, location: undefined, weather: undefined }));
+
 export async function notify(title: string, body: string, url = "/") {
-  if (notificationAccess() !== "granted") return false;
+  if (notificationAccess() !== "granted" || notificationsOff()) return false;
   const options = { body, icon: "/pwa-192x192.png", badge: "/pwa-64x64.png", data: { url } };
   try {
     const reg = await navigator.serviceWorker?.getRegistration();
@@ -238,7 +248,8 @@ export function registerServiceWorker() {
 /** While the app is open: show the daily mood reminder once, after the chosen time,
  * if there is no check-in yet today. */
 export function checkMoodReminder(opts: { enabled: boolean; time: string; loggedToday: boolean }) {
-  if (!opts.enabled || opts.loggedToday || notificationAccess() !== "granted") return;
+  if (!opts.enabled || opts.loggedToday || notificationAccess() !== "granted" || notificationsOff())
+    return;
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   const [h, m] = opts.time.split(":").map(Number);

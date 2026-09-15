@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Bell, Check, Clock3, Footprints, ListChecks, MapPin } from "lucide-react";
+import { ArrowLeft, Bell, Check, Clock3, ListChecks, MapPin } from "lucide-react";
 import { Illustration } from "@/components/art";
 import {
   accentStyle,
@@ -18,7 +18,6 @@ import { getAssessment } from "@/lib/assessment/instruments";
 import { displayName, useAuth } from "@/lib/auth";
 import {
   requestLocation,
-  requestMotion,
   requestNotifications,
   useDevice,
   useNotificationAccess,
@@ -481,17 +480,6 @@ function Permissions({ onDone }: { onDone: () => void }) {
           setLocationState("denied");
           setMessage((e as Error).message);
         }
-      },
-    },
-    {
-      id: "motion",
-      icon: Footprints,
-      title: "Activity",
-      body: "Counts movement on this phone to add activity to your iKAN Score.",
-      state: device.motion ?? "prompt",
-      allow: async () => {
-        const a = await requestMotion();
-        if (a === "unsupported") setMessage("This phone doesn’t share motion with web apps.");
       },
     },
   ];

@@ -172,30 +172,39 @@ function LessonStep({
         <BlockText block={step.block} icon={<BookOpen />} />
       )}
       {view.cards ? (
-        <div className="no-scrollbar -mx-4 mt-6 flex snap-x items-start gap-3 overflow-x-auto px-4">
-          {view.cards.map((c) => (
+        <div className="mt-5 grid gap-3">
+          {view.cards.map((c, i) => (
             <section
               key={c.title}
               className={cn(
-                view.cards!.length > 1 ? "w-[85%]" : "w-full",
-                "shrink-0 snap-start rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]",
+                "rounded-[20px] p-4",
+                i % 2 === 0
+                  ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]"
+                  : "border border-foreground/10 bg-background",
               )}
             >
-              <p className="font-display text-[17px] font-semibold">{c.title}</p>
+              <p className="font-display text-[18px] font-semibold leading-6">{c.title}</p>
               {c.text?.filter(Boolean).map((t) => (
-                <p key={t} className="mt-2 text-[15px] leading-6">
+                <p key={t} className="mt-0.5 text-[14px] leading-5 opacity-80">
                   {t}
                 </p>
               ))}
-              <ul className="mt-3 space-y-2 text-[15px] leading-6">
-                {c.items.map((i) => (
-                  <li key={i} className="flex gap-2">
-                    <span aria-hidden="true">•</span>
-                    {i}
-                  </li>
-                ))}
-              </ul>
-              {c.footer ? <p className="mt-3 text-[15px] leading-6">{c.footer}</p> : null}
+              {c.items.length ? (
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {c.items.map((it) => (
+                    <li
+                      key={it}
+                      className={cn(
+                        "rounded-full px-3 py-1.5 text-[14px] leading-5",
+                        i % 2 === 0 ? "bg-background/70" : "bg-secondary",
+                      )}
+                    >
+                      {it}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {c.footer ? <p className="mt-3 text-[14px] leading-5">{c.footer}</p> : null}
             </section>
           ))}
         </div>

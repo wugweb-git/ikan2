@@ -7,6 +7,7 @@ import {
   Eye,
   Heart,
   ListTodo,
+  Compass,
   NotebookPen,
   NotebookText,
   Scale,
@@ -578,13 +579,14 @@ function ResultPage() {
           <div className="mt-8 flex gap-3 px-4 print:hidden">
             <Button
               variant="outlined"
-              className="flex-1"
+              className="min-w-0 flex-1 whitespace-nowrap px-4"
+              icon={<Compass className="h-4 w-4" />}
               onClick={() => navigate({ to: "/program" })}
             >
-              Explore programs
+              Explore
             </Button>
             <Button
-              className="flex-1"
+              className="min-w-0 flex-1 whitespace-nowrap px-4"
               icon={<NotebookPen className="h-4 w-4" />}
               onClick={() =>
                 navigate({

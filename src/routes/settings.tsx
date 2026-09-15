@@ -25,7 +25,6 @@ import {
   BellRing,
   HeartPulse,
   Unlink,
-  Footprints,
   MapPin,
   Smartphone,
   type LucideIcon,
@@ -35,14 +34,15 @@ import {
   isInstalled,
   notify,
   requestLocation,
-  requestMotion,
   requestNotifications,
   useCanInstall,
   useDevice,
   useLocationAccess,
   useNotificationAccess,
   weatherWord,
-  type Access,
+  clearLocation,
+  notificationsOff,
+  setNotificationsOff,
 } from "@/lib/device";
 import { IkanShell } from "@/components/ikan-shell";
 import {
@@ -60,8 +60,8 @@ import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
 import { AddToCalendar } from "@/components/add-to-calendar";
-import { PLAY_STORE_URL, recentAverage, useHealthConnect } from "@/lib/health-connect";
-import { enablePush, pushSupported, sendTestPush } from "@/lib/push";
+import { recentAverage, useHealthConnect } from "@/lib/health-connect";
+import { disablePush, enablePush, pushSupported, sendTestPush } from "@/lib/push";
 import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
 import type { LegalSlug } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -96,7 +96,7 @@ function SettingsPage() {
 
   // keep this device's push subscription and reminder time in step with the settings
   useEffect(() => {
-    if (!hydrated || notifications !== "granted" || !pushSupported()) return;
+    if (!hydrated || notifications !== "granted" || !pushSupported() || notificationsOff()) return;
     void enablePush({ moodReminder: stored.moodReminders, time: stored.moodReminderTime });
   }, [hydrated, notifications, stored.moodReminders, stored.moodReminderTime]);
 
@@ -410,17 +410,12 @@ function HealthConnectRows({ onMessage }: { onMessage: (m: string) => void }) {
         sub={
           summary
             ? `From your phone, 7-day average: ${summary}`
-            : "Sleep, steps and heart rate from your phone, in the iKAN Android app"
+            : "Sleep, steps and heart rate, in the iKAN Android app (coming soon)"
         }
       >
-        <a
-          href={PLAY_STORE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex h-9 shrink-0 items-center rounded-full border border-foreground/15 px-4 text-[13px] font-semibold"
-        >
-          Get app
-        </a>
+        <span className="inline-flex h-9 shrink-0 items-center rounded-full bg-secondary px-4 text-[13px] font-semibold text-muted-foreground">
+          Soon
+        </span>
       </Row>
     );
   }
@@ -480,43 +475,42 @@ function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
   const canInstall = useCanInstall();
   const installed = hydrated && isInstalled();
 
-  const label = (a: Access) =>
-    a === "granted" ? "On" : a === "denied" ? "Blocked" : a === "unsupported" ? "N/A" : "Allow";
-  const Pill = ({ access, onClick }: { access: Access; onClick: () => void }) => (
-    <button
-      type="button"
-      disabled={access !== "prompt" || busy}
-      onClick={onClick}
-      className={cn(
-        "inline-flex h-9 shrink-0 items-center rounded-full px-4 text-[13px] font-semibold",
-        access === "prompt"
-          ? "bg-foreground text-background"
-          : access === "granted"
-            ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]"
-            : "text-muted-foreground",
-      )}
-    >
-      {label(access)}
-    </button>
-  );
-
   return (
     <Group
       title="Permissions"
       note="Blocked? Open your phone’s settings for this site or app and allow it there."
     >
-      <Row icon={Bell} label="Notifications" sub="Daily check-in and program reminders">
-        <Pill
-          access={hydrated ? notifications : "prompt"}
-          onClick={async () => {
-            const a = await requestNotifications();
-            if (a === "granted")
-              void notify("Reminders are on", "We’ll nudge you at the time you choose.");
-            else if (a === "denied") onMessage("Notifications are blocked for iKAN");
+      <Row
+        icon={Bell}
+        label="Notifications"
+        sub={
+          hydrated && notifications === "denied"
+            ? "Blocked. Allow notifications for iKAN in your phone’s settings."
+            : "Daily check-in and program reminders"
+        }
+      >
+        <Switch
+          label="Notifications"
+          checked={hydrated && notifications === "granted" && !device.notificationsOff}
+          onChange={async (on) => {
+            if (!on) {
+              setNotificationsOff(true);
+              await disablePush().catch(() => {});
+              return onMessage("Notifications off");
+            }
+            const a = notifications === "granted" ? "granted" : await requestNotifications();
+            if (a !== "granted")
+              return onMessage(
+                a === "unsupported"
+                  ? "This browser can’t show notifications"
+                  : "Notifications are blocked for iKAN in your phone’s settings",
+              );
+            setNotificationsOff(false);
+            onMessage("Notifications on");
           }}
         />
       </Row>
-      {hydrated && notifications === "granted" ? (
+      {hydrated && notifications === "granted" && !device.notificationsOff ? (
         <ActionRow
           icon={BellRing}
           label="Send a test notification"
@@ -535,52 +529,31 @@ function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
         sub={
           hydrated && device.location
             ? `${device.location.city || "Location saved"}${device.weather ? ` · ${device.weather.temp}° ${weatherWord(device.weather.code)}` : ""}`
-            : "City, weather and nearby helplines"
+            : hydrated && locationAccess === "denied"
+              ? "Blocked. Allow location for iKAN in your phone’s settings."
+              : "City, weather and nearby helplines"
         }
       >
-        {hydrated && device.location ? (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={async () => {
-              setBusy(true);
-              try {
-                await requestLocation();
-                onMessage("Location updated");
-              } catch (e) {
-                onMessage((e as Error).message);
-              } finally {
-                setBusy(false);
-              }
-            }}
-            className="inline-flex h-9 shrink-0 items-center rounded-full border border-foreground/15 px-4 text-[13px] font-semibold"
-          >
-            Update
-          </button>
-        ) : (
-          <Pill
-            access={locationAccess}
-            onClick={async () => {
-              setBusy(true);
-              try {
-                await requestLocation();
-                setLocationAccess("granted");
-              } catch (e) {
-                setLocationAccess("denied");
-                onMessage((e as Error).message);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          />
-        )}
-      </Row>
-      <Row icon={Footprints} label="Activity" sub="Movement on this phone, for your iKAN Score">
-        <Pill
-          access={hydrated ? (device.motion ?? "prompt") : "prompt"}
-          onClick={async () => {
-            const a = await requestMotion();
-            if (a === "unsupported") onMessage("This phone doesn’t share motion with web apps");
+        <Switch
+          label="Location"
+          checked={hydrated && Boolean(device.location)}
+          onChange={async (on) => {
+            if (!on) {
+              clearLocation();
+              return onMessage("Location off");
+            }
+            if (busy) return;
+            setBusy(true);
+            try {
+              await requestLocation();
+              setLocationAccess("granted");
+              onMessage("Location on");
+            } catch (e) {
+              setLocationAccess("denied");
+              onMessage((e as Error).message);
+            } finally {
+              setBusy(false);
+            }
           }}
         />
       </Row>

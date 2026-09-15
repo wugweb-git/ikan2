@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { CalendarCheck, ListChecks, NotebookPen, Plus, Trash2 } from "lucide-react";
+import { CalendarCheck, ListChecks, NotebookPen, Pencil, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatTime } from "@/lib/equip/metrics";
 import { useProgramme, type Entry } from "@/lib/equip/store";
@@ -115,14 +115,16 @@ function EntryForm({
   onSubmit,
   submitLabel,
   history = [],
+  initial,
 }: {
   fields: Field[];
   onSubmit: (v: EntryValues) => void;
   submitLabel: string;
+  initial?: EntryValues;
   /** earlier entries in the same collection, offered back per field */
   history?: Entry[];
 }) {
-  const [values, setValues] = useState<EntryValues>({});
+  const [values, setValues] = useState<EntryValues>(initial ?? {});
   const [tried, setTried] = useState(false);
   const ready = fields.some((f) => String(values[f.key] ?? "").trim());
   const errors = entryErrors(fields, values);
@@ -266,9 +268,14 @@ export function EntriesStep({
     view.retentionHours,
   );
   const [sheet, setSheet] = useState(false);
-  const [page, setPage] = useState(0);
-  const full = view.limit !== undefined && list.length >= view.limit;
   const hasExample = Boolean(view.example && Object.keys(view.example).length);
+  // open on today's entries: earlier days are carried forward to the left
+  const firstToday = list.findIndex((e) => e.day >= ctx.day);
+  const [page, setPage] = useState(() =>
+    firstToday >= 0 ? firstToday + (hasExample ? 1 : 0) : (hasExample ? 1 : 0) + list.length - 1,
+  );
+  const [editing, setEditing] = useState<Entry | null>(null);
+  const full = view.limit !== undefined && list.length >= view.limit;
   const snack = useSnack();
 
   if (view.list) return <ListEntries step={step} view={view} ctx={ctx} list={list} />;
@@ -294,7 +301,14 @@ export function EntriesStep({
             >
               <Trash2 className="h-5 w-5" />
             </IconButton>
-          ) : null}
+          ) : (
+            <span className="-mr-3 -mt-3 flex items-center">
+              <span className="text-[12px] text-muted-foreground">Day {e.day}</span>
+              <IconButton label={`Edit entry ${i + 1}`} onClick={() => setEditing(e)}>
+                <Pencil className="h-5 w-5" />
+              </IconButton>
+            </span>
+          )}
         </div>
         <Values entry={e} fields={view.fields.filter((f) => !view.editable?.includes(f.key))} />
         {view.fields
@@ -336,6 +350,21 @@ export function EntriesStep({
           </Button>
         </div>
       )}
+      <BottomSheet open={Boolean(editing)} onClose={() => setEditing(null)} title="Edit entry">
+        {editing ? (
+          <EntryForm
+            key={editing.id}
+            fields={view.fields}
+            initial={editing.values}
+            submitLabel="Save changes"
+            onSubmit={(v) => {
+              patchEntry(view.collection, editing.id, v);
+              setEditing(null);
+              snack.show("Entry updated");
+            }}
+          />
+        ) : null}
+      </BottomSheet>
       <BottomSheet open={sheet} onClose={() => setSheet(false)} title={step.block.title}>
         <EntryForm
           fields={view.fields}
@@ -371,35 +400,58 @@ function ListEntries({
   const max = view.list?.max ?? Infinity;
   const [extra, setExtra] = useState(0);
   const f = view.fields[0]!;
-  // Slots are keyed by position, so a blank row keeps focus when it becomes a saved entry.
-  const slots = Math.min(max, Math.max(initial, list.length) + extra);
-  const filled = list.filter((e) => String(e.values[f.key] ?? "").trim()).length;
+  // earlier days' answers come first and stay locked until Edit; today starts on a fresh row
+  const carried = list.filter((e) => e.day < ctx.day);
+  const today = list.filter((e) => e.day >= ctx.day);
+  const todaySlots = Math.min(
+    Math.max(0, max - carried.length),
+    Math.max(carried.length ? 1 : initial, today.length) + extra,
+  );
+  const slots = carried.length + todaySlots;
+  const filled = today.filter((e) => String(e.values[f.key] ?? "").trim()).length;
   const canAddMore = slots < max;
-  const allFilled = filled >= slots;
+  const allFilled = filled >= todaySlots;
 
   return (
     <>
       <BlockText block={step.block} headline={view.prompt} icon={<ListChecks />} />
       <ol className="mt-6 space-y-3">
-        {Array.from({ length: slots }, (_, i) => (
-          <li key={`slot-${i}`} className="flex items-start gap-3">
-            <span className="mt-4 w-5 shrink-0 text-right text-[15px] tabular-nums text-muted-foreground">
-              {i + 1}.
-            </span>
-            <div className="flex-1">
-              <ListSlot
-                label={`${view.prompt ?? step.block.title} ${i + 1}`}
-                entry={list[i]}
-                fieldKey={f.key}
-                collection={view.collection}
-                ctx={ctx}
-                onCreated={() =>
-                  i >= Math.max(initial, list.length) && setExtra((x) => Math.max(0, x - 1))
-                }
-              />
-            </div>
-          </li>
-        ))}
+        {Array.from({ length: slots }, (_, i) => {
+          const isCarried = i < carried.length;
+          const entry = isCarried ? carried[i] : today[i - carried.length];
+          return (
+            <li
+              key={isCarried ? entry!.id : `slot-${i - carried.length}`}
+              className="flex items-start gap-3"
+            >
+              <span className="mt-4 w-5 shrink-0 text-right text-[15px] tabular-nums text-muted-foreground">
+                {i + 1}.
+              </span>
+              <div className="flex-1">
+                {isCarried ? (
+                  <CarriedSlot
+                    entry={entry!}
+                    fieldKey={f.key}
+                    collection={view.collection}
+                    ctx={ctx}
+                  />
+                ) : (
+                  <ListSlot
+                    label={`${view.prompt ?? step.block.title} ${i + 1}`}
+                    entry={entry}
+                    fieldKey={f.key}
+                    collection={view.collection}
+                    ctx={ctx}
+                    onCreated={() =>
+                      i - carried.length >= Math.max(carried.length ? 1 : initial, today.length) &&
+                      setExtra((x) => Math.max(0, x - 1))
+                    }
+                  />
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ol>
       <div className="mt-3 flex items-center justify-between">
         {canAddMore ? (
@@ -422,6 +474,68 @@ function ListEntries({
       </div>
       <Footer onBack={ctx.onBack} onNext={ctx.onNext} label={nextLabel(ctx)} />
     </>
+  );
+}
+
+/** An answer from an earlier day: shown as saved, editable only after tapping Edit. */
+function CarriedSlot({
+  entry,
+  fieldKey,
+  collection,
+  ctx,
+}: {
+  entry: Entry;
+  fieldKey: string;
+  collection: string;
+  ctx: StepCtx;
+}) {
+  const { patchEntry } = useProgramme(ctx.slug);
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(String(entry.values[fieldKey] ?? ""));
+  if (editing)
+    return (
+      <div>
+        <TextField
+          label=""
+          ariaLabel="Edit"
+          value={value}
+          onChange={setValue}
+          autoFocus
+          maxLength={200}
+        />
+        <div className="mt-2 flex justify-end gap-2">
+          <Button
+            variant="text"
+            onClick={() => {
+              setValue(String(entry.values[fieldKey] ?? ""));
+              setEditing(false);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="tonal"
+            disabled={!value.trim()}
+            onClick={() => {
+              patchEntry(collection, entry.id, { [fieldKey]: value.trim() });
+              setEditing(false);
+            }}
+          >
+            Save
+          </Button>
+        </div>
+      </div>
+    );
+  return (
+    <div className="flex min-h-14 items-center gap-2 rounded-[4px] bg-foreground/[0.035] py-2 pl-4 pr-1">
+      <span className="min-w-0 flex-1">
+        <span className="block text-[16px] leading-6">{String(entry.values[fieldKey] ?? "")}</span>
+        <span className="block text-[12px] text-muted-foreground">From day {entry.day}</span>
+      </span>
+      <IconButton label="Edit" onClick={() => setEditing(true)}>
+        <Pencil className="h-5 w-5" />
+      </IconButton>
+    </div>
   );
 }
 
