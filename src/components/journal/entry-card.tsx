@@ -28,18 +28,20 @@ export function EntryCard({
   const energy = at(energyScale, e.energy);
   const experience = at(painExperienceScale, e.pain_experience);
   const impact = at(painImpactScale, e.pain_impact);
-  const pain =
-    e.pain_exist === true
-      ? `🩹 Pain${experience ? `: ${experience.label}` : ""}${impact ? ` · Impact: ${impact.label}` : ""}`
-      : e.pain_exist === false
-        ? "✅ No pain"
-        : undefined;
-  const chips = [
-    sleep && `${sleep.emoji} Sleep: ${sleep.label}`,
-    stress && `${stress.emoji} Stress: ${stress.label}`,
-    pain,
-    energy && `${energy.emoji} Energy: ${energy.label}`,
-  ].filter((c): c is string => Boolean(c));
+  // a strip of small cells: sleep (or energy on older check-ins), stress, pain
+  const cells: { emoji: string; label: string; value: string }[] = [];
+  if (sleep) cells.push({ emoji: sleep.emoji, label: "Sleep", value: sleep.label });
+  else if (energy) cells.push({ emoji: energy.emoji, label: "Energy", value: energy.label });
+  if (stress) cells.push({ emoji: stress.emoji, label: "Stress", value: stress.label });
+  if (e.pain_exist === true)
+    cells.push({
+      emoji: experience?.emoji ?? "🩹",
+      label: "Pain",
+      value: [experience?.label, impact && `Impact: ${impact.label.toLowerCase()}`]
+        .filter(Boolean)
+        .join(" · "),
+    });
+  else if (e.pain_exist === false) cells.push({ emoji: "✅", label: "Pain", value: "No pain" });
   const when = new Date(e.createdAt);
   return (
     <article className="rounded-[20px] border border-foreground/10 p-4">
@@ -67,12 +69,23 @@ export function EntryCard({
           </IconButton>
         ) : null}
       </div>
-      {chips.length ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {chips.map((c) => (
-            <Chip key={c}>{c}</Chip>
+      {cells.length ? (
+        <dl
+          className="mt-3 grid gap-px overflow-hidden rounded-[14px] bg-foreground/10"
+          style={{ gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))` }}
+        >
+          {cells.map((c) => (
+            <div key={c.label} className="bg-background px-2 py-2 text-center">
+              <dt className="text-[11px] text-muted-foreground">{c.label}</dt>
+              <dd className="mt-0.5 text-[13px] font-medium leading-4">
+                <span aria-hidden="true" className="mr-1">
+                  {c.emoji}
+                </span>
+                {c.value}
+              </dd>
+            </div>
           ))}
-        </div>
+        </dl>
       ) : null}
       {e.freehand_text_content ? (
         <p className="mt-3 text-[15px] leading-6">“{e.freehand_text_content}”</p>

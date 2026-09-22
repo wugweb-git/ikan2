@@ -4,6 +4,13 @@ import { Check, History } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { EntryCard } from "@/components/journal/entry-card";
 import {
+  BlockHeader,
+  EmojiScaleBlock,
+  NoteBlock,
+  TagsBlock,
+  YesNoBlock,
+} from "@/components/journal/blocks";
+import {
   accentStyle,
   Button,
   Snackbar,
@@ -16,10 +23,12 @@ import { cn } from "@/lib/utils";
 import {
   addDays,
   blocksFor,
-  contextTags,
   dayKey,
-  painScale,
+  moodScale,
+  painExperienceScale,
+  sleepScale,
   streaks,
+  stressScale,
   useJournal,
   type Answers,
   type Draft,
@@ -267,7 +276,8 @@ function CheckIn({
 }) {
   const [step, setStep] = useState(preset ? 1 : 0);
   const [draft, setDraft] = useState(() => emptyDraft(preset));
-  const [saved, setSaved] = useState(false);
+  const [fromDiary] = useState(() => draft.sleep_rating);
+  const [saved, setSaved] = useState<Answers | null>(null);
   const timer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
@@ -278,7 +288,10 @@ function CheckIn({
           <Check className="h-7 w-7" strokeWidth={3} />
         </span>
         <p className="mt-4 font-display text-[20px] font-semibold">Check-in saved</p>
-        <p className="mt-1 text-[14px]">
+        <p className="mt-2 text-[15px]" aria-label="What you logged">
+          {summaryOf(saved)}
+        </p>
+        <p className="mt-1 text-[13px] opacity-80">
           {countToday} {countToday === 1 ? "entry" : "entries"} logged today
         </p>
         <Button
@@ -287,7 +300,7 @@ function CheckIn({
           onClick={() => {
             setDraft(emptyDraft());
             setStep(0);
-            setSaved(false);
+            setSaved(null);
           }}
         >
           Log another
@@ -310,8 +323,9 @@ function CheckIn({
   const next = () => {
     window.clearTimeout(timer.current);
     if (!last) return setStep(i + 1);
-    onSave(toAnswers(draft));
-    setSaved(true);
+    const answers = toAnswers(draft);
+    onSave(answers);
+    setSaved(answers);
   };
 
   /** Set an answer and move on a moment later, so the choice is seen first. */
@@ -329,7 +343,7 @@ function CheckIn({
 
   return (
     <div className="mt-3 rounded-[24px] bg-secondary p-4">
-      <div className="flex gap-1.5" aria-label={`Step ${i + 1} of ${blocks.length}`}>
+      <div className="flex gap-1.5" aria-hidden="true">
         {blocks.map((b, n) => (
           <span
             key={b.id}
@@ -341,91 +355,60 @@ function CheckIn({
         ))}
       </div>
 
-      <div key={current.id} className="animate-fade">
-        <p className="mt-4 font-display text-[20px] font-semibold leading-7">{current.question}</p>
-        <p className="mt-1 text-[14px] text-muted-foreground">{current.subtitle}</p>
-
+      <div key={current.id} className="animate-fade mt-4">
+        <BlockHeader
+          id={current.id}
+          question={current.question}
+          subtitle={current.subtitle}
+          step={i + 1}
+          of={blocks.length}
+          followUp={Boolean(current.when)}
+        />
         <div className="mt-4">
           {current.type === "emoji_scale" && current.scale ? (
-            <EmojiScale
+            <EmojiScaleBlock
               scale={current.scale}
               value={value as number | undefined}
               onPick={(v) => pick({ [current.save_as]: v })}
               label={current.question}
+              note={
+                current.id === "sleep" && fromDiary && draft.sleep_rating === fromDiary
+                  ? "From today’s sleep diary"
+                  : undefined
+              }
             />
           ) : null}
           {current.type === "yes_no" ? (
-            <div role="radiogroup" aria-label={current.question} className="grid grid-cols-2 gap-2">
-              {painScale.map((o) => {
-                const on = draft.pain_exist === o.value;
-                return (
-                  <button
-                    key={o.label}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    onClick={() => pick({ pain_exist: o.value })}
-                    className={cn(
-                      "flex h-14 items-center justify-center gap-2 rounded-[16px] text-[16px] font-semibold transition-colors",
-                      stateLayer,
-                      on
-                        ? "bg-[var(--accent-container)] text-[var(--on-accent-container)] ring-2 ring-[var(--accent)]"
-                        : "bg-background",
-                    )}
-                  >
-                    <span aria-hidden="true">{o.emoji}</span>
-                    {o.label}
-                  </button>
-                );
-              })}
-            </div>
+            <YesNoBlock
+              value={draft.pain_exist}
+              onPick={(v) => pick({ pain_exist: v })}
+              label={current.question}
+            />
           ) : null}
           {current.type === "free_text" ? (
-            <TextField
-              label=""
-              ariaLabel={current.question}
+            <NoteBlock
               value={draft.freehand_text_content ?? ""}
               onChange={(v) => setDraft((d) => ({ ...d, freehand_text_content: v }))}
-              multiline
-              maxLength={500}
-              placeholder="Write a line or two"
+              label={current.question}
             />
           ) : null}
           {current.type === "multi_select" ? (
-            <div className="flex flex-wrap gap-2">
-              {contextTags.map((t) => {
-                const tags = draft.context_tags ?? [];
-                const on = tags.includes(t.id);
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() =>
-                      setDraft((d) => ({
-                        ...d,
-                        context_tags: on ? tags.filter((x) => x !== t.id) : [...tags, t.id],
-                      }))
-                    }
-                    className={cn(
-                      "inline-flex h-9 items-center gap-1.5 rounded-[8px] border px-3 text-[14px] font-medium transition-colors",
-                      stateLayer,
-                      on
-                        ? "border-transparent bg-[var(--accent-container)] text-[var(--on-accent-container)]"
-                        : "border-foreground/25",
-                    )}
-                  >
-                    {on ? <Check className="h-4 w-4" /> : <span aria-hidden="true">{t.emoji}</span>}
-                    {t.label}
-                  </button>
-                );
-              })}
-            </div>
+            <TagsBlock
+              value={draft.context_tags ?? []}
+              onChange={(context_tags) => setDraft((d) => ({ ...d, context_tags }))}
+            />
           ) : null}
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2">
+      {current.required && !hasValue ? (
+        <p className="mt-4 text-center text-[13px] text-muted-foreground" role="status">
+          Pick one to continue
+        </p>
+      ) : null}
+      <div
+        className={cn("flex items-center gap-2", current.required && !hasValue ? "mt-2" : "mt-4")}
+      >
         {i > 0 ? (
           <Button variant="text" onClick={() => setStep(i - 1)}>
             Back
@@ -448,46 +431,16 @@ function CheckIn({
   );
 }
 
-function EmojiScale({
-  scale,
-  value,
-  onPick,
-  label,
-}: {
-  scale: ScalePoint[];
-  value: number | undefined;
-  onPick: (v: number) => void;
-  label: string;
-}) {
-  return (
-    <div role="radiogroup" aria-label={label} className="grid grid-cols-5 gap-2">
-      {scale.map((p) => {
-        const on = value === p.value;
-        return (
-          <button
-            key={p.value}
-            type="button"
-            role="radio"
-            aria-checked={on}
-            onClick={() => onPick(p.value)}
-            className={cn(
-              "flex flex-col items-center gap-1.5 rounded-[16px] py-3 transition-[background-color,transform] active:scale-95",
-              stateLayer,
-              on
-                ? "bg-[var(--accent-container)] text-[var(--on-accent-container)] ring-2 ring-[var(--accent)]"
-                : "bg-background",
-            )}
-          >
-            <span
-              className={cn("text-[30px] leading-none transition-transform", on && "scale-110")}
-              aria-hidden="true"
-            >
-              {p.emoji}
-            </span>
-            <span className="text-[12px] font-medium">{p.label}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
+/** One line: mood, sleep and stress emoji, then pain. */
+function summaryOf(a: Answers) {
+  const at = (scale: ScalePoint[], v: number | undefined) => (v ? scale[v - 1] : undefined);
+  const parts = [
+    at(moodScale, a.mood_rating)?.emoji,
+    at(sleepScale, a.sleep_rating) && `${at(sleepScale, a.sleep_rating)!.emoji} sleep`,
+    at(stressScale, a.stress_level) && `${at(stressScale, a.stress_level)!.emoji} stress`,
+    a.pain_exist
+      ? `pain: ${at(painExperienceScale, a.pain_experience)?.label.toLowerCase() ?? "yes"}`
+      : "no pain",
+  ].filter(Boolean);
+  return parts.join(" · ");
 }

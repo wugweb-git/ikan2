@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createLocalStore, newId } from "@/lib/local-store";
 
 /* The daily Mood Journal check-in: one template of 8 blocks built on 7 scales, following the
@@ -255,6 +256,19 @@ const entriesOf = (raw: Stored[]) => {
   return lastEntries;
 };
 
+const oldShaped = (r: Stored) => "mood" in r || "stress" in r || "note" in r || "tags" in r;
+
+/** Rewrites check-ins saved under the old short names so every stored row uses the template's
+ * names. Runs once per account: nothing is written when no entry needs it. The write goes
+ * through the store, so the account's cloud copy is rewritten too. */
+export function migrateJournal() {
+  const { entries } = store.read();
+  if (!entries.some(oldShaped)) return;
+  store.update((s) => ({
+    entries: s.entries.map((r) => (oldShaped(r) ? (toEntry(r) ?? r) : r)),
+  }));
+}
+
 /** Today's sleep rating from the journal, if one was logged. */
 export const sleepRatingOn = (date: string) =>
   entriesOf(store.read().entries)
@@ -302,7 +316,11 @@ export const fromKey = (key: string) => {
 };
 
 export function useJournal() {
-  const entries = entriesOf(store.use().entries);
+  const raw = store.use().entries;
+  useEffect(() => {
+    if (raw.some(oldShaped)) migrateJournal();
+  }, [raw]);
+  const entries = entriesOf(raw);
   return {
     entries,
     on: (date: string) =>
