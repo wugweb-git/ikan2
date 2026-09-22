@@ -130,6 +130,18 @@ function subscribe(listener: () => void) {
 /** Read a programme's state outside React. */
 export const readProgramme = (slug: string) => read(slug);
 
+const localDay = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
+/** The sleep diary's last answer (sleep quality, 1–5) from a night saved on this calendar day;
+ * the Mood Journal's sleep block shares it. */
+export const diaryQualityOn = (date: string) =>
+  Object.values(read("sleep-tight").diary)
+    .filter((e) => e.quality !== undefined && e.savedAt && localDay(e.savedAt) === date)
+    .sort((a, b) => b.savedAt!.localeCompare(a.savedAt!))[0]?.quality;
+
 /** Change a programme's state outside React; used by the import from the old iKan app. */
 export const updateProgramme = (slug: string, fn: (s: ProgrammeState) => ProgrammeState) =>
   write(slug, fn(read(slug)));
@@ -184,7 +196,10 @@ export function useProgramme(slug: string) {
         },
       })),
     saveDiary: (day: number, entry: DiaryEntry) =>
-      update((s) => ({ ...s, diary: { ...s.diary, [String(day)]: entry } })),
+      update((s) => ({
+        ...s,
+        diary: { ...s.diary, [String(day)]: { ...entry, savedAt: new Date().toISOString() } },
+      })),
     setTracked: (day: number, id: string, done: boolean) =>
       update((s) => ({
         ...s,

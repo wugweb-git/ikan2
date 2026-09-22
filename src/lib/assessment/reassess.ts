@@ -35,9 +35,10 @@ export function reassessReason(
   const moods = [...journal].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   if (moods.length >= 5) {
     const last5 = moods.slice(0, 5);
-    if (last5.every((e) => e.mood <= 2) || last5.every((e) => (e.stress ?? 0) >= 4)) return "mood";
-    const baseline = moods.slice(1, 5).reduce((n, e) => n + e.mood, 0) / 4;
-    if (moods[0]!.mood <= baseline - 2) return "mood";
+    if (last5.every((e) => e.mood_rating <= 2) || last5.every((e) => (e.stress_level ?? 0) >= 4))
+      return "mood";
+    const baseline = moods.slice(1, 5).reduce((n, e) => n + e.mood_rating, 0) / 4;
+    if (moods[0]!.mood_rating <= baseline - 2) return "mood";
   }
 
   for (const p of programmes) {

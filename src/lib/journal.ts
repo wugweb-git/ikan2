@@ -1,10 +1,14 @@
 import { createLocalStore, newId } from "@/lib/local-store";
 
-/* The daily mood check-in, carried over from the old iKan Mood Journal
- * (template default-daily-checkin: five steps, mood required). */
+/* The daily Mood Journal check-in: one template of 8 blocks built on 7 scales, following the
+ * iKan backend's config (kv_store_cc205da9). Mood is 5 separate rows there (`mood:{id}`); every
+ * other scale is one array row (`checkin_scale:<key>`). Answers are saved under the template's
+ * "saved as" names. */
 
 export type ScalePoint = { value: number; emoji: string; label: string };
+export type Tag = { id: string; emoji: string; label: string };
 
+/** `mood:{id}` × 5, one object row each */
 export const moodScale: ScalePoint[] = [
   { value: 1, emoji: "😫", label: "Awful" },
   { value: 2, emoji: "😕", label: "Bad" },
@@ -13,14 +17,16 @@ export const moodScale: ScalePoint[] = [
   { value: 5, emoji: "😄", label: "Great" },
 ];
 
-export const energyScale: ScalePoint[] = [
-  { value: 1, emoji: "🪫", label: "Exhausted" },
-  { value: 2, emoji: "😴", label: "Tired" },
-  { value: 3, emoji: "⚡", label: "Moderate" },
-  { value: 4, emoji: "💪", label: "Energetic" },
-  { value: 5, emoji: "🔥", label: "Charged!" },
+/** `checkin_scale:sleep` */
+export const sleepScale: ScalePoint[] = [
+  { value: 1, emoji: "😩", label: "Terrible" },
+  { value: 2, emoji: "😴", label: "Poor" },
+  { value: 3, emoji: "😶‍🌫️", label: "Fair" },
+  { value: 4, emoji: "😌", label: "Good" },
+  { value: 5, emoji: "🌟", label: "Excellent" },
 ];
 
+/** `checkin_scale:stress` */
 export const stressScale: ScalePoint[] = [
   { value: 1, emoji: "😌", label: "Chill" },
   { value: 2, emoji: "🤔", label: "Mild" },
@@ -29,7 +35,32 @@ export const stressScale: ScalePoint[] = [
   { value: 5, emoji: "🤯", label: "Yikes!" },
 ];
 
-export const contextTags = [
+/** `checkin_scale:pain` */
+export const painScale = [
+  { value: true, emoji: "✅", label: "Yes" },
+  { value: false, emoji: "❌", label: "No" },
+] as const;
+
+/** `checkin_scale:pain_experience` */
+export const painExperienceScale: ScalePoint[] = [
+  { value: 1, emoji: "😊", label: "None" },
+  { value: 2, emoji: "😐", label: "Mild" },
+  { value: 3, emoji: "😕", label: "Moderate" },
+  { value: 4, emoji: "😧", label: "Severe" },
+  { value: 5, emoji: "😭", label: "Extreme" },
+];
+
+/** `checkin_scale:pain_impact` */
+export const painImpactScale: ScalePoint[] = [
+  { value: 1, emoji: "😊", label: "None" },
+  { value: 2, emoji: "😐", label: "A Little" },
+  { value: 3, emoji: "😕", label: "Somewhat" },
+  { value: 4, emoji: "😧", label: "A Lot" },
+  { value: 5, emoji: "😭", label: "Completely" },
+];
+
+/** `checkin_scale:context_tags` */
+export const contextTags: Tag[] = [
   { id: "work", emoji: "💼", label: "Work" },
   { id: "sleep", emoji: "😴", label: "Sleep" },
   { id: "health", emoji: "🏃", label: "Health" },
@@ -40,54 +71,195 @@ export const contextTags = [
   { id: "other", emoji: "✨", label: "Other" },
 ];
 
-export const checkinSteps = [
+/** No longer asked; kept so check-ins from before the new template still show their energy. */
+export const energyScale: ScalePoint[] = [
+  { value: 1, emoji: "🪫", label: "Exhausted" },
+  { value: 2, emoji: "😴", label: "Tired" },
+  { value: 3, emoji: "⚡", label: "Moderate" },
+  { value: 4, emoji: "💪", label: "Energetic" },
+  { value: 5, emoji: "🔥", label: "Charged!" },
+];
+
+/** The answers of one check-in, under the template's "saved as" names. */
+export type Answers = {
+  mood_rating: number;
+  sleep_rating: number;
+  stress_level: number;
+  pain_exist: boolean;
+  pain_experience?: number;
+  pain_impact?: number;
+  freehand_text_content?: string;
+  context_tags: string[];
+};
+
+export type Draft = Partial<Answers>;
+
+type Block = {
+  order: number;
+  id: string;
+  type: "emoji_scale" | "yes_no" | "free_text" | "multi_select";
+  save_as: keyof Answers;
+  question: string;
+  subtitle: string;
+  required: boolean;
+  scale?: ScalePoint[];
+  /** shown only when this holds */
+  when?: (d: Draft) => boolean;
+};
+
+const hasPain = (d: Draft) => d.pain_exist === true;
+
+/** The template: 8 blocks, in order. */
+export const checkinTemplate: Block[] = [
   {
-    key: "mood",
-    title: "How are you feeling?",
+    order: 0,
+    id: "mood",
+    type: "emoji_scale",
+    save_as: "mood_rating",
+    question: "How are you feeling?",
     subtitle: "Tap the emoji that matches your vibe",
+    required: true,
+    scale: moodScale,
+  },
+  {
+    order: 1,
+    id: "sleep",
+    type: "emoji_scale",
+    save_as: "sleep_rating",
+    question: "How would you rate your sleep?",
+    subtitle: "Think about last night",
+    required: true,
+    scale: sleepScale,
+  },
+  {
+    order: 2,
+    id: "stress",
+    type: "emoji_scale",
+    save_as: "stress_level",
+    question: "Are you under any stress?",
+    subtitle: "Be honest, there's no wrong answer",
+    required: true,
+    scale: stressScale,
+  },
+  {
+    order: 3,
+    id: "pain",
+    type: "yes_no",
+    save_as: "pain_exist",
+    question: "Are you in any pain?",
+    subtitle: "Any kind, physical or otherwise",
     required: true,
   },
   {
-    key: "energy",
-    title: "What's your energy like?",
-    subtitle: "From drained to fully charged",
-    required: false,
+    order: 4,
+    id: "pain_experience",
+    type: "emoji_scale",
+    save_as: "pain_experience",
+    question: "How would you describe your pain?",
+    subtitle: "Pick the closest",
+    required: true,
+    scale: painExperienceScale,
+    when: hasPain,
   },
   {
-    key: "stress",
-    title: "Stress level?",
-    subtitle: "Be honest — there's no wrong answer",
-    required: false,
+    order: 5,
+    id: "pain_impact",
+    type: "emoji_scale",
+    save_as: "pain_impact",
+    question: "Has pain interfered with your usual activities?",
+    subtitle: "Today, so far",
+    required: true,
+    scale: painImpactScale,
+    when: hasPain,
   },
   {
-    key: "note",
-    title: "Anything on your mind?",
+    order: 6,
+    id: "note",
+    type: "free_text",
+    save_as: "freehand_text_content",
+    question: "Anything on your mind?",
     subtitle: "A quick note to capture this moment",
     required: false,
   },
   {
-    key: "tags",
-    title: "What shaped your day?",
-    subtitle: "Pick whatever applies — or skip to save",
+    order: 7,
+    id: "tags",
+    type: "multi_select",
+    save_as: "context_tags",
+    question: "What shaped your day?",
+    subtitle: "Pick whatever applies, or skip to save",
     required: false,
   },
-] as const;
+];
+
+/** Blocks this draft will show: 4 and 5 only after a Yes to pain. */
+export const blocksFor = (d: Draft) => checkinTemplate.filter((b) => !b.when || b.when(d));
 
 export type JournalEntry = {
   id: string;
   /** local calendar day, YYYY-MM-DD */
   date: string;
   createdAt: string;
-  mood: number;
+  mood_rating: number;
+  /** absent on check-ins from before the new template */
+  sleep_rating?: number;
+  stress_level?: number;
+  pain_exist?: boolean;
+  pain_experience?: number;
+  pain_impact?: number;
+  freehand_text_content?: string;
+  context_tags: string[];
+  /** only on check-ins from before the new template */
   energy?: number;
-  stress?: number;
-  note?: string;
-  tags: string[];
 };
 
-export type Draft = Omit<JournalEntry, "id" | "date" | "createdAt">;
+/* Check-ins saved before the new template used short names (mood, stress, note, tags); read
+ * both so nothing already saved is lost. */
+type Stored = Partial<JournalEntry> & {
+  mood?: number;
+  stress?: number;
+  note?: string;
+  tags?: string[];
+};
 
-const store = createLocalStore<{ entries: JournalEntry[] }>("ikan.journal.v1", { entries: [] });
+const toEntry = (r: Stored): JournalEntry | null => {
+  const mood = r.mood_rating ?? r.mood;
+  if (!r.id || !r.date || !r.createdAt || !mood) return null;
+  const stress = r.stress_level ?? r.stress;
+  const note = r.freehand_text_content ?? r.note;
+  return {
+    id: r.id,
+    date: r.date,
+    createdAt: r.createdAt,
+    mood_rating: mood,
+    ...(r.sleep_rating !== undefined ? { sleep_rating: r.sleep_rating } : {}),
+    ...(stress !== undefined ? { stress_level: stress } : {}),
+    ...(r.pain_exist !== undefined ? { pain_exist: r.pain_exist } : {}),
+    ...(r.pain_experience !== undefined ? { pain_experience: r.pain_experience } : {}),
+    ...(r.pain_impact !== undefined ? { pain_impact: r.pain_impact } : {}),
+    ...(note ? { freehand_text_content: note } : {}),
+    context_tags: r.context_tags ?? r.tags ?? [],
+    ...(r.energy !== undefined ? { energy: r.energy } : {}),
+  };
+};
+
+const store = createLocalStore<{ entries: Stored[] }>("ikan.journal.v1", { entries: [] });
+
+let lastRaw: Stored[] | undefined;
+let lastEntries: JournalEntry[] = [];
+const entriesOf = (raw: Stored[]) => {
+  if (raw !== lastRaw) {
+    lastRaw = raw;
+    lastEntries = raw.map(toEntry).filter((e): e is JournalEntry => e !== null);
+  }
+  return lastEntries;
+};
+
+/** Today's sleep rating from the journal, if one was logged. */
+export const sleepRatingOn = (date: string) =>
+  entriesOf(store.read().entries)
+    .filter((e) => e.date === date && e.sleep_rating !== undefined)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]?.sleep_rating;
 
 /** Add entries that aren't here yet (matched by id); used by the import from the old iKan app. */
 export const mergeJournalEntries = (incoming: JournalEntry[]) =>
@@ -130,18 +302,18 @@ export const fromKey = (key: string) => {
 };
 
 export function useJournal() {
-  const { entries } = store.use();
+  const entries = entriesOf(store.use().entries);
   return {
     entries,
     on: (date: string) =>
       entries.filter((e) => e.date === date).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-    add: (draft: Draft) => {
+    add: (answers: Answers) => {
       const now = new Date();
       const entry: JournalEntry = {
         id: newId("j"),
         date: dayKey(now),
         createdAt: now.toISOString(),
-        ...draft,
+        ...answers,
       };
       store.update((s) => ({ entries: [...s.entries, entry] }));
       return entry;

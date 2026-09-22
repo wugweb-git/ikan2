@@ -28,7 +28,7 @@ function JournalHistoryPage() {
   const list = hydrated
     ? [...journal.entries].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     : [];
-  const avg = list.length ? list.reduce((n, e) => n + e.mood, 0) / list.length : null;
+  const avg = list.length ? list.reduce((n, e) => n + e.mood_rating, 0) / list.length : null;
   const streak = streaks(new Set(list.map((e) => e.date)));
 
   const now = new Date();
@@ -49,7 +49,7 @@ function JournalHistoryPage() {
   ];
   const moodOn = (key: string) => {
     const es = list.filter((e) => e.date === key);
-    return es.length ? es.reduce((n, e) => n + e.mood, 0) / es.length : null;
+    return es.length ? es.reduce((n, e) => n + e.mood_rating, 0) / es.length : null;
   };
   const inMonth = list.filter((e) =>
     e.date.startsWith(`${cursor.y}-${String(cursor.m + 1).padStart(2, "0")}`),
@@ -62,11 +62,11 @@ function JournalHistoryPage() {
     const key = e.date.slice(0, 7);
     const m = months.find((x) => x.key === key);
     if (m) {
-      m.avg = (m.avg * m.count + e.mood) / (m.count + 1);
+      m.avg = (m.avg * m.count + e.mood_rating) / (m.count + 1);
       m.count += 1;
     } else {
       const [y, mo] = key.split("-").map(Number) as [number, number];
-      months.push({ key, label: monthLabel(y, mo - 1), count: 1, avg: e.mood });
+      months.push({ key, label: monthLabel(y, mo - 1), count: 1, avg: e.mood_rating });
     }
   }
 

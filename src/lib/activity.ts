@@ -102,15 +102,15 @@ export function useEverything() {
     });
   }
   for (const e of journal.entries) {
-    const m = moodScale[e.mood - 1]!;
+    const m = moodScale[e.mood_rating - 1]!;
     events.push({
       id: e.id,
       type: "mood",
       at: e.createdAt,
       title: `Felt ${m.label.toLowerCase()}`,
-      detail: e.note
-        ? `“${e.note}”`
-        : `Mood ${e.mood}/5${e.tags.length ? ` · ${e.tags.length} tags` : ""}`,
+      detail: e.freehand_text_content
+        ? `“${e.freehand_text_content}”`
+        : `Mood ${e.mood_rating}/5${e.context_tags.length ? ` · ${e.context_tags.length} tags` : ""}`,
       emoji: m.emoji,
       link: { to: "/journal" },
     });
@@ -180,7 +180,7 @@ export function useEverything() {
   const recentMood = journal.entries.filter((e) => e.date >= sinceKey);
   const moodDays = new Set(recentMood.map((e) => e.date));
   const moodAvg = recentMood.length
-    ? recentMood.reduce((n, e) => n + e.mood, 0) / recentMood.length
+    ? recentMood.reduce((n, e) => n + e.mood_rating, 0) / recentMood.length
     : null;
 
   const lastResult = [...results].sort((x, y) => y.completedAt.localeCompare(x.completedAt))[0];

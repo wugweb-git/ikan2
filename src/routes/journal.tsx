@@ -15,17 +15,17 @@ import { pageMeta } from "@/components/equip/program-header";
 import { cn } from "@/lib/utils";
 import {
   addDays,
-  checkinSteps,
+  blocksFor,
   contextTags,
   dayKey,
-  energyScale,
-  moodScale,
+  painScale,
   streaks,
-  stressScale,
   useJournal,
+  type Answers,
   type Draft,
   type ScalePoint,
 } from "@/lib/journal";
+import { diaryQualityOn } from "@/lib/equip/store";
 
 type Search = { mood?: number };
 
@@ -60,7 +60,7 @@ function JournalPage() {
   const { current, best } = streaks(dates, today);
   const avgOn = (key: string) => {
     const list = journal.on(key);
-    return list.length ? list.reduce((n, e) => n + e.mood, 0) / list.length : null;
+    return list.length ? list.reduce((n, e) => n + e.mood_rating, 0) / list.length : null;
   };
   const daily = days.map((d) => avgOn(dayKey(d)));
   const logged = daily.filter((v): v is number => v !== null);
@@ -232,8 +232,29 @@ function Sparkline({ values }: { values: (number | null)[] }) {
   );
 }
 
-const emptyDraft = (mood?: number): Partial<Draft> & { tags: string[] } =>
-  mood ? { mood, tags: [] } : { tags: [] };
+const emptyDraft = (mood?: number): Draft => {
+  const d: Draft = { context_tags: [] };
+  if (mood) d.mood_rating = mood;
+  // the sleep block shares its answer with the sleep diary's last question
+  const sleep = diaryQualityOn(dayKey(new Date()));
+  if (sleep) d.sleep_rating = sleep;
+  return d;
+};
+
+/** Only answered fields are saved; a No to pain drops the two pain follow-ups. */
+function toAnswers(d: Draft): Answers {
+  const a: Answers = {
+    mood_rating: d.mood_rating!,
+    sleep_rating: d.sleep_rating!,
+    stress_level: d.stress_level!,
+    pain_exist: d.pain_exist!,
+    context_tags: d.context_tags ?? [],
+  };
+  if (d.pain_exist && d.pain_experience !== undefined) a.pain_experience = d.pain_experience;
+  if (d.pain_exist && d.pain_impact !== undefined) a.pain_impact = d.pain_impact;
+  if (d.freehand_text_content?.trim()) a.freehand_text_content = d.freehand_text_content.trim();
+  return a;
+}
 
 function CheckIn({
   preset,
@@ -242,10 +263,10 @@ function CheckIn({
 }: {
   preset: number | undefined;
   countToday: number;
-  onSave: (d: Draft) => void;
+  onSave: (a: Answers) => void;
 }) {
   const [step, setStep] = useState(preset ? 1 : 0);
-  const [draft, setDraft] = useState(emptyDraft(preset));
+  const [draft, setDraft] = useState(() => emptyDraft(preset));
   const [saved, setSaved] = useState(false);
   const timer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(timer.current), []);
@@ -261,8 +282,8 @@ function CheckIn({
           {countToday} {countToday === 1 ? "entry" : "entries"} logged today
         </p>
         <Button
-          variant="outlined"
-          className="mt-5 border-[var(--on-accent-container)]/30"
+          variant="text"
+          className="mt-2"
           onClick={() => {
             setDraft(emptyDraft());
             setStep(0);
@@ -275,93 +296,106 @@ function CheckIn({
     );
   }
 
-  const current = checkinSteps[step]!;
-  const last = step === checkinSteps.length - 1;
-  const hasValue =
-    current.key === "tags"
-      ? draft.tags.length > 0
-      : current.key === "note"
-        ? Boolean(draft.note?.trim())
-        : draft[current.key] !== undefined;
+  const blocks = blocksFor(draft);
+  const i = Math.min(step, blocks.length - 1);
+  const current = blocks[i]!;
+  const last = i === blocks.length - 1;
+  const value = draft[current.save_as];
+  const hasValue = Array.isArray(value)
+    ? value.length > 0
+    : typeof value === "string"
+      ? value.trim().length > 0
+      : value !== undefined;
 
   const next = () => {
     window.clearTimeout(timer.current);
-    if (!last) return setStep(step + 1);
-    const entry: Draft = { mood: draft.mood!, tags: draft.tags };
-    if (draft.energy !== undefined) entry.energy = draft.energy;
-    if (draft.stress !== undefined) entry.stress = draft.stress;
-    if (draft.note?.trim()) entry.note = draft.note.trim();
-    onSave(entry);
+    if (!last) return setStep(i + 1);
+    onSave(toAnswers(draft));
     setSaved(true);
   };
 
-  const pick = (key: "mood" | "energy" | "stress", value: number) => {
-    setDraft((d) => ({ ...d, [key]: value }));
+  /** Set an answer and move on a moment later, so the choice is seen first. */
+  const pick = (patch: Draft) => {
+    const d = { ...draft, ...patch };
+    if (d.pain_exist === false) {
+      delete d.pain_experience;
+      delete d.pain_impact;
+    }
+    setDraft(d);
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(
-      () => setStep((s) => Math.min(s + 1, checkinSteps.length - 1)),
-      280,
-    );
+    const count = blocksFor(d).length;
+    timer.current = window.setTimeout(() => setStep((s) => Math.min(s + 1, count - 1)), 280);
   };
 
   return (
     <div className="mt-3 rounded-[24px] bg-secondary p-4">
-      <div className="flex gap-1.5" aria-label={`Step ${step + 1} of ${checkinSteps.length}`}>
-        {checkinSteps.map((s, i) => (
+      <div className="flex gap-1.5" aria-label={`Step ${i + 1} of ${blocks.length}`}>
+        {blocks.map((b, n) => (
           <span
-            key={s.key}
+            key={b.id}
             className={cn(
               "h-1.5 flex-1 rounded-full transition-colors",
-              i <= step ? "bg-[var(--accent)]" : "bg-foreground/10",
+              n <= i ? "bg-[var(--accent)]" : "bg-foreground/10",
             )}
           />
         ))}
       </div>
 
-      <div key={current.key} className="animate-fade">
-        <p className="mt-4 font-display text-[20px] font-semibold leading-7">{current.title}</p>
+      <div key={current.id} className="animate-fade">
+        <p className="mt-4 font-display text-[20px] font-semibold leading-7">{current.question}</p>
         <p className="mt-1 text-[14px] text-muted-foreground">{current.subtitle}</p>
 
         <div className="mt-4">
-          {current.key === "mood" ? (
+          {current.type === "emoji_scale" && current.scale ? (
             <EmojiScale
-              scale={moodScale}
-              value={draft.mood}
-              onPick={(v) => pick("mood", v)}
-              label={current.title}
+              scale={current.scale}
+              value={value as number | undefined}
+              onPick={(v) => pick({ [current.save_as]: v })}
+              label={current.question}
             />
           ) : null}
-          {current.key === "energy" ? (
-            <EmojiScale
-              scale={energyScale}
-              value={draft.energy}
-              onPick={(v) => pick("energy", v)}
-              label={current.title}
-            />
+          {current.type === "yes_no" ? (
+            <div role="radiogroup" aria-label={current.question} className="grid grid-cols-2 gap-2">
+              {painScale.map((o) => {
+                const on = draft.pain_exist === o.value;
+                return (
+                  <button
+                    key={o.label}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => pick({ pain_exist: o.value })}
+                    className={cn(
+                      "flex h-14 items-center justify-center gap-2 rounded-[16px] text-[16px] font-semibold transition-colors",
+                      stateLayer,
+                      on
+                        ? "bg-[var(--accent-container)] text-[var(--on-accent-container)] ring-2 ring-[var(--accent)]"
+                        : "bg-background",
+                    )}
+                  >
+                    <span aria-hidden="true">{o.emoji}</span>
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
           ) : null}
-          {current.key === "stress" ? (
-            <EmojiScale
-              scale={stressScale}
-              value={draft.stress}
-              onPick={(v) => pick("stress", v)}
-              label={current.title}
-            />
-          ) : null}
-          {current.key === "note" ? (
+          {current.type === "free_text" ? (
             <TextField
               label=""
-              ariaLabel={current.title}
-              value={draft.note ?? ""}
-              onChange={(note) => setDraft((d) => ({ ...d, note }))}
+              ariaLabel={current.question}
+              value={draft.freehand_text_content ?? ""}
+              onChange={(v) => setDraft((d) => ({ ...d, freehand_text_content: v }))}
               multiline
               maxLength={500}
               placeholder="Write a line or two"
             />
           ) : null}
-          {current.key === "tags" ? (
+          {current.type === "multi_select" ? (
             <div className="flex flex-wrap gap-2">
               {contextTags.map((t) => {
-                const on = draft.tags.includes(t.id);
+                const tags = draft.context_tags ?? [];
+                const on = tags.includes(t.id);
                 return (
                   <button
                     key={t.id}
@@ -370,7 +404,7 @@ function CheckIn({
                     onClick={() =>
                       setDraft((d) => ({
                         ...d,
-                        tags: on ? d.tags.filter((x) => x !== t.id) : [...d.tags, t.id],
+                        context_tags: on ? tags.filter((x) => x !== t.id) : [...tags, t.id],
                       }))
                     }
                     className={cn(
@@ -392,18 +426,18 @@ function CheckIn({
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        {step > 0 ? (
-          <Button variant="text" onClick={() => setStep(step - 1)}>
+        {i > 0 ? (
+          <Button variant="text" onClick={() => setStep(i - 1)}>
             Back
           </Button>
         ) : null}
         <span className="flex-1" />
-        {last ? (
-          <Button onClick={next}>Save check-in</Button>
-        ) : current.required ? (
+        {current.required ? (
           <Button onClick={next} disabled={!hasValue}>
-            Next
+            {last ? "Save check-in" : "Next"}
           </Button>
+        ) : last ? (
+          <Button onClick={next}>Save check-in</Button>
         ) : (
           <Button variant={hasValue ? "filled" : "tonal"} onClick={next}>
             {hasValue ? "Next" : "Skip"}

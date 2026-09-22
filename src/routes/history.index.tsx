@@ -54,7 +54,7 @@ function HistoryPage() {
   const week = events.filter((e) => new Date(e.at) >= new Date(dayKey(weekAgo)));
   const weekMood = hydrated ? data.journal.entries.filter((e) => e.date >= dayKey(weekAgo)) : [];
   const weekAvg = weekMood.length
-    ? weekMood.reduce((n, e) => n + e.mood, 0) / weekMood.length
+    ? weekMood.reduce((n, e) => n + e.mood_rating, 0) / weekMood.length
     : null;
   const streak = hydrated
     ? streaks(new Set(data.journal.entries.map((e) => e.date)))

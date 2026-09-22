@@ -25,6 +25,7 @@ import {
   stateLayer,
 } from "./m3";
 import { earlierAnswers } from "@/lib/equip/earlier";
+import { dayKey, sleepRatingOn } from "@/lib/journal";
 import { EntriesStep, ReviewStep, TrackerStep } from "./cards";
 import { DayCheckIn } from "./day-check-in";
 
@@ -763,6 +764,14 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
     setEntry(next);
     saveDiary(ctx.day, next);
   };
+
+  // the last question is the Mood Journal's sleep block: fill it from today's check-in
+  const atQuality = question?.kind === "rating";
+  useEffect(() => {
+    if (!atQuality || entry.quality !== undefined) return;
+    const fromJournal = sleepRatingOn(dayKey(new Date()));
+    if (fromJournal) set({ quality: fromJournal });
+  }, [atQuality]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!question) {
     const m = nightMetrics(entry);

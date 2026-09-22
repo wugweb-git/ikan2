@@ -945,7 +945,9 @@ function ThisWeek({ data, hydrated }: { data: Data; hydrated: boolean }) {
   const days = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i - 6));
   const byDay = days.map((d) => {
     const list = hydrated ? data.journal.entries.filter((e) => e.date === dayKey(d)) : [];
-    return list.length ? Math.round(list.reduce((n, e) => n + e.mood, 0) / list.length) : null;
+    return list.length
+      ? Math.round(list.reduce((n, e) => n + e.mood_rating, 0) / list.length)
+      : null;
   });
   let run = 0;
   if (hydrated) {
@@ -1349,7 +1351,7 @@ function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
         </span>
       </div>
       <p className="mt-1 text-[13px] text-muted-foreground">
-        Mood, energy and stress in a few quick taps.
+        Mood, sleep, stress and pain in a few quick taps.
       </p>
       <div className="mt-4 grid grid-cols-5 gap-2">
         {moodScale.map((m) => (

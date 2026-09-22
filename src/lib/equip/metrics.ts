@@ -7,6 +7,8 @@ export type DiaryEntry = {
   woke?: string;
   up?: string;
   quality?: number;
+  /** when this night was last saved; lets the Mood Journal match it to a calendar day */
+  savedAt?: string;
 };
 
 const toMinutes = (value: string | undefined) => {

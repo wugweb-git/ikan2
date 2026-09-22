@@ -106,6 +106,9 @@ type OldJournal = {
   mood_rating: number;
   energy?: number | null;
   stress_level?: number | null;
+  sleep_quality?: number | null;
+  pain_level?: number | null;
+  pain_impact?: number | null;
   freehand_text_content?: string | null;
   context_tags?: string[];
   emotions?: string[];
@@ -130,15 +133,22 @@ function journalEntry(o: OldJournal): JournalEntry | null {
   ];
   const energy = scale(o.energy);
   const stress = scale(o.stress_level);
+  const sleep = scale(o.sleep_quality);
+  // the old app's pain_level is the None…Extreme scale, now asked as pain experience
+  const experience = scale(o.pain_level);
+  const impact = scale(o.pain_impact);
   return {
     id: o.id,
     date: o.date,
     createdAt: o.created_at || `${o.date}T12:00:00.000Z`,
-    mood,
+    mood_rating: mood,
+    ...(sleep ? { sleep_rating: sleep } : {}),
+    ...(stress ? { stress_level: stress } : {}),
+    ...(experience ? { pain_exist: experience > 1, pain_experience: experience } : {}),
+    ...(impact ? { pain_impact: impact } : {}),
+    ...(o.freehand_text_content ? { freehand_text_content: o.freehand_text_content } : {}),
+    context_tags: tags,
     ...(energy ? { energy } : {}),
-    ...(stress ? { stress } : {}),
-    ...(o.freehand_text_content ? { note: o.freehand_text_content } : {}),
-    tags,
   };
 }
 

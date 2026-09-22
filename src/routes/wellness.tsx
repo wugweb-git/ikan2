@@ -390,7 +390,7 @@ function OneAxis({
   const keys = days.map(dayKey);
   const moodByDay = keys.map((k) => {
     const list = hydrated ? data.journal.entries.filter((e) => e.date === k) : [];
-    return list.length ? list.reduce((n, e) => n + e.mood, 0) / list.length : null;
+    return list.length ? list.reduce((n, e) => n + e.mood_rating, 0) / list.length : null;
   });
   const programDays = keys.map((k) =>
     hydrated
