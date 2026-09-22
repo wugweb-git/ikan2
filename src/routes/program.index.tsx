@@ -4,7 +4,7 @@ import { IkanShell } from "@/components/ikan-shell";
 import { accentStyle, stateLayer } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { cn } from "@/lib/utils";
-import { programmes, upcoming } from "@/lib/equip/programs";
+import { dayCount, daysDoneOf, programmes, upcoming } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 import type { Programme } from "@/lib/equip/types";
 
@@ -73,9 +73,9 @@ function ProgramsPage() {
 
 function ProgrammeCard({ programme }: { programme: Programme }) {
   const { state, nextDay } = useProgramme(programme.slug);
-  const total = programme.days.length;
-  const done = state.completed.length;
-  const started = done > 0;
+  const total = dayCount(programme);
+  const done = daysDoneOf(programme, state.completed);
+  const started = state.completed.length > 0;
   const src = programme.source;
 
   return (
@@ -103,14 +103,14 @@ function ProgrammeCard({ programme }: { programme: Programme }) {
                 />
               </div>
               <p className="mt-2 flex items-center justify-between text-[13px] font-medium text-[var(--accent-strong)]">
-                {nextDay < total ? `Continue with day ${nextDay}` : "All days done"}
+                {done < total ? `Continue with day ${nextDay}` : "All days done"}
                 <ChevronRight className="h-4 w-4" />
               </p>
             </>
           ) : (
             <p className="flex items-center justify-between text-[13px] text-muted-foreground">
               <span>
-                {src.meta.days}, {src.meta.level.charAt(0).toUpperCase() + src.meta.level.slice(1)}
+                {total} days, {src.meta.level.charAt(0).toUpperCase() + src.meta.level.slice(1)}
               </span>
               <ChevronRight className="h-4 w-4" />
             </p>

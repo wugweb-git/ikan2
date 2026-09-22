@@ -59,6 +59,11 @@ export type UI =
       seeds?: EntryValues[];
       example?: string[];
       scope: "today" | "all";
+      /** each card is asked once: cards answered on an earlier day aren't asked again */
+      once?: boolean;
+      /** a matching answer copies the card into another collection, e.g. a chosen ritual becomes a
+       * tracked habit; changing the answer back removes the copy */
+      promote?: { collection: string; field: string; from: string; when: string };
     }
   | { ui: "tracker"; collection: string; field: string; prompt: string; note?: string }
   | { ui: "statements"; prompt: string; statements: string[]; options: string[] }

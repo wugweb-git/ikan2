@@ -50,7 +50,7 @@ import { dedupe, programmeAbout, type ProgrammeAbout } from "@/lib/content/about
 import { useScrollY } from "@/hooks/use-personal-context";
 import { cn } from "@/lib/utils";
 import { AddToCalendar } from "@/components/add-to-calendar";
-import { focusOf, getProgramme, minutesOf } from "@/lib/equip/programs";
+import { dayCount, daysDoneOf, focusOf, getProgramme, minutesOf } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 import type { Programme } from "@/lib/equip/types";
 
@@ -81,7 +81,7 @@ function ProgrammePage() {
   const started = state.completed.length > 0;
   const src = programme.source;
   const snack = useSnack();
-  const about = programmeAbout(slug, programme.days.length);
+  const about = programmeAbout(slug, dayCount(programme));
   const openToday = () =>
     today && navigate({ to: "/program/$slug/day/$day", params: { slug, day: String(today.day) } });
   const before = useBeforeStart(`programme.${slug}`, () => void openToday());
@@ -159,7 +159,7 @@ function ProgrammePage() {
           </h1>
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
-              <CalendarDays className="h-4 w-4" /> {programme.days.length} days
+              <CalendarDays className="h-4 w-4" /> {dayCount(programme)} days
             </span>
             <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
               <Clock3 className="h-4 w-4" /> 5–10 min a day
@@ -364,9 +364,9 @@ function ProgrammePage() {
           title={`Cancel ${programme.name}?`}
         >
           <p className="text-[15px] leading-6 text-muted-foreground">
-            You’ve done {Math.min(new Set(state.completed).size, programme.days.length)} of{" "}
-            {programme.days.length} days. Cancelling clears this run’s progress and answers, and
-            can’t be undone. Programs you’ve finished before stay in your history.
+            You’ve done {daysDoneOf(programme, state.completed)} of {dayCount(programme)} days.
+            Cancelling clears this run’s progress and answers, and can’t be undone. Programs you’ve
+            finished before stay in your history.
           </p>
           <div className="mt-6 flex flex-col gap-2">
             <Button onClick={() => setCancelling(false)}>Keep going</Button>
@@ -388,7 +388,7 @@ function ProgrammePage() {
           onClose={before.close}
           onConfirm={before.confirm}
           items={[
-            { icon: CalendarDays, text: `${programme.days.length} days, one short session a day` },
+            { icon: CalendarDays, text: `${dayCount(programme)} days, one short session a day` },
             { icon: Clock3, text: "Go at your own pace and come back any time" },
             { icon: ShieldCheck, text: "A self-help program, not medical treatment" },
             { icon: LifeBuoy, text: "Not for emergencies. Get support if you feel unsafe" },
@@ -414,7 +414,7 @@ function DayGrid({
   return (
     <section className="mt-3 rounded-[20px] bg-background p-3">
       <p className="px-1 text-[13px] tabular-nums text-muted-foreground">
-        {completed.length} of {programme.days.length} days done
+        {daysDoneOf(programme, completed)} of {dayCount(programme)} days done
       </p>
       <ol className="mt-2 grid grid-cols-7 gap-y-2">
         {programme.days.map((d) => {

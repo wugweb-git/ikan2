@@ -8,7 +8,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { completedRuns, dayResponses, shortDate } from "@/lib/equip/journey";
-import { getProgramme } from "@/lib/equip/programs";
+import { dayCount, getProgramme } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 
 /* One programme's archive: summary, every finished run stacked newest first (each day opens to
@@ -54,7 +54,7 @@ function ProgramArchivePage() {
           <div className="absolute inset-x-5 bottom-4">
             <p className="text-[13px] opacity-80">Program history</p>
             <h1 className="font-display text-[28px] font-semibold leading-8">{p.name}</h1>
-            <p className="text-[13px] opacity-80">{p.source.meta.days}</p>
+            <p className="text-[13px] opacity-80">{dayCount(p)} days</p>
           </div>
         </header>
 

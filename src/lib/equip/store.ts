@@ -35,6 +35,8 @@ export type ProgrammeState = {
   tracker: Record<string, Record<string, boolean>>;
   /** active time, in seconds: day → total and per step (step id → seconds) */
   time?: Record<string, { total: number; steps: Record<string, number> }>;
+  /** day → the step reached in a day not finished yet, so leaving and coming back resumes there */
+  progress?: Record<string, number>;
   /** end-of-day check: how helpful the session was and how the person feels after it (both 1–5) */
   feedback?: Record<string, SessionFeedback>;
   /** answers imported from the old iKan app, which can't be matched to today's steps: day → blocks */
@@ -206,14 +208,23 @@ export function useProgramme(slug: string) {
         tracker: { ...s.tracker, [String(day)]: { ...s.tracker[String(day)], [id]: done } },
       })),
     complete: (day: number) =>
-      update((s) =>
-        s.completed.includes(day)
-          ? s
+      update((s) => {
+        const { [String(day)]: _left, ...progress } = s.progress ?? {};
+        return s.completed.includes(day)
+          ? { ...s, progress }
           : {
               ...s,
               completed: [...s.completed, day].sort((a, b) => a - b),
               completedAt: { ...s.completedAt, [String(day)]: new Date().toISOString() },
-            },
+              progress,
+            };
+      }),
+    /** remember the step reached in an unfinished day */
+    saveProgress: (day: number, index: number) =>
+      update((s) =>
+        s.progress?.[String(day)] === index
+          ? s
+          : { ...s, progress: { ...s.progress, [String(day)]: index } },
       ),
     /** add active seconds to a day and one of its steps */
     addTime: (day: number, stepId: string, seconds: number) =>

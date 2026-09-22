@@ -307,7 +307,7 @@
               "notes": [
                 {
                   "kind": "text",
-                  "text": "Tasks 3-7 can be done by showing 2 at a time on 1 card"
+                  "text": "Tasks 2-7 can be done by showing 2 at a time on 1 card"
                 }
               ],
               "columns": [
@@ -1317,7 +1317,8 @@
                 "I can take sick leave",
                 "I don’t need anyone, I can do it all on my own",
                 "I can cut out the absolute non-essential tasks"
-              ]
+              ],
+              "prompt": "Which of these could lighten your load?"
             },
             {
               "n": 4,

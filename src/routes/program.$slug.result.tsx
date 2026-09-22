@@ -44,7 +44,7 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { journeyOf, latestRun, relatedAssessment, runParam } from "@/lib/equip/journey";
 import { formatDuration } from "@/lib/equip/metrics";
-import { getProgramme, programmes } from "@/lib/equip/programs";
+import { dayCount, getProgramme, programmes } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 import { demoRun } from "@/lib/equip/demo";
 import {
@@ -160,7 +160,7 @@ function ResultPage() {
           <div className="px-6 pt-16 text-center">
             <h1 className="font-display text-[22px] font-semibold">No result yet</h1>
             <p className="mt-2 text-[15px] text-muted-foreground">
-              Finish all {p.days.length} days of {p.name} to see your result here.
+              Finish all {dayCount(p)} days of {p.name} to see your result here.
             </p>
             <Button
               className="mt-6"

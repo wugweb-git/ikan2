@@ -164,3 +164,7 @@ export const oneOf =
   (options: readonly string[], message: string): Check =>
   (v) =>
     options.includes(v) ? undefined : message;
+
+/** A written answer counts only with at least 3 letters or digits, so "." or "vd" don't pass. */
+export const hasWords = (v: unknown) =>
+  typeof v === "string" && (v.match(/[\p{L}\p{N}]/gu)?.length ?? 0) >= 3;

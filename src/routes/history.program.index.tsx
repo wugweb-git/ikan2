@@ -16,7 +16,7 @@ import { formatSeconds } from "@/hooks/use-active-time";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { completedRuns, shortDate } from "@/lib/equip/journey";
-import { programmes } from "@/lib/equip/programs";
+import { dayCount, programmes } from "@/lib/equip/programs";
 import { useProgramme, type ProgrammeState } from "@/lib/equip/store";
 
 /* Program history: one summary card for each of the three programmes, finished ones first.
@@ -174,7 +174,7 @@ function ProgramHistoryPage() {
                         Not completed yet
                       </span>
                       <span className="mt-auto pt-2 text-[12px] text-muted-foreground">
-                        {p.source.meta.days}. Each finished run stacks up here.
+                        {dayCount(p)} days. Each finished run stacks up here.
                       </span>
                     </>
                   )}

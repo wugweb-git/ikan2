@@ -30,7 +30,7 @@
               "n": 2,
               "title": "Primary Sleep Concern",
               "type": "quiz",
-              "interaction": "single-select",
+              "interaction": "multi-select",
               "key": "sleep_primary_issue",
               "minutes": 5,
               "group": "onboarding_core",
@@ -1232,7 +1232,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Disturbance: doomscrolling on Instagram → Ideas: uninstall it nightly • keep phone in another room • use night mode • quit the app entirely. (We'll refine these later — for now, quantity over quality.)"
+                  "text": "Disturbance: doomscrolling on Instagram → Ideas: uninstall it nightly • keep phone in another room • use night mode • quit the app entirely. (We'll refine these later. For now, quantity over quality.)"
                 }
               ],
               "notes": []
@@ -1565,7 +1565,7 @@
           "day": 17,
           "title": "Bedtime Rituals (Continued)",
           "kind": "learning",
-          "declaredBlocks": 8,
+          "declaredBlocks": 7,
           "subtitle": "Part of the Solution!",
           "blocks": [
             {
@@ -1611,35 +1611,29 @@
             {
               "n": 4,
               "title": "Forming Habits",
-              "type": "lesson",
-              "minutes": 5,
-              "body": [
-                {
-                  "kind": "p",
-                  "text": "First: list everything you do in a day, start to finish, from brushing your teeth, commuting, cooking, filing reports, all of it. Even the small stuff counts."
-                }
-              ],
-              "notes": []
-            },
-            {
-              "n": 5,
-              "title": "Forming Habits",
-              "type": "journal",
+              "type": "checklist",
+              "interaction": "multi-select",
+              "key": "sleep_daily_activities",
               "minutes": 5,
               "body": [],
-              "notes": [
-                {
-                  "kind": "text",
-                  "text": "For Task 5"
-                },
-                {
-                  "kind": "text",
-                  "text": "Let user create a list of activities they do. Limit to 10?"
-                }
+              "notes": [],
+              "prompt": "From the list below, select all that you do. You can add to the list if you’d like.",
+              "options": [
+                "Lying in bed after waking up or before going to sleep",
+                "Making or having tea or coffee",
+                "Commuting (transit or waiting)",
+                "Taking a break at work",
+                "Waiting for food to cook",
+                "Having meals (breakfast, lunch, dinner and any snacks in between)",
+                "Waiting in line or on hold",
+                "Watching TV or scrolling social media",
+                "Winding down before sleep",
+                "Exercising (walking, jogging or on a machine)",
+                "Other (add your own)"
               ]
             },
             {
-              "n": 6,
+              "n": 5,
               "title": "My Activities",
               "type": "lesson",
               "minutes": 5,
@@ -1652,7 +1646,7 @@
               "notes": []
             },
             {
-              "n": 7,
+              "n": 6,
               "title": "My Activities",
               "type": "exercise",
               "interaction": "input-table",
@@ -1661,11 +1655,11 @@
               "notes": [
                 {
                   "kind": "text",
-                  "text": "For Task 7"
+                  "text": "For Task 6"
                 },
                 {
                   "kind": "text",
-                  "text": "Pull up list from activity 5 and... Promot"
+                  "text": "Pull up list from activity 4 and... Promot"
                 },
                 {
                   "kind": "text",
@@ -1682,7 +1676,7 @@
               ]
             },
             {
-              "n": 8,
+              "n": 7,
               "title": "Conclusion",
               "type": "conclude",
               "minutes": 5,
@@ -1753,11 +1747,23 @@
               "notes": [
                 {
                   "kind": "text",
-                  "text": "For Task 4"
+                  "text": "For Task 4, bring up the rituals the user entered in Task 6 of Day 16"
                 },
                 {
                   "kind": "text",
-                  "text": "Let user create a list of habits they want to inculcate. Limit rituals to 10"
+                  "text": "Prompt"
+                },
+                {
+                  "kind": "text",
+                  "text": "Do you want to inculcate these in your night time rituals?"
+                },
+                {
+                  "kind": "text",
+                  "text": "Options"
+                },
+                {
+                  "kind": "text",
+                  "text": "✅Yes ❌No"
                 }
               ],
               "columns": ["Habit I want to inculcate"],
@@ -1806,7 +1812,7 @@
                   "text": "✅Yes ❌No"
                 }
               ],
-              "listItems": ["Tick off the habits you completed today."]
+              "listItems": ["Tick off the activities you completed from days 17 and 18."]
             },
             {
               "n": 7,
@@ -1816,7 +1822,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Now that we have been able to develop a sleep ritual for ourselves, let’s give it a try."
+                  "text": "Now that we have been able to develop a sleep ritual for ourselves, let’s give them a try."
                 }
               ],
               "notes": []

@@ -239,8 +239,8 @@ export function programmeSummary(p: Programme, s: ProgrammeState): Summary {
               1,
           )
         : 0,
-    daysDone: doneDays.length,
-    totalDays: p.days.length,
+    daysDone: doneDays.filter((d) => d.day > 0).length,
+    totalDays: p.days.filter((d) => d.day > 0).length,
     daysActive: dates.length,
     longestStreak,
     seconds,

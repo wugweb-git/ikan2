@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { CalendarCheck, ListChecks, NotebookPen, Pencil, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { hasWords } from "@/lib/validate";
 import { formatTime } from "@/lib/equip/metrics";
 import { useProgramme, type Entry } from "@/lib/equip/store";
 import { earlierFieldValues } from "@/lib/equip/earlier";
@@ -32,6 +33,9 @@ const display = (f: Field | undefined, v: EntryValues[string] | undefined) => {
       month: "short",
       year: "numeric",
     });
+  if (f?.type === "datetime" && /^\d{1,2}:\d{2}$/.test(v)) return formatTime(v);
+  // anything else that isn't a date (e.g. a written example "10:45 pm") shows as written
+  if (f?.type === "datetime" && Number.isNaN(Date.parse(v))) return v;
   if (f?.type === "datetime")
     return new Date(v).toLocaleString("en-IN", {
       day: "numeric",
@@ -97,6 +101,12 @@ const hintFor = (f: Field, collection?: string) =>
 const nowTime = () => {
   const d = new Date();
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+};
+/** Now, as a local date-time picker value (YYYY-MM-DDTHH:MM). */
+const nowDateTime = () => {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${nowTime()}`;
 };
 
 function FieldInput({
@@ -191,10 +201,18 @@ function EntryForm({
   const [values, setValues] = useState<EntryValues>(
     () =>
       initial ??
-      Object.fromEntries(fields.filter((f) => f.type === "time").map((f) => [f.key, nowTime()])),
+      Object.fromEntries(
+        fields
+          .filter((f) => f.type === "time" || f.type === "datetime")
+          .map((f) => [f.key, f.type === "time" ? nowTime() : nowDateTime()]),
+      ),
   );
   const [tried, setTried] = useState(false);
-  const ready = fields.some((f) => f.type !== "time" && String(values[f.key] ?? "").trim());
+  const ready = fields.some((f) =>
+    f.type === "text" || f.type === "longtext"
+      ? hasWords(values[f.key])
+      : f.type !== "time" && f.type !== "datetime" && String(values[f.key] ?? "").trim() !== "",
+  );
   const errors = entryErrors(fields, values);
   return (
     <form
@@ -323,6 +341,27 @@ function Values({ entry, fields }: { entry: Entry | { values: EntryValues }; fie
   );
 }
 
+/** Tracker steps show a week of history per habit from this programme day. */
+const HISTORY_FROM = 25;
+
+/* Entry values the app keeps for itself, never shown as a field. */
+const UPDATED = "__updated_day";
+const ANSWERED = "__answered_day";
+const FROM = "__from";
+
+/** "perfect_outcome" → "Perfect outcome": a heading for a carried field with no label of its own. */
+const labelOf = (key: string) => {
+  const t = key.replace(/_/g, " ").trim();
+  return t.charAt(0).toUpperCase() + t.slice(1);
+};
+
+/** Help on an empty review: what an entry is, then the question this screen asks of it. */
+const reviewHelp = (view: Extract<UI, { ui: "review" }>) => {
+  const base = helpFor(view.collection, [...(view.addFields ?? []), ...view.fields]) ?? "";
+  const ask = view.prompt || view.fields.map((f) => f.label).find(Boolean);
+  return ask && !base.includes(ask) ? `${base} Then answer: “${ask}”`.trim() : base;
+};
+
 /** What one entry is, shown before the first one exists. */
 const emptyHelp: Record<string, string> = {
   thought_log:
@@ -450,7 +489,9 @@ export function EntriesStep({
               <FieldInput
                 field={f}
                 value={e.values[f.key]}
-                onChange={(v) => patchEntry(view.collection, e.id, { [f.key]: v })}
+                onChange={(v) =>
+                  patchEntry(view.collection, e.id, { [f.key]: v, [UPDATED]: String(ctx.day) })
+                }
               />
             </div>
           ))}
@@ -520,7 +561,9 @@ export function EntriesStep({
         onBack={ctx.onBack}
         onNext={ctx.onNext}
         label={nextLabel(ctx)}
-        disabled={!full && !list.some((e) => e.day === ctx.day)}
+        disabled={
+          !full && !list.some((e) => e.day === ctx.day || e.values[UPDATED] === String(ctx.day))
+        }
         hint="Add an entry for today to continue"
       />
     </>
@@ -544,14 +587,16 @@ function ListEntries({
   const [extra, setExtra] = useState(0);
   const f = view.fields[0]!;
   // earlier days' answers come first and stay locked until Edit; today starts on a fresh row
-  const carried = list.filter((e) => e.day < ctx.day);
+  const carried = list.filter(
+    (e) => e.day < ctx.day && String(e.values[f.key] ?? "").trim() !== "",
+  );
   const today = list.filter((e) => e.day >= ctx.day);
   const todaySlots = Math.min(
     Math.max(0, max - carried.length),
     Math.max(carried.length ? 1 : initial, today.length) + extra,
   );
   const slots = carried.length + todaySlots;
-  const filled = today.filter((e) => String(e.values[f.key] ?? "").trim()).length;
+  const filled = today.filter((e) => hasWords(e.values[f.key])).length;
   const canAddMore = slots < max;
   const allFilled = filled >= todaySlots;
 
@@ -609,9 +654,9 @@ function ListEntries({
         ) : (
           <span />
         )}
-        {max !== Infinity && list.length > 0 ? (
+        {max !== Infinity && carried.length + filled > 0 ? (
           <p className="text-[13px] tabular-nums text-muted-foreground">
-            {list.length} of {max}
+            {carried.length + filled} of {max}
           </p>
         ) : null}
       </div>
@@ -620,7 +665,11 @@ function ListEntries({
         onNext={ctx.onNext}
         label={nextLabel(ctx)}
         disabled={filled === 0 && carried.length < max}
-        hint="Write at least one to continue"
+        hint={
+          today.some((e) => String(e.values[f.key] ?? "").trim())
+            ? "Write a few words to continue"
+            : "Write at least one to continue"
+        }
       />
     </>
   );
@@ -736,8 +785,14 @@ export function ReviewStep({
   view: Extract<UI, { ui: "review" }>;
   ctx: StepCtx;
 }) {
-  const { state, addEntry, patchEntry, entries } = useProgramme(ctx.slug);
-  const list = useVisibleEntries(ctx.slug, view.collection, view.scope, ctx.day);
+  const { state, addEntry, patchEntry, removeEntry, entries } = useProgramme(ctx.slug);
+  const visible = useVisibleEntries(ctx.slug, view.collection, view.scope, ctx.day);
+  const answeredOn = (e: Entry) => e.values[ANSWERED];
+  // asked once: a card answered on an earlier day isn't asked again
+  const list = view.once
+    ? visible.filter((e) => !answeredOn(e) || answeredOn(e) === String(ctx.day))
+    : visible;
+  const doneBefore = visible.length - list.length;
   const [sheet, setSheet] = useState(false);
   const [page, setPage] = useState(0);
   const snack = useSnack();
@@ -775,8 +830,33 @@ export function ReviewStep({
   );
   const infoFields = (e: Entry): Field[] =>
     Object.keys(e.values)
-      .filter((k) => !reviewKeys.has(k) && !k.startsWith("aligns"))
-      .map((k) => labels.get(k) ?? { key: k, label: "", type: "longtext" as const });
+      .filter((k) => !reviewKeys.has(k) && !k.startsWith("aligns") && !k.startsWith("__"))
+      .map(
+        (k) =>
+          labels.get(k) ?? {
+            key: k,
+            label: k === "text" ? "" : labelOf(k),
+            type: "longtext" as const,
+          },
+      );
+
+  const answer = (e: Entry, key: string, v: EntryValues[string]) => {
+    patchEntry(view.collection, e.id, {
+      [key]: v,
+      ...(view.once ? { [ANSWERED]: String(ctx.day) } : {}),
+    });
+    const pr = view.promote;
+    if (!pr) return;
+    const copies = entries(pr.collection).filter((c) => c.values[FROM] === e.id);
+    if (typeof v === "string" && v.includes(pr.when)) {
+      if (!copies.length)
+        addEntry(
+          pr.collection,
+          { [pr.field]: String(e.values[pr.from] ?? ""), [FROM]: e.id },
+          ctx.day,
+        );
+    } else copies.forEach((c) => removeEntry(pr.collection, c.id));
+  };
 
   const answered = list.filter((e) =>
     view.fields.every((f) => String(e.values[f.key] ?? "").trim()),
@@ -812,7 +892,7 @@ export function ReviewStep({
               field={f}
               hideLabel={f.label === view.prompt}
               value={e.values[f.key]}
-              onChange={(v) => patchEntry(view.collection, e.id, { [f.key]: v })}
+              onChange={(v) => answer(e, f.key, v)}
             />
           ))}
         </div>
@@ -828,6 +908,12 @@ export function ReviewStep({
           {answered} of {list.length} done
         </p>
       ) : null}
+      {view.once && doneBefore > 0 ? (
+        <p className="mt-1 text-[13px] text-muted-foreground">
+          {doneBefore} answered on earlier days
+          {list.length ? "" : ". You’ve answered this for every one so far."}
+        </p>
+      ) : null}
       <div className="mt-4">
         {pages.length ? (
           <Pager pages={pages} index={Math.min(page, pages.length - 1)} onIndex={setPage} />
@@ -835,7 +921,7 @@ export function ReviewStep({
           <EmptyCards
             canAdd={Boolean(view.addFields)}
             onAdd={() => setSheet(true)}
-            help={helpFor(view.collection, [...(view.addFields ?? []), ...view.fields])}
+            help={reviewHelp(view)}
           />
         )}
       </div>
@@ -870,10 +956,14 @@ export function ReviewStep({
         onNext={ctx.onNext}
         label={nextLabel(ctx)}
         disabled={
+          !(view.once && doneBefore > 0 && list.length === 0) &&
           !list.some((e) =>
             view.fields.some((f) => {
               const v = e.values[f.key];
-              return typeof v === "boolean" || (typeof v === "string" && v.trim() !== "");
+              if (typeof v === "boolean") return true;
+              return f.type === "text" || f.type === "longtext"
+                ? hasWords(v)
+                : typeof v === "string" && v.trim() !== "";
             }),
           )
         }
@@ -903,6 +993,10 @@ export function TrackerStep({
     .filter((d) => d < ctx.day)
     .sort((a, b) => a - b)
     .slice(-6);
+  // from Day 25 there's a week of tracking to look back on: show it per habit
+  const week = ctx.day >= HISTORY_FROM ? Array.from({ length: 7 }, (_, i) => ctx.day - 6 + i) : [];
+  const doneOn = (d: number, id: string) =>
+    d === ctx.day ? today[id] === true : state.tracker[String(d)]?.[id] === true;
 
   return (
     <>
@@ -915,7 +1009,10 @@ export function TrackerStep({
               <p className="text-[16px] font-medium leading-6">
                 {String(h.values[view.field] ?? "")}
               </p>
-              <span className="flex shrink-0 gap-1" aria-label="Earlier days">
+              <span
+                className={cn("flex shrink-0 gap-1", week.length && "hidden")}
+                aria-label="Earlier days"
+              >
                 {days.map((d) => (
                   <span
                     key={d}
@@ -928,6 +1025,35 @@ export function TrackerStep({
                 ))}
               </span>
             </div>
+            {week.length ? (
+              <div className="mt-2">
+                <div
+                  className="flex gap-1"
+                  role="img"
+                  aria-label={`Done on ${week.filter((d) => doneOn(d, h.id)).length} of the last 7 days`}
+                >
+                  {week.map((d) => (
+                    <span key={d} className="flex flex-1 flex-col items-center gap-0.5">
+                      <span
+                        className={cn(
+                          "grid h-7 w-full place-items-center rounded-[8px] text-[13px] font-semibold",
+                          doneOn(d, h.id)
+                            ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]"
+                            : "bg-foreground/[0.06] text-muted-foreground",
+                        )}
+                        aria-hidden="true"
+                      >
+                        {doneOn(d, h.id) ? "✓" : "·"}
+                      </span>
+                      <span className="text-[10px] tabular-nums text-muted-foreground">D{d}</span>
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-1 text-[12px] text-muted-foreground">
+                  {week.filter((d) => doneOn(d, h.id)).length} of the last 7 days
+                </p>
+              </div>
+            ) : null}
             <div className="mt-3">
               <Segmented
                 label={String(h.values[view.field] ?? "")}

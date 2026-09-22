@@ -42,7 +42,7 @@ import {
   reassessReason,
 } from "@/lib/assessment/reassess";
 import { headlineOf, recommendationsFor, riskEndorsed, scoreAll } from "@/lib/assessment/scoring";
-import { getProgramme, minutesOf, programmes } from "@/lib/equip/programs";
+import { dayCount, daysDoneOf, getProgramme, minutesOf, programmes } from "@/lib/equip/programs";
 import { consultants } from "@/lib/consultants";
 import { addDays, dayKey, moodScale } from "@/lib/journal";
 import { useNotifications } from "@/lib/notifications";
@@ -853,9 +853,7 @@ function Recommended({ data, hydrated }: { data: Data; hydrated: boolean }) {
             <img src={p.cover} alt="" className="absolute inset-0 h-full w-full object-cover" />
             <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
             <span className="absolute inset-x-0 bottom-0 p-4">
-              <span className="block text-[12px] font-semibold opacity-80">
-                {p.source.meta.days}
-              </span>
+              <span className="block text-[12px] font-semibold opacity-80">{dayCount(p)} days</span>
               <span className="block font-display text-[20px] font-semibold">{p.name}</span>
               {p.source.description ? (
                 <span className="mt-0.5 line-clamp-2 text-[12px] leading-4 opacity-85">
@@ -883,7 +881,7 @@ function YourPrograms({ data, hydrated }: { data: Data; hydrated: boolean }) {
         <ul className="space-y-2 px-4">
           {started.map((p) => {
             const s = data.programmeStates[p.slug]!;
-            const done = Math.min(new Set(s.completed).size, p.days.length);
+            const done = daysDoneOf(p, s.completed);
             return (
               <li key={p.slug}>
                 <Link
@@ -906,13 +904,13 @@ function YourPrograms({ data, hydrated }: { data: Data; hydrated: boolean }) {
                         {p.name}
                       </span>
                       <span className="text-[12px] tabular-nums text-muted-foreground">
-                        {done} of {p.days.length} days
+                        {done} of {dayCount(p)} days
                       </span>
                     </span>
                     <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-[var(--accent-container)]">
                       <span
                         className="block h-full rounded-full bg-[var(--accent)]"
-                        style={{ width: `${(done / p.days.length) * 100}%` }}
+                        style={{ width: `${(done / dayCount(p)) * 100}%` }}
                       />
                     </span>
                   </span>
@@ -932,7 +930,7 @@ function YourPrograms({ data, hydrated }: { data: Data; hydrated: boolean }) {
             >
               <img src={p.cover} alt="" className="h-[112px] w-full rounded-[20px] object-cover" />
               <span className="mt-2 block font-display text-[15px] font-semibold">{p.name}</span>
-              <span className="block text-[12px] text-muted-foreground">{p.source.meta.days}</span>
+              <span className="block text-[12px] text-muted-foreground">{dayCount(p)} days</span>
             </Link>
           ))}
         </div>
@@ -1154,8 +1152,8 @@ function ongoing(data: Data) {
 function CurrentProgram({ data, hydrated }: { data: Data; hydrated: boolean }) {
   const cur = hydrated ? ongoing(data) : undefined;
   if (!cur) return null;
-  const done = Math.min(new Set(cur.s.completed).size, cur.p.days.length);
-  const pct = Math.round((done / cur.p.days.length) * 100);
+  const done = daysDoneOf(cur.p, cur.s.completed);
+  const pct = Math.round((done / dayCount(cur.p)) * 100);
   return (
     <section className="px-4">
       <p className="mb-2 text-[13px] font-semibold text-muted-foreground">Your program</p>
@@ -1171,7 +1169,7 @@ function CurrentProgram({ data, hydrated }: { data: Data; hydrated: boolean }) {
               </h2>
               <p className="mt-1 text-[13px] opacity-75">
                 {cur.next === 0 ? "Onboarding" : `Day ${cur.next} · ${cur.day!.title}`} · {done} of{" "}
-                {cur.p.days.length} days done
+                {dayCount(cur.p)} days done
               </p>
             </div>
             <div

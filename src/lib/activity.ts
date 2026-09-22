@@ -3,7 +3,7 @@ import { assessments, getAssessment } from "@/lib/assessment/instruments";
 import { headlineOf, percentOfRange, scoreAll } from "@/lib/assessment/scoring";
 import { useAssessmentStore } from "@/lib/assessment/store";
 import { getConsultant, useBookings } from "@/lib/consultants";
-import { programmes } from "@/lib/equip/programs";
+import { dayCount, daysDoneOf, programmes } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 import { addDays, dayKey, moodScale, useJournal } from "@/lib/journal";
 import { getResource, useResourceStore } from "@/lib/resources";
@@ -125,7 +125,7 @@ export function useEverything() {
           type: "program",
           at,
           title: `${p.name} · Day ${day}`,
-          detail: `Day complete · ${Math.min(p.days.length, new Set(s.completed).size)} of ${p.days.length} done`,
+          detail: `Day complete · ${daysDoneOf(p, s.completed)} of ${dayCount(p)} done`,
           link: { to: "/program/$slug", params: { slug: p.slug } },
         });
       }
@@ -184,10 +184,13 @@ export function useEverything() {
     : null;
 
   const lastResult = [...results].sort((x, y) => y.completedAt.localeCompare(x.completedAt))[0];
-  const doneOf = (slug: string, total: number) =>
-    Math.min(total, new Set(programmeStates[slug]!.completed).size);
+  const doneOf = (slug: string) =>
+    daysDoneOf(
+      programmes.find((p) => p.slug === slug)!,
+      programmeStates[slug]!.completed,
+    );
   const started = programmes.filter((p) => programmeStates[p.slug]!.completed.length > 0);
-  const progPct = started.map((p) => (doneOf(p.slug, p.days.length) / p.days.length) * 100);
+  const progPct = started.map((p) => (doneOf(p.slug) / dayCount(p)) * 100);
 
   const parts: WellnessPart[] = [
     {
@@ -218,9 +221,7 @@ export function useEverything() {
       weight: 15,
       value: progPct.length ? progPct.reduce((n, v) => n + v, 0) / progPct.length : null,
       detail: started.length
-        ? started
-            .map((p) => `${p.name}, ${doneOf(p.slug, p.days.length)} of ${p.days.length} days`)
-            .join(" · ")
+        ? started.map((p) => `${p.name}, ${doneOf(p.slug)} of ${dayCount(p)} days`).join(" · ")
         : "Start a program to add this",
     },
     {
@@ -260,7 +261,7 @@ export function useEverything() {
         type: "program",
         at,
         title: `${p.name} completed`,
-        detail: `All ${p.days.length} days done${stamps[0] ? ` · started ${new Date(stamps[0]).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}` : ""}`,
+        detail: `All ${dayCount(p)} days done${stamps[0] ? ` · started ${new Date(stamps[0]).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}` : ""}`,
         link: { to: "/program/$slug/result", params: { slug: p.slug } },
       });
     }

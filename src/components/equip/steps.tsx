@@ -26,6 +26,7 @@ import {
 } from "./m3";
 import { earlierAnswers } from "@/lib/equip/earlier";
 import { dayKey, sleepRatingOn } from "@/lib/journal";
+import { hasWords } from "@/lib/validate";
 import { EntriesStep, ReviewStep, TrackerStep } from "./cards";
 import { DayCheckIn } from "./day-check-in";
 
@@ -297,7 +298,8 @@ function ChoiceStep({
               >
                 <span
                   className={cn(
-                    "grid h-6 w-6 place-items-center rounded-full",
+                    "grid h-6 w-6 place-items-center",
+                    view.multi ? "rounded-[6px]" : "rounded-full",
                     on ? "bg-foreground text-background" : "border-2 border-foreground/40",
                   )}
                 >
@@ -530,8 +532,8 @@ function TextStep({
         onBack={ctx.onBack}
         onNext={ctx.onNext}
         label={nextLabel(ctx)}
-        disabled={!value.trim()}
-        hint="Write your answer to continue"
+        disabled={!hasWords(value)}
+        hint={value.trim() ? "Write a few words to continue" : "Write your answer to continue"}
       />
     </>
   );
@@ -625,6 +627,11 @@ function SortStep({
   return (
     <>
       <p className="text-[14px] font-semibold text-[var(--accent-strong)]">{step.block.title}</p>
+      {visibleBody(step.block).map((item, i) => (
+        <p key={i} className="mt-2 text-[16px] leading-6 text-foreground/90">
+          {item.text}
+        </p>
+      ))}
       <div className="mt-4">
         <Pager
           peek={false}
@@ -831,12 +838,23 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
     );
   }
 
+  // "tried to sleep" can't come before "went to bed" (up to 12 hours earlier counts as before)
+  const beforeBed =
+    question.key === "tried" && entry.bed && entry.tried
+      ? (() => {
+          const m = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+          const gap = (m(entry.bed) - m(entry.tried) + 1440) % 1440;
+          return gap > 0 && gap <= 720;
+        })()
+      : false;
   const answered =
     question.kind === "time"
-      ? Boolean(entry[question.key])
+      ? Boolean(entry[question.key]) && !beforeBed
       : question.kind === "rating"
         ? entry.quality !== undefined
         : true;
+  /** no wakings means no time awake: that question is skipped and saved as 0 */
+  const skipAwake = (e: DiaryEntry) => (e.wakings ?? 0) === 0;
 
   return (
     <>
@@ -862,6 +880,11 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
             onChange={(v) => set({ [question.key]: v })}
           />
         ) : null}
+        {beforeBed ? (
+          <p className="mt-3 text-[14px] font-medium text-[#B3261E]" role="alert">
+            This can’t be before the time you went to bed.
+          </p>
+        ) : null}
         {question.kind === "minutes" || question.kind === "count" ? (
           <AmountAnswer
             unit={question.kind === "minutes" ? "minutes" : "times"}
@@ -882,13 +905,21 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
         ) : null}
       </div>
       <Footer
-        onBack={q === 0 ? ctx.onBack : () => setQ(q - 1)}
+        onBack={
+          q === 0
+            ? ctx.onBack
+            : () => setQ(questions[q - 1]?.key === "awake" && skipAwake(entry) ? q - 2 : q - 1)
+        }
         onNext={() => {
           if (
             (question.kind === "minutes" || question.kind === "count") &&
             entry[question.key] === undefined
           )
             set({ [question.key]: 0 });
+          if (question.key === "wakings" && skipAwake(entry) && questions[q + 1]?.key === "awake") {
+            set({ wakings: 0, awake: 0 });
+            return setQ(q + 2);
+          }
           setQ(q + 1);
         }}
         label="Next"

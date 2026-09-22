@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useActiveTime } from "@/hooks/use-active-time";
 import { DayCheckIn } from "@/components/equip/day-check-in";
 import { LifeBuoy, Lock, X } from "lucide-react";
@@ -64,9 +64,18 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
   const programme = getProgramme(slug)!;
   const day = getDay(programme, dayNumber)!;
   const navigate = useNavigate();
-  const { state, nextDay, complete, addTime } = useProgramme(slug);
+  const { state, nextDay, complete, addTime, saveProgress } = useProgramme(slug);
   const [index, setIndex] = useState(0);
   const [asking, setAsking] = useState(false);
+
+  // a day left part-way opens again on the step it was left on
+  const saved = state.progress?.[String(day.day)];
+  const resumed = useRef(false);
+  useEffect(() => {
+    if (resumed.current || saved === undefined || state.completed.includes(day.day)) return;
+    resumed.current = true;
+    setIndex(Math.min(saved, day.steps.length - 1));
+  }, [saved]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const step = day.steps[index];
   // active time on each step (and so the day); the feedback screen counts as its own step
@@ -129,6 +138,8 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
 
   const go = (i: number) => {
     setIndex(i);
+    resumed.current = true;
+    if (!done) saveProgress(day.day, i);
     window.scrollTo({ top: 0 });
   };
 

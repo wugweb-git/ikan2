@@ -85,9 +85,18 @@ const blockAt = (p: NProgramme, day: number, n: number) =>
     .find((d) => d.day === day)
     ?.blocks.find((b) => b.n === n);
 
+/** Thought logs ask for the moment as date and time in every programme. The key stays "time", so
+ * entries saved with a time only still show it. */
+const withDateTime = (fields: Field[]) =>
+  fields.map((f) =>
+    f.type === "time" && f.key === "time"
+      ? { ...f, label: "Date and time", type: "datetime" as const }
+      : f,
+  );
+
 /* ------------------------------- Sleep Tight ------------------------------- */
 
-const sleepThoughtFields = (p: NProgramme) => cardFields(blockAt(p, 9, 11)!).fields;
+const sleepThoughtFields = (p: NProgramme) => withDateTime(cardFields(blockAt(p, 9, 11)!).fields);
 
 const sleepOverrides: Overrides = {
   "8.4": (b) => ({
@@ -98,7 +107,13 @@ const sleepOverrides: Overrides = {
   }),
   "9.11": (b) => {
     const { fields, example } = cardFields(b);
-    return { ui: "entries", collection: "thoughts", fields, example, scope: "all" };
+    return {
+      ui: "entries",
+      collection: "thoughts",
+      fields: withDateTime(fields),
+      example,
+      scope: "all",
+    };
   },
   "10.4": (b, p) => {
     const prompt = lineAfter(b, /prompted$/) ?? b.title;
@@ -109,6 +124,7 @@ const sleepOverrides: Overrides = {
       fields: [yesNo(prompt, optionsAfter(b))],
       addFields: sleepThoughtFields(p),
       scope: "all",
+      once: true,
     };
   },
   "11.4": () => ({
@@ -150,30 +166,40 @@ const sleepOverrides: Overrides = {
     limit: 10,
     scope: "all",
   }),
-  "17.5": () => ({
-    ui: "entries",
-    collection: "activities",
-    fields: [field("Activity")],
-    limit: 10,
-    scope: "all",
-  }),
-  "17.7": (b) => {
+  // Day 17: the everyday activities picked in Task 4, each asked "Can I use a device…?"
+  "17.6": (b, p) => {
     const prompt = lineAfter(b, /Promot$/) ?? b.title;
     return {
       ui: "review",
       collection: "activities",
       prompt,
       fields: [yesNo(prompt, optionsAfter(b))],
+      seedFrom: {
+        choiceKey: blockAt(p, 17, 4)?.key ?? "sleep_daily_activities",
+        field: "activity",
+      },
+      addFields: [field("Activity")],
       scope: "all",
     };
   },
-  "18.4": (b) => ({
-    ui: "entries",
-    collection: "habits",
-    fields: [field(b.columns?.[0]?.trim() ?? "Habit")],
-    limit: 10,
-    scope: "all",
-  }),
+  // Day 18: the rituals from Day 16, each asked whether to build it in; a Yes makes it a habit to track
+  "18.4": (b, p) => {
+    const prompt = lineAfter(b, /^Prompt$/) ?? b.title;
+    return {
+      ui: "review",
+      collection: "rituals",
+      prompt,
+      fields: [yesNo(prompt, optionsAfter(b))],
+      addFields: [field("Ritual")],
+      promote: {
+        collection: "habits",
+        field: field(blockAt(p, 18, 4)?.columns?.[0]?.trim() ?? "Habit").key,
+        from: "ritual",
+        when: "Yes",
+      },
+      scope: "all",
+    };
+  },
   "18.6": (b, p) => ({
     ui: "tracker",
     collection: "habits",
@@ -221,11 +247,10 @@ const unburnOverrides: Overrides = {
     scope: "all",
   }),
   "8.3": (b) => ({
-    ui: "choice",
+    ui: "statements",
     prompt: lineAfter(b, /and prompt$/) ?? b.title,
-    multi: false,
-    options: ["✅Yes", "❌No"].map((label) => ({ label })),
-    ...(firstTable(b) ? { table: firstTable(b)! } : {}),
+    statements: (firstTable(b) ?? []).slice(1).map(([effort, reward]) => `${effort} → ${reward}`),
+    options: ["✅Yes", "❌No"],
   }),
   "9.2": (b) => ({
     ui: "choice",
@@ -387,7 +412,7 @@ const noteChecklist =
     };
   };
 
-const stressThoughtLog = (p: NProgramme) => cardFields(blockAt(p, 12, 2)!).fields;
+const stressThoughtLog = (p: NProgramme) => withDateTime(cardFields(blockAt(p, 12, 2)!).fields);
 
 const stressOverrides: Overrides = {
   "1.2": noteList("recent_stressors"),
@@ -447,7 +472,7 @@ const stressOverrides: Overrides = {
   "12.2": (b) => ({
     ui: "entries",
     collection: "thought_log",
-    fields: cardFields(b).fields,
+    fields: withDateTime(cardFields(b).fields),
     scope: "all",
   }),
   "16.2": (b) => {
@@ -550,6 +575,11 @@ function build(
       if (target) {
         seen.add(id);
         const view = resolve(ref.day, target, `${ref.day}.${ref.n}`, seen);
+        if (view.ui === "tracker") {
+          // the note belongs to the day it was written for ("…from days 17 and 18")
+          const { note: _note, ...rest } = view;
+          return rest;
+        }
         return view.ui === "entries" || view.ui === "review" ? { ...view, scope: ref.scope } : view;
       }
     }
@@ -662,6 +692,12 @@ programmes.forEach((p) =>
 export const upcoming = [{ name: "Productivity Reset" }];
 
 export const getProgramme = (s: string) => programmes.find((p) => p.slug === s);
+
+/** Days as people count them: Onboarding (day 0) isn't one, so a 30-day programme says 30. */
+export const dayCount = (p: Programme) => p.days.filter((d) => d.day > 0).length;
+/** Programme days finished, not counting Onboarding. */
+export const daysDoneOf = (p: Programme, completed: number[]) =>
+  new Set(completed.filter((d) => d > 0 && p.days.some((x) => x.day === d))).size;
 export const getDay = (p: Programme, day: number) => p.days.find((d) => d.day === day);
 export const unitOf = (p: Programme, day: number) =>
   p.source.units.find((u) => u.days.some((d) => d.day === day));
