@@ -74,3 +74,47 @@ Two reasons for exclusion, and they are different:
 - **The excluded set is broad.** 56 of 68 discovered titles are off. If someone later splits the
   M3 kit or Blocks story files per component, the new titles inherit no `titleMap` entry and will
   appear automatically — which is the desired behaviour, but it will look like a surprise.
+
+## Where this run stopped (23 Sep 2026)
+
+Setup is complete and working; **verification was paused partway, by choice**. Nothing was
+uploaded, so the project `iKAN` (408a3577-7776-4c10-9f1b-572eec699fc2) is empty and
+un-anchored — the documented safe state. The next run re-verifies everything from scratch;
+it does NOT resume mid-campaign.
+
+Done and reusable:
+- build + validate both exit 0 (16 components, 5 non-blocking warnings)
+- `DayCard` graded `match` on all 3 stories (`.design-sync/.cache/compare/DayCard.grade.json`,
+  gitignored — it will not survive a fresh clone)
+- compare sheets captured for IkanShell, ProfilePhoto, StepView — ungraded
+
+### Resume checklist
+
+1. Regenerate the gitignored inputs (commands under "Generated, not committed").
+2. Reopen the upload channel — `finalize_plan` again; the old planId is dead.
+3. **Fix the capture-height mismatch first — it is global.** Storybook auto-sizes its panel to
+   content (e.g. 900x211 for StepView/Lesson) while previews capture a fixed 900x700 viewport.
+   Full-height components then behave as they would on a phone: the content area scrolls and the
+   sticky footer pins over it, so body text is hidden in the preview and the panels disagree.
+   Affects at least StepView, IkanShell, DayCheckIn, Splash. Remedy is
+   `cfg.overrides.<Name>.viewport: "WxH"` (tall enough for the story's content) — note this is
+   also the size the card renders at in the design tool, and changing it clears grades and needs
+   a full rebuild, so batch every viewport decision into ONE cycle.
+4. Known per-component work already surfaced by validate:
+   - `IkanShell` — `[GRID_OVERFLOW] escape`: stories position content outside their cells.
+     Needs `cfg.overrides.IkanShell = {"cardMode": "single", "primaryStory": "Home"}`.
+   - `ProfilePhoto` — `[RENDER_THIN]`: its two variants render identically. Needs an owned
+     `.design-sync/previews/ProfilePhoto.tsx`.
+   - `[STORY_CAP] StepView`: 8 stories, 6 captured. Pass `--max-stories 8` to cover the tail.
+5. Then the conventions header (`.design-sync/conventions.md` + `cfg.readmeHeader`) — not yet
+   written — and a closing `resync.mjs` run without `--remote` as the receipt.
+
+### Non-issues, so they are not chased again
+
+- `[ASSETS_BLOCKED] this-domain-does-not-exist.example` is a **false positive**. The
+  ProfilePhoto "Broken Photo" story uses an unresolvable host deliberately, to exercise the
+  fallback. Both panels correctly render the fallback. No sandbox change is needed.
+- `[TOKENS_MISSING]` lists 21 vars that are mostly Radix runtime measurements
+  (`--radix-*`, `--skeleton-width`): set by the components at runtime, expected to be absent
+  from the shipped stylesheets.
+- `[FONT_REMOTE] Manrope, Sora` — served from Google Fonts at runtime, same as the app.
