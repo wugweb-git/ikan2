@@ -146,19 +146,20 @@ function ArticlePage() {
                       <span className="block h-28">
                         <Illustration art={bannerArt[assessment.category]} />
                       </span>
-                      {/* same card as the assessments list, so it is recognisably the same thing */}
-                      <span className="flex items-center gap-4 p-4">
-                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[16px] bg-[var(--accent-container)] text-[var(--on-accent-container)]">
-                          <AssessmentIcon className="h-6 w-6" />
+                      {/* stacked: the icon sits on the illustration's edge, then the name,
+                       * the title and the meta row run down the card */}
+                      <span className="block px-4 pb-4">
+                        <span className="-mt-7 grid h-14 w-14 place-items-center rounded-[18px] bg-[var(--accent-container)] text-[var(--on-accent-container)] ring-4 ring-secondary">
+                          <AssessmentIcon className="h-7 w-7" />
                         </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[13px] font-medium text-[var(--accent-strong)]">
-                            {assessment.name}
-                          </span>
-                          <span className="block font-display text-[17px] font-semibold leading-6">
-                            {assessment.title}
-                          </span>
-                          <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
+                        <span className="mt-3 block text-[13px] font-medium text-[var(--accent-strong)]">
+                          {assessment.name}
+                        </span>
+                        <span className="mt-0.5 block font-display text-[19px] font-semibold leading-6">
+                          {assessment.title}
+                        </span>
+                        <span className="mt-2 flex items-center justify-between gap-3 text-[13px] text-muted-foreground">
+                          <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
                             <span className="inline-flex items-center gap-1">
                               <ListChecks className="h-3.5 w-3.5" aria-hidden="true" />{" "}
                               {assessment.questions.length} questions
@@ -168,8 +169,8 @@ function ArticlePage() {
                               {assessment.minutes} min
                             </span>
                           </span>
+                          <ChevronRight className="h-5 w-5 shrink-0" />
                         </span>
-                        <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
                       </span>
                     </Link>
                   </div>
