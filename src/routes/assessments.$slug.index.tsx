@@ -27,7 +27,7 @@ import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { accentStyle, Button, IconButton, stateLayer } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
-import { categoryIcon } from "@/components/assessment/ui";
+import { bannerArt, categoryIcon } from "@/components/assessment/ui";
 import { cn } from "@/lib/utils";
 import { getAssessment, profiles, type Assessment } from "@/lib/assessment/instruments";
 import type { Art } from "@/lib/resources";
@@ -75,17 +75,6 @@ export const Route = createFileRoute("/assessments/$slug/")({
   ),
   component: AssessmentDetailPage,
 });
-
-/** Each assessment's banner art, in the same illustration style as the library. */
-export const bannerArt: Record<Assessment["category"], Art> = {
-  depression: "mood",
-  anxiety: "anxiety",
-  stress: "stress",
-  sleep: "sleep",
-  balance: "work",
-  burnout: "burnout",
-  general: "checkup",
-};
 
 const measureIcons = [Target, Activity, Gauge, Brain];
 const afterIcons = [FileBarChart, Lightbulb, TrendingUp, Compass];

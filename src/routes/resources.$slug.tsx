@@ -10,8 +10,7 @@ import {
   ListChecks,
   UserRound,
 } from "lucide-react";
-import { categoryIcon } from "@/components/assessment/ui";
-import { bannerArt } from "@/routes/assessments.$slug.index";
+import { StackedAssessmentCard } from "@/components/assessment/ui";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { accentStyle, IconButton, stateLayer } from "@/components/equip/m3";
@@ -123,58 +122,16 @@ function ArticlePage() {
 
           <div className="prose-ikan mt-6" dangerouslySetInnerHTML={{ __html: article.html }} />
 
-          {assessment
-            ? (() => {
-                const AssessmentIcon = categoryIcon[assessment.category];
-                return (
-                  <div className="mt-10">
-                    <p className="text-[13px] font-semibold text-[var(--accent-strong)]">
-                      {r.assessmentRole === "next"
-                        ? "The fuller test this article points to"
-                        : "The test this article explains"}
-                    </p>
-                    <Link
-                      to="/assessments/$slug"
-                      params={{ slug: assessment.slug }}
-                      className={cn(
-                        "mt-3 block overflow-hidden rounded-[24px] bg-secondary",
-                        stateLayer,
-                      )}
-                    >
-                      <span className="block h-28">
-                        <Illustration art={bannerArt[assessment.category]} />
-                      </span>
-                      {/* stacked: the icon sits on the illustration's edge, then the name,
-                       * the title and the meta row run down the card */}
-                      <span className="block px-4 pb-4">
-                        <span className="-mt-7 grid h-14 w-14 place-items-center rounded-[18px] bg-[var(--accent-container)] text-[var(--on-accent-container)] ring-4 ring-secondary">
-                          <AssessmentIcon className="h-7 w-7" />
-                        </span>
-                        <span className="mt-3 block text-[13px] font-medium text-[var(--accent-strong)]">
-                          {assessment.name}
-                        </span>
-                        <span className="mt-0.5 block font-display text-[19px] font-semibold leading-6">
-                          {assessment.title}
-                        </span>
-                        <span className="mt-2 flex items-center justify-between gap-3 text-[13px] text-muted-foreground">
-                          <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                            <span className="inline-flex items-center gap-1">
-                              <ListChecks className="h-3.5 w-3.5" aria-hidden="true" />{" "}
-                              {assessment.questions.length} questions
-                            </span>
-                            <span className="inline-flex items-center gap-1">
-                              <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />{" "}
-                              {assessment.minutes} min
-                            </span>
-                          </span>
-                          <ChevronRight className="h-5 w-5 shrink-0" />
-                        </span>
-                      </span>
-                    </Link>
-                  </div>
-                );
-              })()
-            : null}
+          {assessment ? (
+            <StackedAssessmentCard
+              assessment={assessment}
+              label={
+                r.assessmentRole === "next"
+                  ? "The fuller test this article points to"
+                  : "The test this article explains"
+              }
+            />
+          ) : null}
 
           {/* The article ends here: what follows is a tinted footer, so people can tell the
            * reading from the suggestions after it. */}
