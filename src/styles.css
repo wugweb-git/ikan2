@@ -863,7 +863,16 @@ html.reduce-motion *::after {
   outline: none;
 }
 
-/* Article and legal text copied from ikanhealth.in, rendered as plain HTML */
+/* Article and legal text, rendered as plain HTML. One type scale, largest to smallest:
+ *   title        display 27 / 600   the article heading (in the route, not here)
+ *   standfirst   display 18.5 / 500 the excerpt under the title (in the route)
+ *   h2           display 21 / 600   a section of the article
+ *   h3           display 17 / 600   the two standing sub-sections: "Things to know
+ *                                   about X" and "Just so you know"
+ *   body, lists  16.5 / 1.7         everything else
+ *   score band   display 17 / 600   the middle line of a score block
+ *   score, meta  13 / 500-650       the score line, and the date/author/read-time row
+ * Every article follows it, so the same question always looks the same weight. */
 .prose-ikan {
   font-size: 16.5px;
   line-height: 1.7;
