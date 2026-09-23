@@ -225,7 +225,7 @@
  *   headline-lg     32 / 40 / 600                 page titles: Resources, Programs, Journal
  *   headline-md     28 / 36 / 600                 an article's title
  *   headline-sm     24 / 32 / 600                 an article's section (h2)
- *   title-lg        22 / 28 / 400                 an article's standfirst
+ *   title-lg        22 / 28 / 500                 an article's standfirst
  *   title-md        16 / 24 / 600                 an article's sub-section (h3), score band
  *   body-lg         16 / 26 / 400                 article body and lists (M3 says 24)
  *   body-md         14 / 21 / 400                 the detail line of a score block
@@ -256,7 +256,8 @@
   font-family: var(--font-display);
   font-size: 22px;
   line-height: 28px;
-  font-weight: 400;
+  /* M3 says 400; Sora is only loaded from 500 up, so 500 is the lightest real weight */
+  font-weight: 500;
 }
 @utility type-title-md {
   font-family: var(--font-display);
