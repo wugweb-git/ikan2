@@ -99,17 +99,15 @@ function ArticlePage() {
 
         <div className="relative -mt-8 rounded-t-[28px] bg-background px-5 pt-6">
           <p className="text-[13px] font-semibold text-[var(--accent-strong)]">{r.category}</p>
-          <h1 className="mt-1 font-display text-[27px] font-semibold leading-[1.2] tracking-[-0.01em] text-balance">
-            {r.title}
-          </h1>
+          <h1 className="type-headline-md mt-1 text-balance">{r.title}</h1>
           {article.description ? (
             /* the standfirst: display face, full contrast, so it reads as part of the title
              * group rather than as the first paragraph of the article */
-            <p className="mt-3 font-display text-[18.5px] font-medium leading-[1.45] text-foreground/90 text-balance">
+            <p className="type-title-lg mt-3 text-muted-foreground text-balance">
               {article.description}
             </p>
           ) : null}
-          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-foreground/10 pb-5 text-[13px] text-muted-foreground">
+          <p className="type-label-lg mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-foreground/10 pb-5 text-muted-foreground">
             {article.author ? (
               <span className="inline-flex items-center gap-1.5">
                 <UserRound className="h-4 w-4" /> {article.author}
@@ -182,7 +180,7 @@ function ArticlePage() {
            * reading from the suggestions after it. */}
           {more.length ? (
             <section className="-mx-5 mt-12 rounded-t-[28px] border-t border-foreground/10 bg-secondary/50 px-5 pb-8 pt-7">
-              <h2 className="font-display text-[20px] font-semibold">Keep reading</h2>
+              <h2 className="type-title-lg font-semibold">Keep reading</h2>
               <ul className="mt-4 divide-y divide-foreground/10">
                 {more.map((m) => (
                   <li key={m.id}>

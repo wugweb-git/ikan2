@@ -214,6 +214,78 @@
 @utility font-display {
   font-family: var(--font-display);
 }
+
+/* Type scale, on Material 3's roles and sizes (Display / Headline / Title / Body / Label),
+ * set in the app's own faces: Sora for Headline and Title, the body face for Body and Label.
+ * Each role fixes size, line height, weight and tracking together, so a heading is picked by
+ * what it is rather than by a pixel value. One deviation from M3, marked below: article body
+ * text gets a taller line for long-form reading.
+ *
+ *   role            size / line-height / weight   used for
+ *   headline-lg     32 / 40 / 600                 page titles: Resources, Programs, Journal
+ *   headline-md     28 / 36 / 600                 an article's title
+ *   headline-sm     24 / 32 / 600                 an article's section (h2)
+ *   title-lg        22 / 28 / 400                 an article's standfirst
+ *   title-md        16 / 24 / 600                 an article's sub-section (h3), score band
+ *   body-lg         16 / 26 / 400                 article body and lists (M3 says 24)
+ *   body-md         14 / 21 / 400                 the detail line of a score block
+ *   label-lg        14 / 20 / 500                 author, date, read time
+ *   label-md        12 / 16 / 500                 chips and captions
+ */
+@utility type-headline-lg {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@utility type-headline-md {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@utility type-headline-sm {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+@utility type-title-lg {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 400;
+}
+@utility type-title-md {
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+@utility type-body-lg {
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 400;
+}
+@utility type-body-md {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+}
+@utility type-label-lg {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+@utility type-label-md {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
 @utility shadow-app {
   box-shadow: var(--shadow-app);
 }
@@ -863,38 +935,35 @@ html.reduce-motion *::after {
   outline: none;
 }
 
-/* Article and legal text, rendered as plain HTML. One type scale, largest to smallest:
- *   title        display 27 / 600   the article heading (in the route, not here)
- *   standfirst   display 18.5 / 500 the excerpt under the title (in the route)
- *   h2           display 21 / 600   a section of the article
- *   h3           display 17 / 600   the two standing sub-sections: "Things to know
- *                                   about X" and "Just so you know"
- *   body, lists  16.5 / 1.7         everything else
- *   score band   display 17 / 600   the middle line of a score block
- *   score, meta  13 / 500-650       the score line, and the date/author/read-time row
- * Every article follows it, so the same question always looks the same weight. */
+/* Article and legal text, rendered as plain HTML. Each level is one of the type roles
+ * defined above, so the scale is set in one place: h2 is headline-sm, h3 is title-md,
+ * everything else is body-lg. */
 .prose-ikan {
-  font-size: 16.5px;
-  line-height: 1.7;
+  /* body-lg */
+  font-size: 16px;
+  line-height: 26px;
   color: color-mix(in oklab, var(--foreground) 88%, transparent);
 }
 .prose-ikan > * + * {
   margin-top: 1em;
 }
 .prose-ikan h2 {
+  /* headline-sm */
   margin-top: 1.9em;
   font-family: var(--font-display);
-  font-size: 21px;
-  line-height: 1.3;
+  font-size: 24px;
+  line-height: 32px;
   font-weight: 600;
   color: var(--foreground);
 }
 .prose-ikan h3 {
-  margin-top: 1.5em;
+  /* title-md: same size as the body, told apart by the display face and the weight */
+  margin-top: 1.6em;
   font-family: var(--font-display);
-  font-size: 17px;
-  line-height: 1.35;
+  font-size: 16px;
+  line-height: 24px;
   font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--foreground);
 }
 .prose-ikan > :first-child {
@@ -952,23 +1021,35 @@ html.reduce-motion *::after {
   padding: 0;
 }
 .prose-ikan td:first-child {
-  font-size: 13px;
-  font-weight: 650;
-  letter-spacing: 0.01em;
+  /* label-lg, and it says "Score" because the header row is hidden */
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
   color: var(--accent-strong, var(--foreground));
 }
+.prose-ikan td:first-child::before {
+  /* label-md: the header row is hidden, so each block says what its number is */
+  content: "Score";
+  display: block;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted-foreground);
+}
 .prose-ikan td:nth-child(2) {
+  /* title-md */
   margin-top: 2px;
   font-family: var(--font-display);
-  font-size: 17px;
-  line-height: 1.3;
+  font-size: 16px;
+  line-height: 24px;
   font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--foreground);
 }
 .prose-ikan td:nth-child(3) {
+  /* body-md */
   margin-top: 6px;
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 21px;
 }
 .prose-ikan td h2 {
   margin: 0;
