@@ -103,7 +103,9 @@ function ArticlePage() {
             {r.title}
           </h1>
           {article.description ? (
-            <p className="mt-3 text-[17px] leading-7 text-muted-foreground">
+            /* the standfirst: display face, full contrast, so it reads as part of the title
+             * group rather than as the first paragraph of the article */
+            <p className="mt-3 font-display text-[18.5px] font-medium leading-[1.45] text-foreground/90 text-balance">
               {article.description}
             </p>
           ) : null}
@@ -169,8 +171,10 @@ function ArticlePage() {
               })()
             : null}
 
+          {/* The article ends here: what follows is a tinted footer, so people can tell the
+           * reading from the suggestions after it. */}
           {more.length ? (
-            <section className="mt-12">
+            <section className="-mx-5 mt-12 rounded-t-[28px] border-t border-foreground/10 bg-secondary/50 px-5 pb-8 pt-7">
               <h2 className="font-display text-[20px] font-semibold">Keep reading</h2>
               <ul className="mt-4 divide-y divide-foreground/10">
                 {more.map((m) => (
@@ -183,7 +187,7 @@ function ArticlePage() {
                         stateLayer,
                       )}
                     >
-                      <span className="h-20 w-20 shrink-0 overflow-hidden rounded-[16px]">
+                      <span className="h-20 w-20 shrink-0 overflow-hidden rounded-[16px] bg-background">
                         <Illustration art={m.art} />
                       </span>
                       <span className="min-w-0 flex-1">
@@ -191,7 +195,7 @@ function ArticlePage() {
                           {m.title}
                         </span>
                         <span className="mt-2 flex items-center gap-2 text-[12px] text-muted-foreground">
-                          <span className="rounded-full bg-secondary px-2 py-0.5 font-medium">
+                          <span className="rounded-full bg-background px-2 py-0.5 font-medium">
                             {m.category}
                           </span>
                           <span className="inline-flex items-center gap-1">
