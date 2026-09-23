@@ -1,0 +1,7 @@
+{
+  "name": "ikan",
+  "version": "0.0.0",
+  "private": true,
+  "types": "./types/.design-sync/entry.d.ts",
+  "comment": "Package boundary for design-sync only. ikan2 is an app with no published library, so the converter has no dist/ or .d.ts to read. This manifest plus entry.tsx and the generated types/ give it one, without touching the app's own package.json."
+}

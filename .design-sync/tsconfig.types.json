@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+    "strict": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmitOnError": false,
+    "rootDir": "..",
+    "outDir": "types",
+    "baseUrl": "..",
+    "paths": {
+      "@/assets/*": ["./.design-sync/asset-shims/*"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["entry.tsx"]
+}

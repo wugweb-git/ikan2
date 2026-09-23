@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/assets/*": [
+        "../.design-sync/asset-shims/*"
+      ],
+      "@/lib/content": [
+        "../src/lib/content/index.ts"
+      ],
+      "@/*": [
+        "../src/*"
+      ]
+    }
+  }
+}

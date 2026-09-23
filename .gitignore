@@ -34,3 +34,13 @@ dist-ssr
 
 # Storybook build output
 storybook-static
+
+# design-sync (build artifacts, scratch, verification state)
+.design-sync/sb-reference/
+.design-sync/learnings/
+.design-sync/.cache/
+.design-sync/node_modules
+.ds-sync/
+ds-bundle/
+.design-sync/types/
+.design-sync/asset-shims/
