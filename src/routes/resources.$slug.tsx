@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Bookmark,
   BookmarkCheck,
+  CalendarDays,
   ChevronRight,
   Clock3,
   ListChecks,
@@ -112,7 +113,9 @@ function ArticlePage() {
                 <UserRound className="h-4 w-4" /> {article.author}
               </span>
             ) : null}
-            <span>{dateLabel(r.date)}</span>
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="h-4 w-4" /> {dateLabel(r.date)}
+            </span>
             <span className="inline-flex items-center gap-1.5">
               <Clock3 className="h-4 w-4" /> {r.minutes} min read
             </span>
@@ -141,7 +144,10 @@ function ArticlePage() {
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-[12px] font-semibold text-muted-foreground">
-                          {assessment.name} · the test this article explains
+                          {assessment.name} ·{" "}
+                          {r.assessmentRole === "next"
+                            ? "the fuller test this article points to"
+                            : "the test this article explains"}
                         </span>
                         <span className="mt-0.5 block font-display text-[18px] font-semibold leading-6">
                           {assessment.title}

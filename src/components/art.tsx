@@ -14,6 +14,11 @@ const palettes: Record<Art, [string, string, string]> = {
   sleep: ["#1F2A44", "#3D4E7A", "#F4E3A1"],
   measure: ["#DFF0E8", "#8CC7AC", "#2B634D"],
   checkup: ["#E3F1F6", "#8FC6D8", "#236174"],
+  wellbeing: ["#EAF3DB", "#A9CE82", "#3C6B27"],
+  confidence: ["#EFE7FA", "#B79DE2", "#4B2E86"],
+  resilience: ["#E7EAF0", "#A6B2C6", "#33415C"],
+  worry: ["#E7EAFB", "#9AA6EA", "#2E3A8C"],
+  lowmood: ["#F4E7F1", "#D2A2C7", "#6C2F60"],
 };
 
 export function Illustration({ art, className }: { art: Art; className?: string }) {
@@ -190,6 +195,118 @@ export function Illustration({ art, className }: { art: Art; className?: string 
           ))}
           <circle cx="228" cy="40" r="18" fill={ink} />
           <path d="M221 40 h14 M228 33 v14" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+        </g>
+      ) : null}
+      {art === "wellbeing" ? (
+        <g>
+          {[-140, -115, -90, -65, -40].map((deg) => {
+            const a = (deg * Math.PI) / 180;
+            return (
+              <line
+                key={deg}
+                x1={160 + Math.cos(a) * 48}
+                y1={96 + Math.sin(a) * 48}
+                x2={160 + Math.cos(a) * 76}
+                y2={96 + Math.sin(a) * 76}
+                stroke={ink}
+                strokeWidth="7"
+                strokeLinecap="round"
+                strokeOpacity="0.85"
+              />
+            );
+          })}
+          <circle cx="160" cy="96" r="34" fill={ink} fillOpacity="0.9" />
+          <path
+            d="M0 152 C 70 126, 130 166, 200 146 S 290 130, 320 142 V200 H0Z"
+            fill={ink}
+            fillOpacity="0.3"
+          />
+        </g>
+      ) : null}
+      {art === "confidence" ? (
+        <g>
+          {[0, 1, 2].map((i) => (
+            <rect
+              key={i}
+              x={70 + i * 63}
+              y={150 - [40, 72, 104][i]!}
+              width="54"
+              height={[40, 72, 104][i]}
+              rx="10"
+              fill={ink}
+              fillOpacity={0.35 + i * 0.2}
+            />
+          ))}
+          <circle cx="223" cy="30" r="14" fill={ink} />
+          <path
+            d="M56 152 H 264"
+            stroke={ink}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeOpacity="0.5"
+          />
+        </g>
+      ) : null}
+      {art === "resilience" ? (
+        <g>
+          <path
+            d="M70 156 Q 100 116 130 156 Q 165 76 200 156 Q 235 34 270 156"
+            fill="none"
+            stroke={ink}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray="2 10"
+            strokeOpacity="0.7"
+          />
+          <circle cx="235" cy="40" r="14" fill={ink} />
+          <path
+            d="M40 158 H 286"
+            stroke={ink}
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeOpacity="0.45"
+          />
+        </g>
+      ) : null}
+      {art === "worry" ? (
+        <g fill="none" stroke={ink}>
+          <circle cx="126" cy="100" r="52" strokeWidth="5" strokeOpacity="0.85" />
+          <circle
+            cx="194"
+            cy="100"
+            r="52"
+            strokeWidth="5"
+            strokeOpacity="0.55"
+            strokeDasharray="7 11"
+          />
+          <circle cx="160" cy="100" r="8" fill={ink} stroke="none" />
+        </g>
+      ) : null}
+      {art === "lowmood" ? (
+        <g>
+          <circle cx="160" cy="132" r="44" fill={ink} fillOpacity="0.85" />
+          <path d="M0 132 H320 V200 H0Z" fill={ink} fillOpacity="0.28" />
+          <path
+            d="M28 132 H 92"
+            stroke={ink}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeOpacity="0.55"
+          />
+          <path
+            d="M228 132 H 292"
+            stroke={ink}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeOpacity="0.55"
+          />
+          {[
+            [78, 56],
+            [242, 46],
+            [196, 74],
+          ].map(([x, y]) => (
+            <circle key={`${x}`} cx={x} cy={y} r="4" fill={ink} fillOpacity="0.6" />
+          ))}
         </g>
       ) : null}
     </svg>

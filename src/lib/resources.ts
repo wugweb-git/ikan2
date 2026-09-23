@@ -3,11 +3,26 @@ import { createLocalStore } from "@/lib/local-store";
 /* The ten articles on ikanhealth.in/resource (as listed on 13 Sep 2026). Titles, categories,
  * dates and read times are copied from the site; the articles themselves open on the site.
  * Two fixes: "An easy guide o the" → "to the", and the GAD-7 guide, filed under Sleep on the
- * site, is filed under General here. */
+ * site, is filed under General here.
+ *
+ * Plus the five brief-scale posts written for the app (23 Sep 2026). These live only here: they
+ * are not on ikanhealth.in yet. */
 
 export type ResourceCategory = "General" | "Stress" | "Sleep";
 export type Art =
-  "stress" | "burnout" | "work" | "anxiety" | "mood" | "sleep" | "measure" | "checkup";
+  | "stress"
+  | "burnout"
+  | "work"
+  | "anxiety"
+  | "mood"
+  | "sleep"
+  | "measure"
+  | "checkup"
+  | "wellbeing"
+  | "confidence"
+  | "resilience"
+  | "worry"
+  | "lowmood";
 
 export type Resource = {
   id: string;
@@ -19,9 +34,60 @@ export type Resource = {
   featured?: boolean;
   /** the iKAN assessment this article explains */
   assessment?: string;
+  /** how the article relates to that assessment: it explains it, or it points at it as the
+   * fuller test to take next (the GAD-2 and PHQ-2 posts) */
+  assessmentRole?: "explains" | "next";
 };
 
 export const resources: Resource[] = [
+  {
+    id: "resource-who-5",
+    title: "What is the WHO-5 Well-Being Index? A Simple Guide to Measuring Mental Wellness",
+    category: "General",
+    date: "2026-09-23",
+    minutes: 4,
+    art: "wellbeing",
+    featured: true,
+  },
+  {
+    id: "resource-ngse",
+    title:
+      "What is the New General Self-Efficacy (NGSE) Scale? A Simple Guide to Measuring Self-Belief",
+    category: "General",
+    date: "2026-09-23",
+    minutes: 4,
+    art: "confidence",
+  },
+  {
+    id: "resource-brs",
+    title: "What is the Brief Resilience Scale (BRS)? A Simple Guide to the Resilience Test",
+    category: "Stress",
+    date: "2026-09-23",
+    minutes: 4,
+    art: "resilience",
+  },
+  {
+    id: "resource-gad-2",
+    title:
+      "What is Generalized Anxiety Disorder (GAD)-2? A Simple Guide to the Ultra-Brief Anxiety Screener",
+    category: "General",
+    date: "2026-09-23",
+    minutes: 3,
+    art: "worry",
+    assessment: "feeling-overwhelmed-and-anxious",
+    assessmentRole: "next",
+  },
+  {
+    id: "resource-phq-2",
+    title:
+      "What is the Patient Health Questionnaire (PHQ)-2? A Simple Guide to the Ultra-Brief Depression Screener",
+    category: "General",
+    date: "2026-09-23",
+    minutes: 3,
+    art: "lowmood",
+    assessment: "feeling-depressed-and-hopeless",
+    assessmentRole: "next",
+  },
   {
     id: "de31d473-fda7-47e4-82d6-a549b02eec44",
     title: "What is the Perceived Stress Scale (PSS-10)? Understand The Stress Screening Test",

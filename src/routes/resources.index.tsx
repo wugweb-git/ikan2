@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bookmark, BookmarkCheck, BookOpen, Search } from "lucide-react";
+import { Bookmark, BookmarkCheck, BookOpen, CalendarDays, Clock3, Search } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { accentStyle, IconButton, Snackbar, stateLayer, useSnack } from "@/components/equip/m3";
@@ -109,8 +109,13 @@ function ResourcesPage() {
                     <span className="mt-2 line-clamp-3 font-display text-[20px] font-semibold leading-6">
                       {r.title}
                     </span>
-                    <span className="mt-2 block text-[13px] opacity-85">
-                      {dateLabel(r.date)}, {r.minutes} min read
+                    <span className="mt-2 flex items-center gap-3 text-[13px] opacity-85">
+                      <span className="inline-flex items-center gap-1.5">
+                        <CalendarDays className="h-3.5 w-3.5" /> {dateLabel(r.date)}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock3 className="h-3.5 w-3.5" /> {r.minutes} min read
+                      </span>
                     </span>
                   </span>
                 </button>
@@ -199,8 +204,13 @@ function ResourcesPage() {
                         <span className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">
                           {r.title}
                         </span>
-                        <span className="mt-1 block text-[12px] text-muted-foreground">
-                          {dateLabel(r.date)}, {r.minutes} min read
+                        <span className="mt-1 flex items-center gap-3 text-[12px] text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5">
+                            <CalendarDays className="h-3.5 w-3.5" /> {dateLabel(r.date)}
+                          </span>
+                          <span className="inline-flex items-center gap-1.5">
+                            <Clock3 className="h-3.5 w-3.5" /> {r.minutes} min read
+                          </span>
                         </span>
                       </span>
                     </button>
