@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AssessmentFlowRouteImport } from './routes/assessment-flow'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DeleteAccountRouteImport } from './routes/delete-account'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as JournalRouteImport } from './routes/journal'
@@ -72,6 +73,11 @@ const AssessmentFlowRoute = AssessmentFlowRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeleteAccountRoute = DeleteAccountRouteImport.update({
+  id: '/delete-account',
+  path: '/delete-account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -280,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/contact': typeof ContactRoute
+  '/delete-account': typeof DeleteAccountRoute
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
@@ -326,6 +333,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/contact': typeof ContactRoute
+  '/delete-account': typeof DeleteAccountRoute
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
@@ -373,6 +381,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/assessment-flow': typeof AssessmentFlowRoute
   '/contact': typeof ContactRoute
+  '/delete-account': typeof DeleteAccountRoute
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
@@ -421,6 +430,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/assessment-flow'
     | '/contact'
+    | '/delete-account'
     | '/faq'
     | '/forgot-password'
     | '/journal'
@@ -467,6 +477,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/assessment-flow'
     | '/contact'
+    | '/delete-account'
     | '/faq'
     | '/forgot-password'
     | '/journal'
@@ -513,6 +524,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/assessment-flow'
     | '/contact'
+    | '/delete-account'
     | '/faq'
     | '/forgot-password'
     | '/journal'
@@ -560,6 +572,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AssessmentFlowRoute: typeof AssessmentFlowRoute
   ContactRoute: typeof ContactRoute
+  DeleteAccountRoute: typeof DeleteAccountRoute
   FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   JournalRoute: typeof JournalRoute
@@ -630,6 +643,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delete-account': {
+      id: '/delete-account'
+      path: '/delete-account'
+      fullPath: '/delete-account'
+      preLoaderRoute: typeof DeleteAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -920,6 +940,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AssessmentFlowRoute: AssessmentFlowRoute,
   ContactRoute: ContactRoute,
+  DeleteAccountRoute: DeleteAccountRoute,
   FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   JournalRoute: JournalRoute,
