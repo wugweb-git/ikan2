@@ -1,5 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Outlet, createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
+import {
+  Outlet,
+  createRootRouteWithContext,
+  HeadContent,
+  Scripts,
+  useRouter,
+} from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
@@ -8,6 +14,7 @@ import { AuthProvider } from "../lib/auth";
 import { AuthGate } from "../components/auth-ui";
 import { ErrorScreen, NotFoundScreen, OfflineBanner } from "../components/skeleton";
 import { registerServiceWorker } from "../lib/device";
+import { pageView } from "@/lib/analytics";
 import { restoreEvicted } from "@/lib/durable";
 import { syncStatusBar } from "@/lib/native";
 import { refreshStores } from "@/lib/storage-scope";
@@ -91,6 +98,20 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => registerServiceWorker(), []);
+
+  /* Screen views for GA4. The router is the source of the path on purpose: its matched route
+   * id is the PATTERN ("/assessments/$slug"), so the condition someone screened for never
+   * leaves the device. See analytics.ts. */
+  const router = useRouter();
+  useEffect(() => {
+    const send = () => {
+      const matches = router.state.matches;
+      const last = matches[matches.length - 1];
+      if (last) pageView(last.routeId, document.title);
+    };
+    send();
+    return router.subscribe("onResolved", send);
+  }, [router]);
 
   /* Android app only: put back anything the system evicted from the WebView's localStorage,
    * and colour the status bar to match the page. Both no-op on the web. */
