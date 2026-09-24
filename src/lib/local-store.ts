@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { mirrorWrite } from "@/lib/durable";
 import { getScope, onScopeChange, reportWrite, scopedKey } from "@/lib/storage-scope";
 
 /* A small localStorage-backed store, kept per signed-in account (see storage-scope).
@@ -27,7 +28,10 @@ export function createLocalStore<T extends object>(key: string, empty: T) {
     cache = next;
     cacheScope = getScope();
     try {
-      window.localStorage.setItem(scopedKey(key), JSON.stringify(next));
+      const json = JSON.stringify(next);
+      window.localStorage.setItem(scopedKey(key), json);
+      // Android can evict a WebView's localStorage; the app keeps a native copy (see durable.ts)
+      mirrorWrite(scopedKey(key), json);
     } catch {
       /* storage unavailable — keep in memory for this session */
     }

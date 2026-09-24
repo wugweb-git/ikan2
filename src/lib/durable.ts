@@ -1,0 +1,57 @@
+import { Capacitor } from "@capacitor/core";
+
+/* A second copy of the app's saved data, in native storage, for the Android app only.
+ *
+ * Why: everything the app saves lives in localStorage, and Android can evict a WebView's
+ * localStorage when the device is short of space - without warning and without asking. On the
+ * web that costs a browser tab's cache; here it would throw away a mood journal that had not
+ * reached the backend yet, which is exactly the entry made offline first thing in the morning.
+ *
+ * localStorage stays the working copy: it is synchronous, which the stores and server rendering
+ * need, and @capacitor/preferences is not. Every write is mirrored across afterwards, and on
+ * startup any key that has vanished from localStorage is restored. Only missing keys are
+ * restored - a key still present in localStorage is the newer one by definition, since the
+ * mirror is only ever written from it. */
+
+const active = () => Capacitor.isNativePlatform();
+
+/** Copy one saved value into native storage. Fire-and-forget: never blocks a save. */
+export function mirrorWrite(key: string, value: string) {
+  if (!active()) return;
+  void import("@capacitor/preferences")
+    .then(({ Preferences }) => Preferences.set({ key, value }))
+    .catch(() => {
+      /* the backup is best-effort - a failure must never fail the save itself */
+    });
+}
+
+export function mirrorRemove(key: string) {
+  if (!active()) return;
+  void import("@capacitor/preferences")
+    .then(({ Preferences }) => Preferences.remove({ key }))
+    .catch(() => {});
+}
+
+/**
+ * Put back anything Android has evicted. Returns the number of keys restored, so the caller can
+ * refresh the stores only when something actually came back.
+ */
+export async function restoreEvicted(): Promise<number> {
+  if (!active() || typeof window === "undefined") return 0;
+  try {
+    const { Preferences } = await import("@capacitor/preferences");
+    const { keys } = await Preferences.keys();
+    let restored = 0;
+    for (const key of keys) {
+      if (!key.startsWith("ikan.")) continue;
+      if (window.localStorage.getItem(key) !== null) continue; // still there, and newer
+      const { value } = await Preferences.get({ key });
+      if (value === null) continue;
+      window.localStorage.setItem(key, value);
+      restored++;
+    }
+    return restored;
+  } catch {
+    return 0;
+  }
+}

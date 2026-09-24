@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Download, Mail, Share2 } from "lucide-react";
+import { canShare, share, tap } from "@/lib/native";
 import { BottomSheet, IconButton } from "@/components/equip/m3";
 import { cn } from "@/lib/utils";
 
@@ -30,10 +31,26 @@ export function PrintHeader({ title }: { title: string }) {
   );
 }
 
-/** Small share button: download the result (save as PDF) or email a plain summary. */
+/** Small share button: the system share sheet where there is one, then download as PDF or email. */
 export function ShareButton({ subject, body }: { subject: string; body: string }) {
   const [open, setOpen] = useState(false);
   const rows = [
+    /* The system share sheet, where there is one: the Android app and browsers with
+     * navigator.share. Everywhere else the list starts at Download, as it always did. */
+    ...(canShare()
+      ? [
+          {
+            icon: Share2,
+            label: "Share",
+            note: "Send it wherever you like",
+            run: () => {
+              setOpen(false);
+              tap();
+              void share({ title: subject, text: `${body}\n\nShared from iKAN` });
+            },
+          },
+        ]
+      : []),
     {
       icon: Download,
       label: "Download",

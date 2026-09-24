@@ -186,6 +186,7 @@ export async function startCloudSync(uid: string, token: () => Promise<string | 
     schedulePush();
   });
   if (!cloudConfigured) return setStatus({ state: "unconfigured" });
+  flushOnReconnect();
   await pull();
 }
 
@@ -196,10 +197,48 @@ export function stopCloudSync() {
   setStatus({ state: cloudConfigured ? "off" : "unconfigured" });
 }
 
-function schedulePush() {
+/* Retry delay after a failed push. A phone with no signal used to retry every 1.5s forever;
+ * it now backs off to a minute, and a reconnect (below) flushes immediately anyway, so the
+ * wait never costs the user a late save. Reset on every success. */
+const PUSH_DELAY = 1500;
+const MAX_DELAY = 60_000;
+let retryDelay = PUSH_DELAY;
+
+function schedulePush(delay = PUSH_DELAY) {
   if (!cloudConfigured) return;
   window.clearTimeout(timer);
-  timer = window.setTimeout(() => void push(), 1500);
+  timer = window.setTimeout(() => void push(), delay);
+}
+
+/** True while anything in the queue is still waiting to reach the backend. */
+function hasPending(uid: string) {
+  const m = readMeta(uid);
+  return [...SYNCED].some((n) => m[n] && (!m[n]!.pushed || m[n]!.changed > m[n]!.pushed!));
+}
+
+/* The queue is drained as soon as the connection is back, rather than on the next timer. The
+ * browser's online event covers the web and the installed PWA; @capacitor/network is added on
+ * top for the Android app, where the WebView's online event is not dependable. */
+let watchingNetwork = false;
+function flushOnReconnect() {
+  if (watchingNetwork || typeof window === "undefined") return;
+  watchingNetwork = true;
+  const flush = () => {
+    if (!session || !hasPending(session.uid)) return;
+    retryDelay = PUSH_DELAY;
+    schedulePush(0);
+  };
+  window.addEventListener("online", flush);
+  void import("@capacitor/core")
+    .then(({ Capacitor }) => (Capacitor.isNativePlatform() ? import("@capacitor/network") : null))
+    .then((mod) => {
+      void mod?.Network.addListener("networkStatusChange", (s) => {
+        if (s.connected) flush();
+      });
+    })
+    .catch(() => {
+      /* the plugin is absent on the web - the online event is enough there */
+    });
 }
 
 async function pull() {
@@ -258,6 +297,7 @@ async function pull() {
 async function push() {
   const s = session;
   if (!s || pushing || !cloudConfigured) return;
+  let failed = false;
   const meta = readMeta(s.uid);
   const dirty = [...SYNCED].filter(
     (name) => meta[name] && (!meta[name]!.pushed || meta[name]!.changed > meta[name]!.pushed!),
@@ -282,19 +322,20 @@ async function push() {
       if (after[i.key]?.changed === i.updated_at)
         after[i.key] = { ...after[i.key]!, pushed: i.updated_at };
     writeMeta(s.uid, after);
+    retryDelay = PUSH_DELAY;
     setStatus({ state: "synced", at: new Date().toISOString() });
   } catch (e) {
+    failed = true;
     setStatus({ state: "error", message: (e as Error).message });
   } finally {
     pushing = false;
   }
-  const again = readMeta(s.uid);
-  if (
-    [...SYNCED].some(
-      (n) => again[n] && (!again[n]!.pushed || again[n]!.changed > again[n]!.pushed!),
-    )
-  )
-    schedulePush();
+  // Still dirty: either more was written while this ran (retry at once) or this attempt failed
+  // and the next one waits longer each time, up to a minute.
+  if (hasPending(s.uid)) {
+    if (failed) retryDelay = Math.min(retryDelay * 2, MAX_DELAY);
+    schedulePush(failed ? retryDelay : PUSH_DELAY);
+  }
 }
 
 /** Delete this account's saved data from the database (used by "Clear all data"). */

@@ -8,6 +8,9 @@ import { AuthProvider } from "../lib/auth";
 import { AuthGate } from "../components/auth-ui";
 import { ErrorScreen, NotFoundScreen, OfflineBanner } from "../components/skeleton";
 import { registerServiceWorker } from "../lib/device";
+import { restoreEvicted } from "@/lib/durable";
+import { syncStatusBar } from "@/lib/native";
+import { refreshStores } from "@/lib/storage-scope";
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
@@ -88,6 +91,15 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => registerServiceWorker(), []);
+
+  /* Android app only: put back anything the system evicted from the WebView's localStorage,
+   * and colour the status bar to match the page. Both no-op on the web. */
+  useEffect(() => {
+    void restoreEvicted().then((n) => {
+      if (n > 0) refreshStores();
+    });
+    void syncStatusBar(window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
