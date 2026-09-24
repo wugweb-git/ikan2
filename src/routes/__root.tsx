@@ -17,6 +17,7 @@ import { registerServiceWorker } from "../lib/device";
 import { pageView } from "@/lib/analytics";
 import { restoreEvicted } from "@/lib/durable";
 import { listenForReminderTaps } from "@/lib/local-reminders";
+import { listenForPushTaps } from "@/lib/native-push";
 import { syncStatusBar } from "@/lib/native";
 import { refreshStores } from "@/lib/storage-scope";
 
@@ -134,13 +135,21 @@ function RootComponent() {
     void syncStatusBar(window.matchMedia("(prefers-color-scheme: dark)").matches);
   }, []);
 
-  // Tapping a scheduled reminder opens the screen it points at.
+  // Tapping a reminder or a push opens the screen it points at.
   useEffect(() => {
     let stop = () => {};
-    void listenForReminderTaps((url) => void router.navigate({ href: url })).then((f) => {
+    let stopPush = () => {};
+    const go = (url: string) => void router.navigate({ href: url });
+    void listenForReminderTaps(go).then((f) => {
       stop = f;
     });
-    return () => stop();
+    void listenForPushTaps(go).then((f) => {
+      stopPush = f;
+    });
+    return () => {
+      stop();
+      stopPush();
+    };
   }, [router]);
 
   return (

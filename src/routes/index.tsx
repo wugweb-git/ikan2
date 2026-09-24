@@ -56,6 +56,7 @@ import {
 } from "@/lib/profile";
 import { checkMoodReminder, refreshWeather, useDevice, weatherWord } from "@/lib/device";
 import { syncMoodReminder } from "@/lib/local-reminders";
+import { enableNativePush, nativePushSupported } from "@/lib/native-push";
 import { autoSyncHealthConnect, recentAverage, useHealthConnect } from "@/lib/health-connect";
 import { resources, slugOf, type Resource } from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
@@ -170,10 +171,14 @@ function Home() {
     if (!hydrated) return;
     void refreshWeather();
     void autoSyncHealthConnect();
-    if (Notification?.permission === "granted" && !device.notificationsOff)
-      void import("@/lib/push").then((m) =>
-        m.enablePush({ moodReminder: settings.moodReminders, time: settings.moodReminderTime }),
-      );
+    const prefs = { moodReminder: settings.moodReminders, time: settings.moodReminderTime };
+    // Each platform uses the channel that actually reaches it: web push in browsers and on an
+    // iPhone home screen, FCM in the Android app, where Web Push does not exist.
+    if (nativePushSupported()) {
+      if (!device.notificationsOff) void enableNativePush(prefs);
+    } else if (Notification?.permission === "granted" && !device.notificationsOff) {
+      void import("@/lib/push").then((m) => m.enablePush(prefs));
+    }
     checkMoodReminder({
       enabled: settings.moodReminders,
       time: settings.moodReminderTime,
