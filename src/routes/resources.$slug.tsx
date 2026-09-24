@@ -37,7 +37,7 @@ export const Route = createFileRoute("/resources/$slug")({
     const r = loaderData ? getResource(loaderData.id) : undefined;
     const a = loaderData ? articles[loaderData.id] : undefined;
     return r
-      ? pageMeta(r.title, a?.description || r.title)
+      ? pageMeta(r.title, a?.description || r.title, `/resources/${slugOf(r)}`)
       : { meta: [{ title: "Article — iKAN" }] };
   },
   component: ArticlePage,

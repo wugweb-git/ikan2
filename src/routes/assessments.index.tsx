@@ -14,6 +14,7 @@ export const Route = createFileRoute("/assessments/")({
     pageMeta(
       "Assessments",
       "Seven short assessments for depression, anxiety, stress, sleep, work balance, burnout and general wellbeing.",
+      "/assessments",
     ),
   component: AssessmentListPage,
 });

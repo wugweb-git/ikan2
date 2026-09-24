@@ -10,7 +10,7 @@ import { contactPage as c } from "@/lib/content";
 import * as v from "@/lib/validate";
 
 export const Route = createFileRoute("/contact")({
-  head: () => pageMeta("Contact us", c.heroSubtitle),
+  head: () => pageMeta("Contact us", c.heroSubtitle, "/contact"),
   component: ContactPage,
 });
 

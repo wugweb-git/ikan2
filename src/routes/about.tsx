@@ -15,7 +15,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { aboutPage as a, unmark } from "@/lib/content";
 
 export const Route = createFileRoute("/about")({
-  head: () => pageMeta("About iKAN", a.hero.subtitle),
+  head: () => pageMeta("About iKAN", a.hero.subtitle, "/about"),
   component: AboutPage,
 });
 

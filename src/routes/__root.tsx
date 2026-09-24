@@ -16,6 +16,7 @@ import { ErrorScreen, NotFoundScreen, OfflineBanner } from "../components/skelet
 import { registerServiceWorker } from "../lib/device";
 import { pageView } from "@/lib/analytics";
 import { restoreEvicted } from "@/lib/durable";
+import { listenForReminderTaps } from "@/lib/local-reminders";
 import { syncStatusBar } from "@/lib/native";
 import { refreshStores } from "@/lib/storage-scope";
 
@@ -26,6 +27,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
   return <ErrorScreen reset={reset} />;
 }
+
+/* One place for what search engines and link previews read. The description says what iKAN
+ * does and who it is for, rather than listing features. */
+export const SITE_URL = "https://app.ikanhealth.in";
+export const SITE_DESCRIPTION =
+  "Check in on how you feel, take a validated mental health assessment, and work through " +
+  "short daily programmes for sleep, stress and burnout. Private by default.";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -44,19 +52,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "application-name", content: "iKAN" },
       { name: "format-detection", content: "telephone=no" },
       { name: "msapplication-TileColor", content: "#151515" },
-      { title: "iKAN — Personal Wellness" },
-      {
-        name: "description",
-        content: "Personalized mental wellness check-ins, self-help programs, and assessments.",
-      },
+      { title: "iKAN — Mental wellness that fits your day" },
+      { name: "description", content: SITE_DESCRIPTION },
       { name: "author", content: "iKAN" },
-      { property: "og:title", content: "iKAN — Personal Wellness" },
-      {
-        property: "og:description",
-        content: "Personalized mental wellness check-ins, self-help programs, and assessments.",
-      },
+      { name: "robots", content: "index, follow" },
+      { property: "og:site_name", content: "iKAN" },
+      { property: "og:locale", content: "en_IN" },
+      { property: "og:title", content: "iKAN — Mental wellness that fits your day" },
+      { property: "og:description", content: SITE_DESCRIPTION },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: SITE_URL },
+      { property: "og:image", content: `${SITE_URL}/pwa-512x512.png` },
+      // The share image is the square app icon, so the small card is the honest choice: a
+      // large-image card would letterbox it into a wide grey band.
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "iKAN — Mental wellness that fits your day" },
+      { name: "twitter:description", content: SITE_DESCRIPTION },
+      { name: "twitter:image", content: `${SITE_URL}/pwa-512x512.png` },
     ],
     links: [
       {
@@ -121,6 +133,15 @@ function RootComponent() {
     });
     void syncStatusBar(window.matchMedia("(prefers-color-scheme: dark)").matches);
   }, []);
+
+  // Tapping a scheduled reminder opens the screen it points at.
+  useEffect(() => {
+    let stop = () => {};
+    void listenForReminderTaps((url) => void router.navigate({ href: url })).then((f) => {
+      stop = f;
+    });
+    return () => stop();
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>

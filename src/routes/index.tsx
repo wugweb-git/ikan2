@@ -55,6 +55,7 @@ import {
   useSettings,
 } from "@/lib/profile";
 import { checkMoodReminder, refreshWeather, useDevice, weatherWord } from "@/lib/device";
+import { syncMoodReminder } from "@/lib/local-reminders";
 import { autoSyncHealthConnect, recentAverage, useHealthConnect } from "@/lib/health-connect";
 import { resources, slugOf, type Resource } from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
@@ -63,7 +64,11 @@ import resSleep from "@/assets/res-sleep.jpg";
 
 export const Route = createFileRoute("/")({
   head: () =>
-    pageMeta("Home", "What to do today, your iKAN Score, programs, mood and reading in one place."),
+    pageMeta(
+      "Home",
+      "What to do today, your iKAN Score, programs, mood and reading in one place.",
+      "/",
+    ),
   component: Home,
 });
 
@@ -174,7 +179,15 @@ function Home() {
       time: settings.moodReminderTime,
       loggedToday: data.journal.entries.some((e) => e.date === dayKey(new Date())),
     });
+    // The Android app can't use web push, so the same reminder is scheduled on the phone.
+    void syncMoodReminder({ enabled: settings.moodReminders, time: settings.moodReminderTime });
   }, [hydrated]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-schedule whenever the reminder setting changes, not only on first load.
+  useEffect(() => {
+    if (!hydrated) return;
+    void syncMoodReminder({ enabled: settings.moodReminders, time: settings.moodReminderTime });
+  }, [hydrated, settings.moodReminders, settings.moodReminderTime]);
   const city = hydrated ? cityName(profile.city) || device.location?.city || "" : "";
 
   const part = now ? partOf(now.getHours()) : "morning";

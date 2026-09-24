@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { faqPage as f } from "@/lib/content";
 
 export const Route = createFileRoute("/faq")({
-  head: () => pageMeta(f.heroTitle, f.heroSubtitle),
+  head: () => pageMeta(f.heroTitle, f.heroSubtitle, "/faq"),
   component: FaqPage,
 });
 

@@ -9,7 +9,8 @@ import { useProgramme } from "@/lib/equip/store";
 import type { Programme } from "@/lib/equip/types";
 
 export const Route = createFileRoute("/program/")({
-  head: () => pageMeta("Programs", "iKAN Equip programs for sleep, burnout and stress."),
+  head: () =>
+    pageMeta("Programs", "iKAN Equip programs for sleep, burnout and stress.", "/program"),
   component: ProgramsPage,
 });
 

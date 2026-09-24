@@ -18,7 +18,12 @@ export const Route = createFileRoute("/resources/")({
     const c = typeof s["category"] === "string" ? s["category"].toLowerCase() : "";
     return filters.some((f) => f !== "All" && f.toLowerCase() === c) ? { category: c } : {};
   },
-  head: () => pageMeta("Resources", "Articles and guides to support your mental health journey."),
+  head: () =>
+    pageMeta(
+      "Resources",
+      "Articles and guides to support your mental health journey.",
+      "/resources",
+    ),
   component: ResourcesPage,
 });
 
