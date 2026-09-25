@@ -4,28 +4,28 @@
  * generating it once per deploy costs nothing at runtime and cannot fail in production. It runs
  * from the "build" script, so it can never drift from what is deployed.
  *
- * Only pages worth indexing are listed. Everything behind sign-in (journal, programme days,
- * history, settings) is left out: those URLs are private, several of them name a condition, and
- * a crawler cannot reach them anyway.
+ * Only pages a signed-OUT visitor can actually load are listed, which today means the routes in
+ * the PUBLIC allowlist in src/components/auth-ui.tsx. Everything else - home, resources,
+ * assessments, programmes, journal - redirects to the sign-in screen, so listing those URLs
+ * would hand Googlebot 22 identical sign-in pages and earn soft-404s rather than traffic.
+ *
+ * If resources is ever made public, move its entries back below and regenerate. The articles
+ * are already written, linked and marked up with Article JSON-LD, so that is the only step left.
  */
 
 import { writeFileSync } from "node:fs";
-import { resources, slugOf } from "../src/lib/resources";
-import { assessments } from "../src/lib/assessment/instruments";
 
 const ORIGIN = "https://app.ikanhealth.in";
 
 type Entry = { path: string; changefreq: string; priority: string; lastmod?: string };
 
 const staticPages: Entry[] = [
-  { path: "/", changefreq: "weekly", priority: "1.0" },
-  { path: "/assessments", changefreq: "weekly", priority: "0.9" },
-  { path: "/program", changefreq: "weekly", priority: "0.9" },
-  { path: "/resources", changefreq: "daily", priority: "0.9" },
-  { path: "/about", changefreq: "monthly", priority: "0.6" },
-  { path: "/contact", changefreq: "monthly", priority: "0.5" },
-  { path: "/faq", changefreq: "monthly", priority: "0.6" },
-  { path: "/support", changefreq: "monthly", priority: "0.5" },
+  { path: "/about", changefreq: "monthly", priority: "0.8" },
+  { path: "/faq", changefreq: "monthly", priority: "0.7" },
+  { path: "/contact", changefreq: "monthly", priority: "0.6" },
+  { path: "/support", changefreq: "monthly", priority: "0.6" },
+  { path: "/login", changefreq: "yearly", priority: "0.5" },
+  { path: "/signup", changefreq: "yearly", priority: "0.5" },
   { path: "/delete-account", changefreq: "yearly", priority: "0.3" },
   { path: "/legal/privacy-policy", changefreq: "yearly", priority: "0.4" },
   { path: "/legal/terms", changefreq: "yearly", priority: "0.3" },
@@ -33,22 +33,7 @@ const staticPages: Entry[] = [
   { path: "/legal/return-policy", changefreq: "yearly", priority: "0.3" },
 ];
 
-const articles: Entry[] = resources.map((r) => ({
-  path: `/resources/${slugOf(r)}`,
-  changefreq: "monthly",
-  priority: "0.8",
-  lastmod: r.date,
-}));
-
-/* The assessment landing pages describe a screening test, which is what people search for. The
- * RESULT pages are not here: a result URL is about one person. */
-const assessmentPages: Entry[] = assessments.map((a) => ({
-  path: `/assessments/${a.slug}`,
-  changefreq: "monthly",
-  priority: "0.7",
-}));
-
-const entries = [...staticPages, ...articles, ...assessmentPages];
+const entries = staticPages;
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
