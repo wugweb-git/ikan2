@@ -49,8 +49,23 @@ for v in SOURCE_DB_PASSWORD MIRROR_DB_PASSWORD; do
   fi
 done
 
-command -v pg_dump >/dev/null || { echo "pg_dump not found (brew install libpq && brew link --force libpq)"; exit 1; }
-command -v psql    >/dev/null || { echo "psql not found (brew install libpq && brew link --force libpq)"; exit 1; }
+# Homebrew keeps libpq keg-only, so pg_dump is installed but not on PATH. Find it rather than
+# asking for `brew link --force libpq`, which shadows the system psql and surprises people later.
+find_pg () {
+  local name="$1" p
+  if command -v "$name" >/dev/null; then command -v "$name"; return; fi
+  for p in "$(brew --prefix libpq 2>/dev/null)/bin/$name" \
+           /usr/local/opt/libpq/bin/"$name" \
+           /opt/homebrew/opt/libpq/bin/"$name" \
+           /usr/local/opt/postgresql@16/bin/"$name" \
+           /Applications/Postgres.app/Contents/Versions/latest/bin/"$name"; do
+    [ -x "$p" ] && { echo "$p"; return; }
+  done
+  return 1
+}
+
+PG_DUMP="$(find_pg pg_dump)" || { echo "pg_dump not found (brew install libpq)"; exit 1; }
+PSQL="$(find_pg psql)"       || { echo "psql not found (brew install libpq)"; exit 1; }
 
 url () { # ref password region
   printf 'postgresql://postgres.%s:%s@aws-0-%s.pooler.supabase.com:5432/postgres' \
@@ -66,7 +81,7 @@ chmod 700 "$TMP"
 echo "Dumping $SOURCE_REF ..."
 DUMP_ARGS=(--data-only --no-owner --no-privileges --column-inserts=false)
 for t in "${TABLES[@]}"; do DUMP_ARGS+=(--table="public.$t"); done
-pg_dump "$SRC_URL" "${DUMP_ARGS[@]}" > "$TMP/data.sql"
+"$PG_DUMP" "$SRC_URL" "${DUMP_ARGS[@]}" > "$TMP/data.sql"
 
 # The dump says `COPY public.x`; the mirror keeps everything in its own schema.
 sed -i '' -E 's/^COPY public\./COPY mirror./' "$TMP/data.sql" 2>/dev/null \
@@ -83,10 +98,10 @@ echo "Loading into $MIRROR_REF ..."
     echo "insert into mirror._sync_log (table_name, rows_loaded) select '$t', count(*) from mirror.$t;"
   done
   echo "commit;"
-} | psql "$DST_URL" -v ON_ERROR_STOP=1 -q
+} | "$PSQL" "$DST_URL" -v ON_ERROR_STOP=1 -q
 
 echo
-psql "$DST_URL" -q -c \
+"$PSQL" "$DST_URL" -q -c \
   "select table_name, rows_loaded from mirror._sync_log where ran_at > now() - interval '2 minutes' order by table_name;"
 
 echo "Mirror is current."

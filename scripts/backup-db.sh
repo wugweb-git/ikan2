@@ -12,7 +12,7 @@
 #   Supabase dashboard -> Project settings -> Database -> Database password
 # It is read from the environment and never written to disk or into this repo.
 #
-# Needs pg_dump, which is in libpq:   brew install libpq && brew link --force libpq
+# Needs pg_dump, from libpq:   brew install libpq   (no `brew link` required)
 # Deliberately NOT `supabase db dump`: that runs pg_dump inside a container and therefore needs
 # Docker running, which is a heavy prerequisite for taking a backup.
 #
@@ -33,11 +33,26 @@ if [ -z "${SUPABASE_DB_PASSWORD:-}" ]; then
   exit 1
 fi
 
-if ! command -v pg_dump >/dev/null; then
-  echo "pg_dump not found. Install the postgres client tools:"
-  echo "  brew install libpq && brew link --force libpq"
+# Homebrew keeps libpq keg-only, so pg_dump is installed but not on PATH. Find it rather than
+# asking for `brew link --force libpq`, which shadows the system psql and surprises people later.
+find_pg () {
+  local name="$1" p
+  if command -v "$name" >/dev/null; then command -v "$name"; return; fi
+  for p in "$(brew --prefix libpq 2>/dev/null)/bin/$name" \
+           /usr/local/opt/libpq/bin/"$name" \
+           /opt/homebrew/opt/libpq/bin/"$name" \
+           /usr/local/opt/postgresql@16/bin/"$name" \
+           /Applications/Postgres.app/Contents/Versions/latest/bin/"$name"; do
+    [ -x "$p" ] && { echo "$p"; return; }
+  done
+  return 1
+}
+
+PG_DUMP="$(find_pg pg_dump)" || {
+  echo "pg_dump not found. Install the postgres client tools:  brew install libpq"
   exit 1
-fi
+}
+echo "using $PG_DUMP ($("$PG_DUMP" --version))"
 
 # Percent-encode the characters that would otherwise break the connection url.
 enc () { printf %s "$1" | sed -e 's/%/%25/g' -e 's/:/%3A/g' -e 's/@/%40/g' -e 's|/|%2F|g' -e 's/?/%3F/g' -e 's/#/%23/g'; }
@@ -52,10 +67,10 @@ echo "Backing up $PROJECT_REF to $OUT_DIR ..."
 
 # Structure and data separately: a schema diff stays readable, and restoring into a fresh
 # project is then two ordered steps rather than one opaque file.
-pg_dump "$DB_URL" --schema-only --no-owner --no-privileges \
+"$PG_DUMP" "$DB_URL" --schema-only --no-owner --no-privileges \
   --schema=public --schema=archive -f "$OUT_DIR/ikan-schema-$STAMP.sql"
 
-pg_dump "$DB_URL" --data-only --no-owner --no-privileges \
+"$PG_DUMP" "$DB_URL" --data-only --no-owner --no-privileges \
   --schema=public --schema=archive -f "$OUT_DIR/ikan-data-$STAMP.sql"
 
 chmod 600 "$OUT_DIR"/ikan-*-"$STAMP".sql
