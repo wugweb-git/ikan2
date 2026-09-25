@@ -6,6 +6,7 @@ import { Button, TextField } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useAuth, supabase } from "@/lib/auth";
 import { functionUrl } from "@/lib/backend";
+import { clearAllMirrored } from "@/lib/durable";
 
 /* Account deletion, in the app and on the web.
  *
@@ -58,12 +59,15 @@ function DeleteAccountPage() {
       });
       const body = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(body.error ?? "Deletion failed. Please try again.");
-      // The account is gone; clear this device so nothing of it is left lying around.
+      // The account is gone; clear this device so nothing of it is left lying around. The
+      // native mirror has to go too, or restoreEvicted() puts the whole journal back on the
+      // next launch - which would make the promise on the next screen a lie.
       try {
         localStorage.clear();
       } catch {
         /* storage unavailable */
       }
+      await clearAllMirrored();
       await supabase()
         .auth.signOut()
         .catch(() => {});
