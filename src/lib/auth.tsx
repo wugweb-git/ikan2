@@ -15,7 +15,7 @@ export const SUPABASE_ANON_KEY = BACKEND_KEY;
 export const LEGACY_API = functionUrl("make-server-cc205da9");
 export const LEGACY_ANON_KEY = BACKEND_KEY;
 const LEGACY_KEY = BACKEND_KEY;
-/** kept for the sign-up branch below; ikan2 now uses the iKAN project directly */
+/** kept for the sign-up branch below; iKAN now uses its own Supabase project directly */
 const usingLovableCloud = false;
 
 /* "Keep me signed in": when off, the session lives only until the app is closed. */

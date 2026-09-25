@@ -1,4 +1,4 @@
-// ikan2 account deletion.
+// iKAN account deletion.
 //
 //   POST /   (signed-in user, Authorization: Bearer <access token>)
 //     → deletes every row this account owns, then the account itself

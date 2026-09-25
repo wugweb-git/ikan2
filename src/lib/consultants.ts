@@ -5,7 +5,7 @@ import { createLocalStore, newId } from "@/lib/local-store";
  * credentials, ratings, experience, cities, languages, session modes and prices, concerns, therapy
  * areas, approaches, qualifications, about text, review and FAQ. "From" is the lowest session
  * price, which matches the site's "Starting at". Next-available slots are relative to today,
- * since the site's are fixed demo dates. Bookings stay in ikan2 (not sent to the live backend). */
+ * since the site's are fixed demo dates. Bookings stay in iKAN (not sent to the live backend). */
 
 export type SessionMode = "Offline" | "Call" | "Chat" | "Video";
 export type Role = "Therapist" | "Psychiatrist" | "Counselor" | "Family Therapist";

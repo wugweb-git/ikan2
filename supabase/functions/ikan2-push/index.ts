@@ -1,4 +1,4 @@
-// ikan2 web push.
+// iKAN web push.
 //
 //   POST /test       (signed-in user) → sends a test notification to that account's devices
 //   POST /reminders  (scheduler, x-cron-secret header) → daily mood reminders at each
