@@ -14,7 +14,7 @@ import { StackedAssessmentCard } from "@/components/assessment/ui";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { accentStyle, IconButton, stateLayer } from "@/components/equip/m3";
-import { pageMeta } from "@/components/equip/program-header";
+import { jsonLd, pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { getAssessment } from "@/lib/assessment/instruments";
@@ -36,9 +36,34 @@ export const Route = createFileRoute("/resources/$slug")({
   head: ({ loaderData }) => {
     const r = loaderData ? getResource(loaderData.id) : undefined;
     const a = loaderData ? articles[loaderData.id] : undefined;
-    return r
-      ? pageMeta(r.title, a?.description || r.title, `/resources/${slugOf(r)}`)
-      : { meta: [{ title: "Article — iKAN" }] };
+    if (!r) return { meta: [{ title: "Article — iKAN" }] };
+    const url = `https://app.ikanhealth.in/resources/${slugOf(r)}`;
+    const description = a?.description || r.title;
+    return {
+      ...pageMeta(r.title, description, `/resources/${slugOf(r)}`),
+      scripts: [
+        jsonLd({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: r.title,
+          description,
+          datePublished: r.date,
+          dateModified: r.date,
+          articleSection: r.category,
+          inLanguage: "en-IN",
+          mainEntityOfPage: { "@type": "WebPage", "@id": url },
+          author: { "@type": "Organization", name: "iKAN" },
+          publisher: {
+            "@type": "Organization",
+            name: "iKAN",
+            logo: {
+              "@type": "ImageObject",
+              url: "https://app.ikanhealth.in/pwa-512x512.png",
+            },
+          },
+        }),
+      ],
+    };
   },
   component: ArticlePage,
 });
