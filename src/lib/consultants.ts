@@ -1,11 +1,16 @@
 import { addDays } from "@/lib/journal";
 import { createLocalStore, newId } from "@/lib/local-store";
 
-/* The five consultants from the live iKan consultants API (14 Sep 2026): names, photos,
- * credentials, ratings, experience, cities, languages, session modes and prices, concerns, therapy
- * areas, approaches, qualifications, about text, review and FAQ. "From" is the lowest session
- * price, which matches the site's "Starting at". Next-available slots are relative to today,
- * since the site's are fixed demo dates. Bookings stay in iKAN (not sent to the live backend). */
+/* The five consultants from the live iKan consultants API (14 Sep 2026): names, credentials,
+ * ratings, experience, cities, languages, session modes and prices, concerns, therapy areas,
+ * approaches, qualifications, about text, review and FAQ. "From" is the lowest session price,
+ * which matches the site's "Starting at". Next-available slots are relative to today, since the
+ * site's are fixed demo dates. Bookings stay in iKAN (not sent to the live backend).
+ *
+ * No photographs. These entries carried Unsplash stock portraits - strangers' faces presented as
+ * named clinicians on a mental health app, which is a misrepresentation whatever the intent, and
+ * hotlinked from a third party besides. The cards fall back to initials, which is honest. Put a
+ * real photograph in `photo` when there is one to put. */
 
 export type SessionMode = "Offline" | "Call" | "Chat" | "Video";
 export type Role = "Therapist" | "Psychiatrist" | "Counselor" | "Family Therapist";
@@ -25,7 +30,8 @@ export type Consultant = {
   concerns: string[];
   therapyFor: string[];
   about: string;
-  photo: string;
+  /** A real photograph, once we have one. Without it the card shows the person's initials. */
+  photo?: string;
   approaches: string[];
   qualifications: string[];
   sessions: { mode: SessionMode; price: number }[];
@@ -49,7 +55,6 @@ export const consultants: Consultant[] = [
     name: "Dr. Sarah Johnson",
     credentials: "M.Phil (Clinical Psychology), M.Sc",
     role: "Therapist",
-    photo: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=400&fit=crop",
     rating: 4.8,
     reviews: 142,
     years: 15,
@@ -125,7 +130,6 @@ export const consultants: Consultant[] = [
     name: "Dr. Priya Sharma",
     credentials: "M.Phil, RCI Registered",
     role: "Therapist",
-    photo: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop",
     rating: 4.9,
     reviews: 67,
     years: 8,
@@ -180,7 +184,6 @@ export const consultants: Consultant[] = [
     name: "Dr. Michael Chen",
     credentials: "M.Phil, LCSW",
     role: "Counselor",
-    photo: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop",
     rating: 4.6,
     reviews: 89,
     years: 10,
@@ -239,7 +242,6 @@ export const consultants: Consultant[] = [
     name: "Dr. Emily Rodriguez",
     credentials: "Ph.D., LMFT",
     role: "Family Therapist",
-    photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
     rating: 4.9,
     reviews: 156,
     years: 12,
@@ -294,7 +296,6 @@ export const consultants: Consultant[] = [
     name: "Dr. James Thompson",
     credentials: "MD, Psychiatrist",
     role: "Psychiatrist",
-    photo: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop",
     rating: 4.7,
     reviews: 203,
     years: 18,

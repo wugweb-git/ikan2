@@ -52,6 +52,16 @@ android {
              * keep rules in proguard-rules.pro. Read that file before changing either line. */
             minifyEnabled true
             shrinkResources true
+            /* Play warns that this bundle has native code without debug symbols. It cannot be
+             * fixed here and the warning is safe to ignore: the only .so is
+             * libdatastore_shared_counter.so, which arrives prebuilt and already stripped inside
+             * the AndroidX DataStore aar. ndk.debugSymbolLevel extracts symbols from native code
+             * THIS project builds, of which there is none - setting it was tried and produced
+             * nothing. Only AndroidX shipping symbols would clear it.
+             *
+             * The R8 mapping, by contrast, is already inside the bundle at
+             * BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map, so Play
+             * deobfuscates crash reports without anything being uploaded separately. */
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             if (canSign) {
                 signingConfig signingConfigs.release
