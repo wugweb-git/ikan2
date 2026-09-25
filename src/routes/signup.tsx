@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { PhoneField } from "@/components/phone-field";
 import * as v from "@/lib/validate";
+import { track } from "@/lib/analytics";
 
 type Search = { redirect?: string };
 
@@ -56,6 +57,7 @@ function SignupPage() {
         password,
         ...(v.phoneDigits(phone).length === 10 ? { phone: phone.trim() } : {}),
       });
+      track("signup", { verification: outcome === "confirm" ? "email" : "none" });
       if (outcome === "confirm") navigate({ to: "/verify-email", search: { email: email.trim() } });
       // "signedIn": the auth gate takes it from here
     } catch (err) {

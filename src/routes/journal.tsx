@@ -35,6 +35,7 @@ import {
   type ScalePoint,
 } from "@/lib/journal";
 import { diaryQualityOn } from "@/lib/equip/store";
+import { track } from "@/lib/analytics";
 
 type Search = { mood?: number };
 
@@ -121,7 +122,11 @@ function JournalPage() {
             <CheckIn
               preset={preset}
               countToday={journal.on(todayKey).length}
-              onSave={(d) => journal.add(d)}
+              onSave={(d) => {
+                journal.add(d);
+                // No answers and no note text - only that a check-in happened.
+                track("journal_saved", { answers: Object.keys(d).length });
+              }}
             />
           ) : null}
 

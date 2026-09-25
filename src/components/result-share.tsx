@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Download, Mail, Share2 } from "lucide-react";
 import { canShare, share, tap } from "@/lib/native";
+import { track } from "@/lib/analytics";
 import { BottomSheet, IconButton } from "@/components/equip/m3";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +47,7 @@ export function ShareButton({ subject, body }: { subject: string; body: string }
             run: () => {
               setOpen(false);
               tap();
+              track("result_shared", { method: "system" });
               void share({ title: subject, text: `${body}\n\nShared from iKAN` });
             },
           },
