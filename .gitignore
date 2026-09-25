@@ -44,3 +44,10 @@ storybook-static
 ds-bundle/
 .design-sync/types/
 .design-sync/asset-shims/
+
+# Database dumps. supabase/schema.sql is structure only and is committed on purpose;
+# anything carrying rows must never be, because these tables hold journals and health data.
+*.dump
+*.backup
+*-data.sql
+dump.sql
