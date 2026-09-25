@@ -16,6 +16,7 @@
 # Usage:
 #   SOURCE_DB_PASSWORD='...' MIRROR_DB_PASSWORD='...' ./scripts/sync-mirror.sh
 #
+# Port 5432 is the SESSION pooler; 6543 is transaction mode and cannot serve pg_dump.
 # Passwords come from each project's dashboard: Project settings -> Database -> Database
 # password. They are read from the environment, never stored, never committed.
 
@@ -52,7 +53,7 @@ command -v pg_dump >/dev/null || { echo "pg_dump not found (brew install libpq &
 command -v psql    >/dev/null || { echo "psql not found (brew install libpq && brew link --force libpq)"; exit 1; }
 
 url () { # ref password region
-  printf 'postgresql://postgres.%s:%s@aws-0-%s.pooler.supabase.com:6543/postgres' \
+  printf 'postgresql://postgres.%s:%s@aws-0-%s.pooler.supabase.com:5432/postgres' \
     "$1" "$(printf %s "$2" | sed -e 's/:/%3A/g' -e 's/@/%40/g' -e 's|/|%2F|g')" "$3"
 }
 SRC_URL="$(url "$SOURCE_REF" "$SOURCE_DB_PASSWORD" "$SOURCE_REGION")"
