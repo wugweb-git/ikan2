@@ -23,8 +23,8 @@
 create table public."UserConnectCheck" (
   id bigint not null,
   "Json" json,
-  constraint "User ConnectCheck_pkey" PRIMARY KEY (id),
-  constraint "User ConnectCheck_id_key" UNIQUE (id)
+  constraint userconnectcheck_pkey PRIMARY KEY (id),
+  constraint userconnectcheck_id_key UNIQUE (id)
 );
 
 create table public.ikan2_user_state (
@@ -181,11 +181,10 @@ create table public.user_ikan_scores (
 
 CREATE INDEX ikan2_push_subscriptions_kind_idx ON public.ikan2_push_subscriptions USING btree (kind);
 CREATE INDEX ikan2_push_subscriptions_user ON public.ikan2_push_subscriptions USING btree (user_id);
-CREATE INDEX idx_kv_store_key_prefix ON public.kv_store_cc205da9 USING btree (key text_pattern_ops);
-CREATE INDEX kv_store_cc205da9_key_idx294 ON public.kv_store_cc205da9 USING btree (key text_pattern_ops);
-CREATE INDEX idx_uar_user ON public.user_assessment_results USING btree (user_id, completed_at DESC);
-CREATE INDEX idx_uenr_user ON public.user_enrollments USING btree (user_id);
-CREATE INDEX idx_uje_user ON public.user_journal_entries USING btree (user_id, entry_date DESC);
+CREATE INDEX kv_store_key_prefix ON public.kv_store_cc205da9 USING btree (key text_pattern_ops);
+CREATE INDEX user_assessment_results_by_user_recent ON public.user_assessment_results USING btree (user_id, completed_at DESC);
+CREATE INDEX user_enrollments_by_user ON public.user_enrollments USING btree (user_id);
+CREATE INDEX user_journal_entries_by_user_recent ON public.user_journal_entries USING btree (user_id, entry_date DESC);
 
 
 -- ============================================================ row level security
@@ -204,7 +203,7 @@ alter table public.user_ikan_scores enable row level security;
 -- kv_store_cc205da9 has RLS on and NO policies on purpose: it is reached only through the
 -- make-server function with the service role, so nothing with the anon key can touch it.
 
-create policy deny_all on public."UserConnectCheck" as RESTRICTIVE for ALL to anon, authenticated using (false);
+create policy "no access" on public."UserConnectCheck" as RESTRICTIVE for ALL to anon, authenticated using (false);
 
 create policy "own state select" on public.ikan2_user_state as PERMISSIVE for SELECT to authenticated using ((( SELECT auth.uid() AS uid) = user_id));
 create policy "own state insert" on public.ikan2_user_state as PERMISSIVE for INSERT to authenticated with check ((( SELECT auth.uid() AS uid) = user_id));
@@ -221,11 +220,11 @@ create policy "own push insert" on public.ikan2_push_subscriptions as PERMISSIVE
 create policy "own push update" on public.ikan2_push_subscriptions as PERMISSIVE for UPDATE to authenticated using ((( SELECT auth.uid() AS uid) = user_id)) with check ((( SELECT auth.uid() AS uid) = user_id));
 create policy "own push delete" on public.ikan2_push_subscriptions as PERMISSIVE for DELETE to authenticated using ((( SELECT auth.uid() AS uid) = user_id));
 
-create policy own_rows on public.user_assessment_results as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
-create policy own_rows on public.user_enrollments as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
-create policy own_rows on public.user_journal_entries as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
-create policy own_rows on public.user_program_progress as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
-create policy own_rows on public.user_ikan_scores as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
+create policy "own results" on public.user_assessment_results as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
+create policy "own enrollments" on public.user_enrollments as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
+create policy "own journal" on public.user_journal_entries as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
+create policy "own progress" on public.user_program_progress as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
+create policy "own scores" on public.user_ikan_scores as PERMISSIVE for ALL to authenticated using ((auth.uid() = user_id)) with check ((auth.uid() = user_id));
 
 
 -- ============================================================ notes
