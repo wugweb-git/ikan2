@@ -41,16 +41,22 @@ const TABLES = [
  * ten identical 401s - which buries the one fact that matters. */
 function keyProblem(k) {
   if (!k) return "is not set";
-  if (/^(eyJ\.\.\.|<.*>|your-.*|\.\.\.)$/i.test(k.trim())) return "is still the placeholder from the example";
+  if (/^(eyJ\.\.\.|<.*>|your-.*|\.\.\.)$/i.test(k.trim()))
+    return "is still the placeholder from the example";
   const jwt = k.split(".").length === 3 && k.startsWith("eyJ");
   const modern = k.startsWith("sb_secret_") || k.startsWith("sb_publishable_");
-  if (!jwt && !modern) return "does not look like a Supabase key (expected eyJ... with two dots, or sb_secret_...)";
-  if (k.startsWith("sb_publishable_")) return "is the PUBLISHABLE key, which row level security will block. Use service_role";
+  if (!jwt && !modern)
+    return "does not look like a Supabase key (expected eyJ... with two dots, or sb_secret_...)";
+  if (k.startsWith("sb_publishable_"))
+    return "is the PUBLISHABLE key, which row level security will block. Use service_role";
   if (jwt) {
     try {
       const role = JSON.parse(Buffer.from(k.split(".")[1], "base64").toString()).role;
-      if (role && role !== "service_role") return `is the ${role} key. Use service_role, or row level security returns almost nothing`;
-    } catch { /* unreadable payload; let the request decide */ }
+      if (role && role !== "service_role")
+        return `is the ${role} key. Use service_role, or row level security returns almost nothing`;
+    } catch {
+      /* unreadable payload; let the request decide */
+    }
   }
   return null;
 }
@@ -64,7 +70,11 @@ if (problem) {
   process.exit(1);
 }
 
-const OUT = join(homedir(), "ikan-backups", new Date().toISOString().slice(0, 19).replace(/[:T]/g, ""));
+const OUT = join(
+  homedir(),
+  "ikan-backups",
+  new Date().toISOString().slice(0, 19).replace(/[:T]/g, ""),
+);
 mkdirSync(OUT, { recursive: true });
 
 /* PostgREST caps a response at 1000 rows by default, so page rather than trusting one request -
@@ -90,7 +100,11 @@ async function fetchAll(table) {
 }
 
 let total = 0;
-const manifest = { exportedAt: new Date().toISOString(), project: "jpfvoevxegnknxoqmwye", tables: {} };
+const manifest = {
+  exportedAt: new Date().toISOString(),
+  project: "jpfvoevxegnknxoqmwye",
+  tables: {},
+};
 
 for (const table of TABLES) {
   try {
