@@ -51,3 +51,9 @@ ds-bundle/
 *.backup
 *-data.sql
 dump.sql
+
+# Environment files. Lovable's Supabase integration committed a .env once; the values were
+# publishable keys, but a tracked .env is how a secret eventually gets committed by accident.
+.env
+.env.*
+!.env.example
