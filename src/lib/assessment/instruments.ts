@@ -630,7 +630,9 @@ export const assessments: Assessment[] = [
       {
         id: "sleep-total",
         label: "Sleep",
-        instrument: "Sleep severity",
+        /* Not "Sleep severity": the result screen prints "<label>, <instrument>", so that read
+         * as "Sleep, Sleep severity". */
+        instrument: "Insomnia severity",
         profile: "sleep-severity",
       },
     ],
