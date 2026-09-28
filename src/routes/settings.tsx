@@ -42,7 +42,6 @@ import {
   useNotificationAccess,
   weatherWord,
   clearLocation,
-  notificationsOff,
   setNotificationsOff,
 } from "@/lib/device";
 import { IkanShell } from "@/components/ikan-shell";
@@ -60,10 +59,11 @@ import {
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
-import { mirrorRemove } from "@/lib/durable";
+import { clearAllMirrored } from "@/lib/durable";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { recentAverage, useHealthConnect } from "@/lib/health-connect";
 import { disablePush, enablePush, pushSupported, sendTestPush } from "@/lib/push";
+import { enableNativePush, nativePushSupported } from "@/lib/native-push";
 import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
 import type { LegalSlug } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -95,12 +95,26 @@ function SettingsPage() {
   const snack = useSnack();
   const [clearing, setClearing] = useState(false);
   const notifications = useNotificationAccess();
+  const device = useDevice();
 
-  // keep this device's push subscription and reminder time in step with the settings
+  /* Keep this device's push subscription and reminder time in step with the settings.
+   *
+   * device.notificationsOff has to be a dependency, not just a value read inside: it was
+   * guarded on but not depended on, so switching notifications back on changed the flag
+   * without re-running this - and the re-registration never happened until the component
+   * remounted. The switch now registers directly as well, but an effect that silently
+   * ignores the state it reads is a trap for the next person. */
   useEffect(() => {
-    if (!hydrated || notifications !== "granted" || !pushSupported() || notificationsOff()) return;
+    if (!hydrated || notifications !== "granted" || !pushSupported() || device.notificationsOff)
+      return;
     void enablePush({ moodReminder: stored.moodReminders, time: stored.moodReminderTime });
-  }, [hydrated, notifications, stored.moodReminders, stored.moodReminderTime]);
+  }, [
+    hydrated,
+    notifications,
+    device.notificationsOff,
+    stored.moodReminders,
+    stored.moodReminderTime,
+  ]);
 
   const toggle = (key: keyof Settings, label: string, sub: string, icon: LucideIcon) => (
     <Row icon={icon} label={label} sub={sub}>
@@ -354,10 +368,14 @@ function SettingsPage() {
                   } catch {
                     /* ignore */
                   }
-                  // The Android app keeps a native copy of every key; without this it is
-                  // restored on the next launch (see durable.ts).
-                  mirrorRemove(k);
                 }
+                /* Awaited, and before the reload. The Android app keeps a native copy of every
+                 * key (durable.ts); mirrorRemove is fire-and-forget, so calling it per key and
+                 * then navigating immediately meant the page went away before the dynamic
+                 * import even resolved. The deletes never ran, restoreEvicted put everything
+                 * back on the next launch, and cloud-sync then re-uploaded it - so "Clear
+                 * everything" undid itself and said nothing. */
+                await clearAllMirrored();
                 window.location.assign("/");
               }}
             >
@@ -521,6 +539,8 @@ function ActivityRow({ onMessage }: { onMessage: (m: string) => void }) {
 function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
   const hydrated = useHydrated();
   const notifications = useNotificationAccess();
+  // Needed when the switch goes back on, to re-register at the person's chosen reminder time.
+  const { settings: stored } = useSettings();
   const device = useDevice();
   const [locationAccess, setLocationAccess] = useLocationAccess();
   const [busy, setBusy] = useState(false);
@@ -558,6 +578,14 @@ function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
                   : "Notifications are blocked for iKAN in your phone’s settings",
               );
             setNotificationsOff(false);
+            /* Turning the switch off unsubscribed this device and deleted its row, so turning
+             * it back on has to register again. The effect above would do it, but it guards on
+             * notificationsOff() without that value being one of its dependencies - so it does
+             * not re-run here, and reminders stayed silently dead until the app was reopened.
+             * Registering directly is what the person just asked for; do it here. */
+            const prefs = { moodReminder: stored.moodReminders, time: stored.moodReminderTime };
+            if (pushSupported()) await enablePush(prefs).catch(() => {});
+            if (nativePushSupported()) await enableNativePush(prefs).catch(() => {});
             onMessage("Notifications on");
           }}
         />
