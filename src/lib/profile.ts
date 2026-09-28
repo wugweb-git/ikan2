@@ -163,10 +163,15 @@ export function seedProfile(account: {
   if (current.email) {
     // a photo from the sign-in provider replaces none, or an old iKan link that expires after a week
     if (account.avatar && (!current.avatar || expiringPhoto(current.avatar)))
-      profileStore.update((p) => ({ ...p, avatar: account.avatar! }));
+      profileStore.updateDerived((p) => ({ ...p, avatar: account.avatar! }));
     return;
   }
-  profileStore.update((p) => ({
+  /* updateDerived, not update. This runs the moment a session appears, which on a device with
+   * no local profile is before the cloud pull has returned. A normal write would mark the key
+   * as an unpushed local edit, and the pull would then keep these three fields and discard the
+   * city, birthday, gender, phone and emergency contact held in the account - then push the
+   * remains over them. Nothing here was typed by anyone; it is derived from the session. */
+  profileStore.updateDerived((p) => ({
     ...p,
     name: account.name || p.name,
     email: account.email,
