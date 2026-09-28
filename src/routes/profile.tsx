@@ -557,6 +557,9 @@ function ProfilePage() {
           </div>
         </BottomSheet>
         <Snackbar message={snack.message} />
+        {/* Room for the sticky "continue" bar above the dock. Without it the last rows
+            can never scroll clear of the button that floats over them. */}
+        <div aria-hidden className="h-24" />
       </div>
     </IkanShell>
   );

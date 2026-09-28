@@ -64,14 +64,14 @@ export function IkanShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-canvas text-foreground">
-      <main className="mx-auto min-h-dvh w-full max-w-app bg-background pb-[calc(7rem+env(safe-area-inset-bottom))] lg:shadow-app">
+      <main className="mx-auto min-h-dvh w-full max-w-app bg-background pb-[calc(7.5rem+env(safe-area-inset-bottom))] lg:shadow-app">
         {children}
       </main>
       {moreOpen ? <MoreSheet onClose={() => setMoreOpen(false)} /> : null}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center print:hidden">
         <nav
           aria-label="Main navigation"
-          className="pointer-events-auto mb-[max(12px,env(safe-area-inset-bottom))] w-full max-w-app px-3"
+          className="pointer-events-auto mb-[max(12px,calc(env(safe-area-inset-bottom)+6px))] w-full max-w-app px-3"
         >
           <div className="grid grid-cols-5 rounded-[24px] border border-border/80 bg-background/92 p-2 shadow-dock backdrop-blur-xl">
             {navItems.map((item, index) => {

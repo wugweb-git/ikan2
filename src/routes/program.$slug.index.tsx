@@ -544,6 +544,9 @@ function ProgrammeAboutSections({ about }: { about: ProgrammeAbout }) {
         className="mx-0"
         text="A self-help program, not medical treatment, a diagnosis or an emergency service. If things feel severe or don’t ease, speak with a professional."
       />
+      {/* Room for the sticky "continue" bar above the dock. Without it the last rows can never
+          scroll clear of the button that floats over them. */}
+      <div aria-hidden className="h-24" />
     </div>
   );
 }

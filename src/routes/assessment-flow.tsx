@@ -141,7 +141,7 @@ function AssessmentFlowPage() {
     <div className="min-h-dvh bg-canvas" style={accentStyle("mind")}>
       <div className="mx-auto flex min-h-dvh w-full max-w-app flex-col bg-background shadow-app">
         <header className="sticky top-0 z-30 bg-background">
-          <div className="flex h-16 items-center gap-1 px-1">
+          <div className="safe-top-sm flex min-h-16 items-center gap-1 px-1">
             <IconButton
               label="Close"
               onClick={() => (answeredCount > 0 ? setLeaving(true) : exit())}
