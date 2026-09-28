@@ -10,6 +10,17 @@ import { Splash } from "@/components/splash";
 
 const PUBLIC =
   /^\/(login|phone-login|signup|verify-email|forgot-password|reset-password|support|about|faq|contact|legal|delete-account)(\/|$)/;
+
+/* Pages that must be READABLE by someone - or something - that never signs in and may not run
+ * our JavaScript: a Play reviewer checking the account-deletion link, a crawler, a person who
+ * has already uninstalled. They render immediately, ahead of the launch animation.
+ *
+ * Google rejected the app twice over exactly this. /delete-account returned 200 with nothing in
+ * it but "Opening iKAN", because the intro splash was checked before the public-route branch,
+ * so the server rendered a spinner instead of the page. The link was correct; what it served
+ * was not. The auth screens are deliberately excluded - nobody needs to read /login without
+ * JavaScript, and the launch animation belongs there. */
+const MUST_RENDER_WITHOUT_AUTH = /^\/(support|about|faq|contact|legal|delete-account)(\/|$)/;
 const AUTH_ONLY = /^\/(login|phone-login|signup|verify-email|forgot-password)(\/|$)/;
 
 /* Only a brand-new account sees the welcome flow. An account created more than a day ago is a
@@ -116,6 +127,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   // dev only: /?splash to look at the launch screen
   if (import.meta.env.DEV && location.searchStr.includes("splash")) return <Splash />;
+  if (MUST_RENDER_WITHOUT_AUTH.test(path)) return <>{children}</>;
   if (intro) return <Splash />;
   if (isPublic) return <>{children}</>;
   if (status !== "signedIn") return <Splash />;
