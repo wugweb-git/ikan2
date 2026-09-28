@@ -15,7 +15,7 @@ export function PageSkeleton() {
     <div
       role="status"
       aria-label="Loading"
-      className="mx-auto min-h-dvh w-full max-w-app bg-background px-4 pt-[max(1rem,env(safe-area-inset-top))]"
+      className="mx-auto min-h-dvh w-full max-w-app bg-background px-4 pt-[max(1rem,var(--safe-top,env(safe-area-inset-top)))]"
     >
       <div className="flex h-12 items-center gap-3">
         <Skeleton className="h-10 w-10 rounded-full" />
@@ -143,7 +143,7 @@ export function OfflineBanner() {
   return (
     <div
       role="status"
-      className="fixed inset-x-0 top-0 z-[95] flex justify-center pt-[env(safe-area-inset-top)] print:hidden"
+      className="fixed inset-x-0 top-0 z-[95] flex justify-center pt-[var(--safe-top,env(safe-area-inset-top))] print:hidden"
     >
       <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-[13px] font-semibold text-background shadow-dock">
         <CloudOff className="h-4 w-4" /> Offline. Changes save on this phone.

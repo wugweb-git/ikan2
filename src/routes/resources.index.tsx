@@ -71,7 +71,7 @@ function ResourcesPage() {
   return (
     <IkanShell>
       <div style={accentStyle("calm")}>
-        <header className="px-4 pb-1 pt-8">
+        <header className="safe-top px-4 pb-1">
           <h1 className="font-display text-[32px] font-semibold leading-10">Resources</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">
             Articles and guides to support your mental health journey

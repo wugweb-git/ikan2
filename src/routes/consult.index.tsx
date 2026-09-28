@@ -100,7 +100,7 @@ function ConsultPage() {
   return (
     <IkanShell>
       <div style={accentStyle("night")}>
-        <header className="px-4 pb-1 pt-8">
+        <header className="safe-top px-4 pb-1">
           <h1 className="font-display text-[32px] font-semibold leading-10">
             Find your consultant
           </h1>

@@ -64,14 +64,14 @@ export function IkanShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-canvas text-foreground">
-      <main className="mx-auto min-h-dvh w-full max-w-app bg-background pb-[calc(7rem+env(safe-area-inset-bottom))] lg:shadow-app">
+      <main className="mx-auto min-h-dvh w-full max-w-app bg-background pb-[calc(7.5rem+env(safe-area-inset-bottom))] lg:shadow-app">
         {children}
       </main>
       {moreOpen ? <MoreSheet onClose={() => setMoreOpen(false)} /> : null}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center print:hidden">
         <nav
           aria-label="Main navigation"
-          className="pointer-events-auto mb-[max(12px,env(safe-area-inset-bottom))] w-full max-w-app px-3"
+          className="pointer-events-auto mb-[max(12px,calc(env(safe-area-inset-bottom)+6px))] w-full max-w-app px-3"
         >
           <div className="grid grid-cols-5 rounded-[24px] border border-border/80 bg-background/92 p-2 shadow-dock backdrop-blur-xl">
             {navItems.map((item, index) => {
@@ -262,11 +262,15 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
     },
   ];
 
-  const legal: { slug: LegalSlug; label: string }[] = [
-    { slug: "terms", label: "Terms" },
-    { slug: "privacy-policy", label: "Privacy" },
-    { slug: "cancellation-policy", label: "Cancellation" },
-    { slug: "return-policy", label: "Refunds" },
+  /* The legal pages. These used to be four underlined words wrapped along the bottom of the
+   * sheet, which read as small print rather than as pages - and they are the only copy of
+   * these links now that Settings no longer duplicates them. A section like every other
+   * section, with what each page is for. */
+  const legal: { slug: LegalSlug; label: string; sub: string }[] = [
+    { slug: "privacy-policy", label: "Privacy policy", sub: "What we collect and why" },
+    { slug: "terms", label: "Terms of use", sub: "The agreement you are on" },
+    { slug: "cancellation-policy", label: "Cancellation", sub: "Ending a subscription" },
+    { slug: "return-policy", label: "Refunds", sub: "When money comes back" },
   ];
 
   const name = hydrated ? profile.name || displayName(user) : "";
@@ -344,18 +348,31 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
           </section>
         ))}
 
-        <nav aria-label="Legal" className="mt-5 flex flex-wrap gap-x-4 gap-y-2 px-5 text-[13px]">
-          {legal.map((l) => (
-            <Link
-              key={l.slug}
-              to="/legal/$slug"
-              params={{ slug: l.slug }}
-              className="text-muted-foreground underline-offset-4 hover:underline"
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
+        <section className="mt-5" aria-label="Legal">
+          <h2 className="px-5 text-[13px] font-semibold text-muted-foreground">Legal</h2>
+          <ul className="mx-3 mt-1.5 overflow-hidden rounded-[20px] bg-secondary">
+            {legal.map((l) => (
+              <li key={l.slug} className="border-b border-background last:border-0">
+                <Link
+                  to="/legal/$slug"
+                  params={{ slug: l.slug }}
+                  className="flex min-h-14 items-center gap-3 px-3 py-2 transition-colors hover:bg-background/60"
+                >
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-background">
+                    <FileText className="h-[18px] w-[18px]" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[15px] font-medium">{l.label}</span>
+                    <span className="block truncate text-[12px] text-muted-foreground">
+                      {l.sub}
+                    </span>
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
 
         <div className="mt-5 flex items-center justify-between gap-3 px-5">
           <p className="min-w-0 truncate text-[12px] text-muted-foreground">

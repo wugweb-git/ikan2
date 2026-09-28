@@ -302,7 +302,7 @@ function SkyHeader({
 
   return (
     <header
-      className="relative overflow-hidden px-5 pb-14 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.5rem))] transition-colors duration-1000"
+      className="relative overflow-hidden px-5 pb-14 pt-[max(2.5rem,calc(var(--safe-top,env(safe-area-inset-top))+1.5rem))] transition-colors duration-1000"
       style={{
         background: `linear-gradient(160deg, ${s.from}, ${s.via} 50%, ${s.to})`,
         color: s.ink,

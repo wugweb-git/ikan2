@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Eye, EyeOff, Lock, ShieldCheck, Smartphone, Sparkles, UserRoundCheck } from "lucide-react";
 import { Illustration } from "@/components/art";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,17 @@ import { Splash } from "@/components/splash";
 
 const PUBLIC =
   /^\/(login|phone-login|signup|verify-email|forgot-password|reset-password|support|about|faq|contact|legal|delete-account)(\/|$)/;
+
+/* Pages that must be READABLE by someone - or something - that never signs in and may not run
+ * our JavaScript: a Play reviewer checking the account-deletion link, a crawler, a person who
+ * has already uninstalled. They render immediately, ahead of the launch animation.
+ *
+ * Google rejected the app twice over exactly this. /delete-account returned 200 with nothing in
+ * it but "Opening iKAN", because the intro splash was checked before the public-route branch,
+ * so the server rendered a spinner instead of the page. The link was correct; what it served
+ * was not. The auth screens are deliberately excluded - nobody needs to read /login without
+ * JavaScript, and the launch animation belongs there. */
+const MUST_RENDER_WITHOUT_AUTH = /^\/(support|about|faq|contact|legal|delete-account)(\/|$)/;
 const AUTH_ONLY = /^\/(login|phone-login|signup|verify-email|forgot-password)(\/|$)/;
 
 /* Only a brand-new account sees the welcome flow. An account created more than a day ago is a
@@ -68,22 +79,33 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const path = location.pathname;
   const isPublic = PUBLIC.test(path);
   const intro = useLaunchIntro();
+  /** Which account has been seeded on this mount; see the note in the effect below. */
+  const seeded = useRef<string | null>(null);
 
   useEffect(() => {
     if (status === "signedOut" && !isPublic) {
+      seeded.current = null;
       navigate({ to: "/login", search: { redirect: location.href }, replace: true });
     }
     if (status === "signedIn" && user) {
-      seedProfile({
-        name: displayName(user),
-        email: user.email ?? "",
-        phone: (user.user_metadata?.["phone"] as string | undefined) ?? "",
-        avatar:
-          (user.user_metadata?.["avatar_url"] as string | undefined) ||
-          (user.user_metadata?.["picture"] as string | undefined) ||
-          (user.identities?.find((i) => i.provider === "google")?.identity_data?.["picture"] as
-            string | undefined),
-      });
+      /* Once per account, not once per navigation. This effect depends on `path`, so it runs on
+       * every route change - and seedProfile is not free: with no avatar saved it writes on
+       * each call, which marks the profile changed and queues a push every time the person
+       * opens a different screen. Nothing about the session changes between routes, so there
+       * is nothing to re-read. */
+      if (seeded.current !== user.id) {
+        seeded.current = user.id;
+        seedProfile({
+          name: displayName(user),
+          email: user.email ?? "",
+          phone: (user.user_metadata?.["phone"] as string | undefined) ?? "",
+          avatar:
+            (user.user_metadata?.["avatar_url"] as string | undefined) ||
+            (user.user_metadata?.["picture"] as string | undefined) ||
+            (user.identities?.find((i) => i.provider === "google")?.identity_data?.["picture"] as
+              string | undefined),
+        });
+      }
       const needsWelcome = !onboardingDone() && isNewAccount(user);
       if (!needsWelcome) markOnboardingDone();
       if (AUTH_ONLY.test(path)) {
@@ -105,6 +127,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   // dev only: /?splash to look at the launch screen
   if (import.meta.env.DEV && location.searchStr.includes("splash")) return <Splash />;
+  if (MUST_RENDER_WITHOUT_AUTH.test(path)) return <>{children}</>;
   if (intro) return <Splash />;
   if (isPublic) return <>{children}</>;
   if (status !== "signedIn") return <Splash />;
@@ -132,7 +155,7 @@ export function AuthLayout({
           <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-background to-transparent" />
           <Link
             to="/login"
-            className="absolute left-5 top-[max(1rem,env(safe-area-inset-top))] flex items-center gap-2 rounded-full bg-background/85 py-1 pl-1 pr-3 backdrop-blur"
+            className="absolute left-5 top-[max(1rem,var(--safe-top,env(safe-area-inset-top)))] flex items-center gap-2 rounded-full bg-background/85 py-1 pl-1 pr-3 backdrop-blur"
           >
             <img src="/favicon.svg" alt="" className="h-7 w-7 rounded-[9px]" />
             <span className="font-display text-[17px] font-semibold">iKAN</span>

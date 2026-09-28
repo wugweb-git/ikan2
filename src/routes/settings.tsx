@@ -15,10 +15,10 @@ import {
   Download,
   Accessibility,
   LifeBuoy,
-  Lock,
   Share2,
   Sparkles,
   Trash2,
+  UserRoundX,
   TrendingUp,
   Watch,
   Footprints,
@@ -27,6 +27,7 @@ import {
   HeartPulse,
   Unlink,
   MapPin,
+  Link2 as LinkIcon,
   Smartphone,
   type LucideIcon,
 } from "lucide-react";
@@ -42,7 +43,6 @@ import {
   useNotificationAccess,
   weatherWord,
   clearLocation,
-  notificationsOff,
   setNotificationsOff,
 } from "@/lib/device";
 import { IkanShell } from "@/components/ikan-shell";
@@ -59,21 +59,17 @@ import {
 } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { useAuth } from "@/lib/auth";
-import { mirrorRemove } from "@/lib/durable";
+import { supabase, useAuth, type Provider } from "@/lib/auth";
+import { clearAllMirrored } from "@/lib/durable";
+import { deleteAccount } from "@/lib/delete-account";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { recentAverage, useHealthConnect } from "@/lib/health-connect";
 import { disablePush, enablePush, pushSupported, sendTestPush } from "@/lib/push";
+import { enableNativePush, nativePushSupported } from "@/lib/native-push";
 import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
 import type { LegalSlug } from "@/lib/content";
 import { cn } from "@/lib/utils";
-import {
-  defaultSettings,
-  legalLinks,
-  storageKeys,
-  useSettings,
-  type Settings,
-} from "@/lib/profile";
+import { defaultSettings, storageKeys, useSettings, type Settings } from "@/lib/profile";
 
 type Search = { health?: "connected" | "cancelled" | "error" };
 
@@ -94,13 +90,29 @@ function SettingsPage() {
   const settings = hydrated ? stored : defaultSettings;
   const snack = useSnack();
   const [clearing, setClearing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const notifications = useNotificationAccess();
+  const device = useDevice();
 
-  // keep this device's push subscription and reminder time in step with the settings
+  /* Keep this device's push subscription and reminder time in step with the settings.
+   *
+   * device.notificationsOff has to be a dependency, not just a value read inside: it was
+   * guarded on but not depended on, so switching notifications back on changed the flag
+   * without re-running this - and the re-registration never happened until the component
+   * remounted. The switch now registers directly as well, but an effect that silently
+   * ignores the state it reads is a trap for the next person. */
   useEffect(() => {
-    if (!hydrated || notifications !== "granted" || !pushSupported() || notificationsOff()) return;
+    if (!hydrated || notifications !== "granted" || !pushSupported() || device.notificationsOff)
+      return;
     void enablePush({ moodReminder: stored.moodReminders, time: stored.moodReminderTime });
-  }, [hydrated, notifications, stored.moodReminders, stored.moodReminderTime]);
+  }, [
+    hydrated,
+    notifications,
+    device.notificationsOff,
+    stored.moodReminders,
+    stored.moodReminderTime,
+  ]);
 
   const toggle = (key: keyof Settings, label: string, sub: string, icon: LucideIcon) => (
     <Row icon={icon} label={label} sub={sub}>
@@ -250,14 +262,23 @@ function SettingsPage() {
           )}
         </Group>
 
+        {/* One place for everything iKAN talks to. Google and LinkedIn are both a way in and a
+            source of data - Google fills a profile from People API - so splitting them across
+            two groups asked people to know which hat a provider was wearing. Health Connect
+            sits here too, and Strava and the rest join it as rows.
+
+            Email and password is deliberately not here: it is not something you connect to,
+            it is the account itself, and it lives under Account with the rest of the
+            credentials. */}
         <Group
-          title="Health data"
-          note="iKAN reads sleep, steps, heart rate and exercise from Health Connect, only after you allow it, to show them beside your iKAN Score and programs. Shown only to you, never sold or shared."
+          title="Connected apps"
+          note="Accounts and apps linked to iKAN. Each is optional and can be disconnected at any time — your journal, results and progress stay on the account either way."
         >
+          <ConnectedAccounts onMessage={snack.show} />
           <HealthConnectRows onMessage={snack.show} />
         </Group>
 
-        <Group title="Privacy">
+        <Group title="Privacy and data">
           {toggle(
             "shareWithConsultant",
             "Share results with my consultant",
@@ -273,9 +294,20 @@ function SettingsPage() {
           <ActionRow
             icon={Trash2}
             label="Clear all data"
-            sub="Remove results, check-ins, progress and bookings from this device"
+            sub="Remove results, check-ins, progress and bookings — the account stays"
             danger
             onClick={() => setClearing(true)}
+          />
+          {/* Asked for here rather than by sending people to another page: a link is not a
+              confirmation. Google also requires an app that creates accounts to offer deletion
+              of the ACCOUNT from inside the app - /delete-account existed and worked, but
+              nothing linked to it, so there was no way to find it. */}
+          <ActionRow
+            icon={UserRoundX}
+            label="Delete my account"
+            sub="Removes the account and everything saved with it, permanently"
+            danger
+            onClick={() => setDeleting(true)}
           />
         </Group>
 
@@ -303,39 +335,43 @@ function SettingsPage() {
           />
         </Group>
 
-        <Group title="Legal">
-          {legalLinks.map((l) => {
-            const inner = (
-              <>
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
-                  <Lock className="h-5 w-5" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[16px]">{l.label}</span>
-                  <span className="block text-[13px] text-muted-foreground">{l.description}</span>
-                </span>
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
-              </>
-            );
-            const cls = cn("flex min-h-16 items-center gap-4 px-4 py-3", stateLayer);
-            return l.id === "about" || l.id === "faq" ? (
-              <Link key={l.id} to={l.id === "about" ? "/about" : "/faq"} className={cls}>
-                {inner}
-              </Link>
-            ) : (
-              <Link
-                key={l.id}
-                to="/legal/$slug"
-                params={{ slug: l.id as LegalSlug }}
-                className={cls}
-              >
-                {inner}
-              </Link>
-            );
-          })}
-        </Group>
-
         <p className="mt-6 text-center text-[12px] text-muted-foreground">iKAN preview</p>
+
+        {/* On success the account no longer exists, so there is nowhere to go back to - the
+            person lands on the sign-in screen, which is the only honest destination. */}
+        <BottomSheet
+          open={deleting}
+          onClose={() => (deleteBusy ? undefined : setDeleting(false))}
+          title="Delete your account?"
+        >
+          <p className="text-[15px] leading-6 text-muted-foreground">
+            This removes your account and everything saved with it — your journal, assessment
+            results, programme progress, profile and settings. It cannot be undone, and nothing can
+            be recovered afterwards.
+          </p>
+          <div className="mt-6 flex flex-col gap-2">
+            <Button
+              className="bg-[#B3261E] text-white"
+              disabled={deleteBusy}
+              onClick={async () => {
+                setDeleteBusy(true);
+                try {
+                  await deleteAccount();
+                  window.location.assign("/login");
+                } catch (e) {
+                  setDeleteBusy(false);
+                  setDeleting(false);
+                  snack.show((e as Error).message);
+                }
+              }}
+            >
+              {deleteBusy ? "Deleting…" : "Delete my account permanently"}
+            </Button>
+            <Button variant="text" disabled={deleteBusy} onClick={() => setDeleting(false)}>
+              Keep my account
+            </Button>
+          </div>
+        </BottomSheet>
 
         <BottomSheet open={clearing} onClose={() => setClearing(false)} title="Clear all data?">
           <p className="text-[15px] leading-6 text-muted-foreground">
@@ -354,10 +390,14 @@ function SettingsPage() {
                   } catch {
                     /* ignore */
                   }
-                  // The Android app keeps a native copy of every key; without this it is
-                  // restored on the next launch (see durable.ts).
-                  mirrorRemove(k);
                 }
+                /* Awaited, and before the reload. The Android app keeps a native copy of every
+                 * key (durable.ts); mirrorRemove is fire-and-forget, so calling it per key and
+                 * then navigating immediately meant the page went away before the dynamic
+                 * import even resolved. The deletes never ran, restoreEvicted put everything
+                 * back on the next launch, and cloud-sync then re-uploaded it - so "Clear
+                 * everything" undid itself and said nothing. */
+                await clearAllMirrored();
                 window.location.assign("/");
               }}
             >
@@ -521,6 +561,8 @@ function ActivityRow({ onMessage }: { onMessage: (m: string) => void }) {
 function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
   const hydrated = useHydrated();
   const notifications = useNotificationAccess();
+  // Needed when the switch goes back on, to re-register at the person's chosen reminder time.
+  const { settings: stored } = useSettings();
   const device = useDevice();
   const [locationAccess, setLocationAccess] = useLocationAccess();
   const [busy, setBusy] = useState(false);
@@ -558,6 +600,14 @@ function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
                   : "Notifications are blocked for iKAN in your phone’s settings",
               );
             setNotificationsOff(false);
+            /* Turning the switch off unsubscribed this device and deleted its row, so turning
+             * it back on has to register again. The effect above would do it, but it guards on
+             * notificationsOff() without that value being one of its dependencies - so it does
+             * not re-run here, and reminders stayed silently dead until the app was reopened.
+             * Registering directly is what the person just asked for; do it here. */
+            const prefs = { moodReminder: stored.moodReminders, time: stored.moodReminderTime };
+            if (pushSupported()) await enablePush(prefs).catch(() => {});
+            if (nativePushSupported()) await enableNativePush(prefs).catch(() => {});
             onMessage("Notifications on");
           }}
         />
@@ -777,5 +827,102 @@ function SyncRow() {
         </button>
       ) : null}
     </div>
+  );
+}
+
+/* External accounts: Google and LinkedIn.
+
+ * Each is two things at once - a way into iKAN, and a source of data (Google fills a profile
+ * from People API) - which is why they sit with Health Connect under one heading rather than
+ * being split across "sign-in" and "apps". Nobody should have to know which hat a provider is
+ * wearing to find it.
+ *
+ * Email and password is not here. It is not something you connect to; it is the account, and
+ * it belongs under Account with the other credentials.
+ *
+ * On identities generally:
+ *
+ * Every row can be disconnected and reconnected freely. Disconnecting removes the sign-in
+ * method, not the person's data - the profile, journal and results live in ikan2_user_state
+ * against the account, and reconnecting the same provider picks them straight back up.
+ *
+ * One limit is not ours: Supabase refuses to remove the last remaining identity, because the
+ * account would have no way to authenticate afterwards. Rather than grey the button out and
+ * decide on the person's behalf, the action runs and the server's own answer is shown. If that
+ * rule changes, this needs no edit.
+ *
+ * Manual linking must be enabled on the Supabase project for Connect to work; if it is not,
+ * the server says so and that message is passed through unaltered.
+ *
+ * Adding a provider is one entry in PROVIDERS - Strava and the rest slot in here. */
+function ConnectedAccounts({ onMessage }: { onMessage: (m: string) => void }) {
+  const { user } = useAuth();
+  const [busy, setBusy] = useState<string | null>(null);
+  const hydrated = useHydrated();
+
+  const identities = user?.identities ?? [];
+  const has = (p: string) => identities.some((i) => i.provider === p);
+  const sole = identities.length <= 1;
+
+  const providers: { id: Provider; label: string; sub: string }[] = [
+    { id: "google", label: "Google", sub: "Sign in with your Google account" },
+    { id: "linkedin_oidc", label: "LinkedIn", sub: "Sign in with your LinkedIn account" },
+  ];
+
+  const link = async (p: Provider) => {
+    setBusy(p);
+    try {
+      const { error } = await supabase().auth.linkIdentity({
+        provider: p,
+        options: { redirectTo: `${window.location.origin}/settings` },
+      });
+      if (error) throw error;
+      // On success the browser leaves for the provider; nothing after this runs.
+    } catch (e) {
+      onMessage((e as Error).message || "Could not connect that account.");
+      setBusy(null);
+    }
+  };
+
+  const unlink = async (p: Provider) => {
+    const identity = identities.find((i) => i.provider === p);
+    if (!identity) return;
+    setBusy(p);
+    try {
+      const { error } = await supabase().auth.unlinkIdentity(identity);
+      if (error) throw error;
+      onMessage(`${p === "google" ? "Google" : "LinkedIn"} disconnected`);
+    } catch (e) {
+      onMessage((e as Error).message || "Could not disconnect that account.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  if (!hydrated) return null;
+
+  return (
+    <>
+      {providers.map((p) => {
+        const connected = has(p.id);
+        return (
+          <Row key={p.id} icon={LinkIcon} label={p.label} sub={connected ? "Connected" : p.sub}>
+            <Button
+              variant={connected ? "text" : "tonal"}
+              disabled={busy === p.id}
+              onClick={() => (connected ? unlink(p.id) : link(p.id))}
+            >
+              {busy === p.id ? "…" : connected ? "Disconnect" : "Connect"}
+            </Button>
+          </Row>
+        );
+      })}
+      {sole ? (
+        <p className="px-4 pb-3 text-[13px] leading-5 text-muted-foreground">
+          Connecting one of these is also a second way to sign in, which is worth having if you ever
+          lose access to the first.
+        </p>
+      ) : null}
+    </>
   );
 }

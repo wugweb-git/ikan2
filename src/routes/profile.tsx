@@ -225,7 +225,7 @@ function ProfilePage() {
             aria-label="Settings"
             className={cn(
               stateLayer,
-              "absolute right-3 top-3 grid h-12 w-12 place-items-center rounded-full bg-background/80 backdrop-blur",
+              "safe-pin absolute right-3 grid h-12 w-12 place-items-center rounded-full bg-background/80 backdrop-blur",
             )}
           >
             <Settings className="h-6 w-6" />
@@ -345,13 +345,20 @@ function ProfilePage() {
                 setGoogleBusy(true);
                 try {
                   const g = await fillFromGoogle(profile.email || undefined);
+                  /* Fill, not overwrite. Only fields that are empty right now are touched, and
+                   * only when Google actually has a value - so pressing this can never replace
+                   * something you typed, and can never blank a field. birthday, gender, city
+                   * and zip used to overwrite whatever was in the form while phone and avatar
+                   * did not, which was an inconsistency rather than a decision. */
+                  const fill = <K extends keyof typeof draft>(k: K, v: string | undefined) =>
+                    v && !draft[k] ? { [k]: v } : {};
                   const next = {
-                    ...(g.birthday ? { birthday: g.birthday } : {}),
-                    ...(g.gender ? { gender: g.gender } : {}),
-                    ...(g.city ? { city: g.city } : {}),
-                    ...(g.zip ? { zip: g.zip } : {}),
-                    ...(g.phone && !draft.phone ? { phone: g.phone } : {}),
-                    ...(g.avatar && !draft.avatar ? { avatar: g.avatar } : {}),
+                    ...fill("birthday", g.birthday),
+                    ...fill("gender", g.gender),
+                    ...fill("city", g.city),
+                    ...fill("zip", g.zip),
+                    ...fill("phone", g.phone),
+                    ...fill("avatar", g.avatar),
                   };
                   setDraft((d) => ({ ...d, ...next }));
                   snack.show(
@@ -550,6 +557,9 @@ function ProfilePage() {
           </div>
         </BottomSheet>
         <Snackbar message={snack.message} />
+        {/* Room for the sticky "continue" bar above the dock. Without it the last rows
+            can never scroll clear of the button that floats over them. */}
+        <div aria-hidden className="h-24" />
       </div>
     </IkanShell>
   );

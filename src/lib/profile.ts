@@ -160,23 +160,36 @@ export function seedProfile(account: {
   avatar?: string | undefined;
 }) {
   const current = profileStore.read();
-  if (current.email) {
-    // a photo from the sign-in provider replaces none, or an old iKan link that expires after a week
-    if (account.avatar && (!current.avatar || expiringPhoto(current.avatar)))
-      profileStore.update((p) => ({ ...p, avatar: account.avatar! }));
-    return;
-  }
-  profileStore.update((p) => ({
-    ...p,
-    name: account.name || p.name,
-    email: account.email,
-    phone: p.phone || account.phone || "",
-    avatar: p.avatar || account.avatar || "",
-    memberSince:
-      p.memberSince === defaultProfile.memberSince
-        ? new Date().toISOString().slice(0, 10)
-        : p.memberSince,
-  }));
+
+  /* Fill only what is missing, and write only if something actually is.
+   *
+   * Every value here is inferred from the session rather than typed by anyone, so it must
+   * never replace a saved one - and an unnecessary write is not free: it marks the profile
+   * changed and queues a push. A complete profile produces no write at all. */
+  const patch: Partial<Profile> = {};
+  const want = (k: keyof Profile, v: string | undefined) => {
+    if (v && !current[k]) patch[k] = v;
+  };
+
+  want("name", account.name);
+  want("email", account.email);
+  want("phone", account.phone);
+  want("avatar", account.avatar);
+
+  // Old iKan photos were signed links that stop working after a week; replace those even
+  // though the field is not empty.
+  if (account.avatar && current.avatar && expiringPhoto(current.avatar))
+    patch.avatar = account.avatar;
+
+  if (current.memberSince === defaultProfile.memberSince)
+    patch.memberSince = new Date().toISOString().slice(0, 10);
+
+  if (!Object.keys(patch).length) return;
+
+  // updateDerived, not update: see the note on it in local-store.ts. A normal write would mark
+  // this an unpushed local edit, and a pull arriving afterwards would keep these few fields
+  // and discard the fuller profile held in the account.
+  profileStore.updateDerived((p) => ({ ...p, ...patch }));
 }
 
 const onboardingStore = createLocalStore<{ done: boolean; reason: string }>("ikan.onboarding.v1", {

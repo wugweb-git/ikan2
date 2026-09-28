@@ -91,7 +91,9 @@ export function TopAppBar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-16 items-center gap-1 bg-background px-1 print:hidden",
+        // min-h, not h: the bar carries safe-top-sm, and a fixed height with border-box would
+        // spend that padding squashing its own contents instead of clearing the notch.
+        "safe-top-sm sticky top-0 z-30 flex min-h-16 items-center gap-1 bg-background px-1 print:hidden",
         className,
       )}
     >

@@ -17,8 +17,8 @@ export const Route = createFileRoute("/program/")({
 function ProgramsPage() {
   return (
     <IkanShell>
-      <header className="relative px-4 pb-1 pt-8">
-        <div className="absolute right-2 top-6 flex">
+      <header className="safe-top relative px-4 pb-1">
+        <div className="safe-pin absolute right-2 flex">
           <Link
             to="/history/program"
             aria-label="Equip history"

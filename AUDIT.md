@@ -1,7 +1,13 @@
 # iKAN — full audit
 
-28 September 2026, against `dev` (commit `cf1cf43` plus two uncommitted changes) and the live
-Supabase project `jpfvoevxegnknxoqmwye`.
+28 September 2026, against the live Supabase project `jpfvoevxegnknxoqmwye` and the code.
+
+**Caveat on the code findings.** The audit was run against `cf1cf43`, which turned out to be
+**20 commits behind `origin/main`** — the local checkout had never been fetched. That work has
+since been merged in, and the findings below were re-checked against it, but anything touching
+`auth-ui.tsx`, `settings.tsx`, `profile.tsx`, `delete-account.tsx`, `local-store.ts` or
+`supabase/config.toml` deserves a second look before it is acted on. Database, auth and storage
+findings are unaffected — they were measured live.
 
 Scope: product code, data architecture, database, auth, storage, privacy, build. **Excludes**
 `android/`, version codes and the Play release, which belong to the release window.

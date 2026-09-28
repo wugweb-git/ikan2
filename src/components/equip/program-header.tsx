@@ -36,7 +36,7 @@ export function ProgramHeader({
   action?: ReactNode;
 }) {
   return (
-    <header className="flex items-center justify-between gap-3 px-5 pb-2 pt-5">
+    <header className="safe-top flex items-center justify-between gap-3 px-5 pb-2">
       {back}
       {title ? (
         <p className="min-w-0 truncate font-display text-[15px] font-semibold">{title}</p>

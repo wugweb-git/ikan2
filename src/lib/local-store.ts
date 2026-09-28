@@ -24,7 +24,7 @@ export function createLocalStore<T extends object>(key: string, empty: T) {
     return state;
   };
 
-  const write = (next: T) => {
+  const write = (next: T, report = true) => {
     cache = next;
     cacheScope = getScope();
     try {
@@ -35,7 +35,7 @@ export function createLocalStore<T extends object>(key: string, empty: T) {
     } catch {
       /* storage unavailable — keep in memory for this session */
     }
-    reportWrite(scopedKey(key));
+    if (report) reportWrite(scopedKey(key));
     listeners.forEach((l) => l());
   };
 
@@ -62,6 +62,16 @@ export function createLocalStore<T extends object>(key: string, empty: T) {
   return {
     read,
     update: (fn: (s: T) => T) => write(fn(read())),
+    /**
+     * Write without marking the key as a local edit.
+     *
+     * For values the app derives rather than the person entering them - the profile seeded
+     * from the signed-in account, say. A normal write tells cloud-sync this device has an
+     * unpushed change, which makes the next pull keep the local copy and overwrite the
+     * account's. That is right for something typed and wrong for something inferred: it let a
+     * three-field seed erase a full profile. See seedProfile in profile.ts.
+     */
+    updateDerived: (fn: (s: T) => T) => write(fn(read()), false),
     use: () => useSyncExternalStore(subscribe, read, () => empty),
   };
 }

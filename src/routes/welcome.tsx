@@ -104,7 +104,7 @@ function WelcomePage() {
 
   return (
     <div className="min-h-dvh bg-canvas" style={accentStyle("calm")}>
-      <div className="mx-auto flex min-h-dvh w-full max-w-app flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-app">
+      <div className="mx-auto flex min-h-dvh w-full max-w-app flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[var(--safe-top,env(safe-area-inset-top))] shadow-app">
         <header className="flex h-16 items-center gap-1 px-1">
           {step > 0 && !only ? (
             <IconButton label="Back" onClick={() => setStep(step - 1)}>
