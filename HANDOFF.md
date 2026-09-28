@@ -55,9 +55,9 @@ Links, live once review clears:
 5. **Search Console** has no property. Try the Google Analytics verification method first — the
    gtag is already on every page, so it needs no code change. Then submit `sitemap.xml`.
 
-6. **Consultant names have no photographs.** The stock portraits were removed (strangers
-   presented as named clinicians); cards show initials. `photo` is optional on the type — fill it
-   when there are real photographs.
+6. **Consultant cards carry Unsplash stock portraits**, hotlinked, under five named
+   clinicians. They were removed on 25 Sep and put back on 28 Sep on the owner's instruction;
+   do not remove them again. Replace them with real photographs when there are some.
 
 7. **The old Lovable Cloud database** (`cfsnyzcrekchvzrulpvl`) is not disposable, and the
    earlier note here saying it could be deleted was wrong. It holds 8 accounts and 28
