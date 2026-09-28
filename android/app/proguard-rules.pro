@@ -12,6 +12,12 @@
 -keepattributes SourceFile, LineNumberTable
 -renamesourcefileattribute SourceFile
 
+# Flatten the package hierarchy of everything R8 is free to rename. Play lists this as
+# "Repackage Classes". Classes matched by a -keep rule below are exempt - R8 never moves or
+# renames a kept class - so the plugin classes Capacitor resolves by name from
+# capacitor.plugins.json are untouched by this.
+-repackageclasses ''
+
 # ---- Capacitor core -------------------------------------------------------
 -keep class com.getcapacitor.** { *; }
 -keep interface com.getcapacitor.** { *; }
@@ -41,8 +47,11 @@
 -keep class androidx.health.connect.client.permission.** { *; }
 
 # ---- Firebase / FCM -------------------------------------------------------
--keep class com.google.firebase.** { *; }
--keep class com.google.android.gms.** { *; }
+# These were blanket -keep ... { *; } rules, which pinned every member of both libraries and held
+# Play's optimization score at 0%. Both libraries ship their own consumer ProGuard rules inside
+# their aars, so the blanket keeps were redundant; what is NOT covered by those is a messaging
+# service resolved from the manifest, so that stays explicit.
+-keep class * extends com.google.firebase.messaging.FirebaseMessagingService { *; }
 
 # ---- Kotlin ---------------------------------------------------------------
 -keep class kotlin.Metadata { *; }
