@@ -18,6 +18,7 @@ import {
   Share2,
   Sparkles,
   Trash2,
+  UserRoundX,
   TrendingUp,
   Watch,
   Footprints,
@@ -274,7 +275,7 @@ function SettingsPage() {
           <HealthConnectRows onMessage={snack.show} />
         </Group>
 
-        <Group title="Privacy">
+        <Group title="Privacy and data">
           {toggle(
             "shareWithConsultant",
             "Share results with my consultant",
@@ -290,10 +291,28 @@ function SettingsPage() {
           <ActionRow
             icon={Trash2}
             label="Clear all data"
-            sub="Remove results, check-ins, progress and bookings from this device"
+            sub="Remove results, check-ins, progress and bookings — the account stays"
             danger
             onClick={() => setClearing(true)}
           />
+          {/* Google requires an app that creates accounts to offer deletion of the ACCOUNT from
+              inside the app, not only from a web page. The page existed and was reachable by
+              url; nothing in the app linked to it, so there was no way to find it. */}
+          <Link
+            to="/delete-account"
+            className={cn("flex min-h-16 items-center gap-4 px-4 py-3 text-[#B3261E]", stateLayer)}
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#F9DEDC]">
+              <UserRoundX className="h-5 w-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[16px]">Delete my account</span>
+              <span className="block text-[13px] leading-5 text-muted-foreground">
+                Removes the account and everything saved with it, permanently
+              </span>
+            </span>
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          </Link>
         </Group>
 
         <Group title="Accessibility">
