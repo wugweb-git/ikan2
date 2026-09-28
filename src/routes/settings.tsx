@@ -15,7 +15,6 @@ import {
   Download,
   Accessibility,
   LifeBuoy,
-  Lock,
   Share2,
   Sparkles,
   Trash2,
@@ -27,6 +26,8 @@ import {
   HeartPulse,
   Unlink,
   MapPin,
+  Link2 as LinkIcon,
+  Mail,
   Smartphone,
   type LucideIcon,
 } from "lucide-react";
@@ -58,7 +59,7 @@ import {
 } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { useAuth } from "@/lib/auth";
+import { supabase, useAuth, type Provider } from "@/lib/auth";
 import { clearAllMirrored } from "@/lib/durable";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { recentAverage, useHealthConnect } from "@/lib/health-connect";
@@ -69,7 +70,6 @@ import type { LegalSlug } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import {
   defaultSettings,
-  legalLinks,
   storageKeys,
   useSettings,
   type Settings,
@@ -293,6 +293,13 @@ function SettingsPage() {
           />
         </Group>
 
+        <Group
+          title="Connected accounts"
+          note="Sign-in methods on this account. Adding a second one means you can still get in if you lose access to the first."
+        >
+          <ConnectedAccounts onMessage={snack.show} />
+        </Group>
+
         <Group title="Accessibility">
           {toggle(
             "reduceMotion",
@@ -315,38 +322,6 @@ function SettingsPage() {
             sub="Talk to a therapist or counselor"
             to="/consult"
           />
-        </Group>
-
-        <Group title="Legal">
-          {legalLinks.map((l) => {
-            const inner = (
-              <>
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary">
-                  <Lock className="h-5 w-5" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[16px]">{l.label}</span>
-                  <span className="block text-[13px] text-muted-foreground">{l.description}</span>
-                </span>
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
-              </>
-            );
-            const cls = cn("flex min-h-16 items-center gap-4 px-4 py-3", stateLayer);
-            return l.id === "about" || l.id === "faq" ? (
-              <Link key={l.id} to={l.id === "about" ? "/about" : "/faq"} className={cls}>
-                {inner}
-              </Link>
-            ) : (
-              <Link
-                key={l.id}
-                to="/legal/$slug"
-                params={{ slug: l.id as LegalSlug }}
-                className={cls}
-              >
-                {inner}
-              </Link>
-            );
-          })}
         </Group>
 
         <p className="mt-6 text-center text-[12px] text-muted-foreground">iKAN preview</p>
@@ -805,5 +780,95 @@ function SyncRow() {
         </button>
       ) : null}
     </div>
+  );
+}
+
+/* Sign-in methods, and the ability to add or remove one.
+ *
+ * Supabase calls these identities. The rules that matter here: linking sends the person
+ * through the provider's consent screen and back, and unlinking is refused when only one
+ * identity remains - which is right, since removing it would lock them out of their own
+ * account. The UI says so rather than letting them find out from an error.
+ *
+ * Manual linking has to be enabled on the Supabase project. If it is not, linkIdentity fails
+ * with a clear message from the server, which is shown as-is. */
+function ConnectedAccounts({ onMessage }: { onMessage: (m: string) => void }) {
+  const { user } = useAuth();
+  const [busy, setBusy] = useState<string | null>(null);
+  const hydrated = useHydrated();
+
+  const identities = user?.identities ?? [];
+  const has = (p: string) => identities.some((i) => i.provider === p);
+  const sole = identities.length <= 1;
+
+  const providers: { id: Provider; label: string; sub: string }[] = [
+    { id: "google", label: "Google", sub: "Sign in with your Google account" },
+    { id: "linkedin_oidc", label: "LinkedIn", sub: "Sign in with your LinkedIn account" },
+  ];
+
+  const link = async (p: Provider) => {
+    setBusy(p);
+    try {
+      const { error } = await supabase().auth.linkIdentity({
+        provider: p,
+        options: { redirectTo: `${window.location.origin}/settings` },
+      });
+      if (error) throw error;
+      // On success the browser leaves for the provider; nothing after this runs.
+    } catch (e) {
+      onMessage((e as Error).message || "Could not connect that account.");
+      setBusy(null);
+    }
+  };
+
+  const unlink = async (p: Provider) => {
+    const identity = identities.find((i) => i.provider === p);
+    if (!identity) return;
+    setBusy(p);
+    try {
+      const { error } = await supabase().auth.unlinkIdentity(identity);
+      if (error) throw error;
+      onMessage(`${p === "google" ? "Google" : "LinkedIn"} disconnected`);
+    } catch (e) {
+      onMessage((e as Error).message || "Could not disconnect that account.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  if (!hydrated) return null;
+
+  return (
+    <>
+      {providers.map((p) => {
+        const connected = has(p.id);
+        return (
+          <Row key={p.id} icon={LinkIcon} label={p.label} sub={connected ? "Connected" : p.sub}>
+            <Button
+              variant={connected ? "text" : "tonal"}
+              disabled={busy === p.id || (connected && sole)}
+              onClick={() => (connected ? unlink(p.id) : link(p.id))}
+            >
+              {busy === p.id ? "…" : connected ? "Disconnect" : "Connect"}
+            </Button>
+          </Row>
+        );
+      })}
+      {identities.some((i) => i.provider === "email") ? (
+        <Row icon={Mail} label="Email and password" sub={user?.email ?? "Connected"}>
+          <span className="text-[13px] text-muted-foreground">Connected</span>
+        </Row>
+      ) : null}
+      {identities.some((i) => i.provider === "phone") ? (
+        <Row icon={Smartphone} label="Phone" sub={user?.phone ?? "Connected"}>
+          <span className="text-[13px] text-muted-foreground">Connected</span>
+        </Row>
+      ) : null}
+      {sole ? (
+        <p className="px-4 pb-3 text-[13px] leading-5 text-muted-foreground">
+          This is the only way you can sign in, so it cannot be disconnected. Add another first.
+        </p>
+      ) : null}
+    </>
   );
 }
