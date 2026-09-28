@@ -68,12 +68,7 @@ import { enableNativePush, nativePushSupported } from "@/lib/native-push";
 import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
 import type { LegalSlug } from "@/lib/content";
 import { cn } from "@/lib/utils";
-import {
-  defaultSettings,
-  storageKeys,
-  useSettings,
-  type Settings,
-} from "@/lib/profile";
+import { defaultSettings, storageKeys, useSettings, type Settings } from "@/lib/profile";
 
 type Search = { health?: "connected" | "cancelled" | "error" };
 
@@ -265,8 +260,19 @@ function SettingsPage() {
         </Group>
 
         <Group
-          title="Health data"
-          note="iKAN reads sleep, steps, heart rate and exercise from Health Connect, only after you allow it, to show them beside your iKAN Score and programs. Shown only to you, never sold or shared."
+          title="Sign-in methods"
+          note="How you get into this account. Connect or disconnect any of them — your journal, results and progress stay on the account either way."
+        >
+          <ConnectedAccounts onMessage={snack.show} />
+        </Group>
+
+        {/* Apps that supply data, as opposed to the sign-in methods above. Nothing here is
+            required, each connects and disconnects on its own, and disconnecting one stops new
+            data arriving without touching what is already saved. Strava and the like belong in
+            this group: add a row beside HealthConnectRows. */}
+        <Group
+          title="Connected apps"
+          note="Apps you have connected to iKAN. Each one is optional, and you can disconnect it at any time — what has already been saved stays."
         >
           <HealthConnectRows onMessage={snack.show} />
         </Group>
@@ -291,13 +297,6 @@ function SettingsPage() {
             danger
             onClick={() => setClearing(true)}
           />
-        </Group>
-
-        <Group
-          title="Connected accounts"
-          note="Sign-in methods on this account. Adding a second one means you can still get in if you lose access to the first."
-        >
-          <ConnectedAccounts onMessage={snack.show} />
         </Group>
 
         <Group title="Accessibility">
@@ -783,15 +782,21 @@ function SyncRow() {
   );
 }
 
-/* Sign-in methods, and the ability to add or remove one.
+/* Sign-in methods: the identities Supabase holds for this account.
  *
- * Supabase calls these identities. The rules that matter here: linking sends the person
- * through the provider's consent screen and back, and unlinking is refused when only one
- * identity remains - which is right, since removing it would lock them out of their own
- * account. The UI says so rather than letting them find out from an error.
+ * Every row can be disconnected and reconnected freely. Disconnecting removes the sign-in
+ * method, not the person's data - the profile, journal and results live in ikan2_user_state
+ * against the account, and reconnecting the same provider picks them straight back up.
  *
- * Manual linking has to be enabled on the Supabase project. If it is not, linkIdentity fails
- * with a clear message from the server, which is shown as-is. */
+ * One limit is not ours: Supabase refuses to remove the last remaining identity, because the
+ * account would have no way to authenticate afterwards. Rather than grey the button out and
+ * decide on the person's behalf, the action runs and the server's own answer is shown. If that
+ * rule changes, this needs no edit.
+ *
+ * Manual linking must be enabled on the Supabase project for Connect to work; if it is not,
+ * the server says so and that message is passed through unaltered.
+ *
+ * Adding a provider is one entry in PROVIDERS - Strava and the rest slot in here. */
 function ConnectedAccounts({ onMessage }: { onMessage: (m: string) => void }) {
   const { user } = useAuth();
   const [busy, setBusy] = useState<string | null>(null);
@@ -846,7 +851,7 @@ function ConnectedAccounts({ onMessage }: { onMessage: (m: string) => void }) {
           <Row key={p.id} icon={LinkIcon} label={p.label} sub={connected ? "Connected" : p.sub}>
             <Button
               variant={connected ? "text" : "tonal"}
-              disabled={busy === p.id || (connected && sole)}
+              disabled={busy === p.id}
               onClick={() => (connected ? unlink(p.id) : link(p.id))}
             >
               {busy === p.id ? "…" : connected ? "Disconnect" : "Connect"}
@@ -866,7 +871,8 @@ function ConnectedAccounts({ onMessage }: { onMessage: (m: string) => void }) {
       ) : null}
       {sole ? (
         <p className="px-4 pb-3 text-[13px] leading-5 text-muted-foreground">
-          This is the only way you can sign in, so it cannot be disconnected. Add another first.
+          This is currently the only way you can sign in. Disconnecting your data is not affected
+          either way — it stays on the account and comes back when you reconnect.
         </p>
       ) : null}
     </>
