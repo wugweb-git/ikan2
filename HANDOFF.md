@@ -31,11 +31,22 @@ Links, live once review clears:
 
 ## Open, in rough priority order
 
-1. **No database backup.** The Supabase org is on the **free plan: no automatic backups, no
-   point-in-time recovery.** 11 people's journals with no recovery path. Two scripts exist and
-   neither has run successfully yet: `scripts/backup-db.sh` (needs the database password and a
-   pooler host that answers) and `scripts/export-data.mjs` (needs only the service_role key, and
-   is the easier of the two). The real fix is the Pro plan.
+1. **Backups are ours to run.** The Supabase org is on the **free plan and stays there: no
+   automatic backups, no point-in-time recovery.** The plan is not the answer here; do not
+   propose it again.
+
+   `.github/workflows/backup.yml` takes a nightly `pg_dump`, checks it lists before shipping
+   it, encrypts it and keeps it 90 days as a private Actions artifact. It needs two repository
+   secrets before it does anything: `IKAN_DB_URL` (session mode, port 5432) and
+   `BACKUP_PASSPHRASE`. Lose the passphrase and you lose the backups, so keep it somewhere
+   that is itself backed up.
+
+   `scripts/backup-db.sh` is the same dump by hand, for before anything risky.
+   `scripts/export-data.mjs` needs only the service_role key.
+
+   Two traps with scheduled workflows: GitHub delays them under load, and disables them after
+   60 days of repository inactivity. A restore test has still never been done - an untested
+   backup is a hope, not a backup.
 
 2. **Push does not send.** The code is deployed and correct — `ikan2-push` routes on `kind` and
    speaks FCM v1 — but `FIREBASE_SERVICE_ACCOUNT` is not set in Supabase's edge function
