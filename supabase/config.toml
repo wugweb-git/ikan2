@@ -1,1 +1,14 @@
-project_id = "cfsnyzcrekchvzrulpvl"
+# The iKAN backend: the "Ikan - App" project. Every table, edge function and auth user this
+# app uses lives here.
+#
+# This previously read cfsnyzcrekchvzrulpvl, which is the dormant Lovable Cloud project that
+# nothing reads - written by Lovable's Supabase integration, not by anyone here. Any CLI
+# command run in this repo would have pointed at the wrong database, and `supabase config
+# push` would have pushed this file's contents into it.
+#
+# A warning about that command specifically: it pushes the WHOLE auth configuration, not the
+# keys present in this file. Anything absent here is set to the CLI's default on the remote
+# project - which on a live project means OAuth provider credentials, redirect urls and token
+# lifetimes. Do not run it against this project unless this file genuinely describes the whole
+# configuration you want.
+project_id = "jpfvoevxegnknxoqmwye"
