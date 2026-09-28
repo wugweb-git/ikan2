@@ -969,6 +969,9 @@ function TimeAnswer({
     // Offering a time the answer cannot have is worse than offering nothing: last night's
     // 8:25 am has no business being a one-tap answer for a morning they woke at 9.
     .filter((p) => !notBefore || !isBefore(p.value, notBefore));
+  // The heading describes what survived that filter, not what went into it: on a late
+  // morning every remembered time can be dropped, and the strip is then all suggestions.
+  const fromEarlierNights = picks.slice(0, 5).some((p) => recent.includes(p.value));
   return (
     <>
       <label className="block rounded-[24px] bg-[var(--accent-container)] px-5 py-4 text-[var(--on-accent-container)]">
@@ -984,7 +987,7 @@ function TimeAnswer({
       {picks.length ? (
         <>
           <p className="mt-4 text-[13px] text-muted-foreground">
-            {recent.length ? "From your earlier nights" : "Suggested"}
+            {fromEarlierNights ? "From your earlier nights" : "Suggested"}
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             {picks.slice(0, 5).map((p) => (
@@ -1029,27 +1032,41 @@ function suggestTimes(key: keyof DiaryEntry, e: DiaryEntry) {
     e.tried as string | undefined,
     (e.latency as number | undefined) ?? 0,
   );
+  /* Times earlier than the answer they follow are dropped before these are shown, and on a
+     late morning that can take out every remembered time from earlier nights. So each ladder
+     runs long enough to fill the strip on its own: what is offered stays useful instead of
+     thinning to one chip whenever the night ran unusually. */
+  const ladder = (base: string | undefined, steps: [number, string][]) =>
+    steps.flatMap(([add, what]) => from(base, add, what));
   switch (key) {
     case "bed":
-      return typical(["22:00", "22:30", "23:00", "23:30"]);
+      return typical(["22:00", "22:30", "23:00", "23:30", "00:00"]);
     case "tried":
-      return [
-        ...from(e.bed as string | undefined, 0, "when you got in bed"),
-        ...from(e.bed as string | undefined, 15, "15 min later"),
-        ...from(e.bed as string | undefined, 30, "30 min later"),
-      ];
+      return ladder(e.bed as string | undefined, [
+        [0, "when you got in bed"],
+        [15, "15 min later"],
+        [30, "30 min later"],
+        [45, "45 min later"],
+        [60, "1 hour later"],
+      ]);
     case "woke":
       return [
-        ...from(asleepBy, 7 * 60, "7 h after falling asleep"),
-        ...from(asleepBy, 8 * 60, "8 h after falling asleep"),
-        ...(asleepBy ? [] : typical(["06:00", "06:30", "07:00", "07:30"])),
+        ...ladder(asleepBy, [
+          [6 * 60, "6 h after falling asleep"],
+          [7 * 60, "7 h after falling asleep"],
+          [8 * 60, "8 h after falling asleep"],
+          [9 * 60, "9 h after falling asleep"],
+        ]),
+        ...(asleepBy ? [] : typical(["06:00", "06:30", "07:00", "07:30", "08:00"])),
       ];
     case "up":
-      return [
-        ...from(e.woke as string | undefined, 0, "when you woke"),
-        ...from(e.woke as string | undefined, 10, "10 min later"),
-        ...from(e.woke as string | undefined, 30, "30 min later"),
-      ];
+      return ladder(e.woke as string | undefined, [
+        [0, "when you woke"],
+        [10, "10 min later"],
+        [30, "30 min later"],
+        [60, "1 hour later"],
+        [90, "1.5 hours later"],
+      ]);
     default:
       return [];
   }
