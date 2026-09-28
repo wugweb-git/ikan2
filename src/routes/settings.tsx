@@ -61,6 +61,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { supabase, useAuth, type Provider } from "@/lib/auth";
 import { clearAllMirrored } from "@/lib/durable";
+import { deleteAccount } from "@/lib/delete-account";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { recentAverage, useHealthConnect } from "@/lib/health-connect";
 import { disablePush, enablePush, pushSupported, sendTestPush } from "@/lib/push";
@@ -89,6 +90,8 @@ function SettingsPage() {
   const settings = hydrated ? stored : defaultSettings;
   const snack = useSnack();
   const [clearing, setClearing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const notifications = useNotificationAccess();
   const device = useDevice();
 
@@ -295,24 +298,17 @@ function SettingsPage() {
             danger
             onClick={() => setClearing(true)}
           />
-          {/* Google requires an app that creates accounts to offer deletion of the ACCOUNT from
-              inside the app, not only from a web page. The page existed and was reachable by
-              url; nothing in the app linked to it, so there was no way to find it. */}
-          <Link
-            to="/delete-account"
-            className={cn("flex min-h-16 items-center gap-4 px-4 py-3 text-[#B3261E]", stateLayer)}
-          >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#F9DEDC]">
-              <UserRoundX className="h-5 w-5" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[16px]">Delete my account</span>
-              <span className="block text-[13px] leading-5 text-muted-foreground">
-                Removes the account and everything saved with it, permanently
-              </span>
-            </span>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-          </Link>
+          {/* Asked for here rather than by sending people to another page: a link is not a
+              confirmation. Google also requires an app that creates accounts to offer deletion
+              of the ACCOUNT from inside the app - /delete-account existed and worked, but
+              nothing linked to it, so there was no way to find it. */}
+          <ActionRow
+            icon={UserRoundX}
+            label="Delete my account"
+            sub="Removes the account and everything saved with it, permanently"
+            danger
+            onClick={() => setDeleting(true)}
+          />
         </Group>
 
         <Group title="Accessibility">
@@ -340,6 +336,42 @@ function SettingsPage() {
         </Group>
 
         <p className="mt-6 text-center text-[12px] text-muted-foreground">iKAN preview</p>
+
+        {/* On success the account no longer exists, so there is nowhere to go back to - the
+            person lands on the sign-in screen, which is the only honest destination. */}
+        <BottomSheet
+          open={deleting}
+          onClose={() => (deleteBusy ? undefined : setDeleting(false))}
+          title="Delete your account?"
+        >
+          <p className="text-[15px] leading-6 text-muted-foreground">
+            This removes your account and everything saved with it — your journal, assessment
+            results, programme progress, profile and settings. It cannot be undone, and nothing can
+            be recovered afterwards.
+          </p>
+          <div className="mt-6 flex flex-col gap-2">
+            <Button
+              className="bg-[#B3261E] text-white"
+              disabled={deleteBusy}
+              onClick={async () => {
+                setDeleteBusy(true);
+                try {
+                  await deleteAccount();
+                  window.location.assign("/login");
+                } catch (e) {
+                  setDeleteBusy(false);
+                  setDeleting(false);
+                  snack.show((e as Error).message);
+                }
+              }}
+            >
+              {deleteBusy ? "Deleting…" : "Delete my account permanently"}
+            </Button>
+            <Button variant="text" disabled={deleteBusy} onClick={() => setDeleting(false)}>
+              Keep my account
+            </Button>
+          </div>
+        </BottomSheet>
 
         <BottomSheet open={clearing} onClose={() => setClearing(false)} title="Clear all data?">
           <p className="text-[15px] leading-6 text-muted-foreground">

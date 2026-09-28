@@ -4,9 +4,8 @@ import { AlertTriangle, Check, Trash2 } from "lucide-react";
 import { InfoShell } from "@/components/info-shell";
 import { Button, TextField } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
-import { useAuth, supabase } from "@/lib/auth";
-import { functionUrl } from "@/lib/backend";
-import { clearAllMirrored } from "@/lib/durable";
+import { useAuth } from "@/lib/auth";
+import { deleteAccount } from "@/lib/delete-account";
 
 /* Account deletion, in the app and on the web.
  *
@@ -50,27 +49,7 @@ function DeleteAccountPage() {
     setBusy(true);
     setError("");
     try {
-      const { data } = await supabase().auth.getSession();
-      const token = data.session?.access_token;
-      if (!token) throw new Error("Your session has expired. Sign in again.");
-      const res = await fetch(functionUrl("ikan2-delete-account"), {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = (await res.json()) as { error?: string };
-      if (!res.ok) throw new Error(body.error ?? "Deletion failed. Please try again.");
-      // The account is gone; clear this device so nothing of it is left lying around. The
-      // native mirror has to go too, or restoreEvicted() puts the whole journal back on the
-      // next launch - which would make the promise on the next screen a lie.
-      try {
-        localStorage.clear();
-      } catch {
-        /* storage unavailable */
-      }
-      await clearAllMirrored();
-      await supabase()
-        .auth.signOut()
-        .catch(() => {});
+      await deleteAccount();
       setDone(true);
     } catch (e) {
       setError((e as Error).message);
