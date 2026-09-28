@@ -1,6 +1,7 @@
 # The iKAN database, end to end
 
-Captured 25 September 2026 from the live project.
+Captured 25 September 2026 from the live project. §2.1 (what iKAN uses from the old site) added
+28 September 2026.
 
 **Project:** `jpfvoevxegnknxoqmwye` — "Ikan - App", ap-south-1, Postgres 17.6, org `wugweb`, **free plan**.
 
@@ -9,12 +10,21 @@ The single most useful fact about this database: **two different applications sh
 |                                         | Built on                   | Writes to                               | Last write  |
 | --------------------------------------- | -------------------------- | --------------------------------------- | ----------- |
 | **iKAN** (this repo, app.ikanhealth.in) | TanStack Start + Capacitor | 3 `ikan2_*` tables                      | today       |
-| **The old site** (ikanhealth.in)        | Lovable / React            | `kv_store_cc205da9` + 6 `user_*` tables | 14 Sep 2026 |
+| **The old site** (ikanhealth.in)        | Vite / React, on Vercel    | `kv_store_cc205da9` + 6 `user_*` tables | 24 Sep 2026 |
 
-They do not read each other's tables. Nothing in `kv_store_cc205da9` is used by iKAN, and nothing
-in `ikan2_user_state` is used by the old site. Both hang off the same `auth.users`, which is the
-only real coupling between them — and the reason the two cannot simply be split apart without
-thought.
+They do not read each other's **tables** — nothing in `ikan2_user_state` is used by the old site,
+and iKAN holds no SQL grant on `kv_store_cc205da9` (RLS on, no policies, so the publishable key
+cannot touch it).
+
+**But iKAN is not independent of the old site.** It calls the old site's edge function,
+`make-server-cc205da9`, at runtime on two live paths — the history backfill on every sign-in,
+and the contact form — and that function reads and writes `kv_store_cc205da9` with the service
+role on iKAN's behalf. So the coupling is not only `auth.users`. It was three paths until
+28 Sep 2026: **sign-up went through that function too**, which meant deleting it would have
+stopped anyone creating an account. Section 2.1 has the detail and the current key list.
+
+This is also why the old site's "last write" above is 24 September, not 14: `activity_log:*` has
+**66 `login` rows dated after 14 Sep**, which is iKAN's own sign-ins being logged there.
 
 Sizes tell the same story more bluntly:
 
@@ -120,15 +130,84 @@ against the local date in their own `time_zone`.
 
 ## 2. The old site
 
-Not read by iKAN. Documented because it shares `auth.users`, and because it is most of the
-database by volume.
+Mostly not iKAN's, but **not inert either** — see 2.1. Documented because it shares `auth.users`,
+because iKAN depends on part of it at runtime, and because it is most of the database by volume.
+
+### 2.1 What iKAN actually uses from here
+
+Verified 28 September 2026: every outbound call in `src/` was enumerated, and each prefix below
+was checked against the live store by comparing its JSON field set to the TypeScript types in
+`legacy-import.ts`.
+
+iKAN never touches these keys directly — it holds no SQL grant on the table. Everything goes
+through `make-server-cc205da9` (`verify_jwt` on), called with **the person's own session token**,
+so a person only ever pulls their own history.
+
+**The live call paths — two, since sign-up was cut over:**
+
+| Path              | Where                                       | Runs              | Old endpoints                                                                                                                  |
+| ----------------- | ------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Legacy import** | `src/lib/legacy-import.ts` (`auth.tsx:166`) | **every sign-in** | `/users/profile`, `/user/journal?limit=1000`, `/user/assessments/history`, `/user/equip/{id}/progress`, `/equip/programs/{id}` |
+| **Contact form**  | `src/routes/contact.tsx:52`                 | on submit         | `POST /contact/submit`                                                                                                         |
+
+~~Sign-up~~ used to be a third, and was the dangerous one: it POSTed to `/auth/signup`, hidden
+behind an `if (usingLovableCloud)` guard that was `const false`, so the branch that _looked_ live
+was dead and the legacy call was the real path for every account. It now calls
+`supabase.auth.signUp` against iKAN's own project. The side effect is that the old function
+created users with the admin API and so confirmed their addresses itself — **6 of the 8 email
+accounts predating the change were never sent a confirmation email.**
+
+**Confirmed** — these prefixes carry exactly the fields the client destructures, so the mapping
+is established, not guessed:
+
+| Prefix               | Rows | Field evidence                                                                                              | R/W   |
+| -------------------- | ---: | ----------------------------------------------------------------------------------------------------------- | ----- |
+| `user`               |   10 | has all 12 `OldProfile` fields incl. `emergencyContactName/Phone/Relationship`, `dateOfBirth`, `location`   | R     |
+| `journal`            |   39 | has all 12 `OldJournal` fields incl. `mood_rating`, `pain_level`, `pain_impact`, `context_tags`, `emotions` | R     |
+| `assessment_result`  |  184 | has all 6 `OldResult` fields incl. `record_type`, `responses`, `duration_seconds`                           | R     |
+| `progress`           |  183 | has all 5 `OldDay` fields incl. `block_responses`, `day_number`, `completed_at`                             | R     |
+| `equip_program`      |    4 | carries `daily_content`, which is where `titleOf()` reads old activity titles                               | R     |
+| `contact_submission` |    2 | `name, email, subject, message` — exactly what the form posts, plus `status`, `submitted_at`                | **W** |
+
+**Probable but unverified** — the function's own internals. It plausibly walks these to answer
+the endpoints above, but that is inference from their names and shapes; the function's source is
+not in this repo (deployed, version 358), so do not treat this row set as established:
+`journal_by_user` (38), `assessment_response_by_user` (140, `{assessment_id, date, response_id}` —
+shaped like a per-user index), `enrollment`/`user_enrollment` (72/13), `day`/`block` (105/223,
+which may be what `daily_content` is assembled from), `equip_program_by_slug`/`equip_slug`/`equip`.
+
+`activity_log` (2,800) is a **write** side effect rather than a dependency: 66 `login` rows are
+dated after 14 Sep, latest 24 Sep, which is iKAN's own sign-ins being logged by the function.
+Nothing in iKAN reads it.
+
+Only three old programmes are mapped (`legacy-import.ts:21`): Sleep Tight, Unburn, Stress Buster.
+Productivity Reset (`33eae2e2-…`) has no counterpart here, so its history is not imported.
+
+**Not used by iKAN**, despite living in the same store: `payment` (71), `ikan_score` (92),
+`professional`/`consultant`, `recommendation_rule`, `scoring-profile`, `analytics`, `media`,
+`newsletter`, `brevo-*`, `security_event`, `audit`, and the CMS keys `cms_page` (17), `page`,
+`page_slug`, `resource` (11), `category` (214). iKAN ships its own articles and legal pages in
+the repo; it does **not** read `cms_page`.
+
+One design-time echo, not a runtime read: the Mood Journal template in `src/lib/journal.ts`
+mirrors the old config's shape — mood as 5 rows (`mood:{id}`, 5 live) and each other scale as one
+array row (`checkin_scale:<key>`, 5 live). Those values are **copied into the repo**, so the store
+is not consulted for them.
+
+**If iKAN ever moves off this project** (§6), the import is throwaway — it only backfills history
+once per account, so it retires itself once every account has signed in once. That leaves the
+contact form as the last thing needing an iKAN-owned replacement.
 
 ### `kv_store_cc205da9`
 
-A key/value store, `key text primary key, value jsonb`. **4,397 rows.** The name is Lovable
+A key/value store, `key text primary key, value jsonb`. **4,397 rows.** The name is generated
 scaffolding — the hash suffix matches the `make-server-cc205da9` edge function, which is the only
 thing that reads it. RLS is on with no policies, so the anon key cannot reach it at all; the
 function uses the service role.
+
+(The naming is worth not over-reading: it says nothing about where either app is hosted.
+`ikanhealth.in` is Vite/React on **Vercel**; `app.ikanhealth.in` is this repo, TanStack Start,
+hosted by **Lovable**. Two different apps, two different hosts, one shared Supabase project.)
 
 Keys are `prefix:id`. The larger prefixes:
 
@@ -228,6 +307,10 @@ writable by `anon` — was resolved by dropping the unused `wrappers` extension 
 
 The app's footprint is small: **3 tables, 83 rows, ~70 kB**, two edge functions, one storage
 bucket, and two constants in `src/lib/backend.ts`.
+
+The footprint is not the whole job, though: **iKAN also calls the old site's
+`make-server-cc205da9` for sign-up and the contact form** (§2.1). Those two have to be replaced
+before or during any move, or new accounts break the moment the old function goes.
 
 The hard part is not the data, it is `auth.users`. 14 accounts, and every row keys on `user_id`:
 
