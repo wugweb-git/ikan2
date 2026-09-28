@@ -27,7 +27,6 @@ import {
   Unlink,
   MapPin,
   Link2 as LinkIcon,
-  Mail,
   Smartphone,
   type LucideIcon,
 } from "lucide-react";
@@ -259,21 +258,19 @@ function SettingsPage() {
           )}
         </Group>
 
-        <Group
-          title="Sign-in methods"
-          note="How you get into this account. Connect or disconnect any of them — your journal, results and progress stay on the account either way."
-        >
-          <ConnectedAccounts onMessage={snack.show} />
-        </Group>
+        {/* One place for everything iKAN talks to. Google and LinkedIn are both a way in and a
+            source of data - Google fills a profile from People API - so splitting them across
+            two groups asked people to know which hat a provider was wearing. Health Connect
+            sits here too, and Strava and the rest join it as rows.
 
-        {/* Apps that supply data, as opposed to the sign-in methods above. Nothing here is
-            required, each connects and disconnects on its own, and disconnecting one stops new
-            data arriving without touching what is already saved. Strava and the like belong in
-            this group: add a row beside HealthConnectRows. */}
+            Email and password is deliberately not here: it is not something you connect to,
+            it is the account itself, and it lives under Account with the rest of the
+            credentials. */}
         <Group
           title="Connected apps"
-          note="Apps you have connected to iKAN. Each one is optional, and you can disconnect it at any time — what has already been saved stays."
+          note="Accounts and apps linked to iKAN. Each is optional and can be disconnected at any time — your journal, results and progress stay on the account either way."
         >
+          <ConnectedAccounts onMessage={snack.show} />
           <HealthConnectRows onMessage={snack.show} />
         </Group>
 
@@ -782,7 +779,17 @@ function SyncRow() {
   );
 }
 
-/* Sign-in methods: the identities Supabase holds for this account.
+/* External accounts: Google and LinkedIn.
+
+ * Each is two things at once - a way into iKAN, and a source of data (Google fills a profile
+ * from People API) - which is why they sit with Health Connect under one heading rather than
+ * being split across "sign-in" and "apps". Nobody should have to know which hat a provider is
+ * wearing to find it.
+ *
+ * Email and password is not here. It is not something you connect to; it is the account, and
+ * it belongs under Account with the other credentials.
+ *
+ * On identities generally:
  *
  * Every row can be disconnected and reconnected freely. Disconnecting removes the sign-in
  * method, not the person's data - the profile, journal and results live in ikan2_user_state
@@ -859,20 +866,10 @@ function ConnectedAccounts({ onMessage }: { onMessage: (m: string) => void }) {
           </Row>
         );
       })}
-      {identities.some((i) => i.provider === "email") ? (
-        <Row icon={Mail} label="Email and password" sub={user?.email ?? "Connected"}>
-          <span className="text-[13px] text-muted-foreground">Connected</span>
-        </Row>
-      ) : null}
-      {identities.some((i) => i.provider === "phone") ? (
-        <Row icon={Smartphone} label="Phone" sub={user?.phone ?? "Connected"}>
-          <span className="text-[13px] text-muted-foreground">Connected</span>
-        </Row>
-      ) : null}
       {sole ? (
         <p className="px-4 pb-3 text-[13px] leading-5 text-muted-foreground">
-          This is currently the only way you can sign in. Disconnecting your data is not affected
-          either way — it stays on the account and comes back when you reconnect.
+          Connecting one of these is also a second way to sign in, which is worth having if you ever
+          lose access to the first.
         </p>
       ) : null}
     </>
