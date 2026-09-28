@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Eye, EyeOff, Lock, ShieldCheck, Smartphone, Sparkles, UserRoundCheck } from "lucide-react";
 import { Illustration } from "@/components/art";
 import { cn } from "@/lib/utils";
@@ -68,22 +68,33 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const path = location.pathname;
   const isPublic = PUBLIC.test(path);
   const intro = useLaunchIntro();
+  /** Which account has been seeded on this mount; see the note in the effect below. */
+  const seeded = useRef<string | null>(null);
 
   useEffect(() => {
     if (status === "signedOut" && !isPublic) {
+      seeded.current = null;
       navigate({ to: "/login", search: { redirect: location.href }, replace: true });
     }
     if (status === "signedIn" && user) {
-      seedProfile({
-        name: displayName(user),
-        email: user.email ?? "",
-        phone: (user.user_metadata?.["phone"] as string | undefined) ?? "",
-        avatar:
-          (user.user_metadata?.["avatar_url"] as string | undefined) ||
-          (user.user_metadata?.["picture"] as string | undefined) ||
-          (user.identities?.find((i) => i.provider === "google")?.identity_data?.["picture"] as
-            string | undefined),
-      });
+      /* Once per account, not once per navigation. This effect depends on `path`, so it runs on
+       * every route change - and seedProfile is not free: with no avatar saved it writes on
+       * each call, which marks the profile changed and queues a push every time the person
+       * opens a different screen. Nothing about the session changes between routes, so there
+       * is nothing to re-read. */
+      if (seeded.current !== user.id) {
+        seeded.current = user.id;
+        seedProfile({
+          name: displayName(user),
+          email: user.email ?? "",
+          phone: (user.user_metadata?.["phone"] as string | undefined) ?? "",
+          avatar:
+            (user.user_metadata?.["avatar_url"] as string | undefined) ||
+            (user.user_metadata?.["picture"] as string | undefined) ||
+            (user.identities?.find((i) => i.provider === "google")?.identity_data?.["picture"] as
+              string | undefined),
+        });
+      }
       const needsWelcome = !onboardingDone() && isNewAccount(user);
       if (!needsWelcome) markOnboardingDone();
       if (AUTH_ONLY.test(path)) {
