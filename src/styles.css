@@ -1230,10 +1230,19 @@ html.reduce-motion .splash .splash-ring {
  *
  * `safe-top` is the usual page-header spacing. `safe-top-sm` is for a bar that already has
  * height of its own, like the sticky top app bar. */
+/* --safe-top exists so this can be tested without a notched device. env(safe-area-inset-top)
+ * is 0 in a desktop browser and in Chrome's device toolbar, so the max() simply falls back to
+ * the original padding and the fix looks like it did nothing. Setting the variable simulates a
+ * real inset:
+ *
+ *   document.documentElement.style.setProperty('--safe-top', '59px')   // iPhone 15 Pro
+ *   document.documentElement.style.removeProperty('--safe-top')        // back to normal
+ *
+ * On a real device the variable is unset and env() supplies the true value. */
 @utility safe-top {
-  padding-top: max(1.25rem, calc(env(safe-area-inset-top) + 0.5rem));
+  padding-top: max(1.25rem, calc(var(--safe-top, env(safe-area-inset-top)) + 0.5rem));
 }
 
 @utility safe-top-sm {
-  padding-top: max(0.25rem, env(safe-area-inset-top));
+  padding-top: max(0.25rem, var(--safe-top, env(safe-area-inset-top)));
 }

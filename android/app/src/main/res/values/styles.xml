@@ -13,6 +13,17 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!--
+          Draw into the display cutout. targetSdk 36 means Android 15 and later enforce
+          edge-to-edge, so the WebView already extends under the status bar whether we ask or
+          not - but Chromium only reports env(safe-area-inset-*) when the window opts into the
+          cutout area. Without this the insets are 0, the css that keeps headers clear of the
+          punch-hole falls back to its old padding, and titles sit under the camera.
+        -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <!-- Transparent bars, so what shows through the inset is the page, not a grey block. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
 
