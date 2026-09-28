@@ -36,14 +36,14 @@
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://app.ikanhealth.in/legal/privacy-policy</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
     <loc>https://app.ikanhealth.in/legal/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://app.ikanhealth.in/legal/privacy-policy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
   <url>
     <loc>https://app.ikanhealth.in/legal/cancellation-policy</loc>

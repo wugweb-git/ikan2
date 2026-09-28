@@ -59,10 +59,17 @@ Links, live once review clears:
    presented as named clinicians); cards show initials. `photo` is optional on the type — fill it
    when there are real photographs.
 
-7. **The old Lovable Cloud database** (`cfsnyzcrekchvzrulpvl`) holds 8 profiles including 3
-   emergency contacts, frozen since 14 Sep. Nothing reads it. A `mirror` schema and
-   `scripts/sync-mirror.sh` were set up to use it as a backup target. Delete it or maintain it,
-   but do not leave it as it is.
+7. **The old Lovable Cloud database** (`cfsnyzcrekchvzrulpvl`) is not disposable, and the
+   earlier note here saying it could be deleted was wrong. It holds 8 accounts and 28
+   `user_state` rows - journals, assessments and programme progress - frozen since 14 Sep.
+   All 8 of those people also have accounts in the live project, which is why it looked
+   redundant. But **four of them have no state rows at all in the live project**: about 12 kB
+   of their writing exists in that database and nowhere else, and deleting it destroys it.
+
+   `scripts/rescue-lovable-cloud.sh` dumps it and then copies the stranded rows across,
+   matching on email because the auth user ids were reissued. It never overwrites a key the
+   live account already has. Run `backup`, then `migrate`; delete nothing until a restore
+   test of the dump has passed.
 
 8. **Branch protection and secret scanning** are not enabled on GitHub. A `.env` was committed
    once already.

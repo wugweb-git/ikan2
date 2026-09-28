@@ -15,6 +15,8 @@
 
 import { writeFileSync } from "node:fs";
 
+import { legalOrder } from "../src/lib/content/index";
+
 const ORIGIN = "https://app.ikanhealth.in";
 
 type Entry = { path: string; changefreq: string; priority: string; lastmod?: string };
@@ -27,13 +29,17 @@ const staticPages: Entry[] = [
   { path: "/login", changefreq: "yearly", priority: "0.5" },
   { path: "/signup", changefreq: "yearly", priority: "0.5" },
   { path: "/delete-account", changefreq: "yearly", priority: "0.3" },
-  { path: "/legal/privacy-policy", changefreq: "yearly", priority: "0.4" },
-  { path: "/legal/terms", changefreq: "yearly", priority: "0.3" },
-  { path: "/legal/cancellation-policy", changefreq: "yearly", priority: "0.3" },
-  { path: "/legal/return-policy", changefreq: "yearly", priority: "0.3" },
 ];
 
-const entries = staticPages;
+/* Taken from the app's own list rather than repeated here: a fifth legal document would
+   otherwise be published, linked and invisible to search, with nothing to catch it. */
+const legal: Entry[] = legalOrder.map((slug) => ({
+  path: `/legal/${slug}`,
+  changefreq: "yearly",
+  priority: slug === "privacy-policy" ? "0.4" : "0.3",
+}));
+
+const entries = [...staticPages, ...legal];
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

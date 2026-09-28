@@ -3,6 +3,7 @@ import { useState } from "react";
 import { pageMeta } from "@/components/equip/program-header";
 import { AuthLayout, Field, FormError, PrimaryButton } from "@/components/auth-ui";
 import { useAuth } from "@/lib/auth";
+import { breachError } from "@/lib/pwned";
 import * as v from "@/lib/validate";
 
 export const Route = createFileRoute("/reset-password")({
@@ -60,6 +61,12 @@ function ResetPage() {
           setBusy(true);
           setError(null);
           try {
+            const breached = await breachError(password);
+            if (breached) {
+              setError(breached);
+              setBusy(false);
+              return;
+            }
             await updatePassword(password);
             navigate({ to: "/", replace: true });
           } catch (err) {
