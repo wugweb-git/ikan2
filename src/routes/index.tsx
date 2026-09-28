@@ -17,7 +17,6 @@ import {
   Sparkles,
   CalendarCheck,
   ChevronRight,
-  ClipboardList,
   Flame,
   LifeBuoy,
   Play,
@@ -1080,7 +1079,9 @@ function RecentResults({ data, hydrated }: { data: Data; hydrated: boolean }) {
                 params={{ slug: a.slug, id: r.id }}
                 className={cn("flex min-h-16 items-center gap-3 px-4 py-3", stateLayer)}
               >
-                <ClipboardList className="h-5 w-5 shrink-0 text-muted-foreground" />
+                {/* A clipboard says "a form to fill in", which is what these rows are not:
+                    they are scores already recorded, and each carries its band on the right. */}
+                <ChartNoAxesColumn className="h-5 w-5 shrink-0 text-muted-foreground" />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[15px] font-medium">{a.title}</span>
                   <DateText className="text-[12px] text-muted-foreground">
