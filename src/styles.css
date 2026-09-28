@@ -1216,3 +1216,24 @@ html.reduce-motion .splash .splash-ring {
     display: none !important;
   }
 }
+
+/* Clear of the notch.
+ *
+ * The viewport is viewport-fit=cover, so the page extends under the status bar and the Dynamic
+ * Island - which is what lets a coloured hero run to the very top edge. Anything that is not
+ * such a hero has to keep itself out from under it, or the title collides with the Island and
+ * the corner buttons sit beneath the clock.
+ *
+ * max() rather than a plain addition: on a device with no inset the value falls back to the
+ * comfortable padding the design already used, so nothing changes on the web or on Android
+ * phones without a cutout.
+ *
+ * `safe-top` is the usual page-header spacing. `safe-top-sm` is for a bar that already has
+ * height of its own, like the sticky top app bar. */
+@utility safe-top {
+  padding-top: max(1.25rem, calc(env(safe-area-inset-top) + 0.5rem));
+}
+
+@utility safe-top-sm {
+  padding-top: max(0.25rem, env(safe-area-inset-top));
+}

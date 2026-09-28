@@ -81,13 +81,13 @@ function JournalPage() {
   return (
     <IkanShell>
       <div style={accentStyle("mood")}>
-        <header className="relative px-4 pb-1 pt-[max(1.25rem,env(safe-area-inset-top))]">
+        <header className="safe-top relative px-4 pb-1">
           <Link
             to="/history/journal"
             aria-label="Journal history"
             className={cn(
               stateLayer,
-              "absolute right-2 top-[max(0.75rem,env(safe-area-inset-top))] grid h-12 w-12 place-items-center rounded-full",
+              "absolute right-2 top-[max(0.75rem,calc(env(safe-area-inset-top)+0.5rem))] grid h-12 w-12 place-items-center rounded-full",
             )}
           >
             <History className="h-6 w-6" />
