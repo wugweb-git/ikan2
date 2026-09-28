@@ -5,14 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "bun run scripts/gen-sitemap.ts && vite build",
-    "build:dev": "bun run scripts/gen-sitemap.ts && vite build --mode development",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
     "storybook": "storybook dev -p 6006",
-    "build:storybook": "storybook build",
-    "sitemap": "bun run scripts/gen-sitemap.ts"
+    "build:storybook": "storybook build"
   },
   "overrides": {
     "rolldown": "1.2.1"

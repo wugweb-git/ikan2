@@ -60,7 +60,6 @@ import {
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth";
-import { mirrorRemove } from "@/lib/durable";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { recentAverage, useHealthConnect } from "@/lib/health-connect";
 import { disablePush, enablePush, pushSupported, sendTestPush } from "@/lib/push";
@@ -354,9 +353,6 @@ function SettingsPage() {
                   } catch {
                     /* ignore */
                   }
-                  // The Android app keeps a native copy of every key; without this it is
-                  // restored on the next launch (see durable.ts).
-                  mirrorRemove(k);
                 }
                 window.location.assign("/");
               }}

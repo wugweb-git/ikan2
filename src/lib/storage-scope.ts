@@ -1,5 +1,3 @@
-import { mirrorRemove, mirrorWrite } from "@/lib/durable";
-
 /* Device storage is kept per signed-in account, so two people sharing a phone never see each
  * other's check-ins or results. `ikan.assessments.v1` is stored as `ikan.u.<userId>.assessments.v1`.
  * Data saved before sign-in existed (unscoped `ikan.*` keys) moves to the first account that
@@ -38,13 +36,8 @@ export function claimGuestData(userId: string) {
       const value = window.localStorage.getItem(k);
       if (value !== null && window.localStorage.getItem(target) === null) {
         window.localStorage.setItem(target, value);
-        mirrorWrite(target, value);
       }
       window.localStorage.removeItem(k);
-      /* The native mirror has to lose the unscoped key too. Left behind, restoreEvicted() puts
-       * it back on the next launch as guest data - and the next person to sign in on this phone
-       * claims it as theirs. */
-      mirrorRemove(k);
     }
   } catch {
     /* storage unavailable */

@@ -15,7 +15,6 @@ import {
 import { StepView } from "@/components/equip/steps";
 import { diaryRows, getDay, getProgramme } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
-import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/program/$slug/day/$day")({
   loader: ({ params }) => {
@@ -121,15 +120,11 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
 
   const finish = () => {
     complete(day.day);
-    /* The programme slug is allowed here: "sleep-tight" is a course someone chose, not a
-     * screening result. The day number is what makes drop-off visible. */
-    track("programme_day_complete", { programme: slug, day: day.day });
     // the last day opens the programme result, like finishing an assessment
     const allDone = programme.days.every(
       (d) => d.day === day.day || state.completed.includes(d.day),
     );
     if (allDone) {
-      track("programme_complete", { programme: slug, days: programme.days.length });
       void navigate({ to: "/program/$slug/result", params: { slug }, search: { done: true } });
       return;
     }

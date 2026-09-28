@@ -12,5 +12,3 @@ Allow: /
 
 User-agent: *
 Allow: /
-
-Sitemap: https://app.ikanhealth.in/sitemap.xml

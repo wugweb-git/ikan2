@@ -8,8 +8,8 @@ android {
         applicationId "com.ikan.wugweb"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 1
+        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -21,53 +21,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
-    /* Release signing. The keystore and its passwords stay out of this repo: the file lives in
-     * your home directory and the passwords come from the environment, so nothing secret is ever
-     * committed. On a machine without them - anyone's checkout, CI without the secrets set - the
-     * block is skipped and debug builds still work, rather than failing on a null password.
-     *
-     *   IKAN_STORE_PASS=... ./gradlew bundleRelease
-     *
-     * Override the defaults with IKAN_KEYSTORE, IKAN_KEY_ALIAS and IKAN_KEY_PASS if needed. */
-    def ikanKeystore = file(System.getenv("IKAN_KEYSTORE")
-            ?: "${System.getProperty('user.home')}/ikan-upload.jks")
-    def ikanStorePass = System.getenv("IKAN_STORE_PASS")
-    def canSign = ikanKeystore.exists() && ikanStorePass
-
-    signingConfigs {
-        release {
-            if (canSign) {
-                storeFile ikanKeystore
-                storePassword ikanStorePass
-                keyAlias System.getenv("IKAN_KEY_ALIAS") ?: "ikan-upload"
-                keyPassword System.getenv("IKAN_KEY_PASS") ?: ikanStorePass
-            }
-        }
-    }
-
     buildTypes {
         release {
-            /* R8 on. Play's bundle report flags an unoptimised release, and the win is real -
-             * but Capacitor resolves plugins by reflection, so this is only safe alongside the
-             * keep rules in proguard-rules.pro. Read that file before changing either line. */
-            minifyEnabled true
-            shrinkResources true
-            /* Play warns that this bundle has native code without debug symbols. It cannot be
-             * fixed here and the warning is safe to ignore: the only .so is
-             * libdatastore_shared_counter.so, which arrives prebuilt and already stripped inside
-             * the AndroidX DataStore aar. ndk.debugSymbolLevel extracts symbols from native code
-             * THIS project builds, of which there is none - setting it was tried and produced
-             * nothing. Only AndroidX shipping symbols would clear it.
-             *
-             * The R8 mapping, by contrast, is already inside the bundle at
-             * BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map, so Play
-             * deobfuscates crash reports without anything being uploaded separately. */
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            if (canSign) {
-                signingConfig signingConfigs.release
-            } else {
-                logger.lifecycle("No signing config: set IKAN_STORE_PASS (and keep ikan-upload.jks in your home dir) to produce an upload-ready bundle.")
-            }
         }
     }
 }

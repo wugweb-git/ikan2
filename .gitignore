@@ -44,16 +44,3 @@ storybook-static
 ds-bundle/
 .design-sync/types/
 .design-sync/asset-shims/
-
-# Database dumps. supabase/schema.sql is structure only and is committed on purpose;
-# anything carrying rows must never be, because these tables hold journals and health data.
-*.dump
-*.backup
-*-data.sql
-dump.sql
-
-# Environment files. Lovable's Supabase integration committed a .env once; the values were
-# publishable keys, but a tracked .env is how a secret eventually gets committed by accident.
-.env
-.env.*
-!.env.example

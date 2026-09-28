@@ -67,13 +67,3 @@ export const pageMeta = (title: string, description: string, path?: string) => (
   ],
   ...(path ? { links: [{ rel: "canonical", href: `https://app.ikanhealth.in${path}` }] } : {}),
 });
-
-/* Structured data, as a <script type="application/ld+json"> in the head.
- *
- * Search engines use it to show an article as an article rather than a generic page - the
- * headline, the date, who published it. Nothing here is private: every field is already
- * visible on the page itself. */
-export const jsonLd = (data: Record<string, unknown>) => ({
-  type: "application/ld+json",
-  children: JSON.stringify(data),
-});

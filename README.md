@@ -1,4 +1,4 @@
-# iKAN
+# Ikan
 
 Check ikanhealth.in
 
@@ -18,7 +18,7 @@ Help me redesign the mobile app as per 2026 trends , engaging interactive usable
 
 This project was built with [Lovable](https://lovable.dev).
 
-**Live app**: https://app.ikanhealth.in
+**Live app**: https://ikan2.lovable.app
 
 ## Build with Lovable
 

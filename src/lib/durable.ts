@@ -25,38 +25,11 @@ export function mirrorWrite(key: string, value: string) {
     });
 }
 
-/**
- * Drop one saved value from native storage.
- *
- * This has to be called wherever localStorage is cleared, or restoreEvicted below puts the
- * value straight back on the next launch - which for a deleted account means its journal
- * reappearing on a phone that was told nothing was kept.
- */
 export function mirrorRemove(key: string) {
   if (!active()) return;
   void import("@capacitor/preferences")
     .then(({ Preferences }) => Preferences.remove({ key }))
     .catch(() => {});
-}
-
-/**
- * Drop every value this app has mirrored, for "clear all data" and account deletion, where the
- * caller wipes localStorage wholesale rather than key by key.
- *
- * Only `ikan.` keys are touched: the mirror is shared with anything else the WebView stores.
- * Awaitable, because a caller that navigates away immediately afterwards must not race it.
- */
-export async function clearAllMirrored(): Promise<void> {
-  if (!active()) return;
-  try {
-    const { Preferences } = await import("@capacitor/preferences");
-    const { keys } = await Preferences.keys();
-    await Promise.all(
-      keys.filter((k) => k.startsWith("ikan.")).map((key) => Preferences.remove({ key })),
-    );
-  } catch {
-    /* best-effort, as everywhere else in this file */
-  }
 }
 
 /**

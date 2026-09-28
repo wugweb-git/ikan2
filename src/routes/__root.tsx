@@ -15,7 +15,6 @@ import { AuthGate } from "../components/auth-ui";
 import { ErrorScreen, NotFoundScreen, OfflineBanner } from "../components/skeleton";
 import { registerServiceWorker } from "../lib/device";
 import { pageView } from "@/lib/analytics";
-import { jsonLd } from "@/components/equip/program-header";
 import { restoreEvicted } from "@/lib/durable";
 import { listenForReminderTaps } from "@/lib/local-reminders";
 import { listenForPushTaps } from "@/lib/native-push";
@@ -88,27 +87,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap",
       },
     ],
-    /* Who publishes this site, for search results and knowledge panels. Site-wide, so it sits
-     * in the root rather than being repeated on every page. */
-    scripts: [
-      jsonLd({
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "iKAN",
-        url: SITE_URL,
-        logo: `${SITE_URL}/pwa-512x512.png`,
-        description: SITE_DESCRIPTION,
-        email: "hello@ikanhealth.in",
-        areaServed: "IN",
-      }),
-      jsonLd({
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: "iKAN",
-        url: SITE_URL,
-        inLanguage: "en-IN",
-      }),
-    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -136,14 +114,13 @@ function RootComponent() {
 
   /* Screen views for GA4. The router is the source of the path on purpose: its matched route
    * id is the PATTERN ("/assessments/$slug"), so the condition someone screened for never
-   * leaves the device. The title is deliberately NOT passed: on those same routes it is the
-   * condition in plain words, so analytics.ts looks up a generic label instead. */
+   * leaves the device. See analytics.ts. */
   const router = useRouter();
   useEffect(() => {
     const send = () => {
       const matches = router.state.matches;
       const last = matches[matches.length - 1];
-      if (last) pageView(last.routeId);
+      if (last) pageView(last.routeId, document.title);
     };
     send();
     return router.subscribe("onResolved", send);

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Bookmark, BookmarkCheck, BookOpen, CalendarDays, Clock3, Search } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
@@ -39,7 +39,6 @@ function ResourcesPage() {
   const store = useResourceStore();
   const snack = useSnack();
   const { category } = Route.useSearch();
-  const navigate = useNavigate();
   const filter: Filter = filters.find((f) => f.toLowerCase() === category) ?? "All";
   const setFilter = (f: Filter) =>
     navigate({
@@ -49,6 +48,8 @@ function ResourcesPage() {
       resetScroll: false,
     });
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const open = (r: Resource) => navigate({ to: "/resources/$slug", params: { slug: slugOf(r) } });
 
   const featured = resources.filter((r) => r.featured);
   const q = query.trim().toLowerCase();
@@ -94,25 +95,25 @@ function ResourcesPage() {
           <section className="mt-5" aria-label="Featured">
             <div className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
               {featured.map((r, i) => (
-                <Link
+                <button
                   key={r.id}
-                  to="/resources/$slug"
-                  params={{ slug: slugOf(r) }}
+                  type="button"
+                  onClick={() => open(r)}
                   className={cn(
-                    "relative block h-[232px] w-[86%] shrink-0 snap-center overflow-hidden rounded-[28px] text-left text-white",
+                    "relative h-[232px] w-[86%] shrink-0 snap-center overflow-hidden rounded-[28px] text-left text-white",
                     stateLayer,
                   )}
                 >
                   <Illustration art={r.art} className="absolute inset-0" />
                   <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-5">
+                  <span className="absolute inset-x-0 bottom-0 p-5">
                     <span className="inline-flex h-6 items-center gap-1.5 rounded-full bg-white/20 px-2.5 text-[12px] font-semibold backdrop-blur">
                       <BookOpen className="h-3.5 w-3.5" />
                       {i === 0 ? "Featured story" : r.category}
                     </span>
-                    <h2 className="mt-2 line-clamp-3 font-display text-[20px] font-semibold leading-6">
+                    <span className="mt-2 line-clamp-3 font-display text-[20px] font-semibold leading-6">
                       {r.title}
-                    </h2>
+                    </span>
                     <span className="mt-2 flex items-center gap-3 text-[13px] opacity-85">
                       <span className="inline-flex items-center gap-1.5">
                         <CalendarDays className="h-3.5 w-3.5" /> {dateLabel(r.date)}
@@ -121,8 +122,8 @@ function ResourcesPage() {
                         <Clock3 className="h-3.5 w-3.5" /> {r.minutes} min read
                       </span>
                     </span>
-                  </div>
-                </Link>
+                  </span>
+                </button>
               ))}
             </div>
           </section>
@@ -187,9 +188,9 @@ function ResourcesPage() {
               return (
                 <li key={r.id} className="border-b border-foreground/10 last:border-0">
                   <div className="flex items-center gap-3 py-3">
-                    <Link
-                      to="/resources/$slug"
-                      params={{ slug: slugOf(r) }}
+                    <button
+                      type="button"
+                      onClick={() => open(r)}
                       className={cn(
                         "flex min-w-0 flex-1 items-center gap-3 rounded-[16px] text-left",
                         stateLayer,
@@ -205,9 +206,9 @@ function ResourcesPage() {
                             <span className="ml-2 font-normal text-muted-foreground">Read</span>
                           ) : null}
                         </span>
-                        <h3 className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">
+                        <span className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">
                           {r.title}
-                        </h3>
+                        </span>
                         <span className="mt-1 flex items-center gap-3 text-[12px] text-muted-foreground">
                           <span className="inline-flex items-center gap-1.5">
                             <CalendarDays className="h-3.5 w-3.5" /> {dateLabel(r.date)}
@@ -217,7 +218,7 @@ function ResourcesPage() {
                           </span>
                         </span>
                       </span>
-                    </Link>
+                    </button>
                     <IconButton
                       label={saved ? "Remove from saved" : "Save for later"}
                       onClick={() => toggle(r)}

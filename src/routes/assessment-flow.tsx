@@ -12,7 +12,6 @@ import {
 import { assessments, getAssessment } from "@/lib/assessment/instruments";
 import { optionLabel, type Answers } from "@/lib/assessment/scoring";
 import { readAssessmentState, useAssessmentStore } from "@/lib/assessment/store";
-import { track } from "@/lib/analytics";
 
 type Search = { id?: string };
 
@@ -81,10 +80,6 @@ function AssessmentFlowPage() {
 
   const finish = (final: Answers) => {
     const result = store.saveResult(a.slug, final, seconds.current);
-    /* No slug and no category: on this route both name the condition, which is the one thing
-     * analytics must never learn (see analytics.ts). Length and duration are enough to see
-     * whether people finish. */
-    track("assessment_complete", { questions: total, seconds: seconds.current });
     navigate({
       to: "/assessments/$slug/result/$id",
       params: { slug: a.slug, id: result.id },

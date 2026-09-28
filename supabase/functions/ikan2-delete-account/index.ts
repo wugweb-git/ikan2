@@ -1,4 +1,4 @@
-// iKAN account deletion.
+// ikan2 account deletion.
 //
 //   POST /   (signed-in user, Authorization: Bearer <access token>)
 //     → deletes every row this account owns, then the account itself
@@ -6,9 +6,6 @@
 // Google Play requires an app that creates accounts to offer deletion of the ACCOUNT, not just
 // its data, from inside the app and from a web page. Settings' "Clear all data" only ever
 // removed ikan2_user_state rows, leaving health data, push tokens and the auth user behind.
-//
-// Storage is included: the avatar bucket is public, so a photo left behind after deletion
-// stays fetchable by anyone holding the url.
 //
 // Deleting an auth user needs the service role, which must never reach the client - hence a
 // function. The caller's own access token is what proves whose account it is: the id comes from
@@ -36,22 +33,6 @@ const headers = {
  * here too, or deletion quietly stops being complete. */
 const OWNED_TABLES = ["ikan2_user_state", "ikan2_health_daily", "ikan2_push_subscriptions"];
 
-/* Profile photos live at <uid>/avatar-<timestamp>.jpg in a PUBLIC bucket, and a new file is
- * written on every upload rather than overwriting - so one person can own several, each at a
- * url that needs no authentication. Deleting the rows and leaving those behind would mean a
- * deleted account's photograph stays fetchable forever by anyone who saw the link. */
-const AVATAR_BUCKET = "ikan2-avatars";
-
-async function deleteAvatars(userId: string): Promise<string | null> {
-  const { data, error } = await admin.storage.from(AVATAR_BUCKET).list(userId, { limit: 100 });
-  if (error) return `avatars: ${error.message}`;
-  if (!data?.length) return null;
-  const { error: rmErr } = await admin.storage
-    .from(AVATAR_BUCKET)
-    .remove(data.map((f) => `${userId}/${f.name}`));
-  return rmErr ? `avatars: ${rmErr.message}` : null;
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers });
   if (req.method !== "POST")
@@ -76,8 +57,6 @@ Deno.serve(async (req) => {
     const { error: e } = await admin.from(table).delete().eq("user_id", user.id);
     if (e) failed.push(`${table}: ${e.message}`);
   }
-  const avatarError = await deleteAvatars(user.id);
-  if (avatarError) failed.push(avatarError);
   // Stop before removing the account if any data survived: an account that is gone while its
   // rows remain is worse than a failed attempt the person can retry.
   if (failed.length)
