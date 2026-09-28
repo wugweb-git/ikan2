@@ -58,7 +58,7 @@ export function Splash() {
       className="splash splash-phone-only relative flex min-h-dvh flex-col overflow-hidden transition-[background] duration-700"
       style={{ background: `linear-gradient(180deg, ${s.from} 0%, ${s.to} 100%)`, color: s.ink }}
     >
-      <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-8 pt-[env(safe-area-inset-top)] text-center">
+      <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-8 pt-[var(--safe-top,env(safe-area-inset-top))] text-center">
         <div className="relative grid h-40 w-40 place-items-center">
           {/* after the mark lands, a slow pulse keeps going while iKAN opens */}
           {[0, 1].map((i) => (

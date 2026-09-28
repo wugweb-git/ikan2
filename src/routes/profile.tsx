@@ -225,7 +225,7 @@ function ProfilePage() {
             aria-label="Settings"
             className={cn(
               stateLayer,
-              "absolute right-3 top-3 grid h-12 w-12 place-items-center rounded-full bg-background/80 backdrop-blur",
+              "safe-pin absolute right-3 grid h-12 w-12 place-items-center rounded-full bg-background/80 backdrop-blur",
             )}
           >
             <Settings className="h-6 w-6" />

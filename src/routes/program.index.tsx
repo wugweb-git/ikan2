@@ -18,7 +18,7 @@ function ProgramsPage() {
   return (
     <IkanShell>
       <header className="safe-top relative px-4 pb-1">
-        <div className="absolute right-2 top-6 flex">
+        <div className="safe-pin absolute right-2 flex">
           <Link
             to="/history/program"
             aria-label="Equip history"

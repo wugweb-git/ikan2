@@ -143,7 +143,7 @@ export function AuthLayout({
           <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-background to-transparent" />
           <Link
             to="/login"
-            className="absolute left-5 top-[max(1rem,env(safe-area-inset-top))] flex items-center gap-2 rounded-full bg-background/85 py-1 pl-1 pr-3 backdrop-blur"
+            className="absolute left-5 top-[max(1rem,var(--safe-top,env(safe-area-inset-top)))] flex items-center gap-2 rounded-full bg-background/85 py-1 pl-1 pr-3 backdrop-blur"
           >
             <img src="/favicon.svg" alt="" className="h-7 w-7 rounded-[9px]" />
             <span className="font-display text-[17px] font-semibold">iKAN</span>

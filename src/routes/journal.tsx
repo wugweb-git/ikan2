@@ -87,7 +87,7 @@ function JournalPage() {
             aria-label="Journal history"
             className={cn(
               stateLayer,
-              "absolute right-2 top-[max(0.75rem,calc(env(safe-area-inset-top)+0.5rem))] grid h-12 w-12 place-items-center rounded-full",
+              "safe-pin absolute right-2 grid h-12 w-12 place-items-center rounded-full",
             )}
           >
             <History className="h-6 w-6" />
