@@ -362,3 +362,82 @@ export function Avatar({
     </span>
   );
 }
+
+/* Artwork for the screens where something has gone wrong. Drawn as one open line on the page
+ * rather than inside a tinted card: this app uses its accents for progress and selection, and a
+ * full-bleed block of colour on a dead end would be the loudest thing in the product. The line
+ * draws itself once, which is the whole point of the picture - the path runs out, the wave
+ * breaks, the signal stops - and holds still for anyone who asks for less motion. */
+export type StateScene = "lost" | "broken" | "offline";
+
+/** The ink each scene is drawn in: the text-safe shade of the matching programme accent. */
+export const sceneInk: Record<StateScene, string> = {
+  lost: "#2F5580",
+  broken: "#7A5A12",
+  offline: "#33415C",
+};
+
+export function StateIllustration({ scene, className }: { scene: StateScene; className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 320 150"
+      className={cn("block w-full", className)}
+      style={{ color: sceneInk[scene] }}
+      aria-hidden="true"
+    >
+      <g fill="none" stroke="currentColor" strokeLinecap="round">
+        {scene === "lost" ? (
+          <>
+            {/* the trail you were on, and where it stops being a trail */}
+            <path
+              className="state-draw"
+              d="M24 112 C 72 112, 80 52, 124 52 S 172 100, 198 86"
+              strokeWidth="7"
+            />
+            <path
+              d="M214 78 C 240 66, 254 44, 296 42"
+              strokeWidth="7"
+              strokeDasharray="1 17"
+              strokeOpacity="0.45"
+            />
+            <circle cx="24" cy="112" r="8" fill="currentColor" stroke="none" />
+          </>
+        ) : null}
+        {scene === "broken" ? (
+          <>
+            {/* the line this app draws everywhere else, interrupted */}
+            <path
+              className="state-draw"
+              d="M24 100 C 62 100, 74 44, 116 44 S 146 88, 150 90"
+              strokeWidth="7"
+            />
+            <path
+              d="M186 90 C 204 90, 214 40, 252 40 S 288 86, 300 80"
+              strokeWidth="7"
+              strokeOpacity="0.38"
+            />
+          </>
+        ) : null}
+        {scene === "offline" ? (
+          <>
+            {/* a signal that stops short, and the quiet under it */}
+            <path className="state-draw" d="M124 108 A 36 36 0 0 1 196 108" strokeWidth="7" />
+            <path
+              d="M94 108 A 66 66 0 0 1 226 108"
+              strokeWidth="7"
+              strokeOpacity="0.4"
+              strokeDasharray="3 16"
+            />
+            <path
+              d="M64 108 A 96 96 0 0 1 256 108"
+              strokeWidth="7"
+              strokeOpacity="0.2"
+              strokeDasharray="3 16"
+            />
+            <circle cx="160" cy="108" r="9" fill="currentColor" stroke="none" />
+          </>
+        ) : null}
+      </g>
+    </svg>
+  );
+}
