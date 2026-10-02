@@ -1058,101 +1058,25 @@ html.reduce-motion *::after {
   font-weight: inherit;
 }
 
-/* The report card in the India numbers piece. The draft carried it as one wide infographic: two
- * halves, what is getting better and what is not, each a grid of figures with the earlier value
- * underneath. Rebuilt here as text for the same reason the score tables are blocks — a landscape
- * chart of sixteen numbers is unreadable at 320px, and as text it stays selectable, translatable
- * and legible at any type size. The two halves take iKAN's calm and mood accents rather than the
- * draft's red and green, so the card still reads at a glance without shouting. */
+/* The report card in the India numbers piece: the draft's own infographic, used as it is. It is
+ * a landscape chart, so on a phone it runs full width and opens full size on tap; the alt text
+ * carries every figure on it, since the picture itself is unreadable at 320px. */
 .prose-ikan figure {
   margin: 1.6em 0 0;
 }
-.prose-ikan .rc-title {
-  /* title-md */
-  margin: 0 0 10px;
-  font-family: var(--font-display);
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--foreground);
+.prose-ikan figure a {
+  display: block;
+  text-decoration: none;
 }
-.prose-ikan .rc-group {
-  margin-top: 10px;
-  border-radius: 20px;
-  padding: 16px;
-  background: var(--rc-tint);
-  color: var(--rc-ink);
-}
-.prose-ikan .rc-up {
-  /* calm */
-  --rc-tint: #dff0e8;
-  --rc-ink: #173d2f;
-  --rc-strong: #2b634d;
-}
-.prose-ikan .rc-down {
-  /* mood */
-  --rc-tint: #f9e2e9;
-  --rc-ink: #5a1f32;
-  --rc-strong: #8c3652;
-}
-.prose-ikan .rc-head {
-  /* label-lg, over the rule the draft drew above each half */
-  margin: 0 0 4px;
-  border-bottom: 2px solid var(--rc-strong);
-  padding-bottom: 8px;
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 600;
-  color: var(--rc-strong);
-}
-.prose-ikan .rc-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.prose-ikan .rc-list > li {
-  margin: 0;
-  border-bottom: 1px solid color-mix(in oklab, var(--rc-strong) 20%, transparent);
-  padding: 12px 0;
-}
-.prose-ikan .rc-list > li:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-.prose-ikan .rc-value {
-  /* headline-sm: the figure leads, with what it counts beside it */
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 24px;
-  line-height: 30px;
-  font-weight: 600;
-  color: var(--rc-strong);
-}
-.prose-ikan .rc-value span {
-  /* body-md, in the body face rather than the display one it would otherwise inherit */
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 21px;
-  font-weight: 500;
-  color: var(--rc-ink);
-}
-.prose-ikan .rc-note {
-  /* body-md */
-  margin: 2px 0 0;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--rc-ink);
-}
-.prose-ikan .rc-was {
-  /* label-md: the earlier reading and where the figure comes from */
-  margin: 6px 0 0;
-  font-size: 11px;
-  line-height: 16px;
-  color: color-mix(in oklab, var(--rc-ink) 68%, transparent);
+.prose-ikan figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  background: var(--secondary);
 }
 .prose-ikan figcaption {
-  /* label-md, and it carries the sources for the card above it */
+  /* label-md, and it carries the sources for the figure above it */
   margin-top: 10px;
   font-size: 12px;
   line-height: 18px;
