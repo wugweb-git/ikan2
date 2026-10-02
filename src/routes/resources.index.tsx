@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bookmark, BookmarkCheck, CalendarDays, Clock3, Search } from "lucide-react";
+import { Bookmark, BookmarkCheck, CalendarDays, Check, Clock3, Search } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { accentStyle, IconButton, Snackbar, stateLayer, useSnack } from "@/components/equip/m3";
@@ -15,17 +15,33 @@ import {
   resources,
   slugOf,
   useResourceStore,
+  type Medium,
   type Resource,
 } from "@/lib/resources";
 
-const filters = ["All", "Saved", "General", "Stress", "Sleep"] as const;
+/* The library is filtered by what a thing is, not by what it is about: there are three resource
+ * types and that is the whole list. Saved sits on the end because it is a state, not a type, and
+ * it is the only way back to a bookmark. Categories stay on the cards as a label and in search. */
+const filters = ["All", "Read", "Listen", "Watch", "Saved"] as const;
 type Filter = (typeof filters)[number];
 
-/* The category filter lives in the URL: /resources?category=sleep */
+const filterMedium: Partial<Record<Filter, Medium>> = {
+  Read: "article",
+  Listen: "audio",
+  Watch: "video",
+};
+
+const nothingYet: Partial<Record<Filter, string>> = {
+  Read: "Nothing to read yet",
+  Listen: "Nothing to listen to yet",
+  Watch: "Nothing to watch yet",
+};
+
+/* The filter lives in the URL: /resources?type=watch */
 export const Route = createFileRoute("/resources/")({
-  validateSearch: (s: Record<string, unknown>): { category?: string } => {
-    const c = typeof s["category"] === "string" ? s["category"].toLowerCase() : "";
-    return filters.some((f) => f !== "All" && f.toLowerCase() === c) ? { category: c } : {};
+  validateSearch: (s: Record<string, unknown>): { type?: string } => {
+    const t = typeof s["type"] === "string" ? s["type"].toLowerCase() : "";
+    return filters.some((f) => f !== "All" && f.toLowerCase() === t) ? { type: t } : {};
   },
   head: () =>
     pageMeta(
@@ -47,13 +63,13 @@ function ResourcesPage() {
   const hydrated = useHydrated();
   const store = useResourceStore();
   const snack = useSnack();
-  const { category } = Route.useSearch();
+  const { type } = Route.useSearch();
   const navigate = useNavigate();
-  const filter: Filter = filters.find((f) => f.toLowerCase() === category) ?? "All";
+  const filter: Filter = filters.find((f) => f.toLowerCase() === type) ?? "All";
   const setFilter = (f: Filter) =>
     navigate({
       to: "/resources",
-      search: f === "All" ? {} : { category: f.toLowerCase() },
+      search: f === "All" ? {} : { type: f.toLowerCase() },
       replace: true,
       resetScroll: false,
     });
@@ -62,13 +78,19 @@ function ResourcesPage() {
   const featured = resources.filter((r) => r.featured);
   const q = query.trim().toLowerCase();
   const shown = resources
-    .filter((r) => !q || r.title.toLowerCase().includes(q) || r.category.toLowerCase().includes(q))
+    .filter(
+      (r) =>
+        !q ||
+        r.title.toLowerCase().includes(q) ||
+        r.category.toLowerCase().includes(q) ||
+        mediumOf(r).includes(q),
+    )
     .filter((r) =>
       filter === "All"
         ? true
         : filter === "Saved"
           ? hydrated && store.isSaved(r.id)
-          : r.category === filter,
+          : mediumOf(r) === filterMedium[filter],
     );
 
   const toggle = (r: Resource) => {
@@ -143,11 +165,13 @@ function ResourcesPage() {
         <div
           className="no-scrollbar mt-5 flex gap-2 overflow-x-auto px-4"
           role="tablist"
-          aria-label="Filter articles"
+          aria-label="Filter resources"
         >
           {filters.map((f) => {
             const on = f === filter;
             const count = f === "Saved" && hydrated ? store.saved.length : null;
+            const m = filterMedium[f];
+            const Icon = m ? mediumIcon[m] : null;
             return (
               <button
                 key={f}
@@ -164,6 +188,7 @@ function ResourcesPage() {
                 )}
               >
                 {f === "Saved" ? <Bookmark className="h-4 w-4" /> : null}
+                {Icon ? <Icon className="h-4 w-4" /> : null}
                 {f}
                 {count ? <span className="text-[12px] opacity-70">{count}</span> : null}
               </button>
@@ -172,7 +197,7 @@ function ResourcesPage() {
         </div>
 
         <p className="mt-4 px-4 text-[13px] text-muted-foreground">
-          {shown.length} {shown.length === 1 ? "article" : "articles"}
+          {shown.length} {shown.length === 1 ? "resource" : "resources"}
         </p>
 
         {shown.length === 0 ? (
@@ -182,12 +207,18 @@ function ResourcesPage() {
             </div>
             <div className="p-5 text-center">
               <p className="font-display text-[17px] font-semibold">
-                {q ? "No articles match" : "Nothing saved yet"}
+                {q
+                  ? "Nothing matches that"
+                  : filter === "Saved"
+                    ? "Nothing saved yet"
+                    : (nothingYet[filter] ?? "Nothing here yet")}
               </p>
               <p className="mt-1 text-[14px] text-muted-foreground">
                 {q
                   ? "Try another word, like sleep or stress."
-                  : "Tap the bookmark on any article to keep it here."}
+                  : filter === "Saved"
+                    ? "Tap the bookmark on anything here to keep it."
+                    : "It is on the way. The rest of the library is under All."}
               </p>
             </div>
           </div>
@@ -213,9 +244,12 @@ function ResourcesPage() {
                       <span className="min-w-0 flex-1">
                         <span className="block text-[12px] font-semibold text-[var(--accent-strong)]">
                           {r.category}
+                          {/* opened already. A check, not the word: "Read" now names a type in
+                           * the filter row above, and the eyebrow would say it twice over. */}
                           {read ? (
-                            <span className="ml-2 font-normal text-muted-foreground">
-                              {doneLabel(r)}
+                            <span className="ml-1.5 inline-flex items-center align-middle text-muted-foreground">
+                              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                              <span className="sr-only">{doneLabel(r)}</span>
                             </span>
                           ) : null}
                         </span>
