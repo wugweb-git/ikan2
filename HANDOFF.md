@@ -31,11 +31,22 @@ Links, live once review clears:
 
 ## Open, in rough priority order
 
-1. **No database backup.** The Supabase org is on the **free plan: no automatic backups, no
-   point-in-time recovery.** 11 people's journals with no recovery path. Two scripts exist and
-   neither has run successfully yet: `scripts/backup-db.sh` (needs the database password and a
-   pooler host that answers) and `scripts/export-data.mjs` (needs only the service_role key, and
-   is the easier of the two). The real fix is the Pro plan.
+1. **Backups are ours to run.** The Supabase org is on the **free plan and stays there: no
+   automatic backups, no point-in-time recovery.** The plan is not the answer here; do not
+   propose it again.
+
+   `.github/workflows/backup.yml` takes a nightly `pg_dump`, checks it lists before shipping
+   it, encrypts it and keeps it 90 days as a private Actions artifact. It needs two repository
+   secrets before it does anything: `IKAN_DB_URL` (session mode, port 5432) and
+   `BACKUP_PASSPHRASE`. Lose the passphrase and you lose the backups, so keep it somewhere
+   that is itself backed up.
+
+   `scripts/backup-db.sh` is the same dump by hand, for before anything risky.
+   `scripts/export-data.mjs` needs only the service_role key.
+
+   Two traps with scheduled workflows: GitHub delays them under load, and disables them after
+   60 days of repository inactivity. A restore test has still never been done - an untested
+   backup is a hope, not a backup.
 
 2. **Push does not send.** The code is deployed and correct — `ikan2-push` routes on `kind` and
    speaks FCM v1 — but `FIREBASE_SERVICE_ACCOUNT` is not set in Supabase's edge function
@@ -55,14 +66,21 @@ Links, live once review clears:
 5. **Search Console** has no property. Try the Google Analytics verification method first — the
    gtag is already on every page, so it needs no code change. Then submit `sitemap.xml`.
 
-6. **Consultant names have no photographs.** The stock portraits were removed (strangers
-   presented as named clinicians); cards show initials. `photo` is optional on the type — fill it
-   when there are real photographs.
+6. **Consultant cards carry Unsplash stock portraits**, hotlinked, under five named
+   clinicians. They were removed on 25 Sep and put back on 28 Sep on the owner's instruction;
+   do not remove them again. Replace them with real photographs when there are some.
 
-7. **The old Lovable Cloud database** (`cfsnyzcrekchvzrulpvl`) holds 8 profiles including 3
-   emergency contacts, frozen since 14 Sep. Nothing reads it. A `mirror` schema and
-   `scripts/sync-mirror.sh` were set up to use it as a backup target. Delete it or maintain it,
-   but do not leave it as it is.
+7. **The old Lovable Cloud database** (`cfsnyzcrekchvzrulpvl`) is not disposable, and the
+   earlier note here saying it could be deleted was wrong. It holds 8 accounts and 28
+   `user_state` rows - journals, assessments and programme progress - frozen since 14 Sep.
+   All 8 of those people also have accounts in the live project, which is why it looked
+   redundant. But **four of them have no state rows at all in the live project**: about 12 kB
+   of their writing exists in that database and nowhere else, and deleting it destroys it.
+
+   `scripts/rescue-lovable-cloud.sh` dumps it and then copies the stranded rows across,
+   matching on email because the auth user ids were reissued. It never overwrites a key the
+   live account already has. Run `backup`, then `migrate`; delete nothing until a restore
+   test of the dump has passed.
 
 8. **Branch protection and secret scanning** are not enabled on GitHub. A `.env` was committed
    once already.

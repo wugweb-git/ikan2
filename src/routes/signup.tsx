@@ -6,6 +6,7 @@ import { AuthLayout, Field, FormError, PrimaryButton, SocialButtons } from "@/co
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { PhoneField } from "@/components/phone-field";
+import { breachError } from "@/lib/pwned";
 import * as v from "@/lib/validate";
 import { track } from "@/lib/analytics";
 
@@ -51,6 +52,14 @@ function SignupPage() {
     setBusy(true);
     setError(null);
     try {
+      // Checked here rather than as they type: it is one network round trip, and telling
+      // someone their half-finished password is breached is noise, not help.
+      const breached = await breachError(password);
+      if (breached) {
+        setError(breached);
+        setBusy(false);
+        return;
+      }
       const outcome = await signUp({
         name: name.trim(),
         email: email.trim(),

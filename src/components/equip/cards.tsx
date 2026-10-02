@@ -462,26 +462,29 @@ export function EntriesStep({
       : []),
     ...list.map((e, i) => (
       <CardShell key={e.id}>
-        <div className="mb-2 flex items-center justify-between">
+        {/* Which actions appeared used to depend on the day: today's entries could only be
+            deleted, earlier ones only edited. Nothing about an entry's age makes one of those
+            wrong, and the missing one was unreachable, so both are always offered. */}
+        <div className="-mt-1 mb-2 flex items-center justify-between gap-2">
           <p className="text-[13px] font-semibold text-muted-foreground">Entry #{i + 1}</p>
-          {e.day === ctx.day ? (
+          <span className="-mr-3 flex items-center gap-1">
+            {e.day === ctx.day ? null : (
+              <span className="text-[12px] text-muted-foreground">Day {e.day}</span>
+            )}
+            <IconButton label={`Edit entry ${i + 1}`} onClick={() => setEditing(e)}>
+              <Pencil className="h-5 w-5" />
+            </IconButton>
             <IconButton
               label={`Delete entry ${i + 1}`}
-              className="-mr-3 -mt-3"
               onClick={() => removeEntry(view.collection, e.id)}
             >
               <Trash2 className="h-5 w-5" />
             </IconButton>
-          ) : (
-            <span className="-mr-3 -mt-3 flex items-center">
-              <span className="text-[12px] text-muted-foreground">Day {e.day}</span>
-              <IconButton label={`Edit entry ${i + 1}`} onClick={() => setEditing(e)}>
-                <Pencil className="h-5 w-5" />
-              </IconButton>
-            </span>
-          )}
+          </span>
         </div>
-        <Values entry={e} fields={view.fields.filter((f) => !view.editable?.includes(f.key))} />
+        <div className="rounded-[12px] bg-background/70 p-3">
+          <Values entry={e} fields={view.fields.filter((f) => !view.editable?.includes(f.key))} />
+        </div>
         {view.fields
           .filter((f) => view.editable?.includes(f.key))
           .map((f) => (
@@ -794,6 +797,7 @@ export function ReviewStep({
     : visible;
   const doneBefore = visible.length - list.length;
   const [sheet, setSheet] = useState(false);
+  const [editing, setEditing] = useState<Entry | null>(null);
   const [page, setPage] = useState(0);
   const snack = useSnack();
   const reviewKeys = new Set(view.fields.map((f) => f.key));
@@ -882,10 +886,37 @@ export function ReviewStep({
           </CardShell>,
         ]
       : []),
-    ...list.map((e) => (
+    ...list.map((e, i) => (
       <CardShell key={e.id}>
-        <Values entry={e} fields={infoFields(e)} />
-        <div className="mt-4 space-y-4 border-t border-foreground/10 pt-4">
+        {/* Carried entries used to be an unlabelled wall of values with no way to correct a
+            typo or drop one written by mistake. Same header the other card types already use:
+            where it came from on the left, and the action that makes sense on the right -
+            delete for something written today, edit for something carried from an earlier
+            day, which is the only way to reach it again. */}
+        <div className="-mt-1 mb-2 flex items-center justify-between gap-2">
+          <p className="text-[13px] font-semibold text-muted-foreground">
+            {e.day === ctx.day ? "Today" : `From day ${e.day}`}
+          </p>
+          <span className="-mr-3 flex items-center">
+            <IconButton label={`Edit entry ${i + 1}`} onClick={() => setEditing(e)}>
+              <Pencil className="h-5 w-5" />
+            </IconButton>
+            <IconButton
+              label={`Delete entry ${i + 1}`}
+              onClick={() => removeEntry(view.collection, e.id)}
+            >
+              <Trash2 className="h-5 w-5" />
+            </IconButton>
+          </span>
+        </div>
+        {/* Two different things share this card: something the person wrote on an earlier day,
+            and the question being asked of it now. They used to read as one undifferentiated
+            column. The inset panel is what separates them - the earlier writing sits quoted
+            inside the card, and the answer belongs to the card itself. */}
+        <div className="rounded-[12px] bg-background/70 p-3">
+          <Values entry={e} fields={infoFields(e)} />
+        </div>
+        <div className="mt-4 space-y-4">
           {view.fields.map((f) => (
             <FieldInput
               key={f.key}
@@ -936,6 +967,20 @@ export function ReviewStep({
           </Button>
         </div>
       ) : null}
+      <BottomSheet open={Boolean(editing)} onClose={() => setEditing(null)} title="Edit entry">
+        {editing ? (
+          <EntryForm
+            key={editing.id}
+            fields={[...(view.addFields ?? []), ...view.fields]}
+            initial={editing.values}
+            submitLabel="Save changes"
+            onSubmit={(v) => {
+              patchEntry(view.collection, editing.id, v);
+              setEditing(null);
+            }}
+          />
+        ) : null}
+      </BottomSheet>
       <BottomSheet open={sheet} onClose={() => setSheet(false)} title={step.block.title}>
         <EntryForm
           fields={[...(view.addFields ?? []), ...view.fields]}

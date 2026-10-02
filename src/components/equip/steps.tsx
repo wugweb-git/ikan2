@@ -838,18 +838,22 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
     );
   }
 
-  // "tried to sleep" can't come before "went to bed" (up to 12 hours earlier counts as before)
-  const beforeBed =
-    question.key === "tried" && entry.bed && entry.tried
-      ? (() => {
-          const m = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
-          const gap = (m(entry.bed) - m(entry.tried) + 1440) % 1440;
-          return gap > 0 && gap <= 720;
-        })()
-      : false;
+  /* A night runs in one direction: bed, tried to sleep, woke, got out of bed. Only the first
+     of those pairs was checked, so "time I got out of bed" accepted - and suggested - times
+     before the person said they woke up. The rule is the same for both pairs, so it is stated
+     once here and used for the error and for the chips. */
+  const EARLIER_THAN: Partial<Record<keyof DiaryEntry, { key: keyof DiaryEntry; label: string }>> =
+    {
+      tried: { key: "bed", label: "the time you went to bed" },
+      up: { key: "woke", label: "the time you woke up" },
+    };
+  const earlier = EARLIER_THAN[question.key];
+  const notBefore = earlier ? (entry[earlier.key] as string | undefined) : undefined;
+  const tooEarly =
+    notBefore && entry[question.key] ? isBefore(entry[question.key] as string, notBefore) : false;
   const answered =
     question.kind === "time"
-      ? Boolean(entry[question.key]) && !beforeBed
+      ? Boolean(entry[question.key]) && !tooEarly
       : question.kind === "rating"
         ? entry.quality !== undefined
         : true;
@@ -877,12 +881,13 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
             value={entry[question.key] as string | undefined}
             recent={recentValues(question.key) as string[]}
             suggested={suggestTimes(question.key, entry)}
+            notBefore={notBefore}
             onChange={(v) => set({ [question.key]: v })}
           />
         ) : null}
-        {beforeBed ? (
+        {tooEarly && earlier ? (
           <p className="mt-3 text-[14px] font-medium text-[#B3261E]" role="alert">
-            This can’t be before the time you went to bed.
+            This can’t be before {earlier.label}.
           </p>
         ) : null}
         {question.kind === "minutes" || question.kind === "count" ? (
@@ -941,6 +946,7 @@ function TimeAnswer({
   value,
   recent,
   suggested,
+  notBefore,
   onChange,
 }: {
   label: string;
@@ -948,6 +954,8 @@ function TimeAnswer({
   recent: string[];
   /** times worked out from tonight's earlier answers, or typical ones */
   suggested: { label: string; value: string }[];
+  /** an answer already given that this time has to come after, e.g. the time they woke up */
+  notBefore?: string | undefined;
   onChange: (v: string) => void;
 }) {
   const picks = [
@@ -956,7 +964,14 @@ function TimeAnswer({
       value: t,
     })),
     ...suggested,
-  ].filter((p, i, all) => all.findIndex((x) => x.value === p.value) === i);
+  ]
+    .filter((p, i, all) => all.findIndex((x) => x.value === p.value) === i)
+    // Offering a time the answer cannot have is worse than offering nothing: last night's
+    // 8:25 am has no business being a one-tap answer for a morning they woke at 9.
+    .filter((p) => !notBefore || !isBefore(p.value, notBefore));
+  // The heading describes what survived that filter, not what went into it: on a late
+  // morning every remembered time can be dropped, and the strip is then all suggestions.
+  const fromEarlierNights = picks.slice(0, 5).some((p) => recent.includes(p.value));
   return (
     <>
       <label className="block rounded-[24px] bg-[var(--accent-container)] px-5 py-4 text-[var(--on-accent-container)]">
@@ -972,7 +987,7 @@ function TimeAnswer({
       {picks.length ? (
         <>
           <p className="mt-4 text-[13px] text-muted-foreground">
-            {recent.length ? "From your earlier nights" : "Suggested"}
+            {fromEarlierNights ? "From your earlier nights" : "Suggested"}
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             {picks.slice(0, 5).map((p) => (
@@ -992,6 +1007,13 @@ function TimeAnswer({
   );
 }
 
+/** Same clock face, no dates: a time up to 12 hours earlier than the anchor is "before" it. */
+const isBefore = (time: string, anchor: string) => {
+  const m = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  const gap = (m(anchor) - m(time) + 1440) % 1440;
+  return gap > 0 && gap <= 720;
+};
+
 const addMinutes = (hhmm: string | undefined, minutes: number) => {
   if (!hhmm || !/^\d{2}:\d{2}$/.test(hhmm)) return undefined;
   const [h, m] = hhmm.split(":").map(Number);
@@ -1010,27 +1032,41 @@ function suggestTimes(key: keyof DiaryEntry, e: DiaryEntry) {
     e.tried as string | undefined,
     (e.latency as number | undefined) ?? 0,
   );
+  /* Times earlier than the answer they follow are dropped before these are shown, and on a
+     late morning that can take out every remembered time from earlier nights. So each ladder
+     runs long enough to fill the strip on its own: what is offered stays useful instead of
+     thinning to one chip whenever the night ran unusually. */
+  const ladder = (base: string | undefined, steps: [number, string][]) =>
+    steps.flatMap(([add, what]) => from(base, add, what));
   switch (key) {
     case "bed":
-      return typical(["22:00", "22:30", "23:00", "23:30"]);
+      return typical(["22:00", "22:30", "23:00", "23:30", "00:00"]);
     case "tried":
-      return [
-        ...from(e.bed as string | undefined, 0, "when you got in bed"),
-        ...from(e.bed as string | undefined, 15, "15 min later"),
-        ...from(e.bed as string | undefined, 30, "30 min later"),
-      ];
+      return ladder(e.bed as string | undefined, [
+        [0, "when you got in bed"],
+        [15, "15 min later"],
+        [30, "30 min later"],
+        [45, "45 min later"],
+        [60, "1 hour later"],
+      ]);
     case "woke":
       return [
-        ...from(asleepBy, 7 * 60, "7 h after falling asleep"),
-        ...from(asleepBy, 8 * 60, "8 h after falling asleep"),
-        ...(asleepBy ? [] : typical(["06:00", "06:30", "07:00", "07:30"])),
+        ...ladder(asleepBy, [
+          [6 * 60, "6 h after falling asleep"],
+          [7 * 60, "7 h after falling asleep"],
+          [8 * 60, "8 h after falling asleep"],
+          [9 * 60, "9 h after falling asleep"],
+        ]),
+        ...(asleepBy ? [] : typical(["06:00", "06:30", "07:00", "07:30", "08:00"])),
       ];
     case "up":
-      return [
-        ...from(e.woke as string | undefined, 0, "when you woke"),
-        ...from(e.woke as string | undefined, 10, "10 min later"),
-        ...from(e.woke as string | undefined, 30, "30 min later"),
-      ];
+      return ladder(e.woke as string | undefined, [
+        [0, "when you woke"],
+        [10, "10 min later"],
+        [30, "30 min later"],
+        [60, "1 hour later"],
+        [90, "1.5 hours later"],
+      ]);
     default:
       return [];
   }
