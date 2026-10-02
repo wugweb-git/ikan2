@@ -157,6 +157,8 @@ function ArticlePage() {
             <MediaPlayer
               src={r.src}
               kind={mediumOf(r) === "audio" ? "audio" : "video"}
+              cover={<Illustration art={r.art} className="h-full w-full object-cover" />}
+              title={r.title}
               className="mt-6"
             />
           ) : null}
