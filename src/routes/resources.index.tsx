@@ -1,13 +1,22 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bookmark, BookmarkCheck, BookOpen, CalendarDays, Clock3, Search } from "lucide-react";
+import { Bookmark, BookmarkCheck, CalendarDays, Clock3, Search } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { accentStyle, IconButton, Snackbar, stateLayer, useSnack } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
-import { resources, slugOf, useResourceStore, type Resource } from "@/lib/resources";
+import {
+  doneLabel,
+  lengthLabel,
+  mediumIcon,
+  mediumOf,
+  resources,
+  slugOf,
+  useResourceStore,
+  type Resource,
+} from "@/lib/resources";
 
 const filters = ["All", "Saved", "General", "Stress", "Sleep"] as const;
 type Filter = (typeof filters)[number];
@@ -107,7 +116,10 @@ function ResourcesPage() {
                   <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-5">
                     <span className="inline-flex h-6 items-center gap-1.5 rounded-full bg-white/20 px-2.5 text-[12px] font-semibold backdrop-blur">
-                      <BookOpen className="h-3.5 w-3.5" />
+                      {(() => {
+                        const Icon = mediumIcon[mediumOf(r)];
+                        return <Icon className="h-3.5 w-3.5" />;
+                      })()}
                       {i === 0 ? "Featured story" : r.category}
                     </span>
                     <h2 className="mt-2 line-clamp-3 font-display text-[20px] font-semibold leading-6">
@@ -118,7 +130,7 @@ function ResourcesPage() {
                         <CalendarDays className="h-3.5 w-3.5" /> {dateLabel(r.date)}
                       </span>
                       <span className="inline-flex items-center gap-1.5">
-                        <Clock3 className="h-3.5 w-3.5" /> {r.minutes} min read
+                        <Clock3 className="h-3.5 w-3.5" /> {lengthLabel(r)}
                       </span>
                     </span>
                   </div>
@@ -202,7 +214,9 @@ function ResourcesPage() {
                         <span className="block text-[12px] font-semibold text-[var(--accent-strong)]">
                           {r.category}
                           {read ? (
-                            <span className="ml-2 font-normal text-muted-foreground">Read</span>
+                            <span className="ml-2 font-normal text-muted-foreground">
+                              {doneLabel(r)}
+                            </span>
                           ) : null}
                         </span>
                         <h3 className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">
@@ -213,7 +227,7 @@ function ResourcesPage() {
                             <CalendarDays className="h-3.5 w-3.5" /> {dateLabel(r.date)}
                           </span>
                           <span className="inline-flex items-center gap-1.5">
-                            <Clock3 className="h-3.5 w-3.5" /> {r.minutes} min read
+                            <Clock3 className="h-3.5 w-3.5" /> {lengthLabel(r)}
                           </span>
                         </span>
                       </span>

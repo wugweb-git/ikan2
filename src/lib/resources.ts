@@ -1,3 +1,4 @@
+import { BookOpen, Headphones, Play, type LucideIcon } from "lucide-react";
 import { createLocalStore } from "@/lib/local-store";
 
 /* The ten articles on ikanhealth.in/resource (as listed on 13 Sep 2026). Titles, categories,
@@ -24,13 +25,26 @@ export type Art =
   | "worry"
   | "lowmood";
 
+/* What a resource is to be done with. Everything in the library is an article today; video and
+ * audio are modelled here so adding one is a data change, not a rebuild. A resource with no
+ * `medium` is an article, so the entries below need no field. */
+export type Medium = "article" | "video" | "audio";
+
 export type Resource = {
   id: string;
   title: string;
   category: ResourceCategory;
   date: string;
+  /** how long it takes: to read, to watch or to listen to */
   minutes: number;
   art: Art;
+  medium?: Medium;
+  /** video and audio only: a direct file to play (mp4, webm, mp3, m4a). The app plays it with
+   * the browser's own <video>/<audio>, so nothing loads from a third party and no cookie is set
+   * before someone presses play. Host it anywhere that serves the file with CORS - the project's
+   * own Supabase Storage is the obvious place. An article's body, if it has one, becomes the
+   * transcript or the show notes below the player. */
+  src?: string;
   featured?: boolean;
   /** the iKAN assessment this article explains */
   assessment?: string;
@@ -189,6 +203,33 @@ export const resources: Resource[] = [
     art: "checkup",
   },
 ];
+
+export const mediumOf = (r: Resource): Medium => r.medium ?? "article";
+
+const verb: Record<Medium, string> = { article: "read", video: "watch", audio: "listen" };
+const done: Record<Medium, string> = { article: "Read", video: "Watched", audio: "Listened" };
+const plural: Record<Medium, string> = { article: "articles", video: "videos", audio: "audio" };
+
+/** "5 min read", "12 min watch", "18 min listen" */
+export const lengthLabel = (r: Resource) => `${r.minutes} min ${verb[mediumOf(r)]}`;
+
+/** The badge on something already opened: Read, Watched, Listened. */
+export const doneLabel = (r: Resource) => done[mediumOf(r)];
+
+export const mediumIcon: Record<Medium, LucideIcon> = {
+  article: BookOpen,
+  video: Play,
+  audio: Headphones,
+};
+
+/** What the library row says it holds, which changes once it holds more than articles. */
+export const libraryLabel = () => {
+  const parts = (["article", "video", "audio"] as const)
+    .map((m) => [m, resources.filter((r) => mediumOf(r) === m).length] as const)
+    .filter(([, n]) => n > 0)
+    .map(([m, n]) => `${n} ${plural[m]}`);
+  return parts.length === 1 ? `${parts[0]} and guides` : parts.join(" \u00b7 ");
+};
 
 export const getResource = (id: string) => resources.find((r) => r.id === id);
 

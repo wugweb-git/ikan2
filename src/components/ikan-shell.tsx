@@ -32,7 +32,7 @@ import { useBackToClose } from "@/hooks/use-back-close";
 import { useEverything } from "@/lib/activity";
 import { useNotifications } from "@/lib/notifications";
 import { profileInitials, useProfile, useSettings } from "@/lib/profile";
-import { resources } from "@/lib/resources";
+import { libraryLabel } from "@/lib/resources";
 import { consultants } from "@/lib/consultants";
 import { cn } from "@/lib/utils";
 import type { LegalSlug } from "@/lib/content";
@@ -218,7 +218,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
         {
           to: "/resources",
           label: "Resources",
-          sub: `${resources.length} articles and guides`,
+          sub: libraryLabel(),
           icon: BookOpen,
         },
         {
