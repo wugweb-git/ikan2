@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -131,6 +131,15 @@ export function MediaPlayer({
 }) {
   const source = parseSource(src);
   const [playing, setPlaying] = useState(false);
+
+  /* Moving between two media articles keeps this component mounted, so without this the next
+   * one would open with the previous one's "already playing" and load its embed before anyone
+   * asked. That would quietly undo the only privacy promise this component makes. */
+  const shown = useRef(src);
+  if (shown.current !== src) {
+    shown.current = src;
+    setPlaying(false);
+  }
 
   if (source.kind === "embed") {
     const box =
