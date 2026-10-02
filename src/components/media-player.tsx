@@ -1,5 +1,6 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import { Play } from "lucide-react";
+import { stateLayer } from "@/components/equip/m3";
 import { cn } from "@/lib/utils";
 
 /* The one player in the app. Resources use it for video and audio posts; the Equip blocks will
@@ -111,7 +112,6 @@ export function MediaPlayer({
   src,
   kind,
   poster,
-  cover,
   className,
   title,
   onEnded,
@@ -120,8 +120,6 @@ export function MediaPlayer({
   kind: "video" | "audio";
   /** a still for a file video; without one the browser shows the first frame */
   poster?: string;
-  /** what sits behind the play button until an embed is asked for: the article's own artwork */
-  cover?: ReactNode;
   className?: string;
   /** names the embed for screen readers, since the iframe's own title is the service's */
   title?: string;
@@ -142,29 +140,33 @@ export function MediaPlayer({
   }
 
   if (source.kind === "embed") {
+    /* The embed's own height is Spotify's, and it is tall. The placeholder does not need it:
+     * before anyone presses play there is nothing to show but a button. */
     const box =
       source.provider === "spotify"
         ? { height: source.height }
         : { aspectRatio: "16 / 9" as const };
     if (!playing) {
+      const rest = source.provider === "spotify" ? { height: 168 } : box;
       return (
-        <div className={cn("relative", className)} style={box}>
+        <div className={cn("relative", className)} style={rest}>
           <button
             type="button"
             onClick={() => setPlaying(true)}
-            className="group relative block h-full w-full overflow-hidden rounded-[20px] bg-secondary"
+            className={cn(
+              "flex h-full w-full flex-col items-center justify-center gap-3 rounded-[20px] bg-secondary px-6 text-center",
+              stateLayer,
+            )}
           >
-            {cover ? <span className="absolute inset-0">{cover}</span> : null}
-            <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-            <span className="absolute inset-x-0 bottom-0 flex items-center gap-3 p-4 text-left text-white">
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/95 text-foreground transition-transform group-active:scale-95">
-                <Play className="ml-0.5 h-5 w-5 fill-current" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[15px] font-semibold">{label[source.provider]}</span>
-                <span className="block text-[12px] leading-4 opacity-85">
-                  {note[source.provider]}
-                </span>
+            {/* No artwork here on purpose: the article's illustration is already the hero
+             * directly above, and repeating it put the same picture on screen twice. */}
+            <span className="grid h-14 w-14 place-items-center rounded-full bg-[var(--accent-strong,theme(colors.foreground))] text-background">
+              <Play className="ml-0.5 h-6 w-6 fill-current" />
+            </span>
+            <span>
+              <span className="block text-[15px] font-semibold">{label[source.provider]}</span>
+              <span className="mt-0.5 block text-[12px] leading-4 text-muted-foreground">
+                {note[source.provider]}
               </span>
             </span>
           </button>
