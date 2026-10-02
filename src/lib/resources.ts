@@ -45,6 +45,10 @@ export type Resource = {
    * own Supabase Storage is the obvious place. An article's body, if it has one, becomes the
    * transcript or the show notes below the player. */
   src?: string;
+  /** the real artwork for a video or audio piece, behind the play button. Fetched once from the
+   * provider and committed, never requested at render: the whole point of the placeholder is
+   * that nothing reaches YouTube or Spotify until somebody presses play. */
+  poster?: string;
   featured?: boolean;
   /** the iKAN assessment this article explains */
   assessment?: string;
@@ -63,6 +67,7 @@ export const resources: Resource[] = [
     art: "stress",
     medium: "video",
     src: "https://www.youtube.com/watch?v=z7ATOc4ShOc",
+    poster: "/resources/poster-five-minutes-stress.jpg",
     featured: true,
   },
   {
@@ -87,6 +92,7 @@ export const resources: Resource[] = [
     art: "work",
     medium: "audio",
     src: "https://open.spotify.com/episode/5IvwJBttwqfAgJspvpyB43",
+    poster: "/resources/poster-stress-performance.jpg",
   },
   {
     id: "resource-stress-takes-over",
@@ -97,6 +103,7 @@ export const resources: Resource[] = [
     art: "burnout",
     medium: "video",
     src: "https://www.youtube.com/watch?v=Dq9odPtHbcg",
+    poster: "/resources/poster-stress-takes-over.jpg",
   },
   {
     id: "resource-great-practices",
@@ -107,6 +114,7 @@ export const resources: Resource[] = [
     art: "resilience",
     medium: "video",
     src: "https://www.youtube.com/watch?v=RIyge4jzeFg",
+    poster: "/resources/poster-great-practices.jpg",
   },
   {
     id: "resource-can-we-talk",

@@ -157,23 +157,19 @@ function ArticlePage() {
             <MediaPlayer
               src={r.src}
               kind={mediumOf(r) === "audio" ? "audio" : "video"}
+              {...(r.poster ? { poster: r.poster } : {})}
               title={r.title}
               className="mt-6"
             />
           ) : null}
 
+          {/* A media piece's body is a written article about the thing, not a transcript and
+           * not the publisher's show notes, so it carries no heading of its own. */}
           {article ? (
-            <>
-              {r.src ? (
-                <h2 className="type-title-lg mt-8 font-semibold">
-                  {mediumOf(r) === "audio" ? "Show notes" : "Transcript"}
-                </h2>
-              ) : null}
-              <div
-                className={cn("prose-ikan", r.src ? "mt-3" : "mt-6")}
-                dangerouslySetInnerHTML={{ __html: article.html }}
-              />
-            </>
+            <div
+              className={cn("prose-ikan", r.src ? "mt-7" : "mt-6")}
+              dangerouslySetInnerHTML={{ __html: article.html }}
+            />
           ) : null}
 
           {assessment ? (

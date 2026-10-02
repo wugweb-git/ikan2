@@ -154,18 +154,34 @@ export function MediaPlayer({
             type="button"
             onClick={() => setPlaying(true)}
             className={cn(
-              "flex h-full w-full flex-col items-center justify-center gap-3 rounded-[20px] bg-secondary px-6 text-center",
+              "relative block h-full w-full overflow-hidden rounded-[20px] bg-secondary text-left",
+              poster && "text-white",
               stateLayer,
             )}
           >
-            {/* No artwork here on purpose: the article's illustration is already the hero
-             * directly above, and repeating it put the same picture on screen twice. */}
-            <span className="grid h-14 w-14 place-items-center rounded-full bg-[var(--accent-strong,theme(colors.foreground))] text-background">
-              <Play className="ml-0.5 h-6 w-6 fill-current" />
+            {/* The piece's own artwork, committed to this repo rather than fetched, so the
+             * placeholder still reaches nobody. Never the article's illustration: that is the
+             * hero directly above, and repeating it put the same picture on screen twice. */}
+            {poster ? (
+              <>
+                <img src={poster} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+              </>
+            ) : null}
+            {/* The button sits above the centre so it never lands on the wording below it. */}
+            <span className="absolute inset-x-0 top-0 bottom-[4.25rem] grid place-items-center">
+              <span className="grid h-14 w-14 place-items-center rounded-full bg-white text-foreground shadow-lg">
+                <Play className="ml-0.5 h-6 w-6 fill-current" />
+              </span>
             </span>
-            <span>
+            <span className="absolute inset-x-0 bottom-0 block px-4 pb-3.5">
               <span className="block text-[15px] font-semibold">{label[source.provider]}</span>
-              <span className="mt-0.5 block text-[12px] leading-4 text-muted-foreground">
+              <span
+                className={cn(
+                  "mt-0.5 block text-[12px] leading-4",
+                  poster ? "text-white/85" : "text-muted-foreground",
+                )}
+              >
                 {note[source.provider]}
               </span>
             </span>
