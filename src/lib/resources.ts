@@ -5,8 +5,8 @@ import { createLocalStore } from "@/lib/local-store";
  * Two fixes: "An easy guide o the" → "to the", and the GAD-7 guide, filed under Sleep on the
  * site, is filed under General here.
  *
- * Plus the five brief-scale posts written for the app (23 Sep 2026). These live only here: they
- * are not on ikanhealth.in yet. */
+ * Plus the five brief-scale posts written for the app (23 Sep 2026) and the India numbers piece
+ * (3 Oct 2026, from the Notion draft). These live only here: they are not on ikanhealth.in yet. */
 
 export type ResourceCategory = "General" | "Stress" | "Sleep";
 export type Art =
@@ -40,6 +40,15 @@ export type Resource = {
 };
 
 export const resources: Resource[] = [
+  {
+    id: "resource-india-numbers",
+    title: "India's Mental Health Crisis: The Numbers We Can No Longer Ignore.",
+    category: "General",
+    date: "2026-10-03",
+    minutes: 5,
+    art: "measure",
+    featured: true,
+  },
   {
     id: "resource-who-5",
     title: "What is the WHO-5 Well-Being Index? A Simple Guide to Measuring Mental Wellness",
@@ -188,6 +197,9 @@ export const slugOf = (r: Resource) =>
   r.title
     .toLowerCase()
     .replace(/\(.*?\)/g, "")
+    /* apostrophes go, rather than becoming a separator: "India's" would otherwise slug as
+     * "india-s" and spend one of the nine words on the s. */
+    .replace(/['’]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .split("-")
