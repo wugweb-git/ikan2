@@ -16,7 +16,7 @@
  * Generated from the @utility declarations above - regenerate if you add one:
  *   node -e '...'  (see .design-sync/NOTES.md)
  */
-@source inline("{activity-dial,ambient,ambient-afternoon,ambient-evening,ambient-morning,ambient-night,animate-fade,animate-fade-in,animate-sheet,avatar,avatar-ring,avatar-sm,brand-mark,chart-column,delay-1,delay-2,delay-3,delay-4,eyebrow,font-display,hero-card,hero-chip,hero-media,hero-ring,hero-track,hero-veil,insight-card,metric-pill,metric-track,mini-score,nav-icon,nav-item,no-scrollbar,pb-safe,program-band,read-body,read-card,read-meta,read-tag,read-veil,reveal,reveal-in,ring-dial,ring-label,ring-stat,row-link,safe-pin,safe-top,safe-top-sm,score-alert,score-calm,score-mind,score-orb,score-rest,score-ring,score-tile,semantic-chip,shadow-app,shadow-dock,skeleton,splash-disc,splash-hills,splash-mark,splash-progress,splash-ring,splash-rise,sticky-bar,sticky-bar-on,surface,tile,type-action,type-body-lg,type-body-md,type-body-sm,type-body-xl,type-display-lg,type-display-md,type-display-sm,type-headline-lg,type-headline-md,type-headline-sm,type-label-lg,type-label-md,type-title-lg,type-title-md}");
+@source inline("{activity-dial,ambient,ambient-afternoon,ambient-evening,ambient-morning,ambient-night,animate-fade,animate-fade-in,animate-sheet,avatar,avatar-ring,avatar-sm,brand-mark,chart-column,delay-1,delay-2,delay-3,delay-4,eyebrow,font-display,hero-card,hero-chip,hero-media,hero-ring,hero-track,hero-veil,insight-card,metric-pill,metric-track,mini-score,motion-enter,motion-error,motion-press,motion-tint,nav-icon,nav-item,no-scrollbar,pb-safe,program-band,read-body,read-card,read-meta,read-tag,read-veil,reveal,reveal-in,ring-dial,ring-label,ring-stat,row-link,safe-pin,safe-top,safe-top-sm,score-alert,score-calm,score-mind,score-orb,score-rest,score-ring,score-tile,semantic-chip,shadow-app,shadow-dock,skeleton,splash-disc,splash-hills,splash-mark,splash-progress,splash-ring,splash-rise,sticky-bar,sticky-bar-on,surface,tile,type-action,type-body-lg,type-body-md,type-body-sm,type-body-xl,type-display-lg,type-display-md,type-display-sm,type-headline-lg,type-headline-md,type-headline-sm,type-label-lg,type-label-md,type-title-lg,type-title-md}");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -182,6 +182,15 @@
   --brand-coral-ink: oklch(0.511 0.141 26.5);
   --brand-slate: oklch(0.674 0.111 269.3);
   --brand-slate-ink: oklch(0.487 0.111 268.4);
+  /* Motion. Three durations and two easings cover every state change in the app.
+   * `--ease-out` is the standard decelerate curve: fast to start, settling at the end, which
+   * is what a thing arriving should do. `--ease-spring` overshoots very slightly and is for
+   * a press releasing. */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.26, 0.64, 1);
   --shadow-app: 0 0 45px oklch(0.2 0.01 255 / 0.08);
   --shadow-card: 0 10px 30px oklch(0.2 0.01 255 / 0.06);
   --shadow-dock: 0 12px 35px oklch(0.18 0.01 255 / 0.14);
@@ -486,6 +495,52 @@
   line-height: 16px;
   font-weight: 500;
   letter-spacing: 0.01em;
+}
+/* State motion.
+ *
+ * One rule each, so a component says what it is rather than re-deriving a duration. All of
+ * them are transitions, which the reduced-motion block above now collapses to ~0ms.
+ *
+ * `press` is the one worth explaining: scale on :active reads as physical, and 0.97 is small
+ * enough to feel like a button depressing rather than a thing shrinking. */
+@utility motion-press {
+  transition:
+    transform var(--dur-fast) var(--ease-spring),
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+  &:active {
+    transform: scale(0.97);
+  }
+}
+/* For a surface that should not move, only tint - cards and rows. */
+@utility motion-tint {
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+/* Something appearing in place: a chip being added, an error message arriving. */
+@utility motion-enter {
+  animation: motion-enter var(--dur-base) var(--ease-out) both;
+}
+@keyframes motion-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+/* An error arriving. Shorter and flatter than motion-enter - an error should register, not
+ * perform. No shake: it draws the eye away from the message that explains the problem. */
+@utility motion-error {
+  animation: motion-error var(--dur-fast) var(--ease-out) both;
+}
+@keyframes motion-error {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
 }
 @utility shadow-app {
   box-shadow: var(--shadow-app);
@@ -1102,6 +1157,10 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    /* transitions too: the rule used to cover `animation` only, so every state transition
+     * still ran at full length for someone who had asked for less motion. */
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
 }

@@ -49,7 +49,7 @@ export function cardClass({
   inset?: boolean | undefined;
 } = {}) {
   return cn(
-    "block overflow-hidden",
+    "motion-tint block overflow-hidden",
     radii[radius],
     tones[tone],
     inset && "p-4",

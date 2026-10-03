@@ -189,7 +189,7 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-[0.01em] transition-colors disabled:pointer-events-none disabled:opacity-40",
+        "motion-press inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-[0.01em] disabled:pointer-events-none disabled:opacity-40",
         buttonSizes[size],
         stateLayer,
         buttonVariants[variant],
@@ -234,7 +234,7 @@ export function Fab({
       onClick={onClick}
       aria-label={extended ? undefined : label}
       className={cn(
-        "inline-flex h-14 items-center justify-center gap-2 rounded-full bg-foreground text-background shadow-dock",
+        "motion-press inline-flex h-14 items-center justify-center gap-2 rounded-full bg-foreground text-background shadow-dock",
         extended ? "px-5 text-[15px] font-semibold" : "w-14",
         stateLayer,
         className,

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ExternalLink } from "@/components/kit/link";
 
 /* Launch screen, under the same sky as Home for the time of day. One sequence: the disc opens,
  * the iKAN burst blooms into it, then the name, promise and a loading line rise in; a soft
@@ -134,15 +135,14 @@ export function Splash() {
         style={{ color: s.muted, animationDelay: "1500ms" }}
       >
         Made by{" "}
-        <a
+        <ExternalLink
           href="https://wugweb.com"
-          target="_blank"
-          rel="noopener noreferrer"
+          underline={false}
           className="font-semibold hover:underline"
           style={{ color: s.ink }}
         >
           wugweb
-        </a>
+        </ExternalLink>
       </footer>
     </div>
   );

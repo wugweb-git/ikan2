@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarDays, CalendarPlus, ChevronRight } from "lucide-react";
+import { ArrowUpRight, CalendarDays, CalendarPlus, ChevronRight } from "lucide-react";
 import { BottomSheet } from "@/components/equip/m3";
 import { googleCalendarUrl, nextAt, openIcs, type CalendarEvent } from "@/lib/calendar";
 import { cn } from "@/lib/utils";
@@ -109,7 +109,7 @@ export function AddToCalendar({
               setAdded("Finish saving it in Google Calendar.");
             }}
             className={cn(
-              "flex min-h-16 items-center gap-3 border-b border-foreground/10 px-4 py-3",
+              "motion-tint flex min-h-16 items-center gap-3 border-b border-foreground/10 px-4 py-3",
               !validTime && "pointer-events-none opacity-50",
             )}
           >
@@ -120,7 +120,9 @@ export function AddToCalendar({
                 Opens a ready-made event to save
               </span>
             </span>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            {/* external: the arrow is the house rule for a link that leaves iKAN */}
+            <ArrowUpRight className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+            <span className="sr-only">(opens in a new tab)</span>
           </a>
           <button
             type="button"

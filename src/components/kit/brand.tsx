@@ -78,7 +78,7 @@ export function IconTile({
     <span
       aria-hidden="true"
       className={cn(
-        "grid shrink-0 place-items-center",
+        "motion-tint grid shrink-0 place-items-center",
         size === "sm" && "h-10 w-10 [&_svg]:h-5 [&_svg]:w-5",
         size === "md" && "h-12 w-12 [&_svg]:h-6 [&_svg]:w-6",
         size === "lg" && "h-16 w-16 [&_svg]:h-7 [&_svg]:w-7",

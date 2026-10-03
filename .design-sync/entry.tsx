@@ -40,6 +40,8 @@ export * from "../src/components/kit/chart";
 export * from "../src/components/kit/chip";
 export * from "../src/components/kit/disclosure";
 export * from "../src/components/kit/empty";
+export * from "../src/components/kit/link";
+export * from "../src/components/kit/status";
 export * from "../src/components/kit/search-field";
 
 export * from "../src/components/journal/blocks";

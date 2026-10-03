@@ -69,7 +69,7 @@ export function Chip({
         disabled={disabled}
         aria-pressed={selected}
         className={cn(
-          "-mx-3 inline-flex h-full items-center gap-1.5 rounded-full px-3",
+          "motion-press -mx-3 inline-flex h-full items-center gap-1.5 rounded-full px-3",
           onRemove && "pr-1.5",
           stateLayer,
           "disabled:pointer-events-none disabled:opacity-40",
@@ -83,7 +83,7 @@ export function Chip({
           type="button"
           onClick={onRemove}
           aria-label={removeLabel ?? "Remove"}
-          className="-mr-2 grid h-6 w-6 shrink-0 place-items-center rounded-full"
+          className="motion-press -mr-2 grid h-6 w-6 shrink-0 place-items-center rounded-full"
         >
           <X className="h-3.5 w-3.5" />
         </button>

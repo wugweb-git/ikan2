@@ -26,7 +26,7 @@ export function SearchField({
   return (
     <label
       className={cn(
-        "flex h-12 items-center gap-3 rounded-full border border-foreground/15 px-4 focus-within:border-foreground/40",
+        "motion-tint flex h-12 items-center gap-3 rounded-full border border-foreground/15 px-4 focus-within:border-foreground/40",
         className,
       )}
     >
