@@ -318,6 +318,9 @@
   font-size: 24px;
   line-height: 32px;
   font-weight: 600;
+  /* declared, not omitted: letter-spacing inherits, so a role that
+     leaves it out picks up whatever an ancestor set. */
+  letter-spacing: normal;
 }
 @utility type-title-lg {
   font-family: var(--font-display);
@@ -325,6 +328,7 @@
   line-height: 28px;
   /* M3 says 400; Sora is only loaded from 500 up, so 500 is the lightest real weight */
   font-weight: 500;
+  letter-spacing: normal;
 }
 @utility type-title-md {
   font-family: var(--font-display);
@@ -337,16 +341,25 @@
   font-size: 16px;
   line-height: 26px;
   font-weight: 400;
+  /* declared, not omitted: letter-spacing inherits, so a role that
+     leaves it out picks up whatever an ancestor set. */
+  letter-spacing: normal;
 }
 @utility type-body-md {
   font-size: 14px;
   line-height: 21px;
   font-weight: 400;
+  /* declared, not omitted: letter-spacing inherits, so a role that
+     leaves it out picks up whatever an ancestor set. */
+  letter-spacing: normal;
 }
 @utility type-label-lg {
   font-size: 14px;
   line-height: 20px;
   font-weight: 500;
+  /* declared, not omitted: letter-spacing inherits, so a role that
+     leaves it out picks up whatever an ancestor set. */
+  letter-spacing: normal;
 }
 @utility type-label-md {
   font-size: 12px;
@@ -1006,60 +1019,71 @@ html.reduce-motion *::after {
 /* Article and legal text, rendered as plain HTML. Each level is one of the type roles
  * defined above, so the scale is set in one place: h2 is headline-sm, h3 is title-md,
  * everything else is body-lg. */
-.prose-ikan {
-  /* body-lg */
-  font-size: 16px;
-  line-height: 26px;
-  color: color-mix(in oklab, var(--foreground) 88%, transparent);
-}
-.prose-ikan > * + * {
-  margin-top: 1em;
-}
-.prose-ikan h2 {
-  /* headline-sm */
-  margin-top: 1.9em;
-  font-family: var(--font-display);
-  font-size: 24px;
-  line-height: 32px;
-  font-weight: 600;
-  color: var(--foreground);
-}
-.prose-ikan h3 {
-  /* title-md: same size as the body, told apart by the display face and the weight */
-  margin-top: 1.6em;
-  font-family: var(--font-display);
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--foreground);
-}
-.prose-ikan > :first-child {
-  margin-top: 0;
-}
-.prose-ikan strong {
-  font-weight: 650;
-  color: var(--foreground);
-}
-.prose-ikan ul,
-.prose-ikan ol {
-  padding-left: 1.3em;
-}
-.prose-ikan ul {
-  list-style: disc;
-}
-.prose-ikan ol {
-  list-style: decimal;
-}
-.prose-ikan li + li {
-  margin-top: 0.4em;
-}
-.prose-ikan li::marker {
-  color: var(--muted-foreground);
-}
-.prose-ikan a {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+/* In @layer base, not unlayered.
+ *
+ * Unlayered CSS outranks every layered rule regardless of specificity, and Tailwind compiles
+ * @utility into @layer utilities. While these sat outside a layer, `.prose-ikan h2` beat
+ * `.type-headline-lg`, so a heading inside an article that asked for the 32px role silently
+ * rendered at 24px - with nothing in devtools that looks wrong.
+ *
+ * Inside base, the element defaults still apply to unclassed prose (that is the whole point of
+ * them) and an explicit type-* class on a prose child now wins, as it should. */
+@layer base {
+  .prose-ikan {
+    /* body-lg */
+    font-size: 16px;
+    line-height: 26px;
+    color: color-mix(in oklab, var(--foreground) 88%, transparent);
+  }
+  .prose-ikan > * + * {
+    margin-top: 1em;
+  }
+  .prose-ikan h2 {
+    /* headline-sm */
+    margin-top: 1.9em;
+    font-family: var(--font-display);
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  .prose-ikan h3 {
+    /* title-md: same size as the body, told apart by the display face and the weight */
+    margin-top: 1.6em;
+    font-family: var(--font-display);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--foreground);
+  }
+  .prose-ikan > :first-child {
+    margin-top: 0;
+  }
+  .prose-ikan strong {
+    font-weight: 650;
+    color: var(--foreground);
+  }
+  .prose-ikan ul,
+  .prose-ikan ol {
+    padding-left: 1.3em;
+  }
+  .prose-ikan ul {
+    list-style: disc;
+  }
+  .prose-ikan ol {
+    list-style: decimal;
+  }
+  .prose-ikan li + li {
+    margin-top: 0.4em;
+  }
+  .prose-ikan li::marker {
+    color: var(--muted-foreground);
+  }
+  .prose-ikan a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 /* Score tables read badly in three squeezed columns on a phone, so each row becomes its own
  * block: the score, then the band it falls in, then what to do about it. Every table in the
@@ -1128,9 +1152,32 @@ html.reduce-motion *::after {
 /* The app fills the screen on phones, foldables and tablets (installed as an Android app / PWA).
  * Only on laptop-size screens does it sit in a phone-width column. */
 @utility max-w-app {
+  /* Phones: fill the screen.
+   *
+   * Between 640 and 1023 the column used to stay at 100%, so a 1023px-wide browser window ran
+   * 16/26 body text at roughly 125 characters a line against a 45-75 ideal. A measure that long
+   * is genuinely hard to read - the eye loses its place on the return sweep.
+   *
+   * But full width was right for one case and the old rule could not tell them apart: when the
+   * app is INSTALLED on a foldable or tablet it should fill the device like any native app.
+   * Width alone cannot distinguish that from a half-maximised laptop window; display-mode can,
+   * so the installed case is restored explicitly at the end.
+   *
+   * 30rem above 1024 is narrower than the 36rem below it, deliberately: at laptop size the app
+   * presents as a phone on a canvas, which is the product's own idea of itself. */
   max-width: 100%;
+  @media (min-width: 640px) {
+    max-width: 36rem;
+  }
   @media (min-width: 1024px) {
     max-width: 30rem;
+  }
+  /* installed on a phone-or-tablet-sized device: fill it, as a native app would */
+  @media (display-mode: standalone) and (max-width: 1023px) {
+    max-width: 100%;
+  }
+  @media (display-mode: fullscreen) and (max-width: 1023px) {
+    max-width: 100%;
   }
 }
 @utility pb-safe {
