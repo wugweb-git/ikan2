@@ -67,7 +67,7 @@ function StateScreen({
           <span className="font-display text-[13px] font-semibold tracking-[0.08em]">iKAN</span>
         </span>
         <span
-          className="state-wash mt-10 block w-full"
+          className="surface-wash mt-10 block w-full"
           style={{ color: sceneInk[scene] }}
           aria-hidden="true"
         >
@@ -167,7 +167,7 @@ export function ErrorScreen({ reset }: { reset?: () => void }) {
       }
     >
       <button type="button" className={primary} onClick={retry} disabled={retrying}>
-        <RotateCw className={cn("h-4 w-4", retrying && "state-spin")} />
+        <RotateCw className={cn("h-4 w-4", retrying && "motion-spin")} />
         {retrying ? "Trying…" : online ? "Try again" : "Try anyway"}
       </button>
       <a href="/" className={secondary}>

@@ -38,7 +38,7 @@ const initialsOf = (name: string) =>
 
 function AboutPage() {
   return (
-    <InfoShell>
+    <InfoShell wide>
       <header className="px-5">
         <h1 className="font-display text-[34px] font-semibold leading-[1.15] tracking-[-0.01em]">
           {a.hero.title}

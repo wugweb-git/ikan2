@@ -105,7 +105,7 @@ function ArticlePage() {
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <IkanShell>
+    <IkanShell wide>
       <article style={accentStyle("calm")}>
         <header className="relative">
           <div className="h-60 overflow-hidden">

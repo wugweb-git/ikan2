@@ -4,10 +4,20 @@ import { ArrowLeft } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { IconButton, TopAppBar } from "@/components/equip/m3";
 import { useAuth } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
 /** About, FAQ, Contact and legal pages are open to everyone. Signed-in people get the app
  * navigation; everyone else gets the page with a back button. */
-export function InfoShell({ title, children }: { title?: string; children: ReactNode }) {
+export function InfoShell({
+  title,
+  children,
+  wide = false,
+}: {
+  title?: string;
+  children: ReactNode;
+  /** Long-form pages read at a wider measure on a laptop. */
+  wide?: boolean | undefined;
+}) {
   const { status } = useAuth();
   const router = useRouter();
   const back = () =>
@@ -25,7 +35,7 @@ export function InfoShell({ title, children }: { title?: string; children: React
 
   if (status === "signedIn") {
     return (
-      <IkanShell>
+      <IkanShell wide={wide}>
         {bar}
         {children}
       </IkanShell>
@@ -33,7 +43,12 @@ export function InfoShell({ title, children }: { title?: string; children: React
   }
   return (
     <div className="min-h-dvh bg-canvas text-foreground">
-      <main className="mx-auto min-h-dvh w-full max-w-app bg-background pb-12 shadow-app">
+      <main
+        className={cn(
+          "mx-auto min-h-dvh w-full bg-background pb-12 shadow-app",
+          wide ? "max-w-read" : "max-w-app",
+        )}
+      >
         {bar}
         {children}
       </main>

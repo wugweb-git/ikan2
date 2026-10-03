@@ -48,7 +48,14 @@ const navItems = [
 const moreRoutes =
   /^\/(wellness|history|diaries|resources|consult|profile|notifications|settings|support)/;
 
-export function IkanShell({ children }: { children: ReactNode }) {
+export function IkanShell({
+  children,
+  wide = false,
+}: {
+  children: ReactNode;
+  /** Long-form pages (articles, legal, About, FAQ) read at a wider measure on a laptop. */
+  wide?: boolean | undefined;
+}) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [moreOpen, setMoreOpen] = useState(false);
   const hydrated = useHydrated();
@@ -64,7 +71,13 @@ export function IkanShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-canvas text-foreground">
-      <main className="mx-auto min-h-dvh w-full max-w-app bg-background pb-[calc(7.5rem+env(safe-area-inset-bottom))] lg:shadow-app">
+      <main
+        className={cn(
+          "mx-auto min-h-dvh w-full bg-background pb-[calc(7.5rem+env(safe-area-inset-bottom))] lg:shadow-app",
+          /* long-form pages get the reading measure; everything else stays a phone column */
+          wide ? "max-w-read" : "max-w-app",
+        )}
+      >
         {children}
       </main>
       {moreOpen ? <MoreSheet onClose={() => setMoreOpen(false)} /> : null}

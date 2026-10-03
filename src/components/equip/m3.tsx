@@ -138,12 +138,17 @@ export type ButtonVariant = "filled" | "tonal" | "outlined" | "text" | "elevated
  * existing call site renders today. */
 export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 
+/* Height and padding per size; the type comes from a role.
+ *
+ * `md` and `lg` are `type-action` — 15/22/600 is the primary CTA spec, and it had no name
+ * until now, so every button re-decided it. The outliers borrow the nearest role rather than
+ * inventing a size: xs is Body S, sm is Label L, xl is Body L at the button's own weight. */
 const buttonSizes: Record<ButtonSize, string> = {
-  xs: "h-9 px-4 text-[13px]",
-  sm: "h-10 px-5 text-[14px]",
-  md: "h-11 px-5 text-[15px]",
-  lg: "h-12 px-6 text-[15px]",
-  xl: "h-14 px-7 text-[16px]",
+  xs: "h-9 px-4 type-body-sm font-semibold",
+  sm: "h-10 px-5 type-label-lg font-semibold",
+  md: "h-11 px-5 type-action",
+  lg: "h-12 px-6 type-action",
+  xl: "h-14 px-7 type-body-lg font-semibold",
 };
 
 const buttonVariants: Record<ButtonVariant, string> = {
@@ -189,7 +194,7 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cn(
-        "motion-press inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-[0.01em] disabled:pointer-events-none disabled:opacity-40",
+        "motion-press inline-flex items-center justify-center gap-2 rounded-full disabled:pointer-events-none disabled:opacity-40",
         buttonSizes[size],
         stateLayer,
         buttonVariants[variant],

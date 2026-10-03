@@ -286,7 +286,7 @@ export function MediaPlayer({
 function PlayBadge({ paused = true }: { paused?: boolean }) {
   return (
     <span className="relative grid h-16 w-16 place-items-center">
-      <span className="media-pulse absolute inset-0 rounded-full bg-white/30" aria-hidden="true" />
+      <span className="motion-pulse absolute inset-0 rounded-full bg-white/30" aria-hidden="true" />
       <span className="relative grid h-16 w-16 place-items-center rounded-full bg-white text-foreground shadow-lg transition-transform duration-200 group-hover:scale-105 group-active:scale-95">
         {paused ? (
           <Play className="ml-1 h-7 w-7 fill-current" />
