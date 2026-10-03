@@ -9,7 +9,7 @@ import { MadeBy } from "@/components/made-by";
 import { Splash } from "@/components/splash";
 
 const PUBLIC =
-  /^\/(login|phone-login|signup|verify-email|forgot-password|reset-password|support|about|faq|contact|legal|delete-account)(\/|$)/;
+  /^\/(login|phone-login|signup|verify-email|forgot-password|reset-password|support|about|services|faq|contact|legal|delete-account)(\/|$)/;
 
 /* Pages that must be READABLE by someone - or something - that never signs in and may not run
  * our JavaScript: a Play reviewer checking the account-deletion link, a crawler, a person who
@@ -20,7 +20,7 @@ const PUBLIC =
  * so the server rendered a spinner instead of the page. The link was correct; what it served
  * was not. The auth screens are deliberately excluded - nobody needs to read /login without
  * JavaScript, and the launch animation belongs there. */
-const MUST_RENDER_WITHOUT_AUTH = /^\/(support|about|faq|contact|legal|delete-account)(\/|$)/;
+const MUST_RENDER_WITHOUT_AUTH = /^\/(support|about|services|faq|contact|legal|delete-account)(\/|$)/;
 const AUTH_ONLY = /^\/(login|phone-login|signup|verify-email|forgot-password)(\/|$)/;
 
 /* Only a brand-new account sees the welcome flow. An account created more than a day ago is a
