@@ -24,6 +24,16 @@ const arts: Art[] = [
   "resilience",
   "worry",
   "lowmood",
+  "kindness",
+  "routine",
+  "report",
+  "night",
+  "pause",
+  "breathe",
+  "pressure",
+  "overload",
+  "toolkit",
+  "unwind",
 ];
 
 export const AllIllustrations: Story = {

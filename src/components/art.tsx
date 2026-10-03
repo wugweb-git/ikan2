@@ -19,6 +19,16 @@ const palettes: Record<Art, [string, string, string]> = {
   resilience: ["#E7EAF0", "#A6B2C6", "#33415C"],
   worry: ["#E7EAFB", "#9AA6EA", "#2E3A8C"],
   lowmood: ["#F4E7F1", "#D2A2C7", "#6C2F60"],
+  kindness: ["#F7EDE2", "#E0C3A3", "#8A5A33"],
+  routine: ["#EDF0DF", "#BFCB8E", "#5A6B23"],
+  report: ["#E4EFF0", "#93C0C4", "#1E5A60"],
+  night: ["#2A2340", "#4A3F6B", "#E6C77D"],
+  pause: ["#F3EFE6", "#D9CBA8", "#7A6530"],
+  breathe: ["#E6F2F4", "#A2CDD6", "#276873"],
+  pressure: ["#F0E9F4", "#C3A8D4", "#5C3570"],
+  overload: ["#FCEAE6", "#F0A99B", "#9E3621"],
+  toolkit: ["#F6ECEA", "#DDB4AE", "#8B4A42"],
+  unwind: ["#E4F0EF", "#9CC9C4", "#275E58"],
 };
 
 export function Illustration({ art, className }: { art: Art; className?: string }) {
@@ -280,6 +290,247 @@ export function Illustration({ art, className }: { art: Art; className?: string 
             strokeDasharray="7 11"
           />
           <circle cx="160" cy="100" r="8" fill={ink} stroke="none" />
+        </g>
+      ) : null}
+      {art === "pause" ? (
+        /* a run of hurried marks, and the one gap you give yourself inside it */
+        <g>
+          {Array.from({ length: 13 }, (_, i) => i).map((i) => {
+            const x = 34 + i * 21;
+            const gap = i === 6;
+            return gap ? null : (
+              <path
+                key={i}
+                d={`M${x} ${74 + (i % 3) * 7} V ${130 - (i % 2) * 8}`}
+                stroke={ink}
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeOpacity={0.3 + Math.abs(i - 6) * 0.1}
+              />
+            );
+          })}
+          <circle cx="160" cy="102" r="13" fill={ink} />
+        </g>
+      ) : null}
+      {art === "breathe" ? (
+        /* one breath, drawn out: in, held, and let go */
+        <g fill="none" stroke={ink} strokeLinecap="round">
+          <path
+            d="M24 136 C 70 136, 86 62, 132 62 L 190 62 C 236 62, 252 136, 298 136"
+            strokeWidth="7"
+          />
+          <path
+            d="M24 160 C 70 160, 86 104, 132 104 L 190 104 C 236 104, 252 160, 298 160"
+            strokeWidth="6"
+            strokeOpacity="0.4"
+          />
+          <circle cx="161" cy="62" r="9" fill={ink} stroke="none" />
+        </g>
+      ) : null}
+      {art === "pressure" ? (
+        /* weight coming down on something that bends and does not break */
+        <g>
+          {[0, 1, 2].map((i) => (
+            <path
+              key={i}
+              d={`M${118 + i * 42} 34 V 86`}
+              stroke={ink}
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeOpacity={0.35 + i * 0.12}
+            />
+          ))}
+          <path
+            d="M130 92 L 160 118 L 190 92"
+            fill="none"
+            stroke={ink}
+            strokeWidth="7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M34 140 C 92 140, 110 170, 160 170 C 210 170, 228 140, 286 140"
+            fill="none"
+            stroke={ink}
+            strokeWidth="8"
+            strokeLinecap="round"
+          />
+        </g>
+      ) : null}
+      {art === "overload" ? (
+        /* the response that was useful once, and has not switched off since */
+        <g>
+          <path
+            d="M58 150 A 102 102 0 0 1 262 150"
+            fill="none"
+            stroke={ink}
+            strokeOpacity="0.2"
+            strokeWidth="18"
+            strokeLinecap="round"
+          />
+          <path
+            d="M58 150 A 102 102 0 0 1 252 108"
+            fill="none"
+            stroke={ink}
+            strokeWidth="18"
+            strokeLinecap="round"
+          />
+          <line
+            x1="160"
+            y1="150"
+            x2="248"
+            y2="118"
+            stroke={ink}
+            strokeWidth="7"
+            strokeLinecap="round"
+          />
+          <circle cx="160" cy="150" r="11" fill={ink} />
+          {[
+            [276, 70],
+            [292, 98],
+            [258, 52],
+          ].map(([x, y]) => (
+            <circle key={`${x}`} cx={x} cy={y} r="4" fill={ink} fillOpacity="0.6" />
+          ))}
+        </g>
+      ) : null}
+      {art === "toolkit" ? (
+        /* five things to try, none of which is the whole answer */
+        <g>
+          <circle cx="56" cy="100" r="20" fill={ink} fillOpacity="0.85" />
+          <rect x="94" y="80" width="40" height="40" rx="10" fill={ink} fillOpacity="0.6" />
+          <path d="M166 76 L 190 120 H 142 Z" fill={ink} fillOpacity="0.75" />
+          <rect x="206" y="88" width="40" height="24" rx="12" fill={ink} fillOpacity="0.5" />
+          <path
+            d="M276 84 V 116 M260 100 H 292"
+            stroke={ink}
+            strokeWidth="7"
+            strokeLinecap="round"
+            strokeOpacity="0.9"
+          />
+          <path
+            d="M34 148 H 294"
+            stroke={ink}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeOpacity="0.3"
+          />
+        </g>
+      ) : null}
+      {art === "unwind" ? (
+        /* something wound tight, loosening into a straight line */
+        <g fill="none" stroke={ink} strokeLinecap="round">
+          <path
+            d="M96 100 m -8 0 a 8 8 0 1 1 16 0 a 20 20 0 1 1 -40 0 a 34 34 0 1 1 68 0 C 132 128, 160 142, 196 142 L 300 142"
+            strokeWidth="7"
+          />
+          <circle cx="96" cy="100" r="4" fill={ink} stroke="none" />
+        </g>
+      ) : null}
+      {art === "kindness" ? (
+        /* something small held in an open hand, rather than braced against anything */
+        <g>
+          <path
+            d="M70 104 C 70 150, 110 176, 160 176 C 210 176, 250 150, 250 104"
+            fill="none"
+            stroke={ink}
+            strokeWidth="7"
+            strokeLinecap="round"
+            strokeOpacity="0.85"
+          />
+          <circle cx="160" cy="98" r="30" fill={ink} fillOpacity="0.9" />
+          <circle cx="160" cy="98" r="14" fill={bg} />
+          {[112, 160, 208].map((x, i) => (
+            <circle
+              key={x}
+              cx={x}
+              cy={44 + (i === 1 ? -10 : 0)}
+              r={i === 1 ? 6 : 4}
+              fill={ink}
+              fillOpacity="0.45"
+            />
+          ))}
+        </g>
+      ) : null}
+      {art === "routine" ? (
+        /* the same small thing, done again and again, and one of them today */
+        <g>
+          <path
+            d="M34 142 H 286"
+            stroke={ink}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeOpacity="0.4"
+          />
+          {[0, 1, 2, 3, 4, 5].map((i) => {
+            const x = 48 + i * 43;
+            const tall = i === 3;
+            return (
+              <g key={i}>
+                <path
+                  d={`M${x} 142 V ${tall ? 70 : 110}`}
+                  stroke={ink}
+                  strokeWidth={tall ? 8 : 6}
+                  strokeLinecap="round"
+                  strokeOpacity={tall ? 0.95 : 0.4}
+                />
+                {tall ? <circle cx={x} cy="56" r="10" fill={ink} /> : null}
+              </g>
+            );
+          })}
+        </g>
+      ) : null}
+      {art === "report" ? (
+        /* four measures against one line, every one of them short of it */
+        <g>
+          {[0.3, 0.52, 0.44, 0.74].map((share, i) => {
+            const y = 62 + i * 30;
+            return (
+              <g key={i}>
+                <rect x="38" y={y} width="236" height="10" rx="5" fill={ink} fillOpacity="0.15" />
+                <rect
+                  x="38"
+                  y={y}
+                  width={236 * share}
+                  height="10"
+                  rx="5"
+                  fill={ink}
+                  fillOpacity={0.5 + i * 0.12}
+                />
+              </g>
+            );
+          })}
+          <path
+            d="M274 52 V 182"
+            stroke={ink}
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray="4 7"
+            strokeOpacity="0.75"
+          />
+        </g>
+      ) : null}
+      {art === "night" ? (
+        /* late hours, and what they cost the next day */
+        <g>
+          <circle cx="226" cy="58" r="26" fill={ink} />
+          <circle cx="240" cy="48" r="23" fill={mid} />
+          <path
+            d="M28 92 C 78 92, 104 128, 150 142 S 244 170, 300 162"
+            fill="none"
+            stroke={ink}
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeOpacity="0.9"
+          />
+          {[
+            [62, 52],
+            [104, 74],
+            [150, 44],
+          ].map(([x, y]) => (
+            <circle key={`${x}`} cx={x} cy={y} r="3" fill={ink} fillOpacity="0.8" />
+          ))}
+          <path d="M0 176 H320 V200 H0Z" fill={ink} fillOpacity="0.25" />
         </g>
       ) : null}
       {art === "lowmood" ? (
