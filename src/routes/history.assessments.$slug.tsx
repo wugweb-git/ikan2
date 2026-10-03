@@ -147,7 +147,7 @@ function AssessmentArchivePage() {
         {/* Stacked history */}
         {scored.length ? (
           <section className="mt-8 px-4">
-            <h2 className="font-display text-[18px] font-semibold">All results</h2>
+            <h2 className="type-subhead">All results</h2>
             <ul className="mt-3 space-y-2">
               {scored.map(({ r, scores, head }, i) => (
                 <li key={r.id}>
@@ -220,7 +220,7 @@ function AssessmentArchivePage() {
                 style={{ ...toneStyle("error"), background: "var(--tone-container)" }}
               >
                 <LifeBuoy className="mt-0.5 h-5 w-5 shrink-0 text-[var(--tone)]" />
-                <span className="text-[15px] leading-6">
+                <span className="type-body">
                   {risk
                     ? "You don’t have to carry this alone. Free, confidential support lines are open all day."
                     : "Talking to a professional can help with what your latest result shows."}

@@ -344,7 +344,7 @@ function SettingsPage() {
           onClose={() => (deleteBusy ? undefined : setDeleting(false))}
           title="Delete your account?"
         >
-          <p className="text-[15px] leading-6 text-muted-foreground">
+          <p className="type-body text-muted-foreground">
             This removes your account and everything saved with it — your journal, assessment
             results, programme progress, profile and settings. It cannot be undone, and nothing can
             be recovered afterwards.
@@ -374,7 +374,7 @@ function SettingsPage() {
         </BottomSheet>
 
         <BottomSheet open={clearing} onClose={() => setClearing(false)} title="Clear all data?">
-          <p className="text-[15px] leading-6 text-muted-foreground">
+          <p className="type-body text-muted-foreground">
             This removes your assessment results, journal check-ins, program progress, bookings,
             saved articles, profile and settings from this device and from your account. It can’t be
             undone.

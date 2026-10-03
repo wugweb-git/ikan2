@@ -158,7 +158,7 @@ export function AuthLayout({
             className="absolute left-5 top-[max(1rem,var(--safe-top,env(safe-area-inset-top)))] flex items-center gap-2 rounded-full bg-background/85 py-1 pl-1 pr-3 backdrop-blur"
           >
             <img src="/favicon.svg" alt="" className="h-7 w-7 rounded-[9px]" />
-            <span className="font-display text-[17px] font-semibold">iKAN</span>
+            <span className="type-subhead">iKAN</span>
           </Link>
         </div>
         <main className="flex flex-1 flex-col px-6">

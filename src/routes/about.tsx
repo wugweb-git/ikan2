@@ -72,7 +72,7 @@ function AboutPage() {
           >
             <p className="type-body-sm font-semibold opacity-75">{m.label}</p>
             <p className="type-title-lg font-semibold mt-1">{m.title}</p>
-            <p className="mt-2 text-[15px] leading-6 opacity-85">{m.description}</p>
+            <p className="type-body mt-2 opacity-85">{m.description}</p>
           </div>
         ))}
       </section>
@@ -109,9 +109,9 @@ function AboutPage() {
                   ) : null}
                 </span>
                 <span className="pb-2">
-                  <span className="block font-display text-[17px] font-semibold">{s.title}</span>
+                  <span className="type-subhead block">{s.title}</span>
                   <span className="type-label-lg block text-[#2B634D]">{s.tagline}</span>
-                  <span className="mt-1 block text-[15px] leading-6 text-muted-foreground">
+                  <span className="type-body mt-1 block text-muted-foreground">
                     {s.description}
                   </span>
                 </span>
@@ -139,7 +139,7 @@ function AboutPage() {
                 <Illustration art={(["checkup", "work", "measure"] as const)[i] ?? "checkup"} />
               </div>
               <div className="p-4">
-                <p className="font-display text-[17px] font-semibold">{g.title}</p>
+                <p className="type-subhead">{g.title}</p>
                 <p className="type-label-lg text-[#2B634D]">{g.tagline}</p>
                 <p className="mt-2 text-[14px] leading-6 text-muted-foreground">{g.description}</p>
               </div>
@@ -150,7 +150,7 @@ function AboutPage() {
 
       <section className="mt-10 px-5">
         <h2 className="font-display text-[22px] font-semibold">{a.teamHeading}</h2>
-        <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{a.teamDescription}</p>
+        <p className="type-body mt-1 text-muted-foreground">{a.teamDescription}</p>
         <ul className="mt-4 space-y-3">
           {a.founders.map((f) => (
             <li key={f.name} className="rounded-[24px] bg-secondary p-4">
@@ -162,7 +162,7 @@ function AboutPage() {
                   photo={photoOf(f.name)}
                 />
                 <div>
-                  <p className="font-display text-[17px] font-semibold">{f.name}</p>
+                  <p className="type-subhead">{f.name}</p>
                   <p className="type-body-sm text-muted-foreground">{f.role}</p>
                 </div>
               </div>

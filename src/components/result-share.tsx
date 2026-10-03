@@ -10,7 +10,7 @@ export function BrandTitle({ className }: { className?: string }) {
   return (
     <span className={cn("flex items-center gap-2", className)}>
       <img src="/favicon.svg" alt="" className="h-7 w-7 rounded-[8px]" />
-      <span className="font-display text-[18px] font-semibold">iKAN</span>
+      <span className="type-subhead">iKAN</span>
     </span>
   );
 }

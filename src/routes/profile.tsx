@@ -311,7 +311,7 @@ function ProfilePage() {
         </div>
 
         <section className="mt-8 px-4">
-          <h2 className="flex items-center gap-2 font-display text-[18px] font-semibold">
+          <h2 className="type-subhead flex items-center gap-2">
             <UserRound className="h-5 w-5" /> Profile
           </h2>
           <div className="mt-3 space-y-3">
@@ -337,7 +337,7 @@ function ProfilePage() {
 
         <section className="mt-8 px-4">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-display text-[18px] font-semibold">Personal details</h2>
+            <h2 className="type-subhead">Personal details</h2>
             <button
               type="button"
               disabled={googleBusy}
@@ -409,7 +409,7 @@ function ProfilePage() {
         </section>
 
         <section className="mt-8 px-4">
-          <h2 className="flex items-center gap-2 font-display text-[18px] font-semibold">
+          <h2 className="type-subhead flex items-center gap-2">
             <ShieldPlus className="h-5 w-5" /> Emergency contact
           </h2>
           <p className="type-body-md mt-1 text-muted-foreground">
@@ -462,7 +462,7 @@ function ProfilePage() {
           </div>
         ) : null}
 
-        <h2 className="mx-4 mb-2 mt-8 font-display text-[18px] font-semibold">Archive</h2>
+        <h2 className="type-subhead mx-4 mb-2 mt-8">Archive</h2>
         <ul className="mx-4 overflow-hidden rounded-[24px] border border-foreground/10">
           {archive.map((r) => {
             const Icon = r.icon;

@@ -40,7 +40,7 @@ export function ErrorState({
       )}
     >
       <Icon className="mx-auto h-6 w-6 text-error" aria-hidden="true" />
-      <p className="mt-2 font-display text-[17px] font-semibold">
+      <p className="type-subhead mt-2">
         {offline && title === "That didn't load" ? "You're offline" : title}
       </p>
       <p className="type-body-md mt-1 text-muted-foreground">

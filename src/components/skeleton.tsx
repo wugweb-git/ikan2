@@ -76,7 +76,7 @@ function StateScreen({
         <h1 className="mt-8 font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">
           {title}
         </h1>
-        <p className="mt-2.5 text-[15px] leading-6 text-muted-foreground text-balance">{body}</p>
+        <p className="type-body mt-2.5 text-muted-foreground text-balance">{body}</p>
         <div className="mt-8 flex w-full flex-col gap-2">{children}</div>
         <Link
           to="/support"

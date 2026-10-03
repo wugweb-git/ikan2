@@ -241,7 +241,7 @@ function ScorePage() {
                     </span>
                   </span>
                   <span
-                    className="font-display text-[17px] font-semibold tabular-nums"
+                    className="type-subhead tabular-nums"
                     style={{
                       color:
                         pts > 0 ? toneColors.success.fg : pts < 0 ? toneColors.error.fg : undefined,
@@ -289,7 +289,7 @@ function ScorePage() {
                       {d.answered} of {d.assessment!.questions.length} answered, tap to finish
                     </span>
                   </span>
-                  <span className="font-display text-[17px] font-semibold">0</span>
+                  <span className="type-subhead">0</span>
                 </Link>
               ))
             : null}
@@ -327,9 +327,7 @@ function ScorePage() {
                     </span>
                   </span>
                   <span className="text-right">
-                    <span className="block font-display text-[17px] font-semibold tabular-nums">
-                      {p.weight}%
-                    </span>
+                    <span className="type-subhead block tabular-nums">{p.weight}%</span>
                     {!has ? (
                       <span className="block text-[11px] text-muted-foreground">not counted</span>
                     ) : null}
@@ -345,7 +343,7 @@ function ScorePage() {
         </p>
 
         <SectionTitle>Reading it</SectionTitle>
-        <p className="mx-4 text-[15px] leading-6 text-muted-foreground">
+        <p className="type-body mx-4 text-muted-foreground">
           The score is a summary, not a diagnosis. If it drops and you don’t know why, the factors
           above show what changed and when.
         </p>

@@ -70,7 +70,7 @@ function FaqPage() {
       ) : (
         groups.map((g) => (
           <section key={g.id} className="mt-7 px-5">
-            <h2 className="font-display text-[18px] font-semibold">{g.title}</h2>
+            <h2 className="type-subhead">{g.title}</h2>
             <DisclosureGroup className="mt-3">
               {g.items.map((i) => (
                 <Disclosure
@@ -80,7 +80,7 @@ function FaqPage() {
                   title={i.question}
                   open={Boolean(q)}
                 >
-                  <p className="text-[15px] leading-6 text-muted-foreground">{i.answer}</p>
+                  <p className="type-body text-muted-foreground">{i.answer}</p>
                 </Disclosure>
               ))}
             </DisclosureGroup>
@@ -90,7 +90,7 @@ function FaqPage() {
 
       <section className="mx-5 mt-10 rounded-[24px] bg-secondary p-5">
         <p className="font-display text-[19px] font-semibold">{f.ctaTitle}</p>
-        <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{f.ctaDescription}</p>
+        <p className="type-body mt-1 text-muted-foreground">{f.ctaDescription}</p>
         <Link
           to="/contact"
           className="type-action mt-4 inline-flex h-11 items-center rounded-full bg-foreground px-5 text-background"

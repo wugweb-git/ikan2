@@ -76,7 +76,7 @@ export function DayCard({
             </p>
             <ul className="mt-1 space-y-1">
               {r.lines.map((l, n) => (
-                <li key={n} className="text-[15px] leading-6">
+                <li key={n} className="type-body">
                   {l}
                 </li>
               ))}

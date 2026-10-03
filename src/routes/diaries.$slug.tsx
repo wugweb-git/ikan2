@@ -99,7 +99,7 @@ function DiaryPage() {
         </header>
 
         <section className="px-4 pb-6 pt-6">
-          <h2 className="font-display text-[18px] font-semibold">Program days</h2>
+          <h2 className="type-subhead">Program days</h2>
           {doneDays.length ? (
             <ul className="mt-3 space-y-3">
               {doneDays.map((d) => (

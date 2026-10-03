@@ -81,7 +81,7 @@ export function Splash() {
           Reimagining mental health care.
         </h1>
         <p
-          className="splash-rise mt-3 max-w-[32ch] text-[15px] leading-6"
+          className="type-body splash-rise mt-3 max-w-[32ch]"
           style={{ color: s.muted, animationDelay: "1200ms" }}
         >
           Stay on top of your mental health with real-time monitoring and insights, expert

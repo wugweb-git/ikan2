@@ -58,7 +58,7 @@ export function DayCheckIn({
                 save({ rating: n });
               }}
               className={cn(
-                "h-11 rounded-[14px] font-display text-[18px] font-semibold tabular-nums transition-colors",
+                "type-subhead h-11 rounded-[14px] tabular-nums transition-colors",
                 on ? "bg-[var(--accent-strong)] text-background" : "bg-secondary",
               )}
             >

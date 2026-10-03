@@ -148,9 +148,7 @@ function AssessmentFlowPage() {
             >
               <X className="h-6 w-6" />
             </IconButton>
-            <p className="min-w-0 flex-1 truncate px-2 font-display text-[18px] font-semibold">
-              {a.name}
-            </p>
+            <p className="type-subhead min-w-0 flex-1 truncate px-2">{a.name}</p>
             <p className="type-body-md px-4 tabular-nums text-muted-foreground" aria-live="polite">
               {index + 1} of {total}
             </p>
@@ -172,7 +170,7 @@ function AssessmentFlowPage() {
               <p className="type-label-lg text-[var(--accent-strong)]">{partLabel}</p>
             ) : null}
             {scale.prompt ? (
-              <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{scale.prompt}</p>
+              <p className="type-body mt-1 text-muted-foreground">{scale.prompt}</p>
             ) : null}
             <h1 className="type-headline-sm mt-2">{question.text}</h1>
 
@@ -237,7 +235,7 @@ function AssessmentFlowPage() {
           onClose={() => setLeaving(false)}
           title="Leave this assessment?"
         >
-          <p className="text-[15px] leading-6 text-muted-foreground">
+          <p className="type-body text-muted-foreground">
             Your {answeredCount} {answeredCount === 1 ? "answer is" : "answers are"} saved. You can
             finish this assessment later.
           </p>

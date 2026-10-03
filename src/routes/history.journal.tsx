@@ -141,7 +141,7 @@ function JournalHistoryPage() {
                   <span className="text-[22px] leading-none" aria-hidden="true">
                     {v !== null ? scale[Math.round(v) - 1]?.emoji : "·"}
                   </span>
-                  <span className="font-display text-[17px] font-semibold tabular-nums">
+                  <span className="type-subhead tabular-nums">
                     {v !== null ? v.toFixed(1) : "—"}
                   </span>
                   <span className="type-label-md text-muted-foreground">/5</span>
@@ -154,7 +154,7 @@ function JournalHistoryPage() {
         {/* Trends */}
         <section className="mx-4 mt-4 rounded-[24px] border border-foreground/10 p-4">
           <div className="flex items-baseline justify-between">
-            <h2 className="font-display text-[17px] font-semibold">Last 30 days</h2>
+            <h2 className="type-subhead">Last 30 days</h2>
             <p className="type-label-md text-muted-foreground">daily average, 1 to 5</p>
           </div>
           <div className="mt-3 space-y-3">
@@ -219,9 +219,7 @@ function JournalHistoryPage() {
               <ChevronLeft className="h-5 w-5" />
             </IconButton>
             <div className="text-center">
-              <p className="font-display text-[17px] font-semibold">
-                {monthLabel(cursor.y, cursor.m)}
-              </p>
+              <p className="type-subhead">{monthLabel(cursor.y, cursor.m)}</p>
               <p className="type-label-md text-muted-foreground">
                 {hydrated
                   ? `${inMonth.length} ${inMonth.length === 1 ? "check-in" : "check-ins"}`
@@ -288,7 +286,7 @@ function JournalHistoryPage() {
         </section>
 
         <section className="mt-5 px-4">
-          <h2 className="font-display text-[18px] font-semibold">
+          <h2 className="type-subhead">
             {new Date(`${selected}T00:00:00`).toLocaleDateString("en-IN", {
               weekday: "long",
               day: "numeric",
@@ -312,7 +310,7 @@ function JournalHistoryPage() {
 
         {months.length ? (
           <section className="mt-8 px-4">
-            <h2 className="font-display text-[18px] font-semibold">By month</h2>
+            <h2 className="type-subhead">By month</h2>
             <ul className="mt-3 space-y-2">
               {months.map((m) => (
                 <li key={m.key}>

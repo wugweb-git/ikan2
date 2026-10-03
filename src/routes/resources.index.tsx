@@ -250,7 +250,7 @@ function ResourcesPage() {
               <Illustration art="checkup" />
             </div>
             <div className="p-5 text-center">
-              <p className="font-display text-[17px] font-semibold">
+              <p className="type-subhead">
                 {q
                   ? "Nothing matches that"
                   : filter === "Saved"

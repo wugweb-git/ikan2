@@ -647,7 +647,7 @@ function SortStep({
                   <div className="mt-3 space-y-4">
                     {it.lines.map((line) => (
                       <div key={line}>
-                        <p className="text-[15px] leading-6">{line}</p>
+                        <p className="type-body">{line}</p>
                         <div className="mt-2">
                           <Segmented
                             label={line}

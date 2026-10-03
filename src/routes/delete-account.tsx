@@ -87,7 +87,7 @@ function DeleteAccountPage() {
         </p>
 
         <h2 className="type-title-md mt-8">What gets deleted</h2>
-        <ul className="mt-3 space-y-2 text-[15px] leading-6 text-muted-foreground">
+        <ul className="type-body mt-3 space-y-2 text-muted-foreground">
           {REMOVED.map((r) => (
             <li key={r} className="flex gap-2.5">
               <Trash2 className="mt-1 h-4 w-4 shrink-0" aria-hidden="true" />

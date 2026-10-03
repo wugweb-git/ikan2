@@ -134,7 +134,7 @@ function ConsultantPage() {
                 className="w-[220px] shrink-0 snap-start rounded-[20px] bg-secondary p-4"
               >
                 <Quote className="h-5 w-5 text-[var(--accent)]" />
-                <blockquote className="mt-2 text-[15px] leading-6">{q}</blockquote>
+                <blockquote className="type-body mt-2">{q}</blockquote>
               </figure>
             ))}
           </div>
@@ -156,7 +156,7 @@ function ConsultantPage() {
 
         <section className="mt-7 px-4">
           <h2 className="type-title-md">About</h2>
-          <p className="mt-2 text-[15px] leading-6 text-muted-foreground">{c.about}</p>
+          <p className="type-body mt-2 text-muted-foreground">{c.about}</p>
         </section>
 
         {c.approaches.length ? (
@@ -180,7 +180,7 @@ function ConsultantPage() {
             <h2 className="type-title-md">Qualifications</h2>
             <ul className="mt-3 space-y-2">
               {c.qualifications.map((q) => (
-                <li key={q} className="flex items-start gap-3 text-[15px] leading-6">
+                <li key={q} className="type-body flex items-start gap-3">
                   <GraduationCap className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" /> {q}
                 </li>
               ))}
@@ -208,7 +208,7 @@ function ConsultantPage() {
                 <span className="font-semibold">{c.review.name}</span>
                 {c.review.verified ? <span className="text-muted-foreground">Verified</span> : null}
               </div>
-              <blockquote className="mt-2 text-[15px] leading-6">{c.review.text}</blockquote>
+              <blockquote className="type-body mt-2">{c.review.text}</blockquote>
               <figcaption className="type-label-md mt-2 flex items-center gap-1.5 text-muted-foreground">
                 <ThumbsUp className="h-3.5 w-3.5" /> Helpful ({c.review.helpful})
               </figcaption>
@@ -220,7 +220,7 @@ function ConsultantPage() {
           <section className="mt-7 px-4">
             <h2 className="type-title-md">Frequently asked</h2>
             <Disclosure tone="filled" radius={20} title={c.faq.q} className="mt-3">
-              <p className="text-[15px] leading-6 text-muted-foreground">{c.faq.a}</p>
+              <p className="type-body text-muted-foreground">{c.faq.a}</p>
             </Disclosure>
           </section>
         ) : null}
@@ -363,7 +363,7 @@ function Booking({ c }: { c: Consultant }) {
               <span className="type-label-md opacity-80">
                 {offset === 0 ? "Today" : d.toLocaleDateString("en-IN", { weekday: "short" })}
               </span>
-              <span className="font-display text-[18px] font-semibold">{d.getDate()}</span>
+              <span className="type-subhead">{d.getDate()}</span>
             </button>
           );
         })}
@@ -423,7 +423,7 @@ function Booking({ c }: { c: Consultant }) {
             <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[var(--accent-container)] text-[var(--on-accent-container)]">
               <Check className="h-8 w-8" strokeWidth={3} />
             </span>
-            <p className="mt-4 text-[15px] leading-6 text-muted-foreground">
+            <p className="type-body mt-4 text-muted-foreground">
               Your request with {c.name} is saved in My history. Booking and payment aren’t
               connected in this preview yet.
             </p>

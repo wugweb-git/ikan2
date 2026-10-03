@@ -93,7 +93,7 @@ function ProgramArchivePage() {
 
         {/* Stacked history */}
         <section className="mt-8 px-4">
-          <h2 className="font-display text-[18px] font-semibold">All runs</h2>
+          <h2 className="type-subhead">All runs</h2>
           {hydrated && !runs.length ? (
             <p className="type-action mt-3 rounded-[20px] border border-dashed border-foreground/20 p-6 text-center text-muted-foreground">
               No finished runs yet. Each time you finish {p.name}, it stacks up here.

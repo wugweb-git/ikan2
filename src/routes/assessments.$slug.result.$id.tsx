@@ -244,10 +244,8 @@ function ResultBody({
           style={{ ...toneStyle("error"), background: "var(--tone-container)" }}
         >
           <LifeBuoy className="h-6 w-6 text-[var(--tone)]" />
-          <p className="mt-3 font-display text-[18px] font-semibold text-[var(--tone)]">
-            You don’t have to carry this alone
-          </p>
-          <p className="mt-1 text-[15px] leading-6">
+          <p className="type-subhead mt-3 text-[var(--tone)]">You don’t have to carry this alone</p>
+          <p className="type-body mt-1">
             You said you’ve had thoughts of being better off dead or of hurting yourself. Talking to
             someone today can help. These lines are free, confidential and open all day.
           </p>
@@ -304,7 +302,7 @@ function ResultBody({
                         Best match
                       </span>
                     ) : null}
-                    <span className="block font-display text-[17px] font-semibold">{p.name}</span>
+                    <span className="type-subhead block">{p.name}</span>
                     {p.source.description ? (
                       <span className="type-body-sm mt-1 line-clamp-2 text-muted-foreground">
                         {p.source.description}
@@ -322,7 +320,7 @@ function ResultBody({
         <section className="mx-4 mt-6 flex items-start gap-3 rounded-[20px] border border-foreground/10 p-4">
           <LifeBuoy className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
-            <p className="text-[15px] leading-6">
+            <p className="type-body">
               Talking to a professional can help with what this result shows.
             </p>
             <Link to="/support" className="type-action mt-1 inline-block underline">
@@ -334,7 +332,7 @@ function ResultBody({
 
       <section className="mt-8 px-4">
         <h2 className="type-title-md">What this measured</h2>
-        <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
+        <p className="type-body mt-2 text-muted-foreground">
           {a.instrument}. {a.scores.map((s) => `${s.label} (${s.instrument})`).join(", ")}.
         </p>
       </section>
@@ -445,7 +443,7 @@ function Change({ now, before, on }: { now: ScoreResult; before: ScoreResult; on
   return (
     <section className="mx-4 mt-6 flex items-center gap-3 rounded-[20px] border border-foreground/10 p-4">
       {same ? null : <Icon className="h-5 w-5 shrink-0" />}
-      <p className="text-[15px] leading-6">
+      <p className="type-body">
         {same
           ? "Same score as"
           : better

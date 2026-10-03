@@ -86,7 +86,7 @@ export function EntryCard({
         </dl>
       ) : null}
       {e.freehand_text_content ? (
-        <p className="mt-3 text-[15px] leading-6">“{e.freehand_text_content}”</p>
+        <p className="type-body mt-3">“{e.freehand_text_content}”</p>
       ) : null}
       {e.context_tags.length ? (
         <div className="mt-3 flex flex-wrap gap-2">

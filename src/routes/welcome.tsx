@@ -142,7 +142,7 @@ function WelcomePage() {
           <main className="flex flex-1 flex-col px-4 pb-8">
             <p className="type-label-lg text-[var(--accent-strong)]">Step 2 of {STEPS}</p>
             <h1 className="type-headline-md mt-1">What brings you here?</h1>
-            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
+            <p className="type-body mt-2 text-muted-foreground">
               Pick the one that fits best. You can explore everything later.
             </p>
             <div
@@ -175,7 +175,7 @@ function WelcomePage() {
           <main className="flex flex-1 flex-col px-4 pb-8">
             <p className="type-label-lg text-[var(--accent-strong)]">Step 4 of {STEPS}</p>
             <h1 className="type-headline-md mt-1">Start with a short check</h1>
-            <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
+            <p className="type-body mt-2 text-muted-foreground">
               It shows where you are today and which program fits. It’s a screening, not a
               diagnosis.
             </p>
@@ -331,7 +331,7 @@ function AboutYou({
           {name ? `Hi ${name}, tell us about you` : "Tell us about you"}
         </h1>
       </div>
-      <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
+      <p className="type-body mt-2 text-muted-foreground">
         This helps us suggest the right programs and local support. Only you and consultants you
         book can see it.
       </p>
@@ -507,7 +507,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
     <main className="flex flex-1 flex-col px-4 pb-8">
       <p className="type-label-lg text-[var(--accent-strong)]">Step 3 of {STEPS}</p>
       <h1 className="type-headline-md mt-1">Make iKAN yours</h1>
-      <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
+      <p className="type-body mt-2 text-muted-foreground">
         Allow what’s useful to you. Each one is optional and you can change it any time in Settings.
       </p>
       <ul className="mt-6 space-y-3">

@@ -244,7 +244,7 @@ function ResultPage() {
             </p>
             <UnitBar units={sum.units} />
             {sum.feelEarly !== null && sum.feelLate !== null ? (
-              <p className="mt-4 flex items-center gap-2 text-[15px] leading-6">
+              <p className="type-body mt-4 flex items-center gap-2">
                 <span className="text-[22px]" aria-hidden="true">
                   {feel(sum.feelEarly)?.emoji}
                 </span>
@@ -329,7 +329,7 @@ function ResultPage() {
                   className={cn("px-4 py-3", i > 0 && "border-t border-background")}
                 >
                   <div className="flex items-start gap-3">
-                    <p className="min-w-0 flex-1 text-[15px] font-medium leading-6">{u.title}</p>
+                    <p className="type-body font-medium min-w-0 flex-1">{u.title}</p>
                     <span className="type-body-sm tabular-nums text-muted-foreground">
                       {u.done}/{u.total}
                     </span>
@@ -473,7 +473,7 @@ function ResultPage() {
                 {sum.words.map((w) => (
                   <li key={`${w.day}-${w.text}`} className="rounded-[20px] bg-secondary p-4">
                     <Quote className="h-4 w-4 text-[var(--accent-strong)]" />
-                    <p className="mt-1.5 text-[15px] leading-6">{w.text}</p>
+                    <p className="type-body mt-1.5">{w.text}</p>
                     <p className="type-label-md mt-2 text-muted-foreground">Day {w.day}</p>
                   </li>
                 ))}
@@ -647,12 +647,7 @@ function Rows({ title, rows }: { title: string; rows: Row[] }) {
               )}
             >
               <div className="min-w-0 flex-1">
-                <p
-                  className={cn(
-                    "text-[15px] leading-6",
-                    r.wide ? "text-muted-foreground" : "font-medium",
-                  )}
-                >
+                <p className={cn("type-body", r.wide ? "text-muted-foreground" : "font-medium")}>
                   {r.label}
                 </p>
                 {r.note && !r.wide ? (
@@ -662,9 +657,7 @@ function Rows({ title, rows }: { title: string; rows: Row[] }) {
               <p
                 className={cn(
                   "inline-flex items-center gap-1.5 tabular-nums",
-                  r.wide
-                    ? "mt-0.5 text-[15px] font-medium leading-6"
-                    : "type-action shrink-0 text-right",
+                  r.wide ? "type-body font-medium mt-0.5" : "type-action shrink-0 text-right",
                 )}
               >
                 {Trend ? <Trend className="h-4 w-4 text-[var(--accent-strong)]" /> : null}

@@ -508,7 +508,7 @@ function HealthCard() {
         <div className="mt-3 grid grid-cols-3 gap-2">
           {tiles.map((t) => (
             <div key={t.l} className="rounded-[16px] bg-background p-3">
-              <p className="font-display text-[18px] font-semibold tabular-nums">{t.v}</p>
+              <p className="type-subhead tabular-nums">{t.v}</p>
               <p className="type-label-md text-muted-foreground">{t.l}</p>
             </div>
           ))}
@@ -740,7 +740,7 @@ function Section({
     <section>
       <div className="mb-3 px-4">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-display text-[18px] font-semibold">{title}</h2>
+          <h2 className="type-subhead">{title}</h2>
           {action ? (
             <Link
               to={action.to}
@@ -1378,7 +1378,7 @@ function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="type-body-sm font-semibold text-muted-foreground">Today’s check-in</p>
-          <h2 className="mt-1 font-display text-[17px] font-semibold">How are you feeling?</h2>
+          <h2 className="type-subhead mt-1">How are you feeling?</h2>
         </div>
         <span className="type-label-md rounded-full bg-secondary px-2.5 py-1 text-muted-foreground">
           {logged.length ? `${logged.length} today` : "40 sec"}

@@ -84,7 +84,7 @@ function ContactPage() {
         <div className="flex gap-3 p-5">
           <ShieldAlert className="mt-0.5 h-6 w-6 shrink-0" />
           <div>
-            <p className="font-display text-[18px] font-semibold">{c.crisisCard.title}</p>
+            <p className="type-subhead">{c.crisisCard.title}</p>
             <p className="type-label-lg mt-1">{c.crisisCard.description}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {c.crisisCard.buttons.map((b) => (
@@ -130,7 +130,7 @@ function ContactPage() {
             </div>
             <div className="flex items-start gap-3 p-5">
               <Check className="mt-0.5 h-5 w-5 shrink-0" />
-              <p className="text-[15px] leading-6">
+              <p className="type-body">
                 Message sent. We’ll reply to <span className="font-semibold">{email}</span>.
               </p>
             </div>
@@ -187,7 +187,7 @@ function ContactPage() {
       </section>
 
       <Link to="/faq" className="mx-5 mt-8 block rounded-[24px] border border-foreground/10 p-5">
-        <p className="font-display text-[17px] font-semibold">{c.faqCard.title}</p>
+        <p className="type-subhead">{c.faqCard.title}</p>
         <p className="type-label-lg mt-1 text-muted-foreground">{c.faqCard.description}</p>
         <span className="type-body-md font-semibold mt-3 inline-block underline">
           {c.faqCard.buttonText}

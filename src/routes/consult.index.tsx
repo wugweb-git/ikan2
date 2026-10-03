@@ -278,9 +278,7 @@ function ConsultantCard({ c, recommended }: { c: Consultant; recommended: boolea
       <div className="mt-3 flex items-center gap-3 border-t border-foreground/10 pt-3">
         <span className="min-w-0 flex-1">
           <span className="type-label-md block text-muted-foreground">From</span>
-          <span className="block font-display text-[17px] font-semibold">
-            {rupees(fromPrice(c))}
-          </span>
+          <span className="type-subhead block">{rupees(fromPrice(c))}</span>
         </span>
         <span className="type-body-sm inline-flex items-center gap-1.5 text-[var(--accent-strong)]">
           <Clock3 className="h-4 w-4" /> {nextLabel(c)}

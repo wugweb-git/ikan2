@@ -187,7 +187,7 @@ function JournalPage() {
                             {f?.label ? (
                               <dt className="type-label-md text-muted-foreground">{f.label}</dt>
                             ) : null}
-                            <dd className="whitespace-pre-line text-[15px] leading-6">{shown}</dd>
+                            <dd className="type-body whitespace-pre-line">{shown}</dd>
                           </div>
                         );
                       })}

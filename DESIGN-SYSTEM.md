@@ -19,7 +19,7 @@ This is a defensible choice — iKAN is a phone-shaped PWA inside a Capacitor sh
 laptop it renders as a phone-width column rather than a wide layout. But it means "the scale at
 each breakpoint" has one answer, not three.
 
-## Type scale — the 15 roles
+## Type scale — the 17 roles
 
 Named on Material 3's roles. Each fixes size, line-height, weight and tracking together, so a
 heading is chosen by what it _is_, not by a pixel value. Identical at every breakpoint.
@@ -47,6 +47,16 @@ loaded from 500 up.
 **Display** continues the ladder above Headline, for titles that carry a screen on their own.
 The app's own `h1` stays at Headline L (32/40); Display is for the marketing surfaces and
 anything holding a full-width hero, and is shared with the ikanhealth.in port so the two agree.
+
+**Subhead** replaces two sizes that were doing one job: 17px (21 uses) and 18px (25 uses),
+both Sora semibold. They were not two roles — six screens used _both_, and nobody picks
+between 17 and 18 deliberately on one page. 18 wins because 17 leaves a 1px step above
+Title M, which reads as a mistake rather than a level.
+
+**Body (15/24)** is the app's default copy size and the one screens reach for most. Note it
+is _not_ Action, which is also 15px: Action is 22/600 and lives inside a button. Same size,
+different job — body copy at a button's line-height reads cramped, and button text at 24
+makes the control taller than its label.
 
 **Body XL, Body S and Action** name three sizes that were in heavy use with no role. Action
 matters most: `text-[15px] font-semibold` is the primary button spec, and without a name every
@@ -154,7 +164,7 @@ Closed, mostly. The scale went from decorative to load-bearing on 3 October 2026
 | `type-*` role uses     |      8 | **551** |
 | arbitrary `text-[Npx]` |    869 | **299** |
 
-613 call sites migrated by `scripts/migrate-type-roles.mjs`, in two passes:
+691 call sites migrated by `scripts/migrate-type-roles.mjs`, in two passes:
 
 - **85 provably identical** — size, line-height, weight and family already matched the role,
   so the swap changes nothing that renders (75 exact, 10 as `role font-x` where only the

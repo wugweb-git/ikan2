@@ -359,7 +359,7 @@ function ProgrammePage() {
           onClose={() => setCancelling(false)}
           title={`Cancel ${programme.name}?`}
         >
-          <p className="text-[15px] leading-6 text-muted-foreground">
+          <p className="type-body text-muted-foreground">
             You’ve done {daysDoneOf(programme, state.completed)} of {dayCount(programme)} days.
             Cancelling clears this run’s progress and answers, and can’t be undone. Programs you’ve
             finished before stay in your history.
@@ -508,9 +508,7 @@ function ProgrammeAboutSections({ about }: { about: ProgrammeAbout }) {
   return (
     <div>
       <Group title="About this program" className="px-0">
-        <p className="text-[15px] leading-6 text-foreground/85">
-          {about.description || about.intro}
-        </p>
+        <p className="type-body text-foreground/85">{about.description || about.intro}</p>
         {about.whoFor.length ? (
           <>
             <SubHead>Is this for you?</SubHead>

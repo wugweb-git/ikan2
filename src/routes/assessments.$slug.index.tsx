@@ -155,7 +155,7 @@ function AssessmentDetailPage() {
 
         <Group title="About this assessment">
           {about?.what?.paragraphs.map((t, i) => (
-            <p key={i} className={cn("text-[15px] leading-6 text-foreground/85", i > 0 && "mt-2")}>
+            <p key={i} className={cn("type-body text-foreground/85", i > 0 && "mt-2")}>
               {t}
             </p>
           ))}
@@ -180,7 +180,7 @@ function AssessmentDetailPage() {
                   )}
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[15px] font-medium leading-6">{sc.label}</span>
+                    <span className="type-body font-medium block">{sc.label}</span>
                     <span className="type-body-sm block text-muted-foreground">
                       {sc.instrument}, {formatValue(pr, pr.min)} to {pr.max}
                       {pr.direction === "better" ? ", higher is better" : ""}

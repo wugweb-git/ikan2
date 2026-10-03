@@ -112,7 +112,7 @@ function ProgramHistoryPage() {
         })}
       </section>
 
-      <h2 className="mt-8 px-4 font-display text-[18px] font-semibold">Your programs</h2>
+      <h2 className="type-subhead mt-8 px-4">Your programs</h2>
       <ul className="mt-3 space-y-3 px-4">
         {rows.map(({ p, runs, last, days, seconds, topics }) => {
           const finished = runs.length > 0;

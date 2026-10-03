@@ -118,7 +118,7 @@ function JournalPage() {
         </section>
 
         <section className="mt-4 px-4">
-          <h2 className="font-display text-[18px] font-semibold">Today</h2>
+          <h2 className="type-subhead">Today</h2>
 
           {hydrated ? (
             <CheckIn
