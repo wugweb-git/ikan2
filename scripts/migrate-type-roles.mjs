@@ -46,14 +46,33 @@ const ROLES = [
   ["type-body-sm", "sans", 13, 20, 400],
   ["type-label-md", "sans", 12, 16, 500],
 ];
-const WEIGHT = { "font-thin":100,"font-extralight":200,"font-light":300,"font-normal":400,
-  "font-medium":500,"font-semibold":600,"font-bold":700,"font-extrabold":800,"font-black":900 };
+const WEIGHT = {
+  "font-thin": 100,
+  "font-extralight": 200,
+  "font-light": 300,
+  "font-normal": 400,
+  "font-medium": 500,
+  "font-semibold": 600,
+  "font-bold": 700,
+  "font-extrabold": 800,
+  "font-black": 900,
+};
 const WEIGHT_CLASS = Object.fromEntries(Object.entries(WEIGHT).map(([k, v]) => [v, k]));
-const LEADING = { "leading-3":12,"leading-4":16,"leading-5":20,"leading-6":24,"leading-7":28,
-  "leading-8":32,"leading-9":36,"leading-10":40 };
+const LEADING = {
+  "leading-3": 12,
+  "leading-4": 16,
+  "leading-5": 20,
+  "leading-6": 24,
+  "leading-7": 28,
+  "leading-8": 32,
+  "leading-9": 36,
+  "leading-10": 40,
+};
 
 const files = execSync("grep -rl 'text-\\[' src --include=*.tsx", { encoding: "utf8" })
-  .trim().split("\n").filter((f) => !f.includes(".stories."));
+  .trim()
+  .split("\n")
+  .filter((f) => !f.includes(".stories."));
 
 const tally = { exact: 0, weight: 0, leading: 0, skipped: 0 };
 const skipReasons = {};
@@ -65,11 +84,16 @@ for (const file of files) {
    * newline, and none of { } $ = ; ? which would mean the match has run out of one string
    * and into neighbouring JSX. An earlier, looser pattern spanned from a closing quote to
    * the next opening one and corrupted a file. */
-  const CLASS_STR = /"((?:[A-Za-z0-9 _:/.%#,()[\]-])*text-\[(\d+)px\](?:[A-Za-z0-9 _:/.%#,()[\]-])*)"/g;
+  const CLASS_STR =
+    /"((?:[A-Za-z0-9 _:/.%#,()[\]-])*text-\[(\d+)px\](?:[A-Za-z0-9 _:/.%#,()[\]-])*)"/g;
   const after = before.replace(CLASS_STR, (whole, cls, sizeStr) => {
     const size = Number(sizeStr);
     const toks = cls.split(/\s+/).filter(Boolean);
-    if (toks.some((t) => t.startsWith("tracking-"))) { tally.skipped++; bump("explicit tracking"); return whole; }
+    if (toks.some((t) => t.startsWith("tracking-"))) {
+      tally.skipped++;
+      bump("explicit tracking");
+      return whole;
+    }
 
     const display = toks.includes("font-display");
     const fam = display ? "display" : "sans";
@@ -79,39 +103,68 @@ for (const file of files) {
     const lhArb = cls.match(/leading-\[(\d+)px\]/);
     const lh = lhArb ? Number(lhArb[1]) : lhTok ? LEADING[lhTok] : undefined;
     if (!lhArb && toks.some((t) => /^leading-(none|tight|snug|normal|relaxed|loose)$/.test(t))) {
-      tally.skipped++; bump("relative leading"); return whole;
+      tally.skipped++;
+      bump("relative leading");
+      return whole;
     }
 
     const bySize = ROLES.filter((r) => r[1] === fam && r[2] === size);
-    if (!bySize.length) { tally.skipped++; bump(`no ${fam} role at ${size}px`); return whole; }
+    if (!bySize.length) {
+      tally.skipped++;
+      bump(`no ${fam} role at ${size}px`);
+      return whole;
+    }
 
-    let role = null, tier = null;
+    let role = null,
+      tier = null;
     const lhMatch = bySize.filter((r) => lh !== undefined && Math.abs(lh - r[3]) < 0.6);
     if (lh !== undefined) {
-      if (!lhMatch.length) { tally.skipped++; bump(`${fam} ${size}px line-height ${lh} matches no role`); return whole; }
+      if (!lhMatch.length) {
+        tally.skipped++;
+        bump(`${fam} ${size}px line-height ${lh} matches no role`);
+        return whole;
+      }
       const exact = lhMatch.find((r) => w === undefined || w === r[4]);
-      if (exact) { role = exact; tier = "exact"; }
-      else { role = lhMatch[0]; tier = "weight"; }
+      if (exact) {
+        role = exact;
+        tier = "exact";
+      } else {
+        role = lhMatch[0];
+        tier = "weight";
+      }
     } else {
-      if (!DO_LEADING) { tally.skipped++; bump("would gain a line-height (run with --leading)"); return whole; }
+      if (!DO_LEADING) {
+        tally.skipped++;
+        bump("would gain a line-height (run with --leading)");
+        return whole;
+      }
       const exact = bySize.find((r) => w === undefined || w === r[4]);
       role = exact ?? bySize[0];
       tier = "leading";
     }
 
     // build the replacement token list
-    const keep = toks.filter((t) =>
-      t !== `text-[${size}px]` && t !== "font-display" &&
-      LEADING[t] === undefined && !/^leading-\[\d+px\]$/.test(t) &&
-      WEIGHT[t] === undefined);
+    const keep = toks.filter(
+      (t) =>
+        t !== `text-[${size}px]` &&
+        t !== "font-display" &&
+        LEADING[t] === undefined &&
+        !/^leading-\[\d+px\]$/.test(t) &&
+        WEIGHT[t] === undefined,
+    );
     const out = [role[0]];
     if (w !== undefined && w !== role[4]) out.push(WEIGHT_CLASS[w]);
     tally[tier]++;
     return `"${[...out, ...keep].join(" ")}"`;
   });
-  if (after !== before) { touched++; if (WRITE) writeFileSync(file, after); }
+  if (after !== before) {
+    touched++;
+    if (WRITE) writeFileSync(file, after);
+  }
 }
-function bump(k) { skipReasons[k] = (skipReasons[k] || 0) + 1; }
+function bump(k) {
+  skipReasons[k] = (skipReasons[k] || 0) + 1;
+}
 
 console.log(`${WRITE ? "MIGRATED" : "DRY RUN"}${DO_LEADING ? " (incl. --leading)" : ""}\n`);
 console.log(`  exact   ${String(tally.exact).padStart(4)}  identical rendering`);

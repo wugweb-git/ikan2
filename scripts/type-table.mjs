@@ -12,11 +12,23 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const css = readFileSync("src/styles.css", "utf8");
 const LABEL = {
-  "display-lg": "Display L", "display-md": "Display M", "display-sm": "Display S",
-  "headline-lg": "Headline L", "headline-md": "Headline M", "headline-sm": "Headline S",
-"title-lg": "Title L", subhead: "Subhead", "title-md": "Title M",
-  "body-xl": "Body XL", "body-lg": "Body L", body: "Body", action: "Action",
-  "body-md": "Body M", "body-sm": "Body S", "label-lg": "Label L", "label-md": "Label M",
+  "display-lg": "Display L",
+  "display-md": "Display M",
+  "display-sm": "Display S",
+  "headline-lg": "Headline L",
+  "headline-md": "Headline M",
+  "headline-sm": "Headline S",
+  "title-lg": "Title L",
+  subhead: "Subhead",
+  "title-md": "Title M",
+  "body-xl": "Body XL",
+  "body-lg": "Body L",
+  body: "Body",
+  action: "Action",
+  "body-md": "Body M",
+  "body-sm": "Body S",
+  "label-lg": "Label L",
+  "label-md": "Label M",
 };
 const ORDER = Object.keys(LABEL);
 
@@ -37,10 +49,12 @@ for (const key of ORDER) {
   ]);
 }
 const head = ["Role", "Class", "Family", "Size", "Line-height", "Weight", "Tracking"];
-const table = [head, head.map(() => "---"), ...rows]
-  .map((r) => `| ${r.join(" | ")} |`).join("\n");
+const table = [head, head.map(() => "---"), ...rows].map((r) => `| ${r.join(" | ")} |`).join("\n");
 
-if (!process.argv.includes("--write")) { console.log(table); process.exit(0); }
+if (!process.argv.includes("--write")) {
+  console.log(table);
+  process.exit(0);
+}
 
 const doc = readFileSync("DESIGN-SYSTEM.md", "utf8");
 const start = doc.indexOf("| Role");
