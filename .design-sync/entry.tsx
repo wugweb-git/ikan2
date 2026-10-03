@@ -34,6 +34,7 @@ export * from "../src/components/equip/steps";
 
 /* the generic primitives: chips, badges, cards, disclosures, charts, empty states, search */
 export * from "../src/components/kit/badge";
+export * from "../src/components/kit/brand";
 export * from "../src/components/kit/card";
 export * from "../src/components/kit/chart";
 export * from "../src/components/kit/chip";

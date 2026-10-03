@@ -95,6 +95,14 @@
   --color-on-error: var(--on-error);
   --color-error-container: var(--error-container);
   --color-on-error-container: var(--on-error-container);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-teal-ink: var(--brand-teal-ink);
+  --color-brand-amber: var(--brand-amber);
+  --color-brand-amber-ink: var(--brand-amber-ink);
+  --color-brand-coral: var(--brand-coral);
+  --color-brand-coral-ink: var(--brand-coral-ink);
+  --color-brand-slate: var(--brand-slate);
+  --color-brand-slate-ink: var(--brand-slate-ink);
 }
 
 :root {
@@ -150,6 +158,30 @@
   --on-error: oklch(1 0 0);
   --error-container: oklch(0.922 0.03 22.8);
   --on-error-container: oklch(0.42 0.147 28.1);
+
+  /* Brand accent palette, carried over from the first iKAN site (globals.css
+   * --ikan-brand-*). Four hues for themed sections, illustration and icon tiles.
+   *
+   * Each hue has two values and they are not interchangeable:
+   *   --brand-<hue>      the hue itself. 2.0-3.0:1 on white, so it is for FILLS,
+   *                      borders, icons and illustration. Never for text.
+   *   --brand-<hue>-ink  the text-safe shade, 5.9-6.5:1 on white and on --canvas.
+   *                      Use this whenever the colour carries a word.
+   *
+   * The old site documented that rule and then broke it on its own About page,
+   * setting a heading's accent word in raw teal at 2.29:1. The -ink values exist
+   * so that pattern can keep its look and still pass AA.
+   *
+   * A wash is color-mix(in oklab, var(--brand-<hue>) 8%, transparent) - the same
+   * 8% the old site used - so there is no separate wash token to keep in step. */
+  --brand-teal: oklch(0.729 0.106 181.8);
+  --brand-teal-ink: oklch(0.485 0.064 170.8);
+  --brand-amber: oklch(0.782 0.151 74.7);
+  --brand-amber-ink: oklch(0.508 0.108 73.3);
+  --brand-coral: oklch(0.705 0.135 21.1);
+  --brand-coral-ink: oklch(0.511 0.141 26.5);
+  --brand-slate: oklch(0.674 0.111 269.3);
+  --brand-slate-ink: oklch(0.487 0.111 268.4);
   --shadow-app: 0 0 45px oklch(0.2 0.01 255 / 0.08);
   --shadow-card: 0 10px 30px oklch(0.2 0.01 255 / 0.06);
   --shadow-dock: 0 12px 35px oklch(0.18 0.01 255 / 0.14);
@@ -192,6 +224,12 @@
   --on-error: oklch(0.145 0.02 27);
   --error-container: oklch(0.29 0.08 27);
   --on-error-container: oklch(0.92 0.04 24);
+  /* On a dark ground the roles swap: the hue itself is now the readable one and
+   * the -ink shade is too dark, so -ink lightens to sit above the surface. */
+  --brand-teal-ink: oklch(0.8 0.09 178);
+  --brand-amber-ink: oklch(0.84 0.13 77);
+  --brand-coral-ink: oklch(0.78 0.12 22);
+  --brand-slate-ink: oklch(0.78 0.09 269);
 }
 
 @layer base {

@@ -52,8 +52,6 @@ export const WithCounter: Story = {
   args: { label: "Anything else?", value: "", onChange: () => {} },
   render: function WithCounter() {
     const [v, setV] = useState("A few lines about the day.");
-    return (
-      <TextField label="Anything else?" value={v} onChange={setV} multiline maxLength={280} />
-    );
+    return <TextField label="Anything else?" value={v} onChange={setV} multiline maxLength={280} />;
   },
 };

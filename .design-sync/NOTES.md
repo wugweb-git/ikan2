@@ -44,18 +44,43 @@ the data helpers they use. Checked at authoring time — no two export the same 
 
 ## Scope
 
-16 components: 10 App, 5 Equip blocks, 1 journal. 56 title segments are excluded by
-`cfg.titleMap` nulls.
+**27 components: 15 M3 primitives and 12 kit primitives.** The user narrowed the sync to
+"ikan2's most used and general ones" (3 Oct 2026), measured from imports: `equip/m3` is imported
+by 40 modules and `Button` alone appears 260 times, so the M3 layer is the design system in
+practice. App-specific compositions (program-header, equip/cards, steps, journal blocks,
+auth-ui, about, result-share, the assessment and consult screens) are out — they are screens,
+not parts.
 
-Two reasons for exclusion, and they are different:
-1. The shadcn kit under `src/components/ui` — the user's call; it is dead code in the app.
-   Note that `UI kit/Button`, `Avatar`, `Label` and `Switch` were *silently pairing to the M3
-   components of the same name* before they were excluded. Any future re-inclusion must handle
-   that collision.
-2. Story files covering several components under one title — `Equip/M3 kit`, `Equip/Blocks`,
-   `App/Journal/Blocks`, `Equip/Testing fixes`, `App/About`, `App/Art`, `App/AuthUI`,
-   `App/ResultShare`. The converter maps one component per title, so these cannot be split
-   without splitting the story files. The user chose to leave them out.
+### How scope is decided now — NOT titleMap
+
+`cfg.titleMap` is empty. Scope comes from **the sync having its own Storybook**:
+
+- `.design-sync/sb-config/` — globs only `../stories/**`, so the converter never sees the app's
+  story files at all.
+- `.design-sync/stories/{m3,kit}/` — 27 story files, **one component per title** (`M3/Button`,
+  `Kit/Chip`, …), 75 stories.
+- `.design-sync/sb-config/preview.tsx` re-exports `.storybook/preview` rather than copying it,
+  so the frame and accent cannot drift from the app's.
+
+**Why the switch.** `titleParts()` resolves a title right-to-left to the first segment that is a
+bundle export, and `titleMap` keys on that *resolved name*. Two consequences the old approach
+could not escape:
+
+1. `UI kit/Badge` and `Kit/Badge` both resolve to `Badge`, so `{Badge: null}` excluded both.
+   Same for `Button`, `Avatar`, `Label`, `Switch`, `Card`, `Chart` — the shadcn kit collides
+   with M3 and with the new kit on seven names.
+2. `Equip/M3 kit` is one title covering twenty components. One title maps to one component, so
+   the most-used layer in the app could not be synced at all without splitting the story file.
+
+Narrowing the glob solves both and touches nothing in `src/`. The user has twice said the
+shadcn files under `src/components/ui` must never be deleted; this keeps all 46 of them, their
+stories, and the app's own Storybook exactly as they were.
+
+### Keeping the sync stories honest
+
+They import the real components, so a story that stops compiling means a prop changed. They are
+committed. If a component gains a variant, add it there — the design agent's card is generated
+from these stories and nothing else.
 
 ## Re-sync risks
 
@@ -118,3 +143,43 @@ Done and reusable:
   (`--radix-*`, `--skeleton-width`): set by the components at runtime, expected to be absent
   from the shipped stylesheets.
 - `[FONT_REMOTE] Manrope, Sora` — served from Google Fonts at runtime, same as the app.
+
+---
+
+## 3 October 2026 — what changed
+
+**CSS completeness (the important one).** Tailwind emits a utility only where it sees one used,
+so 35 of the 80 `@utility` recipes never reached the compiled stylesheet — including four of the
+nine type roles (`type-headline-lg`, `type-body-lg`, `type-body-md`, `type-label-md`). They were
+not merely unused, they were **inert**: typing them did nothing, silently, and the design agent
+builds from the shipped stylesheet so it could not have used them either.
+
+`src/styles.css` now carries an `@source inline("{…}")` listing every `@utility`. All 80 compile;
+the stylesheet went 125 KB → 137 KB (22.6 KB gzipped). **Regenerate that list whenever you add
+an `@utility`:**
+
+    node -e 'const fs=require("fs");const s=fs.readFileSync("src/styles.css","utf8");
+    console.log([...s.matchAll(/^@utility\s+([a-z0-9-]+)/gm)].map(m=>m[1]).sort().join(","))'
+
+A missing name is invisible — it fails by doing nothing — so this is worth checking on any sync:
+compare `@utility` count against the compiled CSS before uploading.
+
+**Error tokens.** `--error`, `--on-error`, `--error-container`, `--on-error-container` added in
+oklch with dark overrides, replacing 20 raw hexes (`#B3261E`, `#F9DEDC`, `#8C1D18`, `#5A1410`).
+Those had no dark value, so every error state rendered light colours on a dark background.
+
+**New components in scope.** `src/components/kit/` — Chip, Pill, MetricPill, Badge, Disclosure,
+Card, Sparkline, ProgressRing, Bars, Dial, EmptyState, SearchField. Added to `entry.tsx`;
+checked at authoring time that none of its 32 exports collides with the existing barrel.
+
+**Button grew.** Five sizes (xs–xl), `elevated` and `destructive` variants, `loading`, `full`,
+plus a new `Fab`. `lg` stayed the default so no existing call site moved.
+
+**`DesignFrame` drift risk is reduced but not gone.** `sb-config/preview.tsx` re-exports the
+app's preview, so the *reference* side can no longer drift. `cfg.provider` → `DesignFrame`
+(`preview-frame.tsx`) is still a hand-copy of that decorator, so the *preview* side still can.
+If `.storybook/preview.tsx` changes its frame width or default accent, update `preview-frame.tsx`
+to match — the compare loop will not catch it, because both panels only move if both are edited.
+
+**Still open at the end of this run.** See the resume checklist above; the capture-height item
+(item 3) is still the first thing to settle, and `.design-sync/conventions.md` is still unwritten.

@@ -22,11 +22,7 @@ export const Rows: Story = {
   render: () => (
     <div className="grid gap-3">
       <Bars values={[6, 7, 5.5, 8, 7.5, 6, 7]} label="Sleep hours this week" />
-      <Bars
-        values={[2, 3, 1, 4, 4, 5, 3]}
-        label="Journal entries this week"
-        color="var(--calm)"
-      />
+      <Bars values={[2, 3, 1, 4, 4, 5, 3]} label="Journal entries this week" color="var(--calm)" />
       <Bars
         values={[40, 55, 30, 70, 65, 80, 60]}
         label="Active minutes this week"
