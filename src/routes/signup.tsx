@@ -147,19 +147,11 @@ function SignupPage() {
             />
             <span>
               I agree to the{" "}
-              <Link
-                to="/legal/$slug"
-                params={{ slug: "terms" }}
-                className="underline underline-offset-2"
-              >
+              <Link to="/legal/$slug" params={{ slug: "terms" }} className="underline">
                 Terms of use
               </Link>{" "}
               and{" "}
-              <Link
-                to="/legal/$slug"
-                params={{ slug: "privacy-policy" }}
-                className="underline underline-offset-2"
-              >
+              <Link to="/legal/$slug" params={{ slug: "privacy-policy" }} className="underline">
                 Privacy policy
               </Link>
               , and I’m 13 or older.
@@ -176,7 +168,7 @@ function SignupPage() {
       <SocialButtons onError={setError} />
       <p className="mt-4 text-center text-[15px]">
         Already have an account?{" "}
-        <Link to="/login" className="font-semibold underline underline-offset-4">
+        <Link to="/login" className="font-semibold underline">
           Sign in
         </Link>
       </p>

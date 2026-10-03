@@ -9,7 +9,7 @@ export function MadeBy({ className }: { className?: string }) {
         href="https://wugweb.com"
         target="_blank"
         rel="noopener noreferrer"
-        className="font-semibold text-foreground underline-offset-4 hover:underline"
+        className="font-semibold text-foreground hover:underline"
       >
         wugweb
       </a>

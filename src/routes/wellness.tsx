@@ -261,10 +261,7 @@ function ScorePage() {
                     Scores {Math.round(p.value!)} of 100 and carries{" "}
                     {Math.round((p.weight / data.totalWeight) * 100)}% of your score, so it moves
                     the total by {pts > 0 ? `+${pts}` : pts} against a middle reading of 50.{" "}
-                    <Link
-                      to={meta.to}
-                      className="font-semibold text-foreground underline underline-offset-4"
-                    >
+                    <Link to={meta.to} className="font-semibold text-foreground underline">
                       {meta.cta}
                     </Link>
                   </div>

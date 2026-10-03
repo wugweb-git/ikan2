@@ -1125,7 +1125,7 @@ function AmountAnswer({
         <button
           type="button"
           onClick={() => onChange(last)}
-          className="mt-3 text-[14px] font-semibold text-[var(--accent-strong)] underline-offset-4 hover:underline"
+          className="mt-3 text-[14px] font-semibold text-[var(--accent-strong)] hover:underline"
         >
           Same as last time: {last} {short}
         </button>

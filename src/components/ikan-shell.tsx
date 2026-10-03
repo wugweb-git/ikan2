@@ -395,17 +395,11 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
           <span className="font-semibold text-foreground">Disclaimer:</span> We at iKan deeply care
           about your mental health but we do not provide emergency support. If you or someone you
           know needs immediate assistance, please reach out to the National Helpline:{" "}
-          <a
-            href="tel:18005990019"
-            className="font-semibold text-foreground underline underline-offset-2"
-          >
+          <a href="tel:18005990019" className="font-semibold text-foreground underline">
             1800-599-0019
           </a>{" "}
           or the iCALL Suicide Prevention Helpline:{" "}
-          <a
-            href="tel:+919152987821"
-            className="font-semibold text-foreground underline underline-offset-2"
-          >
+          <a href="tel:+919152987821" className="font-semibold text-foreground underline">
             9152987821
           </a>
           .

@@ -19,7 +19,7 @@ This is a defensible choice — iKAN is a phone-shaped PWA inside a Capacitor sh
 laptop it renders as a phone-width column rather than a wide layout. But it means "the scale at
 each breakpoint" has one answer, not three.
 
-## Type scale — the 9 defined roles
+## Type scale — the 15 roles
 
 Named on Material 3's roles. Each fixes size, line-height, weight and tracking together, so a
 heading is chosen by what it _is_, not by a pixel value. Identical at every breakpoint.
@@ -43,6 +43,14 @@ a role that omits it picks up whatever an ancestor set. Five of the nine used to
 Two deviations from M3, both deliberate: Body L uses a 26px line rather than 24px, because
 article text is read at length; Title L is weight 500 rather than 400, because Sora is only
 loaded from 500 up.
+
+**Display** continues the ladder above Headline, for titles that carry a screen on their own.
+The app's own `h1` stays at Headline L (32/40); Display is for the marketing surfaces and
+anything holding a full-width hero, and is shared with the ikanhealth.in port so the two agree.
+
+**Body XL, Body S and Action** name three sizes that were in heavy use with no role. Action
+matters most: `text-[15px] font-semibold` is the primary button spec, and without a name every
+button re-decided it.
 
 Faces: `--font-display` = Sora (headlines and titles), `--font-sans` = Manrope (body and
 labels). Both served from Google Fonts at runtime.
@@ -71,9 +79,25 @@ prose still gets these defaults; an explicit `type-*` on a prose child now wins.
 | `li`           | inherit | inherit | inherit     | inherit | `+0.4em` between items; marker `muted-foreground`   |
 | block spacing  | —       | —       | —           | —       | `1em` between siblings, 0 on the first              |
 
-`h4`–`h6` appear nowhere in the app (one use inside an unused shadcn file). If the article
-pipeline ever emits them they will render at browser defaults — Times, unstyled. That is a real
-gap rather than a decision.
+### Element defaults — every level has a role
+
+`@layer base` now gives all six heading levels a role, so no element is ever a browser default:
+
+| Element  | Role       | Value                                                    |
+| -------- | ---------- | -------------------------------------------------------- |
+| `h1`     | Headline L | Sora 32/40, 600, −0.01em                                 |
+| `h2`     | Headline S | Sora 24/32, 600                                          |
+| `h3`     | Title M    | Sora 16/24, 600, +0.01em                                 |
+| `h4`     | Title L    | Sora 22/28, 500                                          |
+| `h5`     | Label L    | Manrope 14/20, 500                                       |
+| `h6`     | Label M    | Manrope 12/16, 500, +0.01em                              |
+| `a`      | —          | `text-underline-offset: 3px` (offset only, no underline) |
+| `strong` | —          | weight 650                                               |
+
+This changes nothing today — every heading in the app already ships with a class, and these sit
+in `base` so any `type-*` beats them. It is the floor that stops the next unclassed heading
+being wrong, and it is what makes `h4`–`h6` usable at all. UA margins are zeroed, because
+spacing here is utilities.
 
 ## Links
 
@@ -139,3 +163,15 @@ Until 3 October 2026 this was worse than drift: Tailwind emits a utility only wh
 used, so `type-headline-lg`, `type-body-lg`, `type-body-md` and `type-label-md` were **absent
 from the compiled stylesheet entirely** — typing them did nothing, silently. `@source inline()`
 in `src/styles.css` now forces all 80 utilities out, so a name either works or does not exist.
+
+## Two open decisions, written down rather than fixed
+
+**The column narrows at 1024px instead of widening.** 100% → 36rem → 30rem. That is right for a
+phone app rendered in a desktop browser, and it is what iKAN is: a Capacitor shell around a PWA.
+But it means the layout never uses desktop width for anything. If any part of iKAN is meant to
+be _read_ on a laptop — long articles, the legal pages — that part wants its own wider treatment.
+Worth deciding deliberately rather than inheriting.
+
+**Title L (22) and Headline S (24) are 2px and one weight apart.** Two roles that close are hard
+to choose between and nearly indistinguishable in use. Both are currently used, so neither has
+been removed, but if one were dropped the scale would be easier to hold in the head.

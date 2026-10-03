@@ -325,10 +325,7 @@ function ResultBody({
             <p className="text-[15px] leading-6">
               Talking to a professional can help with what this result shows.
             </p>
-            <Link
-              to="/support"
-              className="mt-1 inline-block text-[15px] font-semibold underline underline-offset-4"
-            >
+            <Link to="/support" className="mt-1 inline-block text-[15px] font-semibold underline">
               See support options
             </Link>
           </div>

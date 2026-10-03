@@ -188,10 +188,7 @@ function ConsultPage() {
 
         <p className="mx-auto mt-6 max-w-xs px-4 text-center text-[12px] leading-5 text-muted-foreground">
           In a crisis, don’t wait for a booking.{" "}
-          <Link
-            to="/support"
-            className="font-semibold text-foreground underline underline-offset-4"
-          >
+          <Link to="/support" className="font-semibold text-foreground underline">
             Get support now
           </Link>
         </p>

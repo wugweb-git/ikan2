@@ -75,10 +75,7 @@ function ForgotPage() {
           <PrimaryButton busy={busy}>Send reset link</PrimaryButton>
         </form>
       )}
-      <Link
-        to="/login"
-        className="mt-6 block text-center text-[15px] font-semibold underline underline-offset-4"
-      >
+      <Link to="/login" className="mt-6 block text-center text-[15px] font-semibold underline">
         Back to sign in
       </Link>
     </AuthLayout>

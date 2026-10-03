@@ -127,7 +127,7 @@ function PhoneLoginPage() {
                 setStep("phone");
                 setError(null);
               }}
-              className="font-semibold underline-offset-4 hover:underline"
+              className="font-semibold hover:underline"
             >
               Change number
             </button>
@@ -135,7 +135,7 @@ function PhoneLoginPage() {
               type="button"
               disabled={wait > 0 || busy}
               onClick={() => void send()}
-              className="font-semibold underline-offset-4 hover:underline disabled:text-muted-foreground disabled:no-underline"
+              className="font-semibold hover:underline disabled:text-muted-foreground disabled:no-underline"
             >
               {wait > 0 ? `Resend in ${wait}s` : "Resend code"}
             </button>

@@ -105,10 +105,7 @@ export function ImportantNote({ text, className }: { text: string; className?: s
       <div className="min-w-0">
         <h2 className="text-[15px] font-semibold">Good to know</h2>
         <p className="mt-1 text-[14px] leading-5 text-foreground/80">{text}</p>
-        <Link
-          to="/support"
-          className="mt-2 inline-block text-[14px] font-semibold underline underline-offset-4"
-        >
+        <Link to="/support" className="mt-2 inline-block text-[14px] font-semibold underline">
           Need help now?
         </Link>
       </div>

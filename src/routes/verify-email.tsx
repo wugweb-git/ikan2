@@ -77,10 +77,7 @@ function VerifyPage() {
         >
           I’ve confirmed, sign in
         </Link>
-        <Link
-          to="/signup"
-          className="block pt-2 text-center text-[14px] font-semibold underline underline-offset-4"
-        >
+        <Link to="/signup" className="block pt-2 text-center text-[14px] font-semibold underline">
           Use a different email
         </Link>
       </div>

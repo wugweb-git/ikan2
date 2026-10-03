@@ -138,7 +138,7 @@ export function Splash() {
           href="https://wugweb.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-semibold underline-offset-4 hover:underline"
+          className="font-semibold hover:underline"
           style={{ color: s.ink }}
         >
           wugweb

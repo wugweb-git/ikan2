@@ -94,7 +94,7 @@ function LoginPage() {
             <Link
               to="/forgot-password"
               search={email ? { email } : {}}
-              className="text-[14px] font-semibold underline-offset-4 hover:underline"
+              className="text-[14px] font-semibold hover:underline"
             >
               Forgot password?
             </Link>
@@ -108,7 +108,7 @@ function LoginPage() {
         <Link
           to="/signup"
           search={redirect ? { redirect } : {}}
-          className="font-semibold underline underline-offset-4"
+          className="font-semibold underline"
         >
           Create an account
         </Link>

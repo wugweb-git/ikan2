@@ -358,15 +358,11 @@ export function TrustList() {
 export const TermsNote = () => (
   <p className="mt-3 text-center text-[12px] leading-5 text-muted-foreground">
     By continuing you agree to the{" "}
-    <Link to="/legal/$slug" params={{ slug: "terms" }} className="underline underline-offset-2">
+    <Link to="/legal/$slug" params={{ slug: "terms" }} className="underline">
       Terms of use
     </Link>{" "}
     and{" "}
-    <Link
-      to="/legal/$slug"
-      params={{ slug: "privacy-policy" }}
-      className="underline underline-offset-2"
-    >
+    <Link to="/legal/$slug" params={{ slug: "privacy-policy" }} className="underline">
       Privacy policy
     </Link>
     .

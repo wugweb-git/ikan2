@@ -202,7 +202,7 @@ function AssessmentArchivePage() {
                     <Link
                       to="/assessments/$slug/result/$id"
                       params={{ slug, id: r.id }}
-                      className="inline-block text-[14px] font-semibold text-[var(--accent-strong)] underline underline-offset-4"
+                      className="inline-block text-[14px] font-semibold text-[var(--accent-strong)] underline"
                     >
                       Open full result
                     </Link>
@@ -226,9 +226,7 @@ function AssessmentArchivePage() {
                   {risk
                     ? "You don’t have to carry this alone. Free, confidential support lines are open all day."
                     : "Talking to a professional can help with what your latest result shows."}
-                  <span className="mt-1 block font-semibold underline underline-offset-4">
-                    See support options
-                  </span>
+                  <span className="mt-1 block font-semibold underline">See support options</span>
                 </span>
               </Link>
             ) : null}

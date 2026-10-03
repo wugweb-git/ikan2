@@ -16,7 +16,7 @@
  * Generated from the @utility declarations above - regenerate if you add one:
  *   node -e '...'  (see .design-sync/NOTES.md)
  */
-@source inline("{activity-dial,ambient,ambient-afternoon,ambient-evening,ambient-morning,ambient-night,animate-fade,animate-fade-in,animate-sheet,avatar,avatar-ring,avatar-sm,brand-mark,chart-column,delay-1,delay-2,delay-3,delay-4,eyebrow,font-display,hero-card,hero-chip,hero-media,hero-ring,hero-track,hero-veil,insight-card,metric-pill,metric-track,mini-score,nav-icon,nav-item,no-scrollbar,pb-safe,program-band,read-body,read-card,read-meta,read-tag,read-veil,reveal,reveal-in,ring-dial,ring-label,ring-stat,row-link,safe-pin,safe-top,safe-top-sm,score-alert,score-calm,score-mind,score-orb,score-rest,score-ring,score-tile,semantic-chip,shadow-app,shadow-dock,skeleton,splash-disc,splash-hills,splash-mark,splash-progress,splash-ring,splash-rise,sticky-bar,sticky-bar-on,surface,tile,type-body-lg,type-body-md,type-headline-lg,type-headline-md,type-headline-sm,type-label-lg,type-label-md,type-title-lg,type-title-md}");
+@source inline("{activity-dial,ambient,ambient-afternoon,ambient-evening,ambient-morning,ambient-night,animate-fade,animate-fade-in,animate-sheet,avatar,avatar-ring,avatar-sm,brand-mark,chart-column,delay-1,delay-2,delay-3,delay-4,eyebrow,font-display,hero-card,hero-chip,hero-media,hero-ring,hero-track,hero-veil,insight-card,metric-pill,metric-track,mini-score,nav-icon,nav-item,no-scrollbar,pb-safe,program-band,read-body,read-card,read-meta,read-tag,read-veil,reveal,reveal-in,ring-dial,ring-label,ring-stat,row-link,safe-pin,safe-top,safe-top-sm,score-alert,score-calm,score-mind,score-orb,score-rest,score-ring,score-tile,semantic-chip,shadow-app,shadow-dock,skeleton,splash-disc,splash-hills,splash-mark,splash-progress,splash-ring,splash-rise,sticky-bar,sticky-bar-on,surface,tile,type-action,type-body-lg,type-body-md,type-body-sm,type-body-xl,type-display-lg,type-display-md,type-display-sm,type-headline-lg,type-headline-md,type-headline-sm,type-label-lg,type-label-md,type-title-lg,type-title-md}");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -276,6 +276,79 @@
   textarea {
     font-size: max(16px, 1em);
   } /* stops iOS zooming into fields */
+
+  /* Every heading level has a role. Before this, h1-h6 outside an article were browser
+   * defaults - Times-ish, 2em bold, with the UA margin - in the middle of a designed page.
+   * Nothing in the app currently relies on that (no heading ships without a class), so this
+   * changes nothing today; it is the floor that stops the next unclassed heading being wrong,
+   * and it is what makes h4-h6 usable at all.
+   *
+   * These are in @layer base, so any explicit type-* class beats them. Margins are zeroed
+   * because layout here is spacing utilities, never UA margins. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+  }
+  h1 {
+    /* headline-lg: the app's own page-title size */
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  h2 {
+    /* headline-sm */
+    font-family: var(--font-display);
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    letter-spacing: normal;
+  }
+  h3 {
+    /* title-md */
+    font-family: var(--font-display);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  h4 {
+    /* title-lg */
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 500;
+    letter-spacing: normal;
+  }
+  h5 {
+    /* label-lg */
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    letter-spacing: normal;
+  }
+  h6 {
+    /* label-md */
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  /* One underline offset for the whole app. Four were in use - 2px, 3px, 4px and the prose
+   * rule's own. This sets the single value; it does NOT add an underline, because most links
+   * here are cards and nav rows that must not have one. */
+  a {
+    text-underline-offset: 3px;
+  }
+  strong {
+    font-weight: 650;
+  }
 }
 
 @utility font-display {
@@ -299,6 +372,31 @@
  *   label-lg        14 / 20 / 500                 author, date, read time
  *   label-md        12 / 16 / 500                 chips and captions
  */
+/* Display — the ladder above Headline, for page titles that carry a screen on their own.
+ * M3 stops at Display; these continue it in iKAN's faces. The app's own h1 is Headline L
+ * (32/40) and stays there; Display is for the marketing surfaces and anything that has to
+ * hold a full-width hero. Shared with the ikanhealth.in site port so the two agree. */
+@utility type-display-lg {
+  font-family: var(--font-display);
+  font-size: 52px;
+  line-height: 58px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+@utility type-display-md {
+  font-family: var(--font-display);
+  font-size: 42px;
+  line-height: 48px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+@utility type-display-sm {
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
 @utility type-headline-lg {
   font-family: var(--font-display);
   font-size: 32px;
@@ -352,6 +450,28 @@
   /* declared, not omitted: letter-spacing inherits, so a role that
      leaves it out picks up whatever an ancestor set. */
   letter-spacing: normal;
+}
+/* Body XL — the standfirst under a page title. 17/28 was already in use and had no role. */
+@utility type-body-xl {
+  font-size: 17px;
+  line-height: 28px;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+/* Body S — dense supporting copy: card bodies, captions with a full sentence. */
+@utility type-body-sm {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+/* Action — the text inside a button. This is the primary CTA spec and it had no name, so
+ * every button re-decided it; m3 Button's `md` and `lg` sizes are exactly this. */
+@utility type-action {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 @utility type-label-lg {
   font-size: 14px;

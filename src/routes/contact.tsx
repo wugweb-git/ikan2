@@ -189,7 +189,7 @@ function ContactPage() {
       <Link to="/faq" className="mx-5 mt-8 block rounded-[24px] border border-foreground/10 p-5">
         <p className="font-display text-[17px] font-semibold">{c.faqCard.title}</p>
         <p className="mt-1 text-[14px] leading-5 text-muted-foreground">{c.faqCard.description}</p>
-        <span className="mt-3 inline-block text-[14px] font-semibold underline underline-offset-4">
+        <span className="mt-3 inline-block text-[14px] font-semibold underline">
           {c.faqCard.buttonText}
         </span>
       </Link>
