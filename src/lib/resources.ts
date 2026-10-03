@@ -141,7 +141,8 @@ export const resources: Resource[] = [
     title: "Stress, Performance, and Why the Usual Advice Misses",
     category: "Work-Life",
     date: "2026-10-03",
-    minutes: 60,
+    /* 1:46:13, read off the Spotify embed. The brief said "approximately one hour". */
+    minutes: 106,
     source: {
       name: "Ten Percent Happier with Dan Harris",
       url: "https://open.spotify.com/show/65J4WUch2vqFxoGmrKuxof",
