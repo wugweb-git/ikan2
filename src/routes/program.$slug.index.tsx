@@ -125,7 +125,7 @@ function ProgrammePage() {
           <IconButton label="Back" onClick={() => navigate({ to: "/program" })}>
             <ArrowLeft className="h-6 w-6" />
           </IconButton>
-          <p className="type-title-lg font-semibold flex-1 truncate px-2">{programme.name}</p>
+          <p className="type-title-lg flex-1 truncate px-2">{programme.name}</p>
         </div>
 
         <header className="relative h-56 overflow-hidden">
@@ -249,9 +249,7 @@ function ProgrammePage() {
 
         {/* progress band (or what's inside, before starting) */}
         <section className="mt-10 bg-foreground/[0.035] px-4 pb-8 pt-7">
-          <h2 className="type-title-lg font-semibold">
-            {started ? "Your progress" : "What’s inside"}
-          </h2>
+          <h2 className="type-title-lg">{started ? "Your progress" : "What’s inside"}</h2>
           {started ? (
             <>
               <DayGrid programme={programme} completed={state.completed} next={nextDay} />

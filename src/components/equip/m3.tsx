@@ -99,7 +99,7 @@ export function TopAppBar({
     >
       {leading}
       <div className="min-w-0 flex-1 px-2">
-        {title ? <p className="type-title-lg font-semibold truncate">{title}</p> : null}
+        {title ? <p className="type-title-lg truncate">{title}</p> : null}
         {subtitle ? (
           <p className="truncate text-[13px] leading-4 text-muted-foreground">{subtitle}</p>
         ) : null}
@@ -622,7 +622,7 @@ export function BottomSheet({
       />
       <div className="animate-sheet relative max-h-[88dvh] w-full max-w-app overflow-y-auto rounded-t-[28px] bg-background px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-3">
         <div className="mx-auto h-1 w-8 rounded-full bg-foreground/30" />
-        <p className="mt-5 font-display text-[22px] font-semibold">{title}</p>
+        <p className="type-title-lg mt-5">{title}</p>
         <div className="mt-5">{children}</div>
       </div>
     </div>,

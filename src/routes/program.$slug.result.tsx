@@ -158,7 +158,7 @@ function ResultPage() {
         <div style={accentStyle(p.accent)}>
           {bar}
           <div className="px-6 pt-16 text-center">
-            <h1 className="font-display text-[22px] font-semibold">No result yet</h1>
+            <h1 className="type-title-lg">No result yet</h1>
             <p className="type-action mt-2 text-muted-foreground">
               Finish all {dayCount(p)} days of {p.name} to see your result here.
             </p>

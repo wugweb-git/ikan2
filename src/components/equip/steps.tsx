@@ -703,7 +703,7 @@ function StatementsStep({
               key={s}
               className="flex min-h-48 flex-col justify-between rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]"
             >
-              <p className="type-title-lg font-semibold">{s}</p>
+              <p className="type-title-lg">{s}</p>
               <div className="mt-6">
                 <Segmented
                   label={s}
@@ -787,15 +787,15 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
           <div className="mt-3 grid grid-cols-3 gap-2 rounded-[16px] bg-[var(--accent-container)] p-3 text-[var(--on-accent-container)]">
             <div>
               <p className="type-label-md">Asleep</p>
-              <p className="type-title-lg font-semibold tabular-nums">{formatDuration(m.asleep)}</p>
+              <p className="type-title-lg tabular-nums">{formatDuration(m.asleep)}</p>
             </div>
             <div>
               <p className="type-label-md">In bed</p>
-              <p className="type-title-lg font-semibold tabular-nums">{formatDuration(m.inBed)}</p>
+              <p className="type-title-lg tabular-nums">{formatDuration(m.inBed)}</p>
             </div>
             <div>
               <p className="type-label-md">Efficiency</p>
-              <p className="type-title-lg font-semibold tabular-nums">{m.efficiency}%</p>
+              <p className="type-title-lg tabular-nums">{m.efficiency}%</p>
             </div>
           </div>
         ) : null}

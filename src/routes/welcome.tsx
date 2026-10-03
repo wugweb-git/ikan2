@@ -191,9 +191,7 @@ function WelcomePage() {
                   })()}
                   {assessment.name}
                 </p>
-                <p className="mt-1 font-display text-[22px] font-semibold leading-7">
-                  {assessment.title}
-                </p>
+                <p className="type-title-lg mt-1">{assessment.title}</p>
                 <p className="type-body-md mt-3 flex gap-4 text-muted-foreground">
                   <span className="inline-flex items-center gap-1.5">
                     <ListChecks className="h-4 w-4" /> {assessment.questions.length} questions
@@ -324,7 +322,7 @@ function AboutYou({
     <main className="flex flex-1 flex-col px-4 pb-8">
       <p className="type-label-lg text-[var(--accent-strong)]">{label}</p>
       <div className="mt-1 flex items-center gap-3">
-        <span className="type-title-lg font-semibold grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--accent-strong)] text-background">
+        <span className="type-title-lg grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--accent-strong)] text-background">
           <ProfilePhoto src={profile.avatar}>{profileInitials(profile)}</ProfilePhoto>
         </span>
         <h1 className="font-display text-[26px] font-semibold leading-8">

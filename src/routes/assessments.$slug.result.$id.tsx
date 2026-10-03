@@ -126,7 +126,7 @@ function ResultPage() {
         <div style={accentStyle("mind")}>
           {bar}
           <div className="px-6 pt-16 text-center">
-            <h1 className="font-display text-[22px] font-semibold">Result not found</h1>
+            <h1 className="type-title-lg">Result not found</h1>
             <p className="type-action mt-2 text-muted-foreground">
               This result isn’t on this device. See all your {a.title.toLowerCase()} results, or
               take it again.
@@ -202,7 +202,7 @@ function ResultBody({
   if (!complete) {
     return (
       <div className="px-6 pt-12 text-center">
-        <h1 className="font-display text-[22px] font-semibold">This result couldn’t be scored</h1>
+        <h1 className="type-title-lg">This result couldn’t be scored</h1>
         <p className="type-action mt-2 text-muted-foreground">
           Some answers are missing. Take the assessment again to get a result.
         </p>

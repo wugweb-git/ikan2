@@ -272,7 +272,7 @@ function Booking({ c }: { c: Consultant }) {
 
   return (
     <section id="book" className="mx-4 mt-8 rounded-[28px] border border-foreground/10 p-4">
-      <h2 className="type-title-lg font-semibold">Book appointment</h2>
+      <h2 className="type-title-lg">Book appointment</h2>
 
       {mine.length > 0 ? (
         <ul className="mt-3 space-y-2">
@@ -403,7 +403,7 @@ function Booking({ c }: { c: Consultant }) {
       <div className="mt-5 flex items-center justify-between border-t border-foreground/10 pt-4">
         <span>
           <span className="type-label-md block text-muted-foreground">Session fee</span>
-          <span className="font-display text-[22px] font-semibold">{rupees(price)}</span>
+          <span className="type-title-lg">{rupees(price)}</span>
         </span>
         <Button disabled={hour === null} onClick={() => setConfirming(true)}>
           Request appointment

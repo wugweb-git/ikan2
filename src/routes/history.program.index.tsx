@@ -103,9 +103,7 @@ function ProgramHistoryPage() {
           return (
             <div key={t.label} className="rounded-[20px] bg-secondary p-4">
               <Icon className="h-5 w-5 text-muted-foreground" />
-              <p className="mt-2 font-display text-[22px] font-bold leading-7 tabular-nums">
-                {t.value}
-              </p>
+              <p className="type-title-lg font-bold mt-2 tabular-nums">{t.value}</p>
               <p className="type-label-md text-muted-foreground">{t.label}</p>
             </div>
           );

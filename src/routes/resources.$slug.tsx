@@ -139,7 +139,7 @@ function ArticlePage() {
           {article?.description ? (
             /* the standfirst: display face, full contrast, so it reads as part of the title
              * group rather than as the first paragraph of the article */
-            <p className="type-title-lg mt-3 text-muted-foreground text-balance">
+            <p className="type-title-lg mt-3 font-medium text-muted-foreground text-balance">
               {article.description}
             </p>
           ) : null}
@@ -203,7 +203,7 @@ function ArticlePage() {
            * reading from the suggestions after it. */}
           {more.length ? (
             <section className="-mx-5 mt-12 rounded-t-[28px] border-t border-foreground/10 bg-secondary/50 px-5 pb-8 pt-7">
-              <h2 className="type-title-lg font-semibold">Keep reading</h2>
+              <h2 className="type-title-lg">Keep reading</h2>
               <ul className="mt-4 divide-y divide-foreground/10">
                 {more.map((m) => (
                   <li key={m.id}>

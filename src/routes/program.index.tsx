@@ -88,7 +88,7 @@ function ProgrammeCard({ programme }: { programme: Programme }) {
     >
       <img src={programme.cover} alt="" className="w-[112px] shrink-0 object-cover" />
       <div className="flex min-w-0 flex-1 flex-col p-4">
-        <p className="type-title-lg font-semibold">{programme.name}</p>
+        <p className="type-title-lg">{programme.name}</p>
         {src.description ? (
           <p className="type-label-lg mt-1 line-clamp-2 text-muted-foreground">{src.description}</p>
         ) : null}

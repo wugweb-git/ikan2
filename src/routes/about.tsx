@@ -71,14 +71,14 @@ function AboutPage() {
             }
           >
             <p className="type-body-sm font-semibold opacity-75">{m.label}</p>
-            <p className="type-title-lg font-semibold mt-1">{m.title}</p>
+            <p className="type-title-lg mt-1">{m.title}</p>
             <p className="type-body mt-2 opacity-85">{m.description}</p>
           </div>
         ))}
       </section>
 
       <section className="mt-10 px-5">
-        <h2 className="font-display text-[22px] font-semibold">{a.valuesHeading}</h2>
+        <h2 className="type-title-lg">{a.valuesHeading}</h2>
         <div className="mt-4 grid grid-cols-2 gap-3">
           {a.values.map((v) => {
             const Icon = valueIcon[v.iconName] ?? Heart;
@@ -94,7 +94,7 @@ function AboutPage() {
       </section>
 
       <section className="mt-10 px-5">
-        <h2 className="font-display text-[22px] font-semibold">{a.howItWorks.heading}</h2>
+        <h2 className="type-title-lg">{a.howItWorks.heading}</h2>
         <ol className="mt-4 space-y-4">
           {a.howItWorks.steps.map((s, i) => {
             const Icon = stepIcon[i] ?? Sparkles;
@@ -128,7 +128,7 @@ function AboutPage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="px-5 font-display text-[22px] font-semibold">{a.whoFor.heading}</h2>
+        <h2 className="type-title-lg px-5">{a.whoFor.heading}</h2>
         <div className="no-scrollbar mt-4 flex snap-x gap-3 overflow-x-auto px-5 pb-1">
           {a.whoFor.groups.map((g, i) => (
             <div
@@ -149,7 +149,7 @@ function AboutPage() {
       </section>
 
       <section className="mt-10 px-5">
-        <h2 className="font-display text-[22px] font-semibold">{a.teamHeading}</h2>
+        <h2 className="type-title-lg">{a.teamHeading}</h2>
         <p className="type-body mt-1 text-muted-foreground">{a.teamDescription}</p>
         <ul className="mt-4 space-y-3">
           {a.founders.map((f) => (

@@ -17,7 +17,7 @@ export function Group({
 }) {
   return (
     <section className={cn("mt-10 px-4", className)}>
-      <h2 className="type-title-lg font-semibold">{title}</h2>
+      <h2 className="type-title-lg">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>
   );

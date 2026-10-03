@@ -43,15 +43,13 @@ function AssessmentHistoryPage() {
         />
         <section className="mx-4 grid grid-cols-2 divide-x divide-background rounded-[24px] bg-secondary py-4 text-center">
           <div>
-            <p className="font-display text-[22px] font-bold tabular-nums">
+            <p className="type-title-lg font-bold tabular-nums">
               {hydrated ? `${taken}/${assessments.length}` : "—"}
             </p>
             <p className="type-label-md text-muted-foreground">Assessments taken</p>
           </div>
           <div>
-            <p className="font-display text-[22px] font-bold tabular-nums">
-              {hydrated ? total : "—"}
-            </p>
+            <p className="type-title-lg font-bold tabular-nums">{hydrated ? total : "—"}</p>
             <p className="type-label-md text-muted-foreground">Results in total</p>
           </div>
         </section>

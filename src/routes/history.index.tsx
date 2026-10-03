@@ -90,7 +90,7 @@ function HistoryPage() {
           <div className="flex items-center gap-4 p-5">
             <div className="min-w-0 flex-1">
               <p className="type-body-sm opacity-70">This week</p>
-              <p className="mt-1 font-display text-[22px] font-semibold leading-7">
+              <p className="type-title-lg mt-1">
                 {week.length === 0
                   ? "A fresh week"
                   : `${week.length} ${week.length === 1 ? "thing" : "things"} done`}

@@ -122,7 +122,7 @@ function JournalHistoryPage() {
               { v: hydrated ? String(painDays) : "—", l: "Days with pain" },
             ].map((x) => (
               <div key={x.l}>
-                <p className="font-display text-[22px] font-bold tabular-nums">{x.v}</p>
+                <p className="type-title-lg font-bold tabular-nums">{x.v}</p>
                 <p className="type-label-md text-muted-foreground">{x.l}</p>
               </div>
             ))}

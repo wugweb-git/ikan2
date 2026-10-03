@@ -610,9 +610,7 @@ function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
     return (
       <section className="mx-4 rounded-[28px] bg-foreground p-5 text-background">
         <p className="type-body-sm opacity-70">Today’s check-in</p>
-        <p className="mt-1 font-display text-[22px] font-semibold leading-7">
-          How are you feeling?
-        </p>
+        <p className="type-title-lg mt-1">How are you feeling?</p>
         <div className="mt-4 grid grid-cols-5 gap-2">
           {moodScale.map((m) => (
             <Link
@@ -810,7 +808,7 @@ function ScoreCard({
             />
           ) : null}
         </svg>
-        <span className="absolute inset-0 grid place-items-center font-display text-[22px] font-bold tabular-nums">
+        <span className="type-title-lg font-bold absolute inset-0 grid place-items-center tabular-nums">
           {score ?? "—"}
         </span>
       </span>
@@ -883,7 +881,7 @@ function Recommended({ data, hydrated }: { data: Data; hydrated: boolean }) {
               <span className="type-label-md font-semibold block opacity-80">
                 {dayCount(p)} days
               </span>
-              <span className="type-title-lg font-semibold block">{p.name}</span>
+              <span className="type-title-lg block">{p.name}</span>
               {p.source.description ? (
                 <span className="type-label-md mt-0.5 line-clamp-2 opacity-85">
                   {p.source.description}

@@ -121,9 +121,7 @@ function ScorePage() {
               </>
             ) : (
               <>
-                <p className="mt-3 font-display text-[22px] font-semibold">
-                  Your score starts here
-                </p>
+                <p className="type-title-lg mt-3">Your score starts here</p>
                 <p className="type-label-lg mt-1 max-w-[260px] opacity-80">
                   Log a mood check-in, take an assessment or finish a program day.
                 </p>
@@ -367,7 +365,7 @@ function SectionTitle({ children }: { children: string }) {
 function Mini({ value, label }: { value: number | null; label: string }) {
   return (
     <div>
-      <p className="font-display text-[22px] font-semibold tabular-nums">{value ?? "—"}</p>
+      <p className="type-title-lg tabular-nums">{value ?? "—"}</p>
       <p className="type-label-md text-muted-foreground">{label}</p>
     </div>
   );

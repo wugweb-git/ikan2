@@ -48,6 +48,13 @@ loaded from 500 up.
 The app's own `h1` stays at Headline L (32/40); Display is for the marketing surfaces and
 anything holding a full-width hero, and is shared with the ikanhealth.in port so the two agree.
 
+**Title L is 22/28/600**, briefly 20 and now back. 20 and 22 were both already in use, 2px
+apart, doing the same job — moving the role to 20 created a third near-duplicate instead of
+removing one, so they are one role at 22, which is also M3's own Title Large. The weight is
+600 rather than M3's 400/500 because of the 18 call sites, **17 overrode it to semibold**:
+when every use fights the role, the role is wrong. The one exception, the article standfirst,
+now carries , so the override sits on the rare case instead of the common one.
+
 **Subhead** replaces two sizes that were doing one job: 17px (21 uses) and 18px (25 uses),
 both Sora semibold. They were not two roles — six screens used _both_, and nobody picks
 between 17 and 18 deliberately on one page. 18 wins because 17 leaves a 1px step above
@@ -164,7 +171,7 @@ Closed, mostly. The scale went from decorative to load-bearing on 3 October 2026
 | `type-*` role uses     |      8 | **551** |
 | arbitrary `text-[Npx]` |    869 | **299** |
 
-691 call sites migrated by `scripts/migrate-type-roles.mjs`, in two passes:
+710 call sites migrated by `scripts/migrate-type-roles.mjs`, in two passes:
 
 - **85 provably identical** — size, line-height, weight and family already matched the role,
   so the swap changes nothing that renders (75 exact, 10 as `role font-x` where only the

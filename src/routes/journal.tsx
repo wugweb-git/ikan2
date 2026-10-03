@@ -162,7 +162,7 @@ function Stat({ emoji, label, value }: { emoji: string; label: string; value: nu
       </span>
       <span>
         <span className="type-label-md block text-muted-foreground">{label}</span>
-        <span className="type-title-lg font-semibold block tabular-nums">
+        <span className="type-title-lg block tabular-nums">
           {value} {value === 1 ? "day" : "days"}
         </span>
       </span>
@@ -294,7 +294,7 @@ function CheckIn({
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[var(--accent-strong)] text-background">
           <Check className="h-7 w-7" strokeWidth={3} />
         </span>
-        <p className="type-title-lg font-semibold mt-4">Check-in saved</p>
+        <p className="type-title-lg mt-4">Check-in saved</p>
         <p className="type-action mt-2" aria-label="What you logged">
           {summaryOf(saved)}
         </p>

@@ -121,7 +121,7 @@ function ContactPage() {
       </ul>
 
       <section className="mx-5 mt-8">
-        <h2 className="type-title-lg font-semibold">{c.formTitle}</h2>
+        <h2 className="type-title-lg">{c.formTitle}</h2>
         <p className="type-body-md mt-1 text-muted-foreground">{c.formSubtitle}</p>
         {sent ? (
           <div className="mt-4 overflow-hidden rounded-[24px] bg-[#DFF0E8] text-[#173D2F]">
