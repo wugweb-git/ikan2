@@ -30,15 +30,23 @@ a role that omits it picks up whatever an ancestor set. Five of the nine used to
 
 | Role       | Class              | Family  | Size | Line-height | Weight | Tracking |
 | ---------- | ------------------ | ------- | ---- | ----------- | ------ | -------- |
+| Display L  | `type-display-lg`  | Sora    | 52px | 58px        | 600    | −0.02em  |
+| Display M  | `type-display-md`  | Sora    | 42px | 48px        | 600    | −0.015em |
+| Display S  | `type-display-sm`  | Sora    | 34px | 40px        | 600    | −0.01em  |
 | Headline L | `type-headline-lg` | Sora    | 32px | 40px        | 600    | −0.01em  |
 | Headline M | `type-headline-md` | Sora    | 28px | 36px        | 600    | −0.01em  |
 | Headline S | `type-headline-sm` | Sora    | 24px | 32px        | 600    | normal   |
-| Title L    | `type-title-lg`    | Sora    | 22px | 28px        | 500    | normal   |
-| Title M    | `type-title-md`    | Sora    | 16px | 24px        | 600    | +0.01em  |
+| Title L    | `type-title-lg`    | Sora    | 22px | 28px        | 600    | normal   |
+| Subhead    | `type-subhead`     | Sora    | 18px | 26px        | 600    | normal   |
+| Title M    | `type-title-md`    | Sora    | 16px | 24px        | 600    | 0.01em   |
+| Body XL    | `type-body-xl`     | Manrope | 17px | 28px        | 400    | normal   |
 | Body L     | `type-body-lg`     | Manrope | 16px | 26px        | 400    | normal   |
+| Body       | `type-body`        | Manrope | 15px | 24px        | 400    | normal   |
+| Action     | `type-action`      | Manrope | 15px | 22px        | 600    | 0.01em   |
 | Body M     | `type-body-md`     | Manrope | 14px | 21px        | 400    | normal   |
+| Body S     | `type-body-sm`     | Manrope | 13px | 20px        | 400    | normal   |
 | Label L    | `type-label-lg`    | Manrope | 14px | 20px        | 500    | normal   |
-| Label M    | `type-label-md`    | Manrope | 12px | 16px        | 500    | +0.01em  |
+| Label M    | `type-label-md`    | Manrope | 12px | 16px        | 500    | 0.01em   |
 
 Two deviations from M3, both deliberate: Body L uses a 26px line rather than 24px, because
 article text is read at length; Title L is weight 500 rather than 400, because Sora is only
@@ -53,7 +61,7 @@ apart, doing the same job — moving the role to 20 created a third near-duplica
 removing one, so they are one role at 22, which is also M3's own Title Large. The weight is
 600 rather than M3's 400/500 because of the 18 call sites, **17 overrode it to semibold**:
 when every use fights the role, the role is wrong. The one exception, the article standfirst,
-now carries , so the override sits on the rare case instead of the common one.
+now carries `font-medium`, so the override sits on the rare case instead of the common one.
 
 **Subhead** replaces two sizes that were doing one job: 17px (21 uses) and 18px (25 uses),
 both Sora semibold. They were not two roles — six screens used _both_, and nobody picks
