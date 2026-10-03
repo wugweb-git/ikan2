@@ -162,6 +162,8 @@ export const resources: Resource[] = [
     minutes: 10,
     source: {
       name: "National Institute of Mental Health",
+      /* NIMH's own page for this video; checked, and it embeds the same video id. */
+      url: "https://www.nimh.nih.gov/news/media/2021/guided-visualization-dealing-with-stress",
       cost: "Free",
       language: "English",
       note: "Guided Visualization: Dealing with Stress.",
@@ -179,6 +181,9 @@ export const resources: Resource[] = [
     minutes: 3,
     source: {
       name: "National Institute of Mental Health",
+      /* This one has no page of its own on nimh.nih.gov - it lives on NIMH's YouTube channel -
+       * so the link goes to their media library rather than to a URL that does not exist. */
+      url: "https://www.nimh.nih.gov/news/media",
       cost: "Free",
       language: "English",
       note: "GREAT: Helpful Practices to Manage Stress and Anxiety.",
