@@ -33,7 +33,6 @@ export const resourceCategories = [
   "Confidence",
   "Wellness",
   "Work-Life",
-  "Mental Health",
 ] as const;
 export type ResourceCategory = (typeof resourceCategories)[number];
 
@@ -247,7 +246,7 @@ export const resources: Resource[] = [
   {
     id: "resource-india-numbers",
     title: "India's Mental Health Crisis: The Numbers We Can No Longer Ignore.",
-    category: "Mental Health",
+    category: "General",
     date: "2026-10-03",
     minutes: 5,
     art: "measure",
