@@ -8,11 +8,12 @@
     "build": "bun run scripts/gen-sitemap.ts && vite build",
     "build:dev": "bun run scripts/gen-sitemap.ts && vite build --mode development",
     "preview": "vite preview",
-    "lint": "eslint .",
+    "lint": "eslint . && node scripts/check-safelist.mjs",
     "format": "prettier --write .",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
-    "sitemap": "bun run scripts/gen-sitemap.ts"
+    "sitemap": "bun run scripts/gen-sitemap.ts",
+    "check:safelist": "node scripts/check-safelist.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"
