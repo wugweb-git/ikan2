@@ -1896,3 +1896,5 @@ html.reduce-motion .splash .splash-ring {
 @media (prefers-reduced-motion: reduce) {
   .services-page *, .services-page *::before, .services-page *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+/* Public content stays visible even before hydration; movement belongs on interactive cards. */
+.services-page .reveal { opacity: 1; transform: none; }
