@@ -1,0 +1,2 @@
+- [x] Build and verify the public Services page across desktop, tablet, and mobile.
+- [ ] Resolve the three flagged public-read security policies (blocked by the explicit no-database-work instruction and an access-design decision).
