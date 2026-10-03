@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronDown, Search } from "lucide-react";
 import { InfoShell } from "@/components/info-shell";
 import { pageMeta } from "@/components/equip/program-header";
 import { cn } from "@/lib/utils";
 import { faqPage as f } from "@/lib/content";
+import { Disclosure, DisclosureGroup } from "@/components/kit/disclosure";
+import { SearchField } from "@/components/kit/search-field";
 
 export const Route = createFileRoute("/faq")({
   head: () => pageMeta(f.heroTitle, f.heroSubtitle, "/faq"),
@@ -32,17 +33,12 @@ function FaqPage() {
         <p className="mt-2 text-[16px] leading-6 text-muted-foreground">{f.heroSubtitle}</p>
       </header>
 
-      <label className="mx-5 mt-5 flex h-12 items-center gap-3 rounded-full border border-foreground/15 px-4 focus-within:border-foreground/40">
-        <Search className="h-5 w-5 text-muted-foreground" />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={f.searchPlaceholder}
-          aria-label={f.searchPlaceholder}
-          className="h-full flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground"
-        />
-      </label>
+      <SearchField
+        value={query}
+        onChange={setQuery}
+        label={f.searchPlaceholder}
+        className="mx-5 mt-5"
+      />
 
       <div
         className="no-scrollbar mt-4 flex gap-2 overflow-x-auto px-5"
@@ -75,23 +71,19 @@ function FaqPage() {
         groups.map((g) => (
           <section key={g.id} className="mt-7 px-5">
             <h2 className="font-display text-[18px] font-semibold">{g.title}</h2>
-            <div className="mt-3 overflow-hidden rounded-[20px] border border-foreground/10">
-              {g.items.map((i, n) => (
-                <details
+            <DisclosureGroup className="mt-3">
+              {g.items.map((i) => (
+                <Disclosure
                   key={i.question}
-                  className={cn("group", n > 0 && "border-t border-foreground/10")}
+                  tone="plain"
+                  radius={0}
+                  title={i.question}
                   open={Boolean(q)}
                 >
-                  <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3 text-[15px] font-medium [&::-webkit-details-marker]:hidden">
-                    <span className="flex-1">{i.question}</span>
-                    <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
-                  </summary>
-                  <p className="px-4 pb-4 text-[15px] leading-6 text-muted-foreground">
-                    {i.answer}
-                  </p>
-                </details>
+                  <p className="text-[15px] leading-6 text-muted-foreground">{i.answer}</p>
+                </Disclosure>
               ))}
-            </div>
+            </DisclosureGroup>
           </section>
         ))
       )}

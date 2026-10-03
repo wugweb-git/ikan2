@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ChevronDown, LifeBuoy, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowLeft, LifeBuoy, TrendingDown, TrendingUp } from "lucide-react";
 import { DateText } from "@/components/date-text";
 import { IkanShell } from "@/components/ikan-shell";
 import { accentStyle, Button, IconButton, stateLayer, TopAppBar } from "@/components/equip/m3";
@@ -20,6 +20,8 @@ import { getAssessment } from "@/lib/assessment/instruments";
 import { headlineOf, riskEndorsed, scoreAll, type ScoreResult } from "@/lib/assessment/scoring";
 import { useAssessmentStore } from "@/lib/assessment/store";
 import { RETAKE_AFTER_DAYS, retakeTiming } from "@/lib/assessment/reassess";
+import { Disclosure } from "@/components/kit/disclosure";
+import { EmptyState } from "@/components/kit/empty";
 
 /* One assessment's archive: summary, every finished result stacked newest first (each opens to
  * its scores), and what to do next based on the latest result. */
@@ -95,17 +97,18 @@ function AssessmentArchivePage() {
         </section>
 
         {hydrated && !latest ? (
-          <div className="mx-4 mt-5 rounded-[24px] border border-dashed border-foreground/20 p-8 text-center">
-            <p className="text-[15px] text-muted-foreground">
-              No results yet. Your results stack up here each time you take it.
-            </p>
-            <Button
-              className="mt-4"
-              onClick={() => navigate({ to: "/assessment-flow", search: { id: slug } })}
-            >
-              Take assessment
-            </Button>
-          </div>
+          <EmptyState
+            tone="dashed"
+            title="No results yet"
+            className="mx-4 mt-5"
+            action={
+              <Button onClick={() => navigate({ to: "/assessment-flow", search: { id: slug } })}>
+                Take assessment
+              </Button>
+            }
+          >
+            Your results stack up here each time you take it.
+          </EmptyState>
         ) : null}
 
         {latest?.head?.band ? (
@@ -148,12 +151,22 @@ function AssessmentArchivePage() {
             <ul className="mt-3 space-y-2">
               {scored.map(({ r, scores, head }, i) => (
                 <li key={r.id}>
-                  <details
-                    className="group overflow-hidden rounded-[20px] border border-foreground/10"
+                  <Disclosure
+                    tone="outlined"
+                    radius={20}
                     open={i === 0}
-                  >
-                    <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
-                      <span className="min-w-0 flex-1">
+                    bodyClassName="space-y-3 border-t border-foreground/10 px-4 py-3"
+                    meta={
+                      head?.band ? (
+                        <BandChip
+                          label={head.band.label}
+                          tone={head.band.tone}
+                          severity={head.band.severity}
+                        />
+                      ) : null
+                    }
+                    title={
+                      <>
                         <DateText className="text-[15px] font-semibold">
                           {date(r.completedAt)}
                         </DateText>
@@ -161,48 +174,39 @@ function AssessmentArchivePage() {
                           {i === 0 ? "Latest" : `${scored.length - i} of ${scored.length}`}
                           {head ? ` · ${valueText(head)}` : ` · ${scores.length} scores`}
                         </span>
-                      </span>
-                      {head?.band ? (
-                        <BandChip
-                          label={head.band.label}
-                          tone={head.band.tone}
-                          severity={head.band.severity}
-                        />
-                      ) : null}
-                      <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
-                    </summary>
-                    <div className="space-y-3 border-t border-foreground/10 px-4 py-3">
-                      {scores.map((s) => (
-                        <div key={s.score.id}>
-                          <div className="flex items-start gap-3">
-                            <p className="min-w-0 flex-1 text-[14px] font-medium">
-                              {s.score.label}
-                              <span className="block text-[12px] font-normal text-muted-foreground tabular-nums">
-                                {valueText(s)}
-                              </span>
-                            </p>
-                            {s.band ? (
-                              <BandChip
-                                label={s.band.label}
-                                tone={s.band.tone}
-                                severity={s.band.severity}
-                              />
-                            ) : null}
-                          </div>
-                          <div className="mt-2">
-                            <RangeBar result={s} />
-                          </div>
+                      </>
+                    }
+                  >
+                    {scores.map((s) => (
+                      <div key={s.score.id}>
+                        <div className="flex items-start gap-3">
+                          <p className="min-w-0 flex-1 text-[14px] font-medium">
+                            {s.score.label}
+                            <span className="block text-[12px] font-normal text-muted-foreground tabular-nums">
+                              {valueText(s)}
+                            </span>
+                          </p>
+                          {s.band ? (
+                            <BandChip
+                              label={s.band.label}
+                              tone={s.band.tone}
+                              severity={s.band.severity}
+                            />
+                          ) : null}
                         </div>
-                      ))}
-                      <Link
-                        to="/assessments/$slug/result/$id"
-                        params={{ slug, id: r.id }}
-                        className="inline-block text-[14px] font-semibold text-[var(--accent-strong)] underline underline-offset-4"
-                      >
-                        Open full result
-                      </Link>
-                    </div>
-                  </details>
+                        <div className="mt-2">
+                          <RangeBar result={s} />
+                        </div>
+                      </div>
+                    ))}
+                    <Link
+                      to="/assessments/$slug/result/$id"
+                      params={{ slug, id: r.id }}
+                      className="inline-block text-[14px] font-semibold text-[var(--accent-strong)] underline underline-offset-4"
+                    >
+                      Open full result
+                    </Link>
+                  </Disclosure>
                 </li>
               ))}
             </ul>

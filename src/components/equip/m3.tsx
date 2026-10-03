@@ -129,42 +129,119 @@ export function LinearProgress({ value }: { value: number }) {
   );
 }
 
-type ButtonVariant = "filled" | "tonal" | "outlined" | "text";
+/* M3 names five button emphases. `elevated` is the filled card-like one; the rest were
+ * already here. `destructive` is iKAN's own — delete-account and clear-data needed it and
+ * were reaching for a raw hex. */
+export type ButtonVariant = "filled" | "tonal" | "outlined" | "text" | "elevated" | "destructive";
+
+/* The five heights the screens actually use. `lg` is the default because it is what every
+ * existing call site renders today. */
+export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
+
+const buttonSizes: Record<ButtonSize, string> = {
+  xs: "h-9 px-4 text-[13px]",
+  sm: "h-10 px-5 text-[14px]",
+  md: "h-11 px-5 text-[15px]",
+  lg: "h-12 px-6 text-[15px]",
+  xl: "h-14 px-7 text-[16px]",
+};
+
+const buttonVariants: Record<ButtonVariant, string> = {
+  filled: "bg-foreground text-background",
+  tonal: "bg-[var(--accent-container)] text-[var(--on-accent-container)]",
+  outlined: "border border-foreground/25 text-foreground",
+  text: "text-foreground",
+  elevated: "bg-card text-foreground shadow-[var(--shadow-card)]",
+  destructive: "bg-error text-on-error",
+};
 
 export function Button({
   variant = "filled",
+  size = "lg",
   children,
   onClick,
   disabled,
+  loading,
+  full,
   type = "button",
   className,
   icon,
+  trailingIcon,
 }: {
   variant?: ButtonVariant;
+  size?: ButtonSize | undefined;
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean | undefined;
+  /** Blocks the button and shows a spinner in place of the leading icon. */
+  loading?: boolean | undefined;
+  /** Fills the width of its container, as the form submit buttons do. */
+  full?: boolean | undefined;
   type?: "button" | "submit";
   className?: string;
   icon?: ReactNode;
+  trailingIcon?: ReactNode | undefined;
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       className={cn(
-        "inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold tracking-[0.01em] transition-colors disabled:pointer-events-none disabled:opacity-40",
+        "inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-[0.01em] transition-colors disabled:pointer-events-none disabled:opacity-40",
+        buttonSizes[size],
         stateLayer,
-        variant === "filled" && "bg-foreground text-background",
-        variant === "tonal" && "bg-[var(--accent-container)] text-[var(--on-accent-container)]",
-        variant === "outlined" && "border border-foreground/25 text-foreground",
-        variant === "text" && "px-3 text-foreground",
+        buttonVariants[variant],
+        /* a text button has no fill, so it should not carry the fill's side padding */
+        variant === "text" && "px-3",
+        full && "w-full",
         className,
       )}
     >
-      {icon}
+      {loading ? (
+        <span
+          aria-hidden="true"
+          className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent"
+        />
+      ) : (
+        icon
+      )}
       {children}
+      {trailingIcon}
+    </button>
+  );
+}
+
+/** The one floating action button: a circle that sits above the content, not in it. */
+export function Fab({
+  label,
+  onClick,
+  children,
+  extended,
+  className,
+}: {
+  label: string;
+  onClick?: (() => void) | undefined;
+  children: ReactNode;
+  /** Adds the label beside the icon, as M3's extended FAB does. */
+  extended?: boolean | undefined;
+  className?: string | undefined;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={extended ? undefined : label}
+      className={cn(
+        "inline-flex h-14 items-center justify-center gap-2 rounded-full bg-foreground text-background shadow-dock",
+        extended ? "px-5 text-[15px] font-semibold" : "w-14",
+        stateLayer,
+        className,
+      )}
+    >
+      {children}
+      {extended ? label : null}
     </button>
   );
 }

@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowLeft, Brain, Heart } from "lucide-react";
 import {
   Button,
+  Fab,
   IconButton,
   Label,
   LinearProgress,
@@ -38,12 +39,37 @@ function Section({ name, children }: { name: string; children: React.ReactNode }
 
 export const Buttons: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-3">
-      <Button>Next</Button>
-      <Button variant="tonal">Learning diary</Button>
-      <Button variant="outlined">Edit</Button>
-      <Button variant="text">Skip</Button>
-      <Button disabled>Next</Button>
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center gap-3">
+        <Button>Next</Button>
+        <Button variant="tonal">Learning diary</Button>
+        <Button variant="outlined">Edit</Button>
+        <Button variant="text">Skip</Button>
+        <Button variant="elevated">Share</Button>
+        <Button variant="destructive">Delete account</Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button size="xs">Extra small</Button>
+        <Button size="sm">Small</Button>
+        <Button size="md">Medium</Button>
+        <Button size="lg">Large</Button>
+        <Button size="xl">Extra large</Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button disabled>Disabled</Button>
+        <Button loading>Saving</Button>
+        <Button icon={<Heart className="h-4 w-4" />}>With icon</Button>
+        <Button trailingIcon={<ArrowLeft className="h-4 w-4 rotate-180" />}>Trailing</Button>
+      </div>
+      <Button full>Full width</Button>
+      <div className="flex items-center gap-3">
+        <Fab label="New entry">
+          <Heart className="h-6 w-6" />
+        </Fab>
+        <Fab label="New entry" extended>
+          <Heart className="h-5 w-5" />
+        </Fab>
+      </div>
     </div>
   ),
 };

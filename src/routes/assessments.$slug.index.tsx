@@ -42,6 +42,7 @@ import {
   useBeforeStart,
 } from "@/components/about";
 import { assessmentAbout, dedupe } from "@/lib/content/about";
+import { Disclosure } from "@/components/kit/disclosure";
 
 export const Route = createFileRoute("/assessments/$slug/")({
   loader: ({ params }) => {
@@ -197,12 +198,14 @@ function AssessmentDetailPage() {
 
         <Group title="How it works">
           <Bento items={steps.map((text) => ({ icon: stepIcon(text), text }))} offset={1} />
-          <details className="group mt-4 rounded-[16px] border border-foreground/10 px-4 py-3">
-            <summary className="flex cursor-pointer list-none items-center justify-between text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
-              See the answer options
-              <ChevronRight className="h-5 w-5 transition-transform group-open:rotate-90" />
-            </summary>
-            <div className="mt-3 space-y-3">
+          <Disclosure
+            tone="outlined"
+            radius={16}
+            chevron="right"
+            title={<span className="font-semibold">See the answer options</span>}
+            className="mt-4"
+          >
+            <div className="space-y-3">
               {scaleKeys.map((k) => (
                 <div key={k} className="flex flex-wrap gap-2">
                   {a.scales[k]!.options.map((o) => (
@@ -216,7 +219,7 @@ function AssessmentDetailPage() {
                 </div>
               ))}
             </div>
-          </details>
+          </Disclosure>
         </Group>
 
         {about?.youllSee ? (

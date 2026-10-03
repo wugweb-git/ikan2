@@ -13,7 +13,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { Illustration } from "@/components/art";
 import { accentStyle, IconButton, stateLayer, TopAppBar } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { toneColors } from "@/components/assessment/ui";
@@ -21,6 +20,7 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { useEverything, wellnessBand, type ActivityEvent, type ActivityType } from "@/lib/activity";
 import { addDays, dayKey, streaks } from "@/lib/journal";
+import { EmptyState } from "@/components/kit/empty";
 
 export const Route = createFileRoute("/history/")({
   head: () => pageMeta("My history", "Everything you’ve done in iKAN, in one place."),
@@ -217,23 +217,21 @@ function HistoryPage() {
         </div>
 
         {hydrated && shown.length === 0 ? (
-          <div className="mx-4 mt-4 overflow-hidden rounded-[24px] bg-secondary">
-            <div className="h-32">
-              <Illustration art="mood" />
-            </div>
-            <div className="p-5 text-center">
-              <p className="font-display text-[17px] font-semibold">Nothing here yet</p>
-              <p className="mt-1 text-[14px] text-muted-foreground">
-                Finished assessments, completed programs and journal check-ins appear here.
-              </p>
+          <EmptyState
+            art="mood"
+            title="Nothing here yet"
+            className="mx-4 mt-4"
+            action={
               <Link
                 to="/journal"
-                className="mt-4 inline-flex h-11 items-center rounded-full bg-foreground px-5 text-[14px] font-semibold text-background"
+                className="inline-flex h-11 items-center rounded-full bg-foreground px-5 text-[14px] font-semibold text-background"
               >
                 Log today’s mood
               </Link>
-            </div>
-          </div>
+            }
+          >
+            Finished assessments, completed programs and journal check-ins appear here.
+          </EmptyState>
         ) : (
           <div className="mt-2 px-4">
             {groups.map((g) => (

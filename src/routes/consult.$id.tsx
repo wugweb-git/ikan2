@@ -45,6 +45,7 @@ import {
   type SessionMode,
 } from "@/lib/consultants";
 import { addDays } from "@/lib/journal";
+import { Disclosure } from "@/components/kit/disclosure";
 
 export const Route = createFileRoute("/consult/$id")({
   loader: ({ params }) => {
@@ -218,13 +219,9 @@ function ConsultantPage() {
         {c.faq ? (
           <section className="mt-7 px-4">
             <h2 className="font-display text-[16px] font-semibold">Frequently asked</h2>
-            <details className="group mt-3 rounded-[20px] bg-secondary">
-              <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 text-[15px] font-medium">
-                <span className="flex-1">{c.faq.q}</span>
-                <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" />
-              </summary>
-              <p className="px-4 pb-4 text-[15px] leading-6 text-muted-foreground">{c.faq.a}</p>
-            </details>
+            <Disclosure tone="filled" radius={20} title={c.faq.q} className="mt-3">
+              <p className="text-[15px] leading-6 text-muted-foreground">{c.faq.a}</p>
+            </Disclosure>
           </section>
         ) : null}
 

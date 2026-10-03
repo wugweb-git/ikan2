@@ -7,6 +7,7 @@ import { formatDuration, formatTime, nightMetrics } from "@/lib/equip/metrics";
 import { getProgramme } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 import type { Field, Programme, UI } from "@/lib/equip/types";
+import { EmptyState } from "@/components/kit/empty";
 
 export const Route = createFileRoute("/program/$slug/journal")({
   loader: ({ params }) => {
@@ -150,15 +151,14 @@ function JournalPage() {
         {!nights.length &&
         !Object.keys(state.tracker).length &&
         !collectionsOf(programme).some(([c]) => entries(c).length) ? (
-          <div className="mx-4 mt-6 flex flex-col items-center rounded-[16px] border border-dashed border-foreground/25 px-6 py-10 text-center">
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-[var(--accent-container)] text-[var(--on-accent-container)]">
-              <BookOpen className="h-6 w-6" />
-            </span>
-            <p className="mt-3 text-[16px] font-medium">Nothing here yet</p>
-            <p className="mt-1 text-[14px] text-muted-foreground">
-              What you write during each day shows up here.
-            </p>
-          </div>
+          <EmptyState
+            tone="dashed"
+            icon={<BookOpen className="h-6 w-6" />}
+            title="Nothing here yet"
+            className="mx-4 mt-6"
+          >
+            What you write during each day shows up here.
+          </EmptyState>
         ) : null}
 
         {collectionsOf(programme).map(([collection, { title, fields }]) => {

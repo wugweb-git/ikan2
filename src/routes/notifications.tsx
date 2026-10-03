@@ -21,6 +21,7 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { useNotifications, type Notice } from "@/lib/notifications";
 import type { ActivityEvent } from "@/lib/activity";
+import { EmptyState } from "@/components/kit/empty";
 
 export const Route = createFileRoute("/notifications")({
   head: () => pageMeta("Notifications", "What needs you, what changed, and what happened."),
@@ -128,16 +129,9 @@ function NotificationsPage() {
         </div>
 
         {hydrated && empty ? (
-          <div className="mx-4 mt-6 overflow-hidden rounded-[24px] bg-secondary">
-            <div className="h-32">
-              <Illustration art="sleep" />
-            </div>
-            <div className="p-5 text-center">
-              <BellOff className="mx-auto h-6 w-6 text-muted-foreground" />
-              <p className="mt-2 font-display text-[17px] font-semibold">All quiet</p>
-              <p className="mt-1 text-[14px] text-muted-foreground">Nothing needs you right now.</p>
-            </div>
-          </div>
+          <EmptyState art="sleep" title="All quiet" className="mx-4 mt-6">
+            Nothing needs you right now.
+          </EmptyState>
         ) : null}
 
         {(tab === "all" || tab === "needs") && needs.length ? (
