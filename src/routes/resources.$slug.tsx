@@ -14,6 +14,7 @@ import { StackedAssessmentCard } from "@/components/assessment/ui";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { MediaPlayer } from "@/components/media-player";
+import { SourceCard } from "@/components/source-card";
 import { accentStyle, IconButton, stateLayer } from "@/components/equip/m3";
 import { jsonLd, pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -171,6 +172,8 @@ function ArticlePage() {
               dangerouslySetInnerHTML={{ __html: article.html }}
             />
           ) : null}
+
+          {r.source ? <SourceCard source={r.source} /> : null}
 
           {assessment ? (
             <StackedAssessmentCard

@@ -49,6 +49,18 @@ export type Resource = {
    * provider and committed, never requested at render: the whole point of the placeholder is
    * that nothing reaches YouTube or Spotify until somebody presses play. */
   poster?: string;
+  /* Where a shared piece came from. Kept as fields rather than a line of italics at the bottom
+   * of the prose, because it is metadata: who made it, what it costs, what language it is in,
+   * what licence it carries, and a link back to the publisher's own page for it. */
+  source?: {
+    name: string;
+    /** the publisher's page for this piece, where they gave one */
+    url?: string;
+    cost?: string;
+    language?: string;
+    licence?: string;
+    note?: string;
+  };
   featured?: boolean;
   /** the iKAN assessment this article explains */
   assessment?: string;
@@ -64,6 +76,12 @@ export const resources: Resource[] = [
     category: "Stress",
     date: "2026-10-03",
     minutes: 4,
+    source: {
+      name: "NHS Every Mind Matters",
+      url: "https://www.nhs.uk/every-mind-matters/",
+      cost: "Free",
+      language: "English",
+    },
     art: "stress",
     medium: "video",
     src: "https://www.youtube.com/watch?v=z7ATOc4ShOc",
@@ -76,6 +94,13 @@ export const resources: Resource[] = [
     category: "Stress",
     date: "2026-10-03",
     minutes: 5,
+    source: {
+      name: "Mindful Awareness Research Centre (MARC), UCLA",
+      url: "https://www.freemindfulness.org/download",
+      language: "English",
+      licence: "CC BY-NC-SA 3.0",
+      note: "Shared via The Free Mindfulness Project. No background music.",
+    },
     art: "anxiety",
     medium: "audio",
     /* UCLA MARC, via the Free Mindfulness Project, CC BY-NC-SA 3.0. Pulled out of Google
@@ -89,6 +114,12 @@ export const resources: Resource[] = [
     category: "Stress",
     date: "2026-10-03",
     minutes: 60,
+    source: {
+      name: "Ten Percent Happier with Dan Harris",
+      url: "https://open.spotify.com/show/65J4WUch2vqFxoGmrKuxof",
+      language: "English",
+      note: "Guest: Dr. Modupe Akinola, Columbia Business School.",
+    },
     art: "work",
     medium: "audio",
     src: "https://open.spotify.com/episode/5IvwJBttwqfAgJspvpyB43",
@@ -100,6 +131,12 @@ export const resources: Resource[] = [
     category: "Stress",
     date: "2026-10-03",
     minutes: 10,
+    source: {
+      name: "National Institute of Mental Health",
+      cost: "Free",
+      language: "English",
+      note: "Guided Visualization: Dealing with Stress.",
+    },
     art: "burnout",
     medium: "video",
     src: "https://www.youtube.com/watch?v=Dq9odPtHbcg",
@@ -111,6 +148,12 @@ export const resources: Resource[] = [
     category: "Stress",
     date: "2026-10-03",
     minutes: 3,
+    source: {
+      name: "National Institute of Mental Health",
+      cost: "Free",
+      language: "English",
+      note: "GREAT: Helpful Practices to Manage Stress and Anxiety.",
+    },
     art: "resilience",
     medium: "video",
     src: "https://www.youtube.com/watch?v=RIyge4jzeFg",
@@ -122,6 +165,13 @@ export const resources: Resource[] = [
     category: "General",
     date: "2026-10-03",
     minutes: 2,
+    source: {
+      name: "SAMHSA",
+      url: "https://www.samhsa.gov/mental-health/children-and-families/coping-resources/multimedia",
+      cost: "Free for public use",
+      language: "English, with Spanish versions available",
+      note: "U.S. Department of Health & Human Services.",
+    },
     art: "mood",
   },
   {
@@ -130,6 +180,13 @@ export const resources: Resource[] = [
     category: "General",
     date: "2026-10-03",
     minutes: 2,
+    source: {
+      name: "SAMHSA",
+      url: "https://www.samhsa.gov/mental-health/serious-mental-illness/treatment-works/multimedia",
+      cost: "Free for public use",
+      language: "English, with Spanish versions available",
+      note: "U.S. Department of Health & Human Services.",
+    },
     art: "checkup",
   },
   {
