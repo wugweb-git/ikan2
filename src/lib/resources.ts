@@ -49,7 +49,17 @@ export type Art =
   | "confidence"
   | "resilience"
   | "worry"
-  | "lowmood";
+  | "lowmood"
+  | "kindness"
+  | "routine"
+  | "report"
+  | "night"
+  | "pause"
+  | "breathe"
+  | "pressure"
+  | "overload"
+  | "toolkit"
+  | "unwind";
 
 /* What a resource is to be done with. Everything in the library is an article today; video and
  * audio are modelled here so adding one is a data change, not a rebuild. A resource with no
@@ -113,7 +123,7 @@ export const resources: Resource[] = [
       cost: "Free",
       language: "English",
     },
-    art: "stress",
+    art: "pause",
     medium: "video",
     src: "https://www.youtube.com/watch?v=z7ATOc4ShOc",
     poster: "/resources/poster-five-minutes-stress.jpg",
@@ -132,7 +142,7 @@ export const resources: Resource[] = [
       licence: "CC BY-NC-SA 3.0",
       note: "Read by Diana Winston. Shared via The Free Mindfulness Project. No background music.",
     },
-    art: "anxiety",
+    art: "breathe",
     medium: "audio",
     /* UCLA MARC, via the Free Mindfulness Project, CC BY-NC-SA 3.0. Pulled out of Google
      * Drive and into the repo so it is not one quota or one deleted file away from going
@@ -153,7 +163,7 @@ export const resources: Resource[] = [
       language: "English",
       note: "Guest: Dr. Modupe Akinola, Columbia Business School.",
     },
-    art: "work",
+    art: "pressure",
     medium: "audio",
     src: "https://open.spotify.com/episode/5IvwJBttwqfAgJspvpyB43",
     poster: "/resources/poster-stress-performance.jpg",
@@ -173,7 +183,7 @@ export const resources: Resource[] = [
       language: "English",
       note: "Guided Visualization: Dealing with Stress.",
     },
-    art: "burnout",
+    art: "overload",
     medium: "video",
     src: "https://www.youtube.com/watch?v=Dq9odPtHbcg",
     poster: "/resources/poster-stress-takes-over.jpg",
@@ -194,7 +204,7 @@ export const resources: Resource[] = [
       language: "English",
       note: "GREAT: Helpful Practices to Manage Stress and Anxiety.",
     },
-    art: "resilience",
+    art: "toolkit",
     medium: "video",
     src: "https://www.youtube.com/watch?v=RIyge4jzeFg",
     poster: "/resources/poster-great-practices.jpg",
@@ -215,7 +225,7 @@ export const resources: Resource[] = [
     date: "2026-10-03",
     /* 6:34. */
     minutes: 7,
-    art: "mood",
+    art: "unwind",
     medium: "video",
     src: "https://www.youtube.com/watch?v=3cXGt2d1RyQ",
     poster: "/resources/poster-cope-with-anxiety.jpg",
@@ -237,7 +247,7 @@ export const resources: Resource[] = [
     date: "2026-10-03",
     /* 7:45, from the file. */
     minutes: 8,
-    art: "checkup",
+    art: "kindness",
     medium: "audio",
     /* Pulled out of terrance.who.int and into the repo, like the other audio, so it is not one
      * moved file away from going silent and the service worker can cache it. 7.1 MB. */
@@ -249,7 +259,7 @@ export const resources: Resource[] = [
     category: "General",
     date: "2026-10-03",
     minutes: 5,
-    art: "measure",
+    art: "report",
     featured: true,
   },
   {
@@ -363,7 +373,7 @@ export const resources: Resource[] = [
     category: "Sleep",
     date: "2026-04-01",
     minutes: 5,
-    art: "sleep",
+    art: "night",
   },
   {
     id: "resource-1766236115968",
@@ -389,7 +399,7 @@ export const resources: Resource[] = [
     category: "General",
     date: "2026-03-11",
     minutes: 5,
-    art: "checkup",
+    art: "routine",
   },
 ];
 
