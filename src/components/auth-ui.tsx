@@ -20,7 +20,8 @@ const PUBLIC =
  * so the server rendered a spinner instead of the page. The link was correct; what it served
  * was not. The auth screens are deliberately excluded - nobody needs to read /login without
  * JavaScript, and the launch animation belongs there. */
-const MUST_RENDER_WITHOUT_AUTH = /^\/(support|about|services|faq|contact|legal|delete-account)(\/|$)/;
+const MUST_RENDER_WITHOUT_AUTH =
+  /^\/(support|about|services|faq|contact|legal|delete-account)(\/|$)/;
 const AUTH_ONLY = /^\/(login|phone-login|signup|verify-email|forgot-password)(\/|$)/;
 
 /* Only a brand-new account sees the welcome flow. An account created more than a day ago is a
