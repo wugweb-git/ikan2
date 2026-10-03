@@ -166,7 +166,7 @@ function SignupPage() {
             </span>
           </label>
           {agreeError ? (
-            <p role="alert" className="mt-1.5 text-[13px] text-[#B3261E]">
+            <p role="alert" className="mt-1.5 text-[13px] text-error">
               {agreeError}
             </p>
           ) : null}

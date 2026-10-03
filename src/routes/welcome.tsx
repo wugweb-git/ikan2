@@ -421,7 +421,7 @@ function AboutYou({
         {tried && !ok ? (
           <p
             role="alert"
-            className="rounded-[14px] bg-[#F9DEDC] px-4 py-3 text-[14px] text-[#8C1D18]"
+            className="rounded-[14px] bg-error-container px-4 py-3 text-[14px] text-on-error-container"
           >
             Check the highlighted fields.
           </p>
@@ -571,7 +571,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
       {message ? (
         <p
           role="alert"
-          className="mt-3 rounded-[14px] bg-[#F9DEDC] px-4 py-3 text-[14px] text-[#8C1D18]"
+          className="mt-3 rounded-[14px] bg-error-container px-4 py-3 text-[14px] text-on-error-container"
         >
           {message}
         </p>

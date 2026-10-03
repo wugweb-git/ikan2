@@ -98,7 +98,7 @@ export function PhoneField({
     />
   );
   const message = error ? (
-    <span role="alert" className="mt-1.5 block px-1 text-[13px] text-[#B3261E]">
+    <span role="alert" className="mt-1.5 block px-1 text-[13px] text-error">
       {error}
     </span>
   ) : hint ? (
@@ -111,7 +111,7 @@ export function PhoneField({
         <div
           className={cn(
             "rounded-t-[4px] border-b bg-secondary transition-colors focus-within:border-b-2",
-            error ? "border-[#B3261E]" : "border-foreground/50 focus-within:border-foreground",
+            error ? "border-error" : "border-foreground/50 focus-within:border-foreground",
           )}
         >
           <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">
@@ -132,7 +132,7 @@ export function PhoneField({
       <div
         className={cn(
           "flex h-12 items-center rounded-[14px] border bg-secondary px-4 transition-colors focus-within:border-foreground/60 focus-within:bg-background",
-          error ? "border-[#B3261E]" : "border-transparent",
+          error ? "border-error" : "border-transparent",
         )}
       >
         {select}

@@ -429,7 +429,7 @@ export function TextField({
       <label
         className={cn(
           "block rounded-t-[4px] border-b bg-secondary transition-colors focus-within:border-b-2",
-          error ? "border-[#B3261E]" : "border-foreground/50 focus-within:border-foreground",
+          error ? "border-error" : "border-foreground/50 focus-within:border-foreground",
         )}
       >
         {label ? (
@@ -466,7 +466,7 @@ function FieldMessage({
     <span className="mt-1 flex gap-3 px-4 text-[12px] leading-4">
       <span
         role={error ? "alert" : undefined}
-        className={cn("flex-1", error ? "text-[#B3261E]" : "text-muted-foreground")}
+        className={cn("flex-1", error ? "text-error" : "text-muted-foreground")}
       >
         {error ?? hint}
       </span>
@@ -541,7 +541,7 @@ export function SelectField({
       <label
         className={cn(
           "relative block rounded-t-[4px] border-b bg-secondary transition-colors focus-within:border-b-2",
-          error ? "border-[#B3261E]" : "border-foreground/50 focus-within:border-foreground",
+          error ? "border-error" : "border-foreground/50 focus-within:border-foreground",
         )}
       >
         <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">{label}</span>

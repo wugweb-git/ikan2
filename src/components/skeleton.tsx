@@ -63,7 +63,7 @@ function StateScreen({
         <div className="mt-6 flex w-full flex-col gap-2">{children}</div>
         <Link
           to="/support"
-          className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#8C1D18]"
+          className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-on-error-container"
         >
           <LifeBuoy className="h-4 w-4" /> Need help now?
         </Link>

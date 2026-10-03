@@ -80,7 +80,7 @@ function ContactPage() {
         <p className="mt-2 text-[16px] leading-6 text-muted-foreground">{c.heroSubtitle}</p>
       </header>
 
-      <section className="mx-5 mt-6 overflow-hidden rounded-[24px] bg-[#F9DEDC] text-[#5A1410]">
+      <section className="mx-5 mt-6 overflow-hidden rounded-[24px] bg-error-container text-on-error-container">
         <div className="flex gap-3 p-5">
           <ShieldAlert className="mt-0.5 h-6 w-6 shrink-0" />
           <div>
@@ -91,14 +91,14 @@ function ContactPage() {
                 <a
                   key={b.label}
                   href={b.action}
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-[#5A1410] px-4 text-[14px] font-semibold text-white"
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-on-error-container px-4 text-[14px] font-semibold text-error-container"
                 >
                   <Phone className="h-4 w-4" /> {b.label}
                 </a>
               ))}
               <Link
                 to="/support"
-                className="inline-flex h-10 items-center rounded-full border border-[#5A1410]/30 px-4 text-[14px] font-semibold"
+                className="inline-flex h-10 items-center rounded-full border border-on-error-container/30 px-4 text-[14px] font-semibold"
               >
                 More helplines
               </Link>
@@ -173,10 +173,10 @@ function ContactPage() {
                 rows={5}
                 maxLength={2000}
                 aria-invalid={Boolean(show("message"))}
-                className={`w-full resize-none rounded-[16px] border bg-secondary px-4 py-3 text-[16px] outline-none focus:border-foreground/60 focus:bg-background ${show("message") ? "border-[#B3261E]" : "border-transparent"}`}
+                className={`w-full resize-none rounded-[16px] border bg-secondary px-4 py-3 text-[16px] outline-none focus:border-foreground/60 focus:bg-background ${show("message") ? "border-error" : "border-transparent"}`}
               />
               {show("message") ? (
-                <span role="alert" className="mt-1.5 block text-[13px] text-[#B3261E]">
+                <span role="alert" className="mt-1.5 block text-[13px] text-error">
                   {show("message")}
                 </span>
               ) : null}

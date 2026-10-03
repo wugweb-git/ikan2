@@ -110,7 +110,7 @@ export function IkanShell({ children }: { children: ReactNode }) {
               >
                 <LayoutGrid aria-hidden="true" />
                 {hydrated && unreadCount > 0 ? (
-                  <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#B3261E] px-1 text-[10px] font-bold text-white">
+                  <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-error px-1 text-[10px] font-bold text-on-error">
                     {unreadCount}
                   </span>
                 ) : null}
@@ -312,7 +312,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
           </Link>
           <Link
             to="/support"
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#F9DEDC] px-3 text-[13px] font-semibold text-[#8C1D18]"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-error-container px-3 text-[13px] font-semibold text-on-error-container"
           >
             <LifeBuoy className="h-4 w-4" /> Get help
           </Link>
@@ -385,7 +385,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
               await signOut();
               navigate({ to: "/login", replace: true });
             }}
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold text-[#B3261E] hover:bg-[#F9DEDC]/60"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold text-error hover:bg-error/10"
           >
             <LogOut className="h-4 w-4" /> Sign out
           </button>

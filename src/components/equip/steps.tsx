@@ -331,7 +331,7 @@ function ChoiceStep({
                   on
                     ? yes
                       ? "border-transparent bg-[#DFF0E8] text-[#173D2F]"
-                      : "border-transparent bg-[#F9DEDC] text-[#8C1D18]"
+                      : "border-transparent bg-error-container text-on-error-container"
                     : "border-foreground/15",
                 )}
               >
@@ -886,7 +886,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
           />
         ) : null}
         {tooEarly && earlier ? (
-          <p className="mt-3 text-[14px] font-medium text-[#B3261E]" role="alert">
+          <p className="mt-3 text-[14px] font-medium text-error" role="alert">
             This can’t be before {earlier.label}.
           </p>
         ) : null}

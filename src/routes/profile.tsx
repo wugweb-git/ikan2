@@ -543,7 +543,7 @@ function ProfilePage() {
             {p.avatar ? (
               <Button
                 variant="text"
-                className="text-[#B3261E]"
+                className="text-error"
                 onClick={() => {
                   save({ avatar: "" });
                   setDraft((d) => ({ ...d, avatar: "" }));

@@ -92,7 +92,7 @@ export function AddToCalendar({
             </label>
           ) : null}
           {!validTime ? (
-            <p role="alert" className="mt-2 text-[13px] text-[#B3261E]">
+            <p role="alert" className="mt-2 text-[13px] text-error">
               Pick a time for the reminder.
             </p>
           ) : null}

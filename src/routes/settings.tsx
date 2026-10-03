@@ -351,7 +351,7 @@ function SettingsPage() {
           </p>
           <div className="mt-6 flex flex-col gap-2">
             <Button
-              className="bg-[#B3261E] text-white"
+              className="bg-error text-on-error"
               disabled={deleteBusy}
               onClick={async () => {
                 setDeleteBusy(true);
@@ -381,7 +381,7 @@ function SettingsPage() {
           </p>
           <div className="mt-6 flex flex-col gap-2">
             <Button
-              className="bg-[#B3261E] text-white"
+              className="bg-error text-on-error"
               onClick={async () => {
                 await clearCloudData().catch(() => {});
                 for (const k of storageKeys()) {
@@ -747,14 +747,16 @@ function ActionRow({
         className={cn(
           "grid h-10 w-10 shrink-0 place-items-center rounded-full",
           danger
-            ? "bg-[#F9DEDC] text-[#8C1D18]"
+            ? "bg-error-container text-on-error-container"
             : "bg-[var(--accent-container)] text-[var(--on-accent-container)]",
         )}
       >
         <Icon className="h-5 w-5" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className={cn("block text-[16px]", danger && "text-[#8C1D18]")}>{label}</span>
+        <span className={cn("block text-[16px]", danger && "text-on-error-container")}>
+          {label}
+        </span>
         <span className="block text-[13px] leading-5 text-muted-foreground">{sub}</span>
       </span>
       <ChevronRight className="h-5 w-5 text-muted-foreground" />

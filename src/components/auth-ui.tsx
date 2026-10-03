@@ -208,7 +208,7 @@ export function Field({
       <span
         className={cn(
           "flex h-12 items-center rounded-[14px] border bg-secondary px-4 transition-colors focus-within:border-foreground/60 focus-within:bg-background",
-          error ? "border-[#B3261E]" : "border-transparent",
+          error ? "border-error" : "border-transparent",
         )}
       >
         <input
@@ -237,7 +237,7 @@ export function Field({
         ) : null}
       </span>
       {error ? (
-        <span role="alert" className="mt-1.5 block text-[13px] text-[#B3261E]">
+        <span role="alert" className="mt-1.5 block text-[13px] text-error">
           {error}
         </span>
       ) : hint ? (
@@ -281,7 +281,7 @@ export function FormError({ message }: { message: string | null }) {
   return (
     <p
       role="alert"
-      className="rounded-[14px] bg-[#F9DEDC] px-4 py-3 text-[14px] leading-5 text-[#8C1D18]"
+      className="rounded-[14px] bg-error-container px-4 py-3 text-[14px] leading-5 text-on-error-container"
     >
       {message}
     </p>

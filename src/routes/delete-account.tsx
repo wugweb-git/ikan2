@@ -108,7 +108,7 @@ function DeleteAccountPage() {
             <div className="mt-3">
               <TextField label="Confirm" value={confirm} onChange={setConfirm} />
             </div>
-            {error ? <p className="mt-3 text-[14px] text-[#B3261E]">{error}</p> : null}
+            {error ? <p className="mt-3 text-[14px] text-error">{error}</p> : null}
             <Button
               className="mt-4"
               variant="filled"

@@ -77,6 +77,8 @@
   --color-alert-foreground: var(--alert-foreground);
   --color-error: var(--error);
   --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
 }
 
 :root {
@@ -130,6 +132,8 @@
   /* M3 error, used by notification badges and destructive rows */
   --error: oklch(0.501 0.178 28.7);
   --on-error: oklch(1 0 0);
+  --error-container: oklch(0.922 0.03 22.8);
+  --on-error-container: oklch(0.42 0.147 28.1);
   --shadow-app: 0 0 45px oklch(0.2 0.01 255 / 0.08);
   --shadow-card: 0 10px 30px oklch(0.2 0.01 255 / 0.06);
   --shadow-dock: 0 12px 35px oklch(0.18 0.01 255 / 0.14);
@@ -170,6 +174,8 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
   --error: oklch(0.63 0.2 27);
   --on-error: oklch(0.145 0.02 27);
+  --error-container: oklch(0.29 0.08 27);
+  --on-error-container: oklch(0.92 0.04 24);
 }
 
 @layer base {

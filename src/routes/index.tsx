@@ -406,7 +406,7 @@ function SkyHeader({
         >
           <Bell className="h-5 w-5" />
           {unread ? (
-            <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#B3261E] px-1 text-[10px] font-bold text-white">
+            <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-error px-1 text-[10px] font-bold text-on-error">
               {unread}
             </span>
           ) : null}
@@ -565,7 +565,7 @@ function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
       <Link
         to="/support"
         className={cn(
-          "mx-4 flex items-center gap-4 rounded-[28px] bg-[#F9DEDC] p-5 text-[#5A1410]",
+          "mx-4 flex items-center gap-4 rounded-[28px] bg-error-container p-5 text-on-error-container",
           stateLayer,
         )}
       >
@@ -1398,13 +1398,13 @@ function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
 
 function SupportCard({ city }: { city: string }) {
   return (
-    <section className="mx-4 rounded-[22px] border border-[#B3261E]/20 bg-[#FCEEEE] p-4">
+    <section className="mx-4 rounded-[22px] border border-error/20 bg-error/5 p-4">
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-background text-[#8C1D18]">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-background text-on-error-container">
           <Heart className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <p className="text-[12px] font-semibold text-[#8C1D18]">Support</p>
+          <p className="text-[12px] font-semibold text-on-error-container">Support</p>
           <h2 className="font-display text-[16px] font-semibold">Let’s talk about it</h2>
           <p className="mt-0.5 text-[13px] text-muted-foreground">
             {consultants.length} consultants{city ? ` for you in ${city}` : ""}, with video, call
@@ -1414,7 +1414,7 @@ function SupportCard({ city }: { city: string }) {
       </div>
       <Link
         to="/consult"
-        className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#8C1D18] text-[14px] font-semibold text-white transition-transform active:scale-[.98]"
+        className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-on-error-container text-[14px] font-semibold text-error-container transition-transform active:scale-[.98]"
       >
         <CalendarDays className="h-4 w-4" /> Book a consultation
       </Link>
