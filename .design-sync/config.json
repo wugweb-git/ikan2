@@ -1,69 +1,12 @@
 {
   "projectId": "408a3577-7776-4c10-9f1b-572eec699fc2",
   "shape": "storybook",
-  "storybookConfigDir": ".storybook",
+  "storybookConfigDir": ".design-sync/sb-config",
   "pkg": "ikan",
   "globalName": "IkanDS",
   "storybookStatic": ".design-sync/sb-reference",
   "entry": ".design-sync/entry.tsx",
-  "titleMap": {
-    "About": null,
-    "Accordion": null,
-    "Alert": null,
-    "AlertDialog": null,
-    "App": null,
-    "Art": null,
-    "AspectRatio": null,
-    "AuthUI": null,
-    "Avatar": null,
-    "Badge": null,
-    "Blocks": null,
-    "Breadcrumb": null,
-    "Button": null,
-    "Calendar": null,
-    "Card": null,
-    "Carousel": null,
-    "Chart": null,
-    "Checkbox": null,
-    "Collapsible": null,
-    "Command": null,
-    "ContextMenu": null,
-    "Dialog": null,
-    "Drawer": null,
-    "DropdownMenu": null,
-    "Equip": null,
-    "Form": null,
-    "HoverCard": null,
-    "Input": null,
-    "InputOTP": null,
-    "Journal": null,
-    "Label": null,
-    "M3kit": null,
-    "Menubar": null,
-    "NavigationMenu": null,
-    "Pagination": null,
-    "Popover": null,
-    "Progress": null,
-    "RadioGroup": null,
-    "Resizable": null,
-    "ResultShare": null,
-    "ScrollArea": null,
-    "Select": null,
-    "Separator": null,
-    "Sheet": null,
-    "Sidebar": null,
-    "Slider": null,
-    "Sonner": null,
-    "Switch": null,
-    "Table": null,
-    "Tabs": null,
-    "Testingfixes": null,
-    "Textarea": null,
-    "Toggle": null,
-    "ToggleGroup": null,
-    "Tooltip": null,
-    "UIkit": null
-  },
+  "titleMap": {},
   "storyImports": {
     "bundle": [
       "src/lib/equip/programs",
@@ -79,6 +22,16 @@
     "component": "DesignFrame",
     "props": {
       "accent": "night"
+    }
+  },
+  "overrides": {
+    "BottomSheet": {
+      "cardMode": "single",
+      "primaryStory": "Open"
+    },
+    "Snackbar": {
+      "cardMode": "single",
+      "primaryStory": "Shown"
     }
   }
 }

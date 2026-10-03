@@ -2,6 +2,22 @@
 @source "../src";
 @import "tw-animate-css";
 
+/* Keep the whole vocabulary in the stylesheet, not only the parts currently in use.
+ *
+ * Tailwind emits a utility only where it sees it used, so an @utility that no screen happens
+ * to reference today is defined here but absent from the compiled CSS - which makes it
+ * silently inert for anyone who types it, and invisible to the claude.ai/design agent, which
+ * builds from the shipped stylesheet and can only use class names that resolve.
+ *
+ * Four of the nine type roles were in that state. Listing every utility here forces them all
+ * out, so the design system ships its full vocabulary and a name either works or does not
+ * exist. Costs a few KB; worth it to make the scale real.
+ *
+ * Generated from the @utility declarations above - regenerate if you add one:
+ *   node -e '...'  (see .design-sync/NOTES.md)
+ */
+@source inline("{activity-dial,ambient,ambient-afternoon,ambient-evening,ambient-morning,ambient-night,animate-fade,animate-fade-in,animate-sheet,avatar,avatar-ring,avatar-sm,brand-mark,chart-column,delay-1,delay-2,delay-3,delay-4,eyebrow,font-display,hero-card,hero-chip,hero-media,hero-ring,hero-track,hero-veil,insight-card,metric-pill,metric-track,mini-score,nav-icon,nav-item,no-scrollbar,pb-safe,program-band,read-body,read-card,read-meta,read-tag,read-veil,reveal,reveal-in,ring-dial,ring-label,ring-stat,row-link,safe-pin,safe-top,safe-top-sm,score-alert,score-calm,score-mind,score-orb,score-rest,score-ring,score-tile,semantic-chip,shadow-app,shadow-dock,skeleton,splash-disc,splash-hills,splash-mark,splash-progress,splash-ring,splash-rise,sticky-bar,sticky-bar-on,surface,tile,type-body-lg,type-body-md,type-headline-lg,type-headline-md,type-headline-sm,type-label-lg,type-label-md,type-title-lg,type-title-md}");
+
 @custom-variant dark (&:is(.dark *));
 
 /*

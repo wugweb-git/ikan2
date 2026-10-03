@@ -32,6 +32,15 @@ export * from "../src/components/equip/m3";
 export * from "../src/components/equip/program-header";
 export * from "../src/components/equip/steps";
 
+/* the generic primitives: chips, badges, cards, disclosures, charts, empty states, search */
+export * from "../src/components/kit/badge";
+export * from "../src/components/kit/card";
+export * from "../src/components/kit/chart";
+export * from "../src/components/kit/chip";
+export * from "../src/components/kit/disclosure";
+export * from "../src/components/kit/empty";
+export * from "../src/components/kit/search-field";
+
 export * from "../src/components/journal/blocks";
 export * from "../src/components/journal/entry-card";
 
