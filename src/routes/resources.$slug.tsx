@@ -92,6 +92,7 @@ function ArticlePage() {
   const hydrated = useHydrated();
   const store = useResourceStore();
   const saved = hydrated && store.isSaved(id);
+  const played = hydrated ? store.playedOf(id) : undefined;
   const assessment = r.assessment ? getAssessment(r.assessment) : undefined;
   const more = resources
     .filter((x) => x.id !== id && (x.category === r.category || x.art === r.art))
@@ -161,6 +162,8 @@ function ArticlePage() {
               {...(r.poster ? { poster: r.poster } : {})}
               title={r.title}
               className="mt-6"
+              {...(played?.at ? { startAt: played.at } : {})}
+              onProgress={(at, of) => store.markPlayed(id, at, of)}
             />
           ) : null}
 

@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Play } from "lucide-react";
+import { useRef, useState, type SyntheticEvent } from "react";
+import { Pause, Play } from "lucide-react";
 import { stateLayer } from "@/components/equip/m3";
 import { cn } from "@/lib/utils";
 
@@ -114,15 +114,21 @@ export function MediaPlayer({
   poster,
   className,
   title,
+  startAt,
+  onProgress,
   onEnded,
 }: {
   src: string;
   kind: "video" | "audio";
-  /** a still for a file video; without one the browser shows the first frame */
+  /** the piece's own artwork: a video still, an episode cover, an mp3's embedded art */
   poster?: string;
   className?: string;
   /** names the embed for screen readers, since the iframe's own title is the service's */
   title?: string;
+  /** resume point in seconds, from the last time this was played */
+  startAt?: number;
+  /** files only: how far through, as it plays */
+  onProgress?: (at: number, of: number) => void;
   /** for Equip: a watch or listen block that completes when the thing has been played. Files
    * only - an embed plays inside the other service and never tells us it finished. */
   onEnded?: () => void;
@@ -140,21 +146,21 @@ export function MediaPlayer({
   }
 
   if (source.kind === "embed") {
-    /* The embed's own height is Spotify's, and it is tall. The placeholder does not need it:
-     * before anyone presses play there is nothing to show but a button. */
     const box =
       source.provider === "spotify"
         ? { height: source.height }
         : { aspectRatio: "16 / 9" as const };
     if (!playing) {
-      const rest = source.provider === "spotify" ? { height: 168 } : box;
+      /* The embed's own height is Spotify's, and it is tall. The placeholder does not need it:
+       * before anyone presses play there is nothing to show but the artwork and a button. */
+      const rest = source.provider === "spotify" ? { height: 200 } : box;
       return (
         <div className={cn("relative", className)} style={rest}>
           <button
             type="button"
             onClick={() => setPlaying(true)}
             className={cn(
-              "relative block h-full w-full overflow-hidden rounded-[20px] bg-secondary text-left",
+              "group relative block h-full w-full overflow-hidden rounded-[20px] bg-secondary text-left",
               poster && "text-white",
               stateLayer,
             )}
@@ -165,14 +171,11 @@ export function MediaPlayer({
             {poster ? (
               <>
                 <img src={poster} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/15" />
               </>
             ) : null}
-            {/* The button sits above the centre so it never lands on the wording below it. */}
-            <span className="absolute inset-x-0 top-0 bottom-[4.25rem] grid place-items-center">
-              <span className="grid h-14 w-14 place-items-center rounded-full bg-white text-foreground shadow-lg">
-                <Play className="ml-0.5 h-6 w-6 fill-current" />
-              </span>
+            <span className="absolute inset-0 grid place-items-center">
+              <PlayBadge />
             </span>
             <span className="absolute inset-x-0 bottom-0 block px-4 pb-3.5">
               <span className="block text-[15px] font-semibold">{label[source.provider]}</span>
@@ -206,20 +209,205 @@ export function MediaPlayer({
 
   if (kind === "audio") {
     return (
-      <div className={cn("rounded-[20px] bg-secondary p-4", className)}>
-        <audio src={src} controls preload="metadata" onEnded={onEnded} className="w-full" />
-      </div>
+      <AudioPlayer
+        src={src}
+        poster={poster}
+        className={className}
+        startAt={startAt}
+        onProgress={onProgress}
+        onEnded={onEnded}
+      />
     );
   }
   return (
+    <FileVideo
+      src={src}
+      poster={poster}
+      className={className}
+      startAt={startAt}
+      onProgress={onProgress}
+      onEnded={onEnded}
+    />
+  );
+}
+
+/* One play affordance everywhere: dead centre, and it answers the press. The ring behind it
+ * breathes so a still frame does not read as a broken image, and stops for reduced motion. */
+function PlayBadge({ paused = true }: { paused?: boolean }) {
+  return (
+    <span className="relative grid h-16 w-16 place-items-center">
+      <span className="media-pulse absolute inset-0 rounded-full bg-white/30" aria-hidden="true" />
+      <span className="relative grid h-16 w-16 place-items-center rounded-full bg-white text-foreground shadow-lg transition-transform duration-200 group-hover:scale-105 group-active:scale-95">
+        {paused ? (
+          <Play className="ml-1 h-7 w-7 fill-current" />
+        ) : (
+          <Pause className="h-7 w-7 fill-current" />
+        )}
+      </span>
+    </span>
+  );
+}
+
+const clock = (s: number) => {
+  if (!Number.isFinite(s) || s < 0) s = 0;
+  const m = Math.floor(s / 60);
+  return `${m}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+};
+
+/** Shared wiring for the two file players: resume, report progress, report the end. */
+function useMedia(
+  ref: { current: HTMLMediaElement | null },
+  startAt?: number,
+  onProgress?: (at: number, of: number) => void,
+  onEnded?: () => void,
+) {
+  const [at, setAt] = useState(startAt ?? 0);
+  const [of, setOf] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const resumed = useRef(false);
+
+  const bind = {
+    onLoadedMetadata: (e: SyntheticEvent<HTMLMediaElement>) => {
+      const el = e.currentTarget;
+      setOf(el.duration);
+      /* Resume, but not from the very end: finishing something and coming back should start it
+       * again rather than drop you on the last second of it. */
+      if (!resumed.current && startAt && startAt > 1 && startAt < el.duration - 3) {
+        el.currentTime = startAt;
+      }
+      resumed.current = true;
+    },
+    onTimeUpdate: (e: SyntheticEvent<HTMLMediaElement>) => {
+      const el = e.currentTarget;
+      setAt(el.currentTime);
+      onProgress?.(el.currentTime, el.duration || 0);
+    },
+    onPlay: () => setPlaying(true),
+    onPause: () => setPlaying(false),
+    onEnded: () => {
+      setPlaying(false);
+      onEnded?.();
+    },
+  };
+
+  const toggle = () => {
+    const el = ref.current;
+    if (!el) return;
+    if (el.paused) void el.play();
+    else el.pause();
+  };
+
+  const seek = (fraction: number) => {
+    const el = ref.current;
+    if (el && Number.isFinite(el.duration)) el.currentTime = el.duration * fraction;
+  };
+
+  return { at, of, playing, bind, toggle, seek };
+}
+
+/* `undefined` is spelled out because the project runs exactOptionalPropertyTypes: these are
+ * forwarded straight from MediaPlayer's own optional props. */
+type FileProps = {
+  src: string;
+  poster: string | undefined;
+  className: string | undefined;
+  startAt: number | undefined;
+  onProgress: ((at: number, of: number) => void) | undefined;
+  onEnded: (() => void) | undefined;
+};
+
+/* A listening piece deserves more than the browser's grey pill. Its own artwork, one big
+ * control in the middle of it, and a bar you can drag. */
+function AudioPlayer({ src, poster, className, startAt, onProgress, onEnded }: FileProps) {
+  const ref = useRef<HTMLAudioElement | null>(null);
+  const { at, of, playing, bind, toggle, seek } = useMedia(ref, startAt, onProgress, onEnded);
+  const pct = of > 0 ? Math.min(100, (at / of) * 100) : 0;
+
+  return (
+    <div className={cn("overflow-hidden rounded-[20px] bg-secondary", className)}>
+      <audio ref={ref} src={src} preload="metadata" className="hidden" {...bind} />
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={playing ? "Pause" : "Play"}
+        className={cn(
+          "group relative grid aspect-[16/10] w-full place-items-center overflow-hidden",
+          poster && "text-white",
+        )}
+      >
+        {poster ? (
+          <>
+            <img src={poster} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <span className="absolute inset-0 bg-black/40" />
+          </>
+        ) : null}
+        <PlayBadge paused={!playing} />
+      </button>
+      <div className="px-4 pt-3 pb-4">
+        <Scrubber pct={pct} onSeek={seek} />
+        <div className="mt-2 flex justify-between text-[12px] tabular-nums text-muted-foreground">
+          <span>{clock(at)}</span>
+          <span>{of > 0 ? clock(of) : "--:--"}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FileVideo({ src, poster, className, startAt, onProgress, onEnded }: FileProps) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+  const { bind } = useMedia(ref, startAt, onProgress, onEnded);
+  return (
     <video
+      ref={ref}
       src={src}
       poster={poster}
       controls
       playsInline
       preload="metadata"
-      onEnded={onEnded}
       className={cn("aspect-video w-full rounded-[20px] bg-black", className)}
+      {...bind}
     />
+  );
+}
+
+/** A draggable bar. Click or drag anywhere on it; the whole row is the hit area, not the 4px. */
+function Scrubber({ pct, onSeek }: { pct: number; onSeek: (fraction: number) => void }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const to = (clientX: number) => {
+    const box = ref.current?.getBoundingClientRect();
+    if (box && box.width) onSeek(Math.max(0, Math.min(1, (clientX - box.left) / box.width)));
+  };
+  return (
+    <div
+      ref={ref}
+      role="slider"
+      tabIndex={0}
+      aria-label="Seek"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(pct)}
+      onPointerDown={(e) => {
+        e.currentTarget.setPointerCapture(e.pointerId);
+        to(e.clientX);
+      }}
+      onPointerMove={(e) => {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) to(e.clientX);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "ArrowRight") onSeek(Math.min(1, pct / 100 + 0.05));
+        if (e.key === "ArrowLeft") onSeek(Math.max(0, pct / 100 - 0.05));
+      }}
+      className="group -my-2 cursor-pointer py-2 focus-visible:outline-none"
+    >
+      <div className="h-1.5 w-full rounded-full bg-foreground/15">
+        <div
+          className="relative h-1.5 rounded-full bg-[var(--accent-strong,currentColor)]"
+          style={{ width: `${pct}%` }}
+        >
+          <span className="absolute top-1/2 right-0 h-3.5 w-3.5 -translate-y-1/2 translate-x-1/2 rounded-full bg-[var(--accent-strong,currentColor)] shadow transition-transform group-hover:scale-125 group-focus-visible:scale-125" />
+        </div>
+      </div>
+    </div>
   );
 }

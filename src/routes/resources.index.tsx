@@ -227,6 +227,10 @@ function ResourcesPage() {
             {shown.map((r) => {
               const saved = hydrated && store.isSaved(r.id);
               const read = hydrated && Boolean(store.opened[r.id]);
+              /* How far through, for the things that can tell us: a file reports its position,
+               * an embed plays inside someone else's player and never does. */
+              const played = hydrated ? store.playedOf(r.id) : undefined;
+              const pct = played?.of ? Math.min(100, (played.at / played.of) * 100) : 0;
               return (
                 <li key={r.id} className="border-b border-foreground/10 last:border-0">
                   <div className="flex items-center gap-3 py-3">
@@ -246,7 +250,7 @@ function ResourcesPage() {
                           {r.category}
                           {/* opened already. A check, not the word: "Read" now names a type in
                            * the filter row above, and the eyebrow would say it twice over. */}
-                          {read ? (
+                          {played?.done || read ? (
                             <span className="ml-1.5 inline-flex items-center align-middle text-muted-foreground">
                               <Check className="h-3.5 w-3.5" aria-hidden="true" />
                               <span className="sr-only">{doneLabel(r)}</span>
@@ -264,6 +268,20 @@ function ResourcesPage() {
                             <Clock3 className="h-3.5 w-3.5" /> {lengthLabel(r)}
                           </span>
                         </span>
+                        {/* how far through, for the things that can report it */}
+                        {played && !played.done && pct > 1 ? (
+                          <span className="mt-1.5 flex items-center gap-2">
+                            <span className="block h-1 w-full max-w-[120px] overflow-hidden rounded-full bg-foreground/10">
+                              <span
+                                className="block h-1 rounded-full bg-[var(--accent-strong)]"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </span>
+                            <span className="text-[11px] font-medium text-[var(--accent-strong)]">
+                              {Math.round(pct)}%
+                            </span>
+                          </span>
+                        ) : null}
                       </span>
                     </Link>
                     <IconButton

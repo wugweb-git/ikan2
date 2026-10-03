@@ -99,7 +99,7 @@ export const resources: Resource[] = [
       url: "https://www.freemindfulness.org/download",
       language: "English",
       licence: "CC BY-NC-SA 3.0",
-      note: "Shared via The Free Mindfulness Project. No background music.",
+      note: "Read by Diana Winston. Shared via The Free Mindfulness Project. No background music.",
     },
     art: "anxiety",
     medium: "audio",
@@ -107,6 +107,7 @@ export const resources: Resource[] = [
      * Drive and into the repo so it is not one quota or one deleted file away from going
      * silent, and so the service worker can cache it for offline. 3.8 MB, 5:31. */
     src: "/resources/breathing-five-minutes.mp3",
+    poster: "/resources/poster-breathing-five-minutes.jpg",
   },
   {
     id: "resource-stress-performance",
@@ -386,8 +387,15 @@ export const slugOf = (r: Resource) =>
 export const getResourceBySlug = (slug: string) =>
   resources.find((r) => slugOf(r) === slug) ?? getResource(slug);
 
-type State = { saved: string[]; opened: Record<string, string> };
-const store = createLocalStore<State>("ikan.resources.v1", { saved: [], opened: {} });
+/* How far through a piece someone is. Only files can report this: an embed plays inside
+ * YouTube or Spotify and tells us nothing, so those have an opened date and no more. */
+export type Played = { at: number; of: number; done?: boolean };
+type State = {
+  saved: string[];
+  opened: Record<string, string>;
+  played?: Record<string, Played>;
+};
+const store = createLocalStore<State>("ikan.resources.v1", { saved: [], opened: {}, played: {} });
 
 export function useResourceStore() {
   const state = store.use();
@@ -401,5 +409,13 @@ export function useResourceStore() {
       })),
     markOpened: (id: string) =>
       store.update((s) => ({ ...s, opened: { ...s.opened, [id]: new Date().toISOString() } })),
+    playedOf: (id: string) => state.played?.[id],
+    /* Written as it plays, so coming back resumes where you stopped. The last few seconds count
+     * as finished: nobody scrubs to the exact end, and "97% watched" forever is just wrong. */
+    markPlayed: (id: string, at: number, of: number) =>
+      store.update((s) => ({
+        ...s,
+        played: { ...s.played, [id]: { at, of, done: of > 0 && at >= of - 3 } },
+      })),
   };
 }
