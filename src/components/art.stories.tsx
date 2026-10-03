@@ -10,7 +10,21 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const arts: Art[] = ["stress", "burnout", "work", "anxiety", "mood", "sleep", "measure", "checkup"];
+const arts: Art[] = [
+  "stress",
+  "burnout",
+  "work",
+  "anxiety",
+  "mood",
+  "sleep",
+  "measure",
+  "checkup",
+  "wellbeing",
+  "confidence",
+  "resilience",
+  "worry",
+  "lowmood",
+];
 
 export const AllIllustrations: Story = {
   render: () => (

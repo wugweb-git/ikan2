@@ -13,6 +13,8 @@ import {
 import { StackedAssessmentCard } from "@/components/assessment/ui";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
+import { MediaPlayer } from "@/components/media-player";
+import { SourceCard } from "@/components/source-card";
 import { accentStyle, IconButton, stateLayer } from "@/components/equip/m3";
 import { jsonLd, pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -22,6 +24,10 @@ import { articles } from "@/lib/content";
 import {
   getResource,
   getResourceBySlug,
+  lengthLabel,
+  mediumIcon,
+  mediumLabel,
+  mediumOf,
   resources,
   slugOf,
   useResourceStore,
@@ -30,7 +36,9 @@ import {
 export const Route = createFileRoute("/resources/$slug")({
   loader: ({ params }) => {
     const r = getResourceBySlug(params.slug);
-    if (!r || !articles[r.id]) throw notFound();
+    /* an article needs its text; a video or audio post only needs something to play, and its
+     * text, if it has any, is the transcript under the player */
+    if (!r || !(articles[r.id] || r.src)) throw notFound();
     return { id: r.id };
   },
   head: ({ loaderData }) => {
@@ -44,11 +52,14 @@ export const Route = createFileRoute("/resources/$slug")({
       scripts: [
         jsonLd({
           "@context": "https://schema.org",
-          "@type": "Article",
+          "@type": { article: "Article", video: "VideoObject", audio: "AudioObject" }[mediumOf(r)],
           headline: r.title,
+          name: r.title,
           description,
           datePublished: r.date,
           dateModified: r.date,
+          uploadDate: r.date,
+          ...(r.src ? { contentUrl: r.src, duration: `PT${r.minutes}M` } : {}),
           articleSection: r.category,
           inLanguage: "en-IN",
           mainEntityOfPage: { "@type": "WebPage", "@id": url },
@@ -78,11 +89,12 @@ const dateLabel = (d: string) =>
 function ArticlePage() {
   const { id } = Route.useLoaderData();
   const r = getResource(id)!;
-  const article = articles[id]!;
+  const article = articles[id];
   const navigate = useNavigate();
   const hydrated = useHydrated();
   const store = useResourceStore();
   const saved = hydrated && store.isSaved(id);
+  const played = hydrated ? store.playedOf(id) : undefined;
   const assessment = r.assessment ? getAssessment(r.assessment) : undefined;
   const more = resources
     .filter((x) => x.id !== id && (x.category === r.category || x.art === r.art))
@@ -124,7 +136,7 @@ function ArticlePage() {
         <div className="relative -mt-8 rounded-t-[28px] bg-background px-5 pt-6">
           <p className="text-[13px] font-semibold text-[var(--accent-strong)]">{r.category}</p>
           <h1 className="type-headline-md mt-1 text-balance">{r.title}</h1>
-          {article.description ? (
+          {article?.description ? (
             /* the standfirst: display face, full contrast, so it reads as part of the title
              * group rather than as the first paragraph of the article */
             <p className="type-title-lg mt-3 text-muted-foreground text-balance">
@@ -132,7 +144,7 @@ function ArticlePage() {
             </p>
           ) : null}
           <p className="type-label-lg mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-foreground/10 pb-5 text-muted-foreground">
-            {article.author ? (
+            {article?.author ? (
               <span className="inline-flex items-center gap-1.5">
                 <UserRound className="h-4 w-4" /> {article.author}
               </span>
@@ -141,11 +153,40 @@ function ArticlePage() {
               <CalendarDays className="h-4 w-4" /> {dateLabel(r.date)}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Clock3 className="h-4 w-4" /> {r.minutes} min read
+              {(() => {
+                const Icon = mediumIcon[mediumOf(r)];
+                return <Icon className="h-4 w-4" />;
+              })()}
+              {mediumLabel(r)}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock3 className="h-4 w-4" /> {lengthLabel(r)}
             </span>
           </p>
 
-          <div className="prose-ikan mt-6" dangerouslySetInnerHTML={{ __html: article.html }} />
+          {r.src ? (
+            <MediaPlayer
+              src={r.src}
+              kind={mediumOf(r) === "audio" ? "audio" : "video"}
+              {...(r.embeddable === false ? { embeddable: false } : {})}
+              {...(r.poster ? { poster: r.poster } : {})}
+              title={r.title}
+              className="mt-6"
+              {...(played?.at ? { startAt: played.at } : {})}
+              onProgress={(at, of) => store.markPlayed(id, at, of)}
+            />
+          ) : null}
+
+          {/* A media piece's body is a written article about the thing, not a transcript and
+           * not the publisher's show notes, so it carries no heading of its own. */}
+          {article ? (
+            <div
+              className={cn("prose-ikan", r.src ? "mt-7" : "mt-6")}
+              dangerouslySetInnerHTML={{ __html: article.html }}
+            />
+          ) : null}
+
+          {r.source ? <SourceCard source={r.source} /> : null}
 
           {assessment ? (
             <StackedAssessmentCard
@@ -186,7 +227,14 @@ function ArticlePage() {
                             {m.category}
                           </span>
                           <span className="inline-flex items-center gap-1">
-                            <Clock3 className="h-3.5 w-3.5" /> {m.minutes} min read
+                            {(() => {
+                              const Icon = mediumIcon[mediumOf(m)];
+                              return <Icon className="h-3.5 w-3.5" />;
+                            })()}
+                            {mediumLabel(m)}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <Clock3 className="h-3.5 w-3.5" /> {lengthLabel(m)}
                           </span>
                         </span>
                       </span>

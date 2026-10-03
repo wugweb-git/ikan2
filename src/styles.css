@@ -16,7 +16,7 @@
  * Generated from the @utility declarations above - regenerate if you add one:
  *   node -e '...'  (see .design-sync/NOTES.md)
  */
-@source inline("{activity-dial,ambient,ambient-afternoon,ambient-evening,ambient-morning,ambient-night,animate-fade,animate-fade-in,animate-sheet,avatar,avatar-ring,avatar-sm,brand-mark,chart-column,delay-1,delay-2,delay-3,delay-4,eyebrow,font-display,hero-card,hero-chip,hero-media,hero-ring,hero-track,hero-veil,insight-card,metric-pill,metric-track,mini-score,motion-enter,motion-error,motion-press,motion-tint,nav-icon,nav-item,no-scrollbar,pb-safe,program-band,read-body,read-card,read-meta,read-tag,read-veil,reveal,reveal-in,ring-dial,ring-label,ring-stat,row-link,safe-pin,safe-top,safe-top-sm,score-alert,score-calm,score-mind,score-orb,score-rest,score-ring,score-tile,semantic-chip,shadow-app,shadow-dock,skeleton,splash-disc,splash-hills,splash-mark,splash-progress,splash-ring,splash-rise,sticky-bar,sticky-bar-on,surface,tile,type-action,type-body-lg,type-body-md,type-body-sm,type-body-xl,type-display-lg,type-display-md,type-display-sm,type-headline-lg,type-headline-md,type-headline-sm,type-label-lg,type-label-md,type-title-lg,type-title-md}");
+@source inline("{activity-dial,ambient,ambient-afternoon,ambient-evening,ambient-morning,ambient-night,animate-fade,animate-fade-in,animate-sheet,avatar,avatar-ring,avatar-sm,brand-mark,chart-column,delay-1,delay-2,delay-3,delay-4,eyebrow,font-display,hero-card,hero-chip,hero-media,hero-ring,hero-track,hero-veil,insight-card,media-pulse,metric-pill,metric-track,mini-score,motion-enter,motion-error,motion-press,motion-tint,nav-icon,nav-item,no-scrollbar,pb-safe,program-band,read-body,read-card,read-meta,read-tag,read-veil,reveal,reveal-in,ring-dial,ring-label,ring-stat,row-link,safe-pin,safe-top,safe-top-sm,score-alert,score-calm,score-mind,score-orb,score-rest,score-ring,score-tile,semantic-chip,shadow-app,shadow-dock,skeleton,splash-disc,splash-hills,splash-mark,splash-progress,splash-ring,splash-rise,state-spin,state-wash,sticky-bar,sticky-bar-on,surface,tile,type-action,type-body-lg,type-body-md,type-body-sm,type-body-xl,type-display-lg,type-display-md,type-display-sm,type-headline-lg,type-headline-md,type-headline-sm,type-label-lg,type-label-md,type-title-lg,type-title-md}");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -1328,6 +1328,31 @@ html.reduce-motion *::after {
   font-weight: inherit;
 }
 
+/* The report card in the India numbers piece: the draft's own infographic, used as it is. It is
+ * a landscape chart, so on a phone it runs full width and opens full size on tap; the alt text
+ * carries every figure on it, since the picture itself is unreadable at 320px. */
+.prose-ikan figure {
+  margin: 1.6em 0 0;
+}
+.prose-ikan figure a {
+  display: block;
+  text-decoration: none;
+}
+.prose-ikan figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  background: var(--secondary);
+}
+.prose-ikan figcaption {
+  /* label-md, and it carries the sources for the figure above it */
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--muted-foreground);
+}
+
 /* The app fills the screen on phones, foldables and tablets (installed as an Android app / PWA).
  * Only on laptop-size screens does it sit in a phone-width column. */
 @utility max-w-app {
@@ -1371,6 +1396,75 @@ body {
   html,
   body {
     background: var(--canvas);
+  }
+}
+
+/* The state screens. One motion only, and it is motivated: the line draws itself, which is the
+ * picture's whole argument - the path runs out, the wave breaks, the signal stops short. The
+ * wash behind it is a soft field, not a tinted card, because this app spends its accents on
+ * progress and selection and a dead end is not the place to shout. */
+@keyframes state-draw {
+  from {
+    stroke-dashoffset: var(--draw-length, 420);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes state-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.state-draw {
+  stroke-dasharray: var(--draw-length, 420);
+  animation: state-draw 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@utility state-wash {
+  background: radial-gradient(
+    60% 70% at 50% 58%,
+    color-mix(in oklab, currentColor 14%, transparent),
+    transparent 72%
+  );
+}
+@utility state-spin {
+  animation: state-spin 0.9s linear infinite;
+}
+html.reduce-motion .state-draw,
+html.reduce-motion .state-spin {
+  animation: none;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .state-draw,
+  .state-spin {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The ring behind a play button. It breathes so a still frame does not read as a broken image,
+ * and it holds still for anyone who asks for less motion. */
+@keyframes media-pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.5;
+  }
+  70%,
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+@utility media-pulse {
+  animation: media-pulse 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+html.reduce-motion .media-pulse {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .media-pulse {
+    animation: none;
   }
 }
 

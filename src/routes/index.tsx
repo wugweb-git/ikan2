@@ -57,7 +57,15 @@ import { checkMoodReminder, refreshWeather, useDevice, weatherWord } from "@/lib
 import { syncMoodReminder } from "@/lib/local-reminders";
 import { enableNativePush, nativePushSupported } from "@/lib/native-push";
 import { autoSyncHealthConnect, recentAverage, useHealthConnect } from "@/lib/health-connect";
-import { resources, slugOf, type Resource } from "@/lib/resources";
+import {
+  lengthLabel,
+  mediumIcon,
+  mediumLabel,
+  mediumOf,
+  resources,
+  slugOf,
+  type Resource,
+} from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
 import resBurnout from "@/assets/res-burnout.jpg";
 import resSleep from "@/assets/res-sleep.jpg";
@@ -1049,7 +1057,14 @@ function Library() {
                   {r.category}
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <Clock3 className="h-3.5 w-3.5" aria-hidden="true" /> {r.minutes} min read
+                  {(() => {
+                    const Icon = mediumIcon[mediumOf(r)];
+                    return <Icon className="h-3.5 w-3.5" aria-hidden="true" />;
+                  })()}
+                  {mediumLabel(r)}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock3 className="h-3.5 w-3.5" aria-hidden="true" /> {lengthLabel(r)}
                 </span>
               </span>
             </span>

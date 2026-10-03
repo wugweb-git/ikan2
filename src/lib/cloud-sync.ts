@@ -125,13 +125,32 @@ function merge(name: string, local: unknown, remote: unknown): unknown {
     };
   if (name === "consult.v1")
     return { bookings: byId(l["bookings"] as never, r["bookings"] as never) };
-  if (name === "resources.v1")
+  if (name === "resources.v1") {
+    /* Furthest through wins, and finished beats unfinished: listening to half of something on
+     * the phone and all of it on the laptop should not come back as half. */
+    type Played = { at: number; of: number; done?: boolean };
+    const lp = (l["played"] ?? {}) as Record<string, Played>;
+    const rp = (r["played"] ?? {}) as Record<string, Played>;
+    const played: Record<string, Played> = {};
+    for (const k of new Set([...Object.keys(lp), ...Object.keys(rp)])) {
+      const a = lp[k];
+      const b = rp[k];
+      played[k] = !b ? a! : !a ? b : a.done || (!b.done && a.at >= b.at) ? a : b;
+    }
+    /* The spread matters as much as the fields below it. This branch used to name saved and
+     * opened and nothing else, so when the store grew a third field every sync quietly deleted
+     * it: the device wrote it, the next pull merged, and the merge handed back an object that
+     * had never heard of it. Anything added later now survives by default. */
     return {
+      ...r,
+      ...l,
       saved: [
         ...new Set([...((r["saved"] as string[]) ?? []), ...((l["saved"] as string[]) ?? [])]),
       ],
       opened: { ...(r["opened"] as Obj), ...(l["opened"] as Obj) },
+      played,
     };
+  }
   if (name === "wellness.v1") return { days: { ...(r["days"] as Obj), ...(l["days"] as Obj) } };
   if (name === "notifications.v1")
     return {

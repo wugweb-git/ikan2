@@ -1,6 +1,9 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { CloudOff, LifeBuoy, RotateCw, SearchX } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronRight, CloudOff, LifeBuoy, RotateCw } from "lucide-react";
+import { sceneInk, StateIllustration, type StateScene } from "@/components/art";
+import { IkanMark } from "@/components/ikan-mark";
+import { stateLayer } from "@/components/equip/m3";
 import { cn } from "@/lib/utils";
 
 /* Loading, empty and error states shared by every screen. */
@@ -41,31 +44,57 @@ export function PageSkeleton() {
   );
 }
 
+/* The screens nobody wants to land on. They get the same care as the rest of the app: the
+ * drawing says what happened before the words do, the mark says whose app you are still in, and
+ * the crisis row stays in reach as an offer rather than a footnote, because someone who has hit
+ * a dead end may already be having a hard day. */
 function StateScreen({
-  icon: Icon,
+  scene,
   title,
   body,
   children,
 }: {
-  icon: typeof SearchX;
+  scene: StateScene;
   title: string;
   body: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid min-h-dvh place-items-center bg-canvas px-6">
+    <div className="grid min-h-dvh place-items-center bg-canvas px-6 py-12">
       <div className="flex w-full max-w-sm flex-col items-center text-center">
-        <span className="grid h-16 w-16 place-items-center rounded-[20px] bg-secondary">
-          <Icon className="h-8 w-8" />
+        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <IkanMark className="h-4 w-4" />
+          <span className="font-display text-[13px] font-semibold tracking-[0.08em]">iKAN</span>
         </span>
-        <h1 className="mt-5 font-display text-[24px] font-semibold leading-8">{title}</h1>
-        <p className="mt-2 text-[15px] leading-6 text-muted-foreground">{body}</p>
-        <div className="mt-6 flex w-full flex-col gap-2">{children}</div>
+        <span
+          className="state-wash mt-10 block w-full"
+          style={{ color: sceneInk[scene] }}
+          aria-hidden="true"
+        >
+          <StateIllustration scene={scene} />
+        </span>
+        <h1 className="mt-8 font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">
+          {title}
+        </h1>
+        <p className="mt-2.5 text-[15px] leading-6 text-muted-foreground text-balance">{body}</p>
+        <div className="mt-8 flex w-full flex-col gap-2">{children}</div>
         <Link
           to="/support"
-          className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-on-error-container"
+          className={cn(
+            "motion-tint mt-8 flex w-full items-center gap-3 rounded-[20px] border border-on-error-container/20 bg-on-error-container/[0.04] px-4 py-3 text-left",
+            stateLayer,
+          )}
         >
-          <LifeBuoy className="h-4 w-4" /> Need help now?
+          <LifeBuoy className="h-5 w-5 shrink-0 text-on-error-container" aria-hidden="true" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-[14px] font-semibold text-on-error-container">
+              Need help now?
+            </span>
+            <span className="block text-[13px] leading-5 text-muted-foreground">
+              Free, confidential helplines are open right now.
+            </span>
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-on-error-container" aria-hidden="true" />
         </Link>
       </div>
     </div>
@@ -80,12 +109,15 @@ const secondary =
 export function NotFoundScreen() {
   return (
     <StateScreen
-      icon={SearchX}
-      title="This page isn’t here"
-      body="The link may be old, or the page has moved. Everything you saved is safe."
+      scene="lost"
+      title="We can’t find that one"
+      body="The link may be old, or the page has moved since. Nothing you’ve saved has gone anywhere."
     >
       <Link to="/" className={primary}>
-        Go to home
+        Take me home
+      </Link>
+      <Link to="/resources" className={secondary}>
+        Browse the library
       </Link>
     </StateScreen>
   );
@@ -94,28 +126,52 @@ export function NotFoundScreen() {
 export function ErrorScreen({ reset }: { reset?: () => void }) {
   const router = useRouter();
   const online = useOnline();
+  const [retrying, setRetrying] = useState(false);
+
+  const retry = () => {
+    setRetrying(true);
+    void router.invalidate();
+    reset?.();
+  };
+
+  /* Only when the connection actually comes back, never on first render: retrying the thing
+   * that just failed, the instant it failed, is how you get a loop instead of a page. */
+  const wasOffline = useRef(false);
+  useEffect(() => {
+    if (!online) {
+      wasOffline.current = true;
+      setRetrying(false);
+      return;
+    }
+    if (wasOffline.current) {
+      wasOffline.current = false;
+      retry();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [online]);
+
+  useEffect(() => {
+    if (!retrying) return;
+    const t = setTimeout(() => setRetrying(false), 4000);
+    return () => clearTimeout(t);
+  }, [retrying]);
+
   return (
     <StateScreen
-      icon={online ? RotateCw : CloudOff}
-      title={online ? "This page didn’t load" : "You’re offline"}
+      scene={online ? "broken" : "offline"}
+      title={online ? "That didn’t load" : "You’re offline"}
       body={
         online
-          ? "Something went wrong while opening it. Try again, or go back home."
-          : "Connect to the internet and try again. Anything saved on this phone is still here."
+          ? "Something went wrong at our end, not yours. Give it another go in a moment."
+          : "We’ll pick this up the moment you’re back on. Everything saved on this phone is still here."
       }
     >
-      <button
-        type="button"
-        className={primary}
-        onClick={() => {
-          void router.invalidate();
-          reset?.();
-        }}
-      >
-        <RotateCw className="h-4 w-4" /> Try again
+      <button type="button" className={primary} onClick={retry} disabled={retrying}>
+        <RotateCw className={cn("h-4 w-4", retrying && "state-spin")} />
+        {retrying ? "Trying…" : online ? "Try again" : "Try anyway"}
       </button>
       <a href="/" className={secondary}>
-        Go to home
+        Take me home
       </a>
     </StateScreen>
   );
