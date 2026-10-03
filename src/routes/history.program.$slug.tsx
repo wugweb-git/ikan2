@@ -52,9 +52,9 @@ function ProgramArchivePage() {
           <img src={p.cover} alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/10" />
           <div className="absolute inset-x-5 bottom-4">
-            <p className="text-[13px] opacity-80">Program history</p>
+            <p className="type-body-sm opacity-80">Program history</p>
             <h1 className="font-display text-[28px] font-semibold leading-8">{p.name}</h1>
-            <p className="text-[13px] opacity-80">{dayCount(p)} days</p>
+            <p className="type-body-sm opacity-80">{dayCount(p)} days</p>
           </div>
         </header>
 
@@ -70,19 +70,19 @@ function ProgramArchivePage() {
               <p className="font-display text-[24px] font-bold leading-7 tabular-nums">
                 {hydrated ? x.v : "—"}
               </p>
-              <p className="text-[13px] text-muted-foreground">{x.l}</p>
+              <p className="type-body-sm text-muted-foreground">{x.l}</p>
             </div>
           ))}
         </section>
 
         {topics.length ? (
           <section className="mt-6 px-4">
-            <h2 className="font-display text-[16px] font-semibold">Topics you explored</h2>
+            <h2 className="type-title-md">Topics you explored</h2>
             <div className="mt-2 flex flex-wrap gap-2">
               {topics.map((t) => (
                 <span
                   key={t}
-                  className="rounded-[10px] bg-[var(--accent-container)] px-3 py-1.5 text-[14px] text-[var(--on-accent-container)]"
+                  className="type-body-md rounded-[10px] bg-[var(--accent-container)] px-3 py-1.5 text-[var(--on-accent-container)]"
                 >
                   {t}
                 </span>
@@ -95,7 +95,7 @@ function ProgramArchivePage() {
         <section className="mt-8 px-4">
           <h2 className="font-display text-[18px] font-semibold">All runs</h2>
           {hydrated && !runs.length ? (
-            <p className="mt-3 rounded-[20px] border border-dashed border-foreground/20 p-6 text-center text-[15px] text-muted-foreground">
+            <p className="type-action mt-3 rounded-[20px] border border-dashed border-foreground/20 p-6 text-center text-muted-foreground">
               No finished runs yet. Each time you finish {p.name}, it stacks up here.
             </p>
           ) : null}
@@ -107,17 +107,17 @@ function ProgramArchivePage() {
                     <Trophy className="h-5 w-5" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <DateText className="text-[15px] font-semibold">
+                    <DateText className="type-action">
                       {run.startedAt ? shortDate(run.startedAt) : ""}
                       {run.finishedAt ? ` to ${shortDate(run.finishedAt)}` : ""}
                     </DateText>
-                    <span className="block text-[13px] text-muted-foreground">
+                    <span className="type-body-sm block text-muted-foreground">
                       {run.totalDays} days · {run.activitiesDone} activities · {run.responses}{" "}
                       responses
                     </span>
                   </span>
                 </div>
-                <div className="mt-2 grid grid-cols-2 gap-2 text-[13px] font-semibold">
+                <div className="type-body-sm font-semibold mt-2 grid grid-cols-2 gap-2">
                   <Link
                     to="/program/$slug/result"
                     params={{ slug }}

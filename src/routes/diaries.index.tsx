@@ -60,7 +60,7 @@ function DiariesPage() {
                   <span className="block font-display text-[18px] font-semibold leading-6">
                     {p.name}
                   </span>
-                  <span className="block text-[13px] text-muted-foreground">
+                  <span className="type-body-sm block text-muted-foreground">
                     {hydrated && !j.started ? "Not started yet" : "Learning diary"}
                     {hydrated && j.responses
                       ? ` · ${j.responses} ${j.responses === 1 ? "entry" : "entries"}`
@@ -84,7 +84,7 @@ function DiariesPage() {
               <span className="block font-display text-[18px] font-semibold leading-6">
                 {u.name}
               </span>
-              <span className="block text-[13px] text-muted-foreground">
+              <span className="type-body-sm block text-muted-foreground">
                 Learning diary · coming soon
               </span>
             </span>

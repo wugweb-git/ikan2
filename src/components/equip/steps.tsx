@@ -62,7 +62,7 @@ export function Footer({
     <footer className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
       <div className="w-full max-w-app border-t border-foreground/[0.08] bg-background">
         {disabled && hint ? (
-          <p className="px-4 pt-2 text-center text-[13px] text-muted-foreground" role="status">
+          <p className="type-body-sm px-4 pt-2 text-center text-muted-foreground" role="status">
             {hint}
           </p>
         ) : null}
@@ -72,7 +72,7 @@ export function Footer({
               <ArrowLeft className="h-6 w-6" />
             </IconButton>
           ) : null}
-          <Button onClick={onNext} disabled={disabled} className="h-14 flex-1 text-[16px]">
+          <Button onClick={onNext} disabled={disabled} className="type-body-lg h-14 flex-1">
             {label}
           </Button>
         </div>
@@ -119,7 +119,7 @@ function BlockText({
         )}
       </div>
       {body.length ? (
-        <div className="mt-4 space-y-4 text-[17px] leading-[1.6] text-foreground/90">
+        <div className="type-body-xl mt-4 space-y-4 leading-[1.6] text-foreground/90">
           {body.map((item, i) =>
             item.kind === "p" ? (
               <p key={i} className="whitespace-pre-line">
@@ -167,13 +167,13 @@ function LessonStep({
           <h2 className="font-display text-[26px] font-semibold leading-8">{step.block.title}</h2>
           <ul className="mt-4 divide-y divide-foreground/[0.08] rounded-[16px] bg-secondary">
             {step.block.body[0]!.text.split(" • ").map((item) => (
-              <li key={item} className="px-4 py-3.5 text-[16px]">
+              <li key={item} className="type-body-lg px-4 py-3.5">
                 {item}
               </li>
             ))}
           </ul>
           {step.block.body.slice(1).map((p) => (
-            <p key={p.text} className="mt-4 text-[16px]">
+            <p key={p.text} className="type-body-lg mt-4">
               {p.text}
             </p>
           ))}
@@ -207,7 +207,7 @@ function LessonStep({
                       key={it}
                       className="flex gap-3 px-3 py-2.5 text-[15px] leading-5 text-foreground"
                     >
-                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--accent-container)] text-[12px] font-semibold tabular-nums text-[var(--on-accent-container)]">
+                      <span className="type-label-md font-semibold grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--accent-container)] tabular-nums text-[var(--on-accent-container)]">
                         {n + 1}
                       </span>
                       <span className="min-w-0">{it}</span>
@@ -287,7 +287,7 @@ function ChoiceStep({
                 aria-checked={on}
                 onClick={() => toggle(o.label)}
                 className={cn(
-                  "flex min-h-[88px] flex-col justify-between rounded-[16px] border p-4 text-left text-[16px] font-medium transition-colors",
+                  "type-body-lg font-medium flex min-h-[88px] flex-col justify-between rounded-[16px] border p-4 text-left transition-colors",
                   stateLayer,
                   on
                     ? "border-transparent bg-[var(--accent-container)] text-[var(--on-accent-container)]"
@@ -324,7 +324,7 @@ function ChoiceStep({
                 aria-checked={on}
                 onClick={() => toggle(o.label)}
                 className={cn(
-                  "flex h-14 items-center justify-center gap-2 rounded-[16px] border text-[16px] font-semibold transition-colors",
+                  "type-body-lg font-semibold flex h-14 items-center justify-center gap-2 rounded-[16px] border transition-colors",
                   stateLayer,
                   on
                     ? yes
@@ -388,7 +388,7 @@ function DataTable({ rows }: { rows: string[][] }) {
   const [head, ...body] = rows;
   return (
     <div className="mt-5 overflow-hidden rounded-[12px] border border-foreground/15">
-      <table className="w-full text-left text-[15px]">
+      <table className="type-action w-full text-left">
         <thead className="bg-secondary">
           <tr>
             {head?.map((h) => (
@@ -454,7 +454,7 @@ function ScaleStep({
           onClick={(e) => setAnswer(key, Number((e.target as HTMLInputElement).value))}
           className="m3-slider absolute inset-x-2 top-[-12px] h-10 w-[calc(100%-1rem)] cursor-pointer appearance-none bg-transparent"
         />
-        <div className="mt-3 flex justify-between text-[13px] tabular-nums text-muted-foreground">
+        <div className="type-body-sm mt-3 flex justify-between tabular-nums text-muted-foreground">
           {ticks.map((t) => (
             <span
               key={t}
@@ -466,7 +466,7 @@ function ScaleStep({
         </div>
       </div>
       {typeof earlierAnswers(ctx.slug, state, step, ctx.day, 1)[0] === "number" ? (
-        <p className="mt-6 text-center text-[13px] text-muted-foreground">
+        <p className="type-body-sm mt-6 text-center text-muted-foreground">
           Last time you chose{" "}
           <span className="font-semibold text-foreground">
             {String(earlierAnswers(ctx.slug, state, step, ctx.day, 1)[0])}
@@ -572,7 +572,7 @@ function ConcludeStep({
             strokeWidth={2.5}
           />
         </span>
-        <p className="mt-6 text-[14px] font-semibold text-[var(--accent-strong)]">
+        <p className="type-body-md font-semibold mt-6 text-[var(--accent-strong)]">
           {step.block.title}
         </p>
         <div className="mt-2 space-y-2">
@@ -624,7 +624,7 @@ function SortStep({
 
   return (
     <>
-      <p className="text-[14px] font-semibold text-[var(--accent-strong)]">{step.block.title}</p>
+      <p className="type-body-md font-semibold text-[var(--accent-strong)]">{step.block.title}</p>
       {visibleBody(step.block).map((item, i) => (
         <p key={i} className="mt-2 text-[16px] leading-6 text-foreground/90">
           {item.text}
@@ -782,24 +782,20 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
     const m = nightMetrics(entry);
     return (
       <>
-        <p className="text-[14px] font-semibold text-[var(--accent-strong)]">Sleep Diary</p>
+        <p className="type-body-md font-semibold text-[var(--accent-strong)]">Sleep Diary</p>
         {m ? (
           <div className="mt-3 grid grid-cols-3 gap-2 rounded-[16px] bg-[var(--accent-container)] p-3 text-[var(--on-accent-container)]">
             <div>
-              <p className="text-[12px]">Asleep</p>
-              <p className="font-display text-[20px] font-semibold tabular-nums">
-                {formatDuration(m.asleep)}
-              </p>
+              <p className="type-label-md">Asleep</p>
+              <p className="type-title-lg font-semibold tabular-nums">{formatDuration(m.asleep)}</p>
             </div>
             <div>
-              <p className="text-[12px]">In bed</p>
-              <p className="font-display text-[20px] font-semibold tabular-nums">
-                {formatDuration(m.inBed)}
-              </p>
+              <p className="type-label-md">In bed</p>
+              <p className="type-title-lg font-semibold tabular-nums">{formatDuration(m.inBed)}</p>
             </div>
             <div>
-              <p className="text-[12px]">Efficiency</p>
-              <p className="font-display text-[20px] font-semibold tabular-nums">{m.efficiency}%</p>
+              <p className="type-label-md">Efficiency</p>
+              <p className="type-title-lg font-semibold tabular-nums">{m.efficiency}%</p>
             </div>
           </div>
         ) : null}
@@ -814,7 +810,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
                 <span className="type-label-lg text-muted-foreground">
                   {qq.label.replace(/\s*\(1-5, 5 being best\)/, "")}
                 </span>
-                <span className="shrink-0 text-[14px] font-semibold tabular-nums">
+                <span className="type-body-md font-semibold shrink-0 tabular-nums">
                   {answerText(qq, entry)}
                 </span>
               </button>
@@ -861,8 +857,8 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
   return (
     <>
       <div className="flex items-center justify-between">
-        <p className="text-[14px] font-semibold text-[var(--accent-strong)]">Sleep Diary</p>
-        <p className="text-[13px] tabular-nums text-muted-foreground">
+        <p className="type-body-md font-semibold text-[var(--accent-strong)]">Sleep Diary</p>
+        <p className="type-body-sm tabular-nums text-muted-foreground">
           {q + 1} of {questions.length}
         </p>
       </div>
@@ -881,7 +877,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
           />
         ) : null}
         {tooEarly && earlier ? (
-          <p className="mt-3 text-[14px] font-medium text-error" role="alert">
+          <p className="type-label-lg mt-3 text-error" role="alert">
             This can’t be before {earlier.label}.
           </p>
         ) : null}
@@ -931,7 +927,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
 
 const chip = (on: boolean) =>
   cn(
-    "inline-flex h-10 items-center justify-center rounded-full px-4 text-[14px] font-semibold tabular-nums transition-colors",
+    "type-body-md font-semibold inline-flex h-10 items-center justify-center rounded-full px-4 tabular-nums transition-colors",
     stateLayer,
     on ? "bg-foreground text-background" : "bg-secondary",
   );
@@ -970,7 +966,7 @@ function TimeAnswer({
   return (
     <>
       <label className="block rounded-[24px] bg-[var(--accent-container)] px-5 py-4 text-[var(--on-accent-container)]">
-        <span className="text-[12px]">Time</span>
+        <span className="type-label-md">Time</span>
         <input
           type="time"
           aria-label={label}
@@ -981,7 +977,7 @@ function TimeAnswer({
       </label>
       {picks.length ? (
         <>
-          <p className="mt-4 text-[13px] text-muted-foreground">
+          <p className="type-body-sm mt-4 text-muted-foreground">
             {fromEarlierNights ? "From your earlier nights" : "Suggested"}
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -1098,7 +1094,7 @@ function AmountAnswer({
         </IconButton>
         <p className="text-center" aria-live="polite">
           <span className="font-display text-[44px] font-semibold tabular-nums">{v}</span>
-          <span className="ml-2 text-[15px]">{unit}</span>
+          <span className="type-action ml-2">{unit}</span>
         </p>
         <IconButton
           label={`More ${unit}`}
@@ -1120,7 +1116,7 @@ function AmountAnswer({
         <button
           type="button"
           onClick={() => onChange(last)}
-          className="mt-3 text-[14px] font-semibold text-[var(--accent-strong)] hover:underline"
+          className="type-body-md font-semibold mt-3 text-[var(--accent-strong)] hover:underline"
         >
           Same as last time: {last} {short}
         </button>
@@ -1173,8 +1169,8 @@ function QualityAnswer({
               <span className="text-[24px] leading-none" aria-hidden="true">
                 {q.emoji}
               </span>
-              <span className="flex-1 text-[16px] font-semibold">{q.label}</span>
-              <span className="text-[13px] tabular-nums text-muted-foreground">
+              <span className="type-body-lg font-semibold flex-1">{q.label}</span>
+              <span className="type-body-sm tabular-nums text-muted-foreground">
                 {last === n ? "Last night · " : ""}
                 {n} of 5
               </span>

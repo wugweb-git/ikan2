@@ -101,7 +101,7 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
           <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-secondary">
             <Lock className="h-7 w-7" />
           </span>
-          <h1 className="mt-6 font-display text-[24px] font-semibold">
+          <h1 className="type-headline-sm mt-6">
             {day.day === 0 ? "Onboarding" : `Day ${day.day}`} opens after{" "}
             {nextDay === 0 ? "onboarding" : `day ${nextDay}`}
           </h1>
@@ -175,7 +175,7 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
             <div className="flex-1">
               <LinearProgress value={((index + 1) / day.steps.length) * 100} />
             </div>
-            <span className="text-[12px] tabular-nums text-muted-foreground" aria-live="polite">
+            <span className="type-label-md tabular-nums text-muted-foreground" aria-live="polite">
               {index + 1} of {day.steps.length}
             </span>
           </div>
@@ -186,7 +186,7 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
             <div className="animate-fade">
               <DayCheckIn slug={slug} day={day.day} />
               <div className="mt-6">
-                <Button className="h-14 w-full text-[16px]" onClick={finish}>
+                <Button className="type-body-lg h-14 w-full" onClick={finish}>
                   Finish day {day.day}
                 </Button>
               </div>

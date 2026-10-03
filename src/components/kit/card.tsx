@@ -107,7 +107,7 @@ export function CardEyebrow({
   className?: string | undefined;
 }) {
   return (
-    <span className={cn("block text-[13px] font-medium text-[var(--accent-strong)]", className)}>
+    <span className={cn("type-body-sm font-medium block text-[var(--accent-strong)]", className)}>
       {children}
     </span>
   );
@@ -148,7 +148,7 @@ export function CardMeta({
   return (
     <span
       className={cn(
-        "mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground",
+        "type-body-sm mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground",
         className,
       )}
     >
@@ -201,7 +201,7 @@ export function CardProgress({
         />
       </div>
       {caption ? (
-        <p className="mt-2 flex items-center justify-between text-[13px] font-medium text-[var(--accent-strong)]">
+        <p className="type-body-sm font-medium mt-2 flex items-center justify-between text-[var(--accent-strong)]">
           {caption}
           <ChevronRight className="h-4 w-4 shrink-0" />
         </p>

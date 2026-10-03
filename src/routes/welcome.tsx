@@ -125,7 +125,7 @@ function WelcomePage() {
                   ? setStep(step + 1)
                   : leave()
             }
-            className="h-12 px-4 text-[15px] font-semibold text-muted-foreground"
+            className="type-action h-12 px-4 text-muted-foreground"
           >
             Skip
           </button>
@@ -140,7 +140,7 @@ function WelcomePage() {
           />
         ) : step === 1 ? (
           <main className="flex flex-1 flex-col px-4 pb-8">
-            <p className="text-[14px] font-medium text-[var(--accent-strong)]">Step 2 of {STEPS}</p>
+            <p className="type-label-lg text-[var(--accent-strong)]">Step 2 of {STEPS}</p>
             <h1 className="type-headline-md mt-1">What brings you here?</h1>
             <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
               Pick the one that fits best. You can explore everything later.
@@ -163,7 +163,7 @@ function WelcomePage() {
                 Continue
               </Button>
               {!choice ? (
-                <p className="mt-2 text-center text-[13px] text-muted-foreground">
+                <p className="type-body-sm mt-2 text-center text-muted-foreground">
                   Choose one to continue, or skip.
                 </p>
               ) : null}
@@ -173,7 +173,7 @@ function WelcomePage() {
           <Permissions onDone={() => (assessment ? setStep(3) : leave())} />
         ) : assessment && reason ? (
           <main className="flex flex-1 flex-col px-4 pb-8">
-            <p className="text-[14px] font-medium text-[var(--accent-strong)]">Step 4 of {STEPS}</p>
+            <p className="type-label-lg text-[var(--accent-strong)]">Step 4 of {STEPS}</p>
             <h1 className="type-headline-md mt-1">Start with a short check</h1>
             <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
               It shows where you are today and which program fits. It’s a screening, not a
@@ -184,7 +184,7 @@ function WelcomePage() {
                 <Illustration art={reason.art} />
               </div>
               <div className="p-5">
-                <p className="flex items-center gap-2 text-[14px] font-medium text-[var(--accent-strong)]">
+                <p className="type-label-lg flex items-center gap-2 text-[var(--accent-strong)]">
                   {(() => {
                     const Icon = categoryIcon[assessment.category];
                     return <Icon className="h-4 w-4" />;
@@ -194,7 +194,7 @@ function WelcomePage() {
                 <p className="mt-1 font-display text-[22px] font-semibold leading-7">
                   {assessment.title}
                 </p>
-                <p className="mt-3 flex gap-4 text-[14px] text-muted-foreground">
+                <p className="type-body-md mt-3 flex gap-4 text-muted-foreground">
                   <span className="inline-flex items-center gap-1.5">
                     <ListChecks className="h-4 w-4" /> {assessment.questions.length} questions
                   </span>
@@ -322,9 +322,9 @@ function AboutYou({
 
   return (
     <main className="flex flex-1 flex-col px-4 pb-8">
-      <p className="text-[14px] font-medium text-[var(--accent-strong)]">{label}</p>
+      <p className="type-label-lg text-[var(--accent-strong)]">{label}</p>
       <div className="mt-1 flex items-center gap-3">
-        <span className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--accent-strong)] font-display text-[20px] font-semibold text-background">
+        <span className="type-title-lg font-semibold grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--accent-strong)] text-background">
           <ProfilePhoto src={profile.avatar}>{profileInitials(profile)}</ProfilePhoto>
         </span>
         <h1 className="font-display text-[26px] font-semibold leading-8">
@@ -340,12 +340,12 @@ function AboutYou({
         type="button"
         onClick={() => void fromGoogle()}
         disabled={google.busy}
-        className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[15px] font-semibold disabled:opacity-50"
+        className="type-action mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 disabled:opacity-50"
       >
         <GoogleG /> {google.busy ? "Asking Google…" : "Fill from Google"}
       </button>
       {google.note ? (
-        <p role="status" className="mt-2 text-center text-[13px] text-muted-foreground">
+        <p role="status" className="type-body-sm mt-2 text-center text-muted-foreground">
           {google.note}
         </p>
       ) : null}
@@ -417,7 +417,7 @@ function AboutYou({
         {tried && !ok ? (
           <p
             role="alert"
-            className="rounded-[14px] bg-error-container px-4 py-3 text-[14px] text-on-error-container"
+            className="type-body-md rounded-[14px] bg-error-container px-4 py-3 text-on-error-container"
           >
             Check the highlighted fields.
           </p>
@@ -505,7 +505,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
 
   return (
     <main className="flex flex-1 flex-col px-4 pb-8">
-      <p className="text-[14px] font-medium text-[var(--accent-strong)]">Step 3 of {STEPS}</p>
+      <p className="type-label-lg text-[var(--accent-strong)]">Step 3 of {STEPS}</p>
       <h1 className="type-headline-md mt-1">Make iKAN yours</h1>
       <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
         Allow what’s useful to you. Each one is optional and you can change it any time in Settings.
@@ -521,7 +521,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
                 <Icon className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[15px] font-semibold">{r.title}</span>
+                <span className="type-action block">{r.title}</span>
                 <span className="type-body-sm mt-0.5 block text-muted-foreground">{r.body}</span>
               </span>
               <button
@@ -529,7 +529,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
                 disabled={granted || blocked || r.state === "busy"}
                 onClick={() => void r.allow()}
                 className={cn(
-                  "inline-flex h-9 shrink-0 items-center gap-1 self-center rounded-full px-4 text-[13px] font-semibold",
+                  "type-body-sm font-semibold inline-flex h-9 shrink-0 items-center gap-1 self-center rounded-full px-4",
                   granted
                     ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]"
                     : blocked
@@ -565,7 +565,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
       {message ? (
         <p
           role="alert"
-          className="mt-3 rounded-[14px] bg-error-container px-4 py-3 text-[14px] text-on-error-container"
+          className="type-body-md mt-3 rounded-[14px] bg-error-container px-4 py-3 text-on-error-container"
         >
           {message}
         </p>

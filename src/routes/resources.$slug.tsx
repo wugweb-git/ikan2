@@ -134,7 +134,7 @@ function ArticlePage() {
         </header>
 
         <div className="relative -mt-8 rounded-t-[28px] bg-background px-5 pt-6">
-          <p className="text-[13px] font-semibold text-[var(--accent-strong)]">{r.category}</p>
+          <p className="type-body-sm font-semibold text-[var(--accent-strong)]">{r.category}</p>
           <h1 className="type-headline-md mt-1 text-balance">{r.title}</h1>
           {article?.description ? (
             /* the standfirst: display face, full contrast, so it reads as part of the title
@@ -222,7 +222,7 @@ function ArticlePage() {
                         <span className="line-clamp-3 text-[16px] font-semibold leading-[22px]">
                           {m.title}
                         </span>
-                        <span className="mt-2 flex items-center gap-2 text-[12px] text-muted-foreground">
+                        <span className="type-label-md mt-2 flex items-center gap-2 text-muted-foreground">
                           <span className="rounded-full bg-background px-2 py-0.5 font-medium">
                             {m.category}
                           </span>

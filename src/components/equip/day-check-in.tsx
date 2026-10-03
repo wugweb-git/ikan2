@@ -38,7 +38,7 @@ export function DayCheckIn({
         <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--accent-container)] text-[var(--on-accent-container)]">
           <MessageSquareHeart className="h-4 w-4" aria-hidden="true" />
         </span>
-        <h2 className="text-[16px] font-semibold">How was today’s session?</h2>
+        <h2 className="type-body-lg font-semibold">How was today’s session?</h2>
       </div>
       <div
         role="radiogroup"
@@ -67,7 +67,7 @@ export function DayCheckIn({
           );
         })}
       </div>
-      <div className="mt-1.5 flex justify-between text-[12px] text-muted-foreground">
+      <div className="type-label-md mt-1.5 flex justify-between text-muted-foreground">
         <span>Not helpful</span>
         <span>Very helpful</span>
       </div>
@@ -75,7 +75,7 @@ export function DayCheckIn({
       <div className="mt-4">
         {prompt && onText ? (
           <>
-            <p className="mb-2 text-[16px] font-semibold">{prompt}</p>
+            <p className="type-body-lg font-semibold mb-2">{prompt}</p>
             <TextField
               label=""
               ariaLabel={prompt}

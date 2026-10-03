@@ -20,7 +20,7 @@ export function PrintHeader({ title }: { title: string }) {
   return (
     <div className="hidden border-b border-foreground/15 px-4 pb-3 pt-2 print:flex print:items-center print:justify-between">
       <BrandTitle />
-      <span className="text-[12px] text-muted-foreground">
+      <span className="type-label-md text-muted-foreground">
         {title} ·{" "}
         {new Date().toLocaleDateString("en-IN", {
           day: "numeric",
@@ -95,8 +95,8 @@ export function ShareButton({ subject, body }: { subject: string; body: string }
                     <Icon className="h-5 w-5" />
                   </span>
                   <span>
-                    <span className="block text-[15px] font-semibold">{r.label}</span>
-                    <span className="block text-[13px] text-muted-foreground">{r.note}</span>
+                    <span className="type-action block">{r.label}</span>
+                    <span className="type-body-sm block text-muted-foreground">{r.note}</span>
                   </span>
                 </button>
               </li>

@@ -237,7 +237,7 @@ function ProfilePage() {
               aria-label="Change profile photo"
               className="relative"
             >
-              <span className="grid h-24 w-24 place-items-center overflow-hidden rounded-full border-4 border-background bg-[var(--accent-strong)] font-display text-[32px] font-semibold text-background">
+              <span className="type-headline-lg grid h-24 w-24 place-items-center overflow-hidden rounded-full border-4 border-background bg-[var(--accent-strong)] text-background">
                 <ProfilePhoto src={p.avatar}>{profileInitials(p)}</ProfilePhoto>
               </span>
               <span className="absolute bottom-0 right-0 grid h-8 w-8 place-items-center rounded-full border-2 border-background bg-foreground text-background">
@@ -270,8 +270,8 @@ function ProfilePage() {
             <h1 className="mt-3 font-display text-[26px] font-semibold leading-8">
               {p.name || "Your name"}
             </h1>
-            {p.email ? <p className="mt-1 text-[14px] text-muted-foreground">{p.email}</p> : null}
-            <p className="mt-0.5 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground">
+            {p.email ? <p className="type-body-md mt-1 text-muted-foreground">{p.email}</p> : null}
+            <p className="type-body-sm mt-0.5 inline-flex items-center gap-1.5 text-muted-foreground">
               <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
               Member since{" "}
               {new Date(p.memberSince).toLocaleDateString("en-IN", {
@@ -280,14 +280,14 @@ function ProfilePage() {
               })}
             </p>
             {photoBusy ? (
-              <p role="status" className="mt-1 text-[13px] text-muted-foreground">
+              <p role="status" className="type-body-sm mt-1 text-muted-foreground">
                 Uploading photo…
               </p>
             ) : null}
           </div>
         </header>
 
-        <h2 className="mx-4 mb-2 mt-6 text-[13px] font-semibold text-muted-foreground">Jump to</h2>
+        <h2 className="type-body-sm font-semibold mx-4 mb-2 mt-6 text-muted-foreground">Jump to</h2>
         <div className="mx-4 grid grid-cols-2 gap-2">
           {jump.map((j) => {
             const Icon = j.icon;
@@ -302,8 +302,8 @@ function ProfilePage() {
                   <Icon className="h-5 w-5" />
                 </span>
                 <span className="min-w-0">
-                  <span className="block truncate text-[14px] font-semibold">{j.label}</span>
-                  <span className="block truncate text-[12px] opacity-75">{j.sub}</span>
+                  <span className="type-body-md font-semibold block truncate">{j.label}</span>
+                  <span className="type-label-md block truncate opacity-75">{j.sub}</span>
                 </span>
               </Link>
             );
@@ -372,7 +372,7 @@ function ProfilePage() {
                   setGoogleBusy(false);
                 }
               }}
-              className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-foreground/15 px-3 text-[13px] font-semibold disabled:opacity-50"
+              className="type-body-sm font-semibold inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-foreground/15 px-3 disabled:opacity-50"
             >
               {googleBusy ? "Asking Google…" : "Fill from Google"}
             </button>
@@ -412,7 +412,7 @@ function ProfilePage() {
           <h2 className="flex items-center gap-2 font-display text-[18px] font-semibold">
             <ShieldPlus className="h-5 w-5" /> Emergency contact
           </h2>
-          <p className="mt-1 text-[14px] text-muted-foreground">
+          <p className="type-body-md mt-1 text-muted-foreground">
             Who we call, and how, if you need urgent help.
           </p>
           <div className="mt-3 space-y-3">
@@ -476,8 +476,8 @@ function ProfilePage() {
                     <Icon className="h-5 w-5" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[15px] font-medium">{r.label}</span>
-                    <span className="block truncate text-[13px] text-muted-foreground">
+                    <span className="type-action font-medium block">{r.label}</span>
+                    <span className="type-body-sm block truncate text-muted-foreground">
                       {r.sub}
                     </span>
                   </span>
@@ -499,8 +499,8 @@ function ProfilePage() {
                 <Download className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[15px] font-medium">Export your data</span>
-                <span className="block text-[13px] text-muted-foreground">
+                <span className="type-action font-medium block">Export your data</span>
+                <span className="type-body-sm block text-muted-foreground">
                   Everything above, as a file
                 </span>
               </span>
@@ -516,7 +516,7 @@ function ProfilePage() {
           )}
         >
           <Settings className="h-5 w-5" />
-          <span className="flex-1 text-[15px] font-medium">Settings</span>
+          <span className="type-action font-medium flex-1">Settings</span>
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </Link>
         <BottomSheet open={photoSheet} onClose={() => setPhotoSheet(false)} title="Profile photo">

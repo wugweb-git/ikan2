@@ -128,7 +128,7 @@ function FieldInput({
     return (
       <div>
         {field.label && !hideLabel ? (
-          <p className="mb-2 text-[14px] font-semibold">{field.label}</p>
+          <p className="type-body-md font-semibold mb-2">{field.label}</p>
         ) : null}
         <Segmented
           label={field.label}
@@ -399,7 +399,7 @@ function EmptyCards({
 }) {
   return (
     <div className="flex flex-col items-center rounded-[16px] border border-dashed border-foreground/25 px-6 py-8 text-center">
-      <p className="text-[16px] font-medium">No entries yet</p>
+      <p className="type-body-lg font-medium">No entries yet</p>
       {help ? <p className="type-label-lg mt-1.5 max-w-72 text-muted-foreground">{help}</p> : null}
       {canAdd ? (
         <Button
@@ -453,7 +453,7 @@ export function EntriesStep({
     ...(hasExample
       ? [
           <CardShell key="example" tone="example">
-            <p className="mb-3 text-[13px] font-semibold">Entry #1</p>
+            <p className="type-body-sm font-semibold mb-3">Entry #1</p>
             <Values entry={{ values: view.example! }} fields={view.fields} />
           </CardShell>,
         ]
@@ -464,10 +464,10 @@ export function EntriesStep({
             deleted, earlier ones only edited. Nothing about an entry's age makes one of those
             wrong, and the missing one was unreachable, so both are always offered. */}
         <div className="-mt-1 mb-2 flex items-center justify-between gap-2">
-          <p className="text-[13px] font-semibold text-muted-foreground">Entry #{i + 1}</p>
+          <p className="type-body-sm font-semibold text-muted-foreground">Entry #{i + 1}</p>
           <span className="-mr-3 flex items-center gap-1">
             {e.day === ctx.day ? null : (
-              <span className="text-[12px] text-muted-foreground">Day {e.day}</span>
+              <span className="type-label-md text-muted-foreground">Day {e.day}</span>
             )}
             <IconButton label={`Edit entry ${i + 1}`} onClick={() => setEditing(e)}>
               <Pencil className="h-5 w-5" />
@@ -504,7 +504,7 @@ export function EntriesStep({
     <>
       <BlockText block={step.block} headline={view.prompt} icon={<NotebookPen />} />
       {list.length ? (
-        <p className="mt-3 text-[14px] text-muted-foreground">{countLabel(list.length)}</p>
+        <p className="type-body-md mt-3 text-muted-foreground">{countLabel(list.length)}</p>
       ) : null}
       <div className="mt-4">
         {pages.length ? (
@@ -613,7 +613,7 @@ function ListEntries({
               key={isCarried ? entry!.id : `slot-${i - carried.length}`}
               className="flex items-start gap-3"
             >
-              <span className="mt-4 w-5 shrink-0 text-right text-[15px] tabular-nums text-muted-foreground">
+              <span className="type-action mt-4 w-5 shrink-0 text-right tabular-nums text-muted-foreground">
                 {i + 1}.
               </span>
               <div className="flex-1">
@@ -656,7 +656,7 @@ function ListEntries({
           <span />
         )}
         {max !== Infinity && carried.length + filled > 0 ? (
-          <p className="text-[13px] tabular-nums text-muted-foreground">
+          <p className="type-body-sm tabular-nums text-muted-foreground">
             {carried.length + filled} of {max}
           </p>
         ) : null}
@@ -729,7 +729,7 @@ function CarriedSlot({
     <div className="flex min-h-14 items-center gap-2 rounded-[4px] bg-foreground/[0.035] py-2 pl-4 pr-1">
       <span className="min-w-0 flex-1">
         <span className="block text-[16px] leading-6">{String(entry.values[fieldKey] ?? "")}</span>
-        <span className="block text-[12px] text-muted-foreground">From day {entry.day}</span>
+        <span className="type-label-md block text-muted-foreground">From day {entry.day}</span>
       </span>
       <IconButton label="Edit" onClick={() => setEditing(true)}>
         <Pencil className="h-5 w-5" />
@@ -868,7 +868,7 @@ export function ReviewStep({
     ...(view.example
       ? [
           <CardShell key="example" tone="example">
-            <p className="mb-3 text-[13px] font-semibold">Example Card</p>
+            <p className="type-body-sm font-semibold mb-3">Example Card</p>
             <ol className="space-y-2">
               {view.example.map((line, i) => (
                 <li key={i} className="text-[16px] leading-6">
@@ -892,7 +892,7 @@ export function ReviewStep({
             delete for something written today, edit for something carried from an earlier
             day, which is the only way to reach it again. */}
         <div className="-mt-1 mb-2 flex items-center justify-between gap-2">
-          <p className="text-[13px] font-semibold text-muted-foreground">
+          <p className="type-body-sm font-semibold text-muted-foreground">
             {e.day === ctx.day ? "Today" : `From day ${e.day}`}
           </p>
           <span className="-mr-3 flex items-center">
@@ -933,12 +933,12 @@ export function ReviewStep({
     <>
       <BlockText block={step.block} headline={view.prompt || undefined} icon={<NotebookPen />} />
       {list.length ? (
-        <p className="mt-3 text-[14px] text-muted-foreground">
+        <p className="type-body-md mt-3 text-muted-foreground">
           {answered} of {list.length} done
         </p>
       ) : null}
       {view.once && doneBefore > 0 ? (
-        <p className="mt-1 text-[13px] text-muted-foreground">
+        <p className="type-body-sm mt-1 text-muted-foreground">
           {doneBefore} answered on earlier days
           {list.length ? "" : ". You’ve answered this for every one so far."}
         </p>
@@ -1044,7 +1044,7 @@ export function TrackerStep({
   return (
     <>
       <BlockText block={step.block} headline={view.prompt} icon={<CalendarCheck />} />
-      {view.note ? <p className="mt-2 text-[15px] text-muted-foreground">{view.note}</p> : null}
+      {view.note ? <p className="type-action mt-2 text-muted-foreground">{view.note}</p> : null}
       <ul className="-mx-4 mt-4 divide-y divide-foreground/[0.08]">
         {habits.map((h) => (
           <li key={h.id} className="px-4 py-4">
@@ -1079,7 +1079,7 @@ export function TrackerStep({
                     <span key={d} className="flex flex-1 flex-col items-center gap-0.5">
                       <span
                         className={cn(
-                          "grid h-7 w-full place-items-center rounded-[8px] text-[13px] font-semibold",
+                          "type-body-sm font-semibold grid h-7 w-full place-items-center rounded-[8px]",
                           doneOn(d, h.id)
                             ? "bg-[var(--accent-container)] text-[var(--on-accent-container)]"
                             : "bg-foreground/[0.06] text-muted-foreground",
@@ -1092,7 +1092,7 @@ export function TrackerStep({
                     </span>
                   ))}
                 </div>
-                <p className="mt-1 text-[12px] text-muted-foreground">
+                <p className="type-label-md mt-1 text-muted-foreground">
                   {week.filter((d) => doneOn(d, h.id)).length} of the last 7 days
                 </p>
               </div>
@@ -1109,7 +1109,7 @@ export function TrackerStep({
         ))}
       </ul>
       {habits.length === 0 ? (
-        <p className="mt-4 text-[15px] text-muted-foreground">
+        <p className="type-action mt-4 text-muted-foreground">
           No habits yet. Add the habit you want to build.
         </p>
       ) : null}

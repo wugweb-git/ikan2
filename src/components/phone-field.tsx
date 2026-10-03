@@ -63,7 +63,7 @@ export function PhoneField({
     <span className="relative flex h-full shrink-0 items-center">
       <span
         aria-hidden="true"
-        className="pointer-events-none flex items-center gap-1 pr-2 text-[16px]"
+        className="type-body-lg pointer-events-none flex items-center gap-1 pr-2"
       >
         <span className="text-[20px] leading-none">{country.flag}</span>
         <span className="tabular-nums">{country.dial}</span>
@@ -94,15 +94,15 @@ export function PhoneField({
       placeholder="98765 43210"
       aria-label={label}
       aria-invalid={Boolean(error)}
-      className="h-full min-w-0 flex-1 border-l border-foreground/15 bg-transparent pl-3 text-[16px] tabular-nums outline-none placeholder:text-muted-foreground/70"
+      className="type-body-lg h-full min-w-0 flex-1 border-l border-foreground/15 bg-transparent pl-3 tabular-nums outline-none placeholder:text-muted-foreground/70"
     />
   );
   const message = error ? (
-    <span role="alert" className="mt-1.5 block px-1 text-[13px] text-error">
+    <span role="alert" className="type-body-sm mt-1.5 block px-1 text-error">
       {error}
     </span>
   ) : hint ? (
-    <span className="mt-1.5 block px-1 text-[13px] text-muted-foreground">{hint}</span>
+    <span className="type-body-sm mt-1.5 block px-1 text-muted-foreground">{hint}</span>
   ) : null;
 
   if (variant === "m3")
@@ -126,7 +126,7 @@ export function PhoneField({
 
   return (
     <div>
-      <span className="mb-1 block text-[13px] font-medium text-muted-foreground">{label}</span>
+      <span className="type-body-sm font-medium mb-1 block text-muted-foreground">{label}</span>
       <div
         className={cn(
           "flex h-12 items-center rounded-[14px] border bg-secondary px-4 transition-colors focus-within:border-foreground/60 focus-within:bg-background",

@@ -193,7 +193,7 @@ export function StackedAssessmentCard({
   const Icon = categoryIcon[assessment.category];
   return (
     <div className="mt-10">
-      <p className="text-[13px] font-semibold text-[var(--accent-strong)]">{label}</p>
+      <p className="type-body-sm font-semibold text-[var(--accent-strong)]">{label}</p>
       <Link
         to="/assessments/$slug"
         params={{ slug: assessment.slug }}
@@ -206,13 +206,13 @@ export function StackedAssessmentCard({
           <span className="-mt-7 grid h-14 w-14 place-items-center rounded-[18px] bg-[var(--accent-container)] text-[var(--on-accent-container)] ring-4 ring-secondary">
             <Icon className="h-7 w-7" />
           </span>
-          <span className="mt-3 block text-[13px] font-medium text-[var(--accent-strong)]">
+          <span className="type-body-sm font-medium mt-3 block text-[var(--accent-strong)]">
             {assessment.name}
           </span>
           <span className="type-title-md mt-0.5 block text-[19px] leading-6">
             {assessment.title}
           </span>
-          <span className="mt-2 flex items-center justify-between gap-3 text-[13px] text-muted-foreground">
+          <span className="type-body-sm mt-2 flex items-center justify-between gap-3 text-muted-foreground">
             <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="inline-flex items-center gap-1">
                 <ListChecks className="h-3.5 w-3.5" aria-hidden="true" />{" "}

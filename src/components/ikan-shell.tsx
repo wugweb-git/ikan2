@@ -309,7 +309,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
             to="/profile"
             className="flex min-w-0 flex-1 items-center gap-3 rounded-[20px] p-1.5 pr-3 transition-colors hover:bg-secondary"
           >
-            <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full bg-foreground font-display text-[16px] font-semibold text-background">
+            <span className="type-title-md grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full bg-foreground text-background">
               <ProfilePhoto src={hydrated ? profile.avatar : undefined}>
                 {hydrated ? profileInitials(profile) : ""}
               </ProfilePhoto>
@@ -318,14 +318,14 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
               <span className="block truncate font-display text-[17px] font-semibold leading-6">
                 {name || "Your profile"}
               </span>
-              <span className="block truncate text-[13px] text-muted-foreground">
+              <span className="type-body-sm block truncate text-muted-foreground">
                 {user?.email ?? "View and edit your details"}
               </span>
             </span>
           </Link>
           <Link
             to="/support"
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-error-container px-3 text-[13px] font-semibold text-on-error-container"
+            className="type-body-sm font-semibold inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-error-container px-3 text-on-error-container"
           >
             <LifeBuoy className="h-4 w-4" /> Get help
           </Link>
@@ -333,7 +333,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
 
         {groups.map((g) => (
           <section key={g.title} className="mt-5">
-            <h2 className="px-5 text-[13px] font-semibold text-muted-foreground">{g.title}</h2>
+            <h2 className="type-body-sm font-semibold px-5 text-muted-foreground">{g.title}</h2>
             <ul className="mx-3 mt-1.5 overflow-hidden rounded-[20px] bg-secondary">
               {g.rows.map((r) => {
                 const Icon = r.icon;
@@ -347,8 +347,8 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
                         <Icon className="h-[18px] w-[18px]" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[15px] font-medium">{r.label}</span>
-                        <span className="block truncate text-[12px] text-muted-foreground">
+                        <span className="type-action font-medium block">{r.label}</span>
+                        <span className="type-label-md block truncate text-muted-foreground">
                           {r.sub}
                         </span>
                       </span>
@@ -362,7 +362,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
         ))}
 
         <section className="mt-5" aria-label="Legal">
-          <h2 className="px-5 text-[13px] font-semibold text-muted-foreground">Legal</h2>
+          <h2 className="type-body-sm font-semibold px-5 text-muted-foreground">Legal</h2>
           <ul className="mx-3 mt-1.5 overflow-hidden rounded-[20px] bg-secondary">
             {legal.map((l) => (
               <li key={l.slug} className="border-b border-background last:border-0">
@@ -375,8 +375,8 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
                     <FileText className="h-[18px] w-[18px]" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[15px] font-medium">{l.label}</span>
-                    <span className="block truncate text-[12px] text-muted-foreground">
+                    <span className="type-action font-medium block">{l.label}</span>
+                    <span className="type-label-md block truncate text-muted-foreground">
                       {l.sub}
                     </span>
                   </span>
@@ -388,7 +388,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
         </section>
 
         <div className="mt-5 flex items-center justify-between gap-3 px-5">
-          <p className="min-w-0 truncate text-[12px] text-muted-foreground">
+          <p className="type-label-md min-w-0 truncate text-muted-foreground">
             {user?.email ? `Signed in as ${user.email}` : ""}
           </p>
           <button
@@ -398,7 +398,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
               await signOut();
               navigate({ to: "/login", replace: true });
             }}
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold text-error hover:bg-error/10"
+            className="type-body-sm font-semibold inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-error hover:bg-error/10"
           >
             <LogOut className="h-4 w-4" /> Sign out
           </button>

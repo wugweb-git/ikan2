@@ -24,10 +24,7 @@ export function SourceCard({ source }: { source: NonNullable<Resource["source"]>
           {facts.length ? (
             <span className="mt-2 flex flex-wrap gap-1.5">
               {facts.map((f) => (
-                <span
-                  key={f}
-                  className="rounded-full bg-background px-2.5 py-1 text-[12px] font-medium"
-                >
+                <span key={f} className="type-label-md rounded-full bg-background px-2.5 py-1">
                   {f}
                 </span>
               ))}
@@ -42,7 +39,7 @@ export function SourceCard({ source }: { source: NonNullable<Resource["source"]>
         ) : null}
       </span>
       {source.url ? (
-        <span className="mt-3 block text-[13px] font-semibold text-[var(--accent-strong)]">
+        <span className="type-body-sm font-semibold mt-3 block text-[var(--accent-strong)]">
           Open the original
         </span>
       ) : null}

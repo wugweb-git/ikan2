@@ -202,7 +202,7 @@ export function Field({
   const isPassword = type === "password";
   return (
     <label className="block">
-      <span className="mb-1 block text-[13px] font-medium text-muted-foreground">{label}</span>
+      <span className="type-body-sm font-medium mb-1 block text-muted-foreground">{label}</span>
       <span
         className={cn(
           "flex h-12 items-center rounded-[14px] border bg-secondary px-4 transition-colors focus-within:border-foreground/60 focus-within:bg-background",
@@ -221,7 +221,7 @@ export function Field({
           autoCapitalize={type === "email" || type === "password" ? "none" : undefined}
           spellCheck={type === "email" || type === "password" ? false : undefined}
           aria-invalid={Boolean(error)}
-          className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted-foreground/70"
+          className="type-body-lg h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/70"
         />
         {isPassword ? (
           <button
@@ -235,11 +235,11 @@ export function Field({
         ) : null}
       </span>
       {error ? (
-        <span role="alert" className="mt-1.5 block text-[13px] text-error">
+        <span role="alert" className="type-body-sm mt-1.5 block text-error">
           {error}
         </span>
       ) : hint ? (
-        <span className="mt-1.5 block text-[13px] text-muted-foreground">{hint}</span>
+        <span className="type-body-sm mt-1.5 block text-muted-foreground">{hint}</span>
       ) : null}
     </label>
   );
@@ -263,7 +263,7 @@ export function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled || busy}
-      className="relative flex h-12 w-full items-center justify-center rounded-full bg-foreground text-[16px] font-semibold text-background transition-opacity disabled:opacity-50"
+      className="type-body-lg font-semibold relative flex h-12 w-full items-center justify-center rounded-full bg-foreground text-background transition-opacity disabled:opacity-50"
     >
       {busy ? (
         <span className="h-5 w-5 animate-spin rounded-full border-2 border-background/40 border-t-background" />
@@ -301,7 +301,7 @@ export function SocialButtons({ onError: _onError }: { onError: (m: string) => v
   };
   return (
     <div>
-      <div className="my-4 flex items-center gap-3 text-[13px] text-muted-foreground">
+      <div className="type-body-sm my-4 flex items-center gap-3 text-muted-foreground">
         <span className="h-px flex-1 bg-foreground/10" /> or{" "}
         <span className="h-px flex-1 bg-foreground/10" />
       </div>
@@ -311,7 +311,7 @@ export function SocialButtons({ onError: _onError }: { onError: (m: string) => v
           onClick={() => go("google")}
           aria-label="Continue with Google"
           disabled={Boolean(busy)}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[14px] font-semibold disabled:opacity-50"
+          className="type-body-md font-semibold flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 disabled:opacity-50"
         >
           <GoogleMark /> <span>{busy === "google" ? "…" : "Google"}</span>
         </button>
@@ -320,14 +320,14 @@ export function SocialButtons({ onError: _onError }: { onError: (m: string) => v
           onClick={() => go("linkedin_oidc")}
           aria-label="Continue with LinkedIn"
           disabled={Boolean(busy)}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[14px] font-semibold disabled:opacity-50"
+          className="type-body-md font-semibold flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 disabled:opacity-50"
         >
           <LinkedInMark /> <span>{busy === "linkedin_oidc" ? "…" : "LinkedIn"}</span>
         </button>
         <Link
           to="/phone-login"
           aria-label="Continue with phone"
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[14px] font-semibold"
+          className="type-body-md font-semibold flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15"
         >
           <Smartphone className="h-5 w-5" /> Phone
         </Link>
@@ -413,7 +413,7 @@ export function RememberMe({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 text-[14px]">
+    <label className="type-body-md flex cursor-pointer items-center gap-3">
       <input
         type="checkbox"
         checked={checked}

@@ -159,7 +159,7 @@ function ResultPage() {
           {bar}
           <div className="px-6 pt-16 text-center">
             <h1 className="font-display text-[22px] font-semibold">No result yet</h1>
-            <p className="mt-2 text-[15px] text-muted-foreground">
+            <p className="type-action mt-2 text-muted-foreground">
               Finish all {dayCount(p)} days of {p.name} to see your result here.
             </p>
             <Button
@@ -194,10 +194,8 @@ function ResultPage() {
               <span className="mx-auto grid h-28 w-28 place-items-center rounded-full bg-[var(--accent)] text-white">
                 <Trophy className="h-14 w-14" />
               </span>
-              <span className="mt-4 block font-display text-[32px] font-semibold">
-                Congratulations!
-              </span>
-              <span className="mt-1 block text-[17px]">You’ve completed {p.name}!</span>
+              <span className="type-headline-lg mt-4 block">Congratulations!</span>
+              <span className="type-body-xl mt-1 block">You’ve completed {p.name}!</span>
             </span>
           </button>
         ) : null}
@@ -209,7 +207,7 @@ function ResultPage() {
           {/* header, like an assessment result */}
           <header className="px-4 pt-2">
             {sum.timeline.start ? (
-              <p className="text-[13px] text-muted-foreground">
+              <p className="type-body-sm text-muted-foreground">
                 <DateText>
                   {longDate(sum.timeline.start)}
                   {sum.timeline.end && sum.timeline.end !== sum.timeline.start
@@ -219,7 +217,7 @@ function ResultPage() {
               </p>
             ) : null}
             <h1 className="type-headline-md mt-1">{p.name}</h1>
-            <p className="mt-1 flex flex-wrap gap-x-3 text-[14px] text-muted-foreground">
+            <p className="type-body-md mt-1 flex flex-wrap gap-x-3 text-muted-foreground">
               <span>{sum.totalDays} days</span>
               {sum.seconds ? <span>{formatSeconds(sum.seconds)} spent</span> : null}
               <span>
@@ -230,13 +228,13 @@ function ResultPage() {
 
           {/* headline card */}
           <section className="mx-4 mt-5 rounded-[28px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
-            <p className="text-[14px] font-medium">Equip program result</p>
+            <p className="type-label-lg">Equip program result</p>
             <p className="type-display-sm font-bold mt-1">
               {j.finished
                 ? "Completed"
                 : `${Math.round((sum.daysDone / sum.totalDays) * 100)}% done`}
             </p>
-            <p className="mt-1 text-[15px] tabular-nums">
+            <p className="type-action mt-1 tabular-nums">
               <span className="font-semibold">
                 {sum.daysDone} of {sum.totalDays} days
               </span>
@@ -263,7 +261,7 @@ function ResultPage() {
           </section>
 
           <section className="mt-6 px-4">
-            <h2 className="font-display text-[16px] font-semibold">Time and consistency</h2>
+            <h2 className="type-title-md">Time and consistency</h2>
             <div className="mt-3">
               <Bento
                 colored
@@ -323,7 +321,7 @@ function ResultPage() {
 
           {/* what was learnt and explored */}
           <section className="mt-6 px-4">
-            <h2 className="font-display text-[16px] font-semibold">What you learnt</h2>
+            <h2 className="type-title-md">What you learnt</h2>
             <ul className="mt-3 overflow-hidden rounded-[20px] bg-secondary">
               {sum.units.map((u, i) => (
                 <li
@@ -332,7 +330,7 @@ function ResultPage() {
                 >
                   <div className="flex items-start gap-3">
                     <p className="min-w-0 flex-1 text-[15px] font-medium leading-6">{u.title}</p>
-                    <span className="text-[13px] tabular-nums text-muted-foreground">
+                    <span className="type-body-sm tabular-nums text-muted-foreground">
                       {u.done}/{u.total}
                     </span>
                   </div>
@@ -345,7 +343,7 @@ function ResultPage() {
           {/* from the answers: programme specific */}
           {sum.sleep ? (
             <section className="mt-6 px-4">
-              <h2 className="font-display text-[16px] font-semibold">Your sleep</h2>
+              <h2 className="type-title-md">Your sleep</h2>
               <div className="mt-3">
                 <Bento
                   colored
@@ -403,7 +401,7 @@ function ResultPage() {
 
           {highlights && highlights.tiles.length ? (
             <section className="mt-6 px-4">
-              <h2 className="font-display text-[16px] font-semibold">{highlights.title}</h2>
+              <h2 className="type-title-md">{highlights.title}</h2>
               <div className="mt-3">
                 <Bento
                   colored
@@ -445,18 +443,18 @@ function ResultPage() {
 
           {sum.choices.length ? (
             <section className="mt-6 px-4">
-              <h2 className="font-display text-[16px] font-semibold">What you noticed</h2>
+              <h2 className="type-title-md">What you noticed</h2>
               <div className="mt-3 space-y-4 rounded-[20px] bg-secondary p-4">
                 {sum.choices.map((c) => (
                   <div key={`${c.day}-${c.title}`}>
-                    <p className="text-[13px] text-muted-foreground">
+                    <p className="type-body-sm text-muted-foreground">
                       Day {c.day} · {c.title}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {c.picked.map((x) => (
                         <span
                           key={x}
-                          className="rounded-full bg-background px-3 py-1.5 text-[13px]"
+                          className="type-body-sm rounded-full bg-background px-3 py-1.5"
                         >
                           {x}
                         </span>
@@ -470,13 +468,13 @@ function ResultPage() {
 
           {sum.words.length ? (
             <section className="mt-6 px-4">
-              <h2 className="font-display text-[16px] font-semibold">In your words</h2>
+              <h2 className="type-title-md">In your words</h2>
               <ul className="mt-3 space-y-2">
                 {sum.words.map((w) => (
                   <li key={`${w.day}-${w.text}`} className="rounded-[20px] bg-secondary p-4">
                     <Quote className="h-4 w-4 text-[var(--accent-strong)]" />
                     <p className="mt-1.5 text-[15px] leading-6">{w.text}</p>
-                    <p className="mt-2 text-[12px] text-muted-foreground">Day {w.day}</p>
+                    <p className="type-label-md mt-2 text-muted-foreground">Day {w.day}</p>
                   </li>
                 ))}
               </ul>
@@ -484,7 +482,7 @@ function ResultPage() {
           ) : null}
 
           <section className="mt-8 px-4 print:hidden">
-            <h2 className="font-display text-[16px] font-semibold">What’s next</h2>
+            <h2 className="type-title-md">What’s next</h2>
             <ul className="mt-3 space-y-3">
               {related ? (
                 <li>
@@ -500,13 +498,13 @@ function ResultPage() {
                       <Illustration art="measure" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[12px] font-semibold text-[var(--accent-strong)]">
+                      <span className="type-label-md font-semibold block text-[var(--accent-strong)]">
                         Assessment
                       </span>
                       <span className="block text-[15px] font-semibold leading-5">
                         {related.title}
                       </span>
-                      <span className="block text-[13px] text-muted-foreground">
+                      <span className="type-body-sm block text-muted-foreground">
                         {related.questions.length} questions, about {related.minutes} min
                       </span>
                     </span>
@@ -528,7 +526,7 @@ function ResultPage() {
                       <Illustration art={article.art} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[12px] font-semibold text-[var(--accent-strong)]">
+                      <span className="type-label-md font-semibold block text-[var(--accent-strong)]">
                         Read · {article.minutes} min
                       </span>
                       <span className="line-clamp-2 text-[15px] font-semibold leading-5">
@@ -559,11 +557,11 @@ function ResultPage() {
                         className="h-16 w-16 shrink-0 rounded-[14px] object-cover"
                       />
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[12px] font-semibold text-[var(--accent-strong)]">
+                        <span className="type-label-md font-semibold block text-[var(--accent-strong)]">
                           Program
                         </span>
                         <span className="block text-[15px] font-semibold leading-5">{o.name}</span>
-                        <span className="line-clamp-1 text-[13px] text-muted-foreground">
+                        <span className="type-body-sm line-clamp-1 text-muted-foreground">
                           {o.source.description}
                         </span>
                       </span>
@@ -635,7 +633,7 @@ function Rows({ title, rows }: { title: string; rows: Row[] }) {
   if (!shown.length) return null;
   return (
     <section className="mt-6 px-4">
-      <h2 className="font-display text-[16px] font-semibold">{title}</h2>
+      <h2 className="type-title-md">{title}</h2>
       <ul className="mt-3 overflow-hidden rounded-[20px] bg-secondary">
         {shown.map((r, i) => {
           const Trend = r.trend ? (r.trend > 0 ? TrendingUp : TrendingDown) : null;
@@ -666,7 +664,7 @@ function Rows({ title, rows }: { title: string; rows: Row[] }) {
                   "inline-flex items-center gap-1.5 tabular-nums",
                   r.wide
                     ? "mt-0.5 text-[15px] font-medium leading-6"
-                    : "shrink-0 text-right text-[15px] font-semibold",
+                    : "type-action shrink-0 text-right",
                 )}
               >
                 {Trend ? <Trend className="h-4 w-4 text-[var(--accent-strong)]" /> : null}

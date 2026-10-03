@@ -69,7 +69,7 @@ export function ResultLoading({ label = "Loading your result…" }: { label?: st
       <div className="grid min-h-[70dvh] place-items-center px-6 text-center" role="status">
         <div>
           <LoaderCircle className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
-          <p className="mt-3 text-[15px] text-muted-foreground">{label}</p>
+          <p className="type-action mt-3 text-muted-foreground">{label}</p>
           <div className="mx-auto mt-6 w-64 space-y-3" aria-hidden="true">
             <div className="h-24 animate-pulse rounded-[24px] bg-secondary" />
             <div className="h-4 animate-pulse rounded-full bg-secondary" />
@@ -127,7 +127,7 @@ function ResultPage() {
           {bar}
           <div className="px-6 pt-16 text-center">
             <h1 className="font-display text-[22px] font-semibold">Result not found</h1>
-            <p className="mt-2 text-[15px] text-muted-foreground">
+            <p className="type-action mt-2 text-muted-foreground">
               This result isn’t on this device. See all your {a.title.toLowerCase()} results, or
               take it again.
             </p>
@@ -203,7 +203,7 @@ function ResultBody({
     return (
       <div className="px-6 pt-12 text-center">
         <h1 className="font-display text-[22px] font-semibold">This result couldn’t be scored</h1>
-        <p className="mt-2 text-[15px] text-muted-foreground">
+        <p className="type-action mt-2 text-muted-foreground">
           Some answers are missing. Take the assessment again to get a result.
         </p>
         <Button
@@ -219,11 +219,11 @@ function ResultBody({
   return (
     <div className="animate-fade pb-6">
       <header className="px-4 pt-2">
-        <p className="text-[13px] text-muted-foreground">
+        <p className="type-body-sm text-muted-foreground">
           <DateText>{dateTime(result.completedAt)}</DateText>
         </p>
         <h1 className="mt-1 font-display text-[26px] font-semibold leading-8">{a.title}</h1>
-        <p className="mt-1 flex flex-wrap gap-x-3 text-[14px] text-muted-foreground">
+        <p className="type-body-md mt-1 flex flex-wrap gap-x-3 text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <ListChecks className="h-4 w-4" aria-hidden="true" /> {a.questions.length} questions
           </span>
@@ -254,7 +254,7 @@ function ResultBody({
           <Link
             to="/support"
             className={cn(
-              "mt-4 inline-flex h-12 items-center rounded-full bg-foreground px-6 text-[15px] font-semibold text-background",
+              "type-action mt-4 inline-flex h-12 items-center rounded-full bg-foreground px-6 text-background",
               stateLayer,
             )}
           >
@@ -265,7 +265,7 @@ function ResultBody({
 
       {rest.length > 0 ? (
         <section className="mt-6 px-4">
-          <h2 className="font-display text-[16px] font-semibold">
+          <h2 className="type-title-md">
             {head ? (a.category === "burnout" ? "By area" : "Also screened") : "Your scores"}
           </h2>
           <ul className="mt-3 overflow-hidden rounded-[20px] bg-secondary">
@@ -287,7 +287,7 @@ function ResultBody({
 
       {programmes.length > 0 ? (
         <section className="mt-8 px-4">
-          <h2 className="font-display text-[16px] font-semibold">Recommended for you</h2>
+          <h2 className="type-title-md">Recommended for you</h2>
           <ul className="mt-3 space-y-3">
             {programmes.map((p, i) => (
               <li key={p.slug}>
@@ -300,7 +300,7 @@ function ResultBody({
                   <img src={p.cover} alt="" className="w-[88px] shrink-0 object-cover" />
                   <span className="min-w-0 flex-1 p-4">
                     {i === 0 ? (
-                      <span className="block text-[12px] font-semibold text-[var(--accent-strong)]">
+                      <span className="type-label-md font-semibold block text-[var(--accent-strong)]">
                         Best match
                       </span>
                     ) : null}
@@ -325,7 +325,7 @@ function ResultBody({
             <p className="text-[15px] leading-6">
               Talking to a professional can help with what this result shows.
             </p>
-            <Link to="/support" className="mt-1 inline-block text-[15px] font-semibold underline">
+            <Link to="/support" className="type-action mt-1 inline-block underline">
               See support options
             </Link>
           </div>
@@ -333,7 +333,7 @@ function ResultBody({
       ) : null}
 
       <section className="mt-8 px-4">
-        <h2 className="font-display text-[16px] font-semibold">What this measured</h2>
+        <h2 className="type-title-md">What this measured</h2>
         <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
           {a.instrument}. {a.scores.map((s) => `${s.label} (${s.instrument})`).join(", ")}.
         </p>
@@ -364,7 +364,7 @@ function ResultBody({
 function SeverityLine({ severity }: { severity: Severity }) {
   const c = severityContent[severity];
   return (
-    <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-background/70 px-3 py-1 text-[13px] font-medium text-[var(--tone)]">
+    <p className="type-body-sm font-medium mt-2 inline-flex items-center gap-2 rounded-full bg-background/70 px-3 py-1 text-[var(--tone)]">
       <span
         className="h-2 w-2 shrink-0 rounded-full"
         style={{ background: "var(--tone-bar)" }}
@@ -382,12 +382,12 @@ function HeadlineCard({ r }: { r: ScoreResult }) {
       className="mx-4 mt-5 rounded-[28px] p-5"
       style={{ ...bandStyle(band), background: "var(--tone-container)" }}
     >
-      <p className="text-[14px] font-medium text-[var(--tone)]">
+      <p className="type-label-lg text-[var(--tone)]">
         {r.score.label}, {r.score.instrument}
       </p>
       <p className="type-display-sm font-bold mt-1 text-[var(--tone)]">{band.label}</p>
       <SeverityLine severity={band.severity} />
-      <p className="mt-1 text-[15px] tabular-nums">
+      <p className="type-action mt-1 tabular-nums">
         <span className="font-semibold">{valueText(r)}</span>
         {r.profile.direction === "better" ? (
           <span className="text-muted-foreground">, higher is better</span>
@@ -395,7 +395,7 @@ function HeadlineCard({ r }: { r: ScoreResult }) {
       </p>
       <div className="mt-5">
         <RangeBar result={r} large />
-        <div className="mt-2 flex justify-between text-[12px] text-muted-foreground tabular-nums">
+        <div className="type-label-md mt-2 flex justify-between text-muted-foreground tabular-nums">
           <span>{r.profile.min}</span>
           <span>{r.profile.max}</span>
         </div>
@@ -413,7 +413,7 @@ function ScoreRow({ r }: { r: ScoreResult }) {
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-[16px] font-medium leading-6">{r.score.label}</p>
-          <p className="text-[13px] text-muted-foreground tabular-nums">
+          <p className="type-body-sm text-muted-foreground tabular-nums">
             {r.score.instrument}, {valueText(r)}
             {r.profile.direction === "better" ? ", higher is better" : ""}
           </p>

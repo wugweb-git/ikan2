@@ -42,14 +42,14 @@ function VerifyPage() {
           <span className="font-semibold">{email || "your email"}</span>. Open it on this device,
           then sign in.
         </p>
-        <p className="mt-2 text-[14px] text-muted-foreground">
+        <p className="type-body-md mt-2 text-muted-foreground">
           Can’t find it? Check spam or promotions.
         </p>
       </div>
       <div className="mt-6 space-y-3">
         <FormError message={error} />
         {sent ? (
-          <p className="text-center text-[14px] text-[#1E6644]">
+          <p className="type-body-md text-center text-[#1E6644]">
             Sent again. It can take a minute to arrive.
           </p>
         ) : null}
@@ -67,17 +67,17 @@ function VerifyPage() {
               setError((e as Error).message);
             }
           }}
-          className="flex h-14 w-full items-center justify-center rounded-full border border-foreground/20 text-[15px] font-semibold disabled:opacity-50"
+          className="type-action flex h-14 w-full items-center justify-center rounded-full border border-foreground/20 disabled:opacity-50"
         >
           {wait > 0 ? `Resend link in ${wait}s` : "Resend link"}
         </button>
         <Link
           to="/login"
-          className="flex h-14 w-full items-center justify-center rounded-full bg-foreground text-[16px] font-semibold text-background"
+          className="type-body-lg font-semibold flex h-14 w-full items-center justify-center rounded-full bg-foreground text-background"
         >
           I’ve confirmed, sign in
         </Link>
-        <Link to="/signup" className="block pt-2 text-center text-[14px] font-semibold underline">
+        <Link to="/signup" className="type-body-md font-semibold block pt-2 text-center underline">
           Use a different email
         </Link>
       </div>

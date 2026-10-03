@@ -87,7 +87,7 @@ function StateScreen({
         >
           <LifeBuoy className="h-5 w-5 shrink-0 text-on-error-container" aria-hidden="true" />
           <span className="min-w-0 flex-1">
-            <span className="block text-[14px] font-semibold text-on-error-container">
+            <span className="type-body-md font-semibold block text-on-error-container">
               Need help now?
             </span>
             <span className="type-body-sm block text-muted-foreground">
@@ -102,9 +102,9 @@ function StateScreen({
 }
 
 const primary =
-  "flex h-12 items-center justify-center gap-2 rounded-full bg-foreground px-6 text-[15px] font-semibold text-background";
+  "type-action flex h-12 items-center justify-center gap-2 rounded-full bg-foreground px-6 text-background";
 const secondary =
-  "flex h-12 items-center justify-center rounded-full border border-foreground/15 px-6 text-[15px] font-semibold";
+  "type-action flex h-12 items-center justify-center rounded-full border border-foreground/15 px-6";
 
 export function NotFoundScreen() {
   return (
@@ -201,7 +201,7 @@ export function OfflineBanner() {
       role="status"
       className="fixed inset-x-0 top-0 z-[95] flex justify-center pt-[var(--safe-top,env(safe-area-inset-top))] print:hidden"
     >
-      <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-[13px] font-semibold text-background shadow-dock">
+      <p className="type-body-sm font-semibold mt-2 inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-background shadow-dock">
         <CloudOff className="h-4 w-4" /> Offline. Changes save on this phone.
       </p>
     </div>

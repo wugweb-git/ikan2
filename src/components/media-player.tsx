@@ -186,7 +186,7 @@ export function MediaPlayer({
               </span>
             </span>
             <span className="absolute inset-x-0 bottom-0 block px-4 pb-3.5">
-              <span className="block text-[15px] font-semibold">{openLabel[source.provider]}</span>
+              <span className="type-action block">{openLabel[source.provider]}</span>
               <span
                 className={cn(
                   "type-label-md mt-0.5 block",
@@ -228,7 +228,7 @@ export function MediaPlayer({
               <PlayBadge />
             </span>
             <span className="absolute inset-x-0 bottom-0 block px-4 pb-3.5">
-              <span className="block text-[15px] font-semibold">{label[source.provider]}</span>
+              <span className="type-action block">{label[source.provider]}</span>
               <span
                 className={cn(
                   "type-label-md mt-0.5 block",
@@ -398,7 +398,7 @@ function AudioPlayer({ src, poster, className, startAt, onProgress, onEnded }: F
       </button>
       <div className="px-4 pt-3 pb-4">
         <Scrubber pct={pct} onSeek={seek} />
-        <div className="mt-2 flex justify-between text-[12px] tabular-nums text-muted-foreground">
+        <div className="type-label-md mt-2 flex justify-between tabular-nums text-muted-foreground">
           <span>{clock(at)}</span>
           <span>{of > 0 ? clock(of) : "--:--"}</span>
         </div>

@@ -68,11 +68,14 @@ export function EmptyState({
           </span>
         ) : null}
         <p
-          className={cn("font-display font-semibold", dashed ? "mt-3 text-[16px]" : "text-[17px]")}
+          className={cn(
+            "font-display font-semibold",
+            dashed ? "type-body-lg mt-3" : "type-body-xl",
+          )}
         >
           {title}
         </p>
-        <p className="mt-1 text-[14px] text-muted-foreground">{children}</p>
+        <p className="type-body-md mt-1 text-muted-foreground">{children}</p>
         {action ? <div className="mt-4">{action}</div> : null}
       </div>
     </div>
@@ -88,7 +91,7 @@ export function EmptyLine({
   className?: string | undefined;
 }) {
   return (
-    <p className={cn("py-6 text-center text-[14px] text-muted-foreground", className)}>
+    <p className={cn("type-body-md py-6 text-center text-muted-foreground", className)}>
       {children}
     </p>
   );

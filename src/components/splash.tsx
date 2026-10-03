@@ -121,7 +121,7 @@ export function Splash() {
       </svg>
 
       <footer
-        className="splash-rise relative z-10 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-center text-[12px]"
+        className="type-label-md splash-rise relative z-10 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-center"
         style={{ color: s.muted, animationDelay: "1500ms" }}
       >
         Made by{" "}

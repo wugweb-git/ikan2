@@ -163,7 +163,7 @@ function SettingsPage() {
               <UserRound className="h-5 w-5" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-[16px]">Signed in</span>
+              <span className="type-body-lg block">Signed in</span>
               <span className="type-body-sm block truncate text-muted-foreground">
                 {user?.email ?? ""}
               </span>
@@ -211,12 +211,12 @@ function SettingsPage() {
           {settings.moodReminders ? (
             <>
               <label className="flex min-h-14 items-center gap-4 px-4 py-2 pl-[72px]">
-                <span className="flex-1 text-[14px] text-muted-foreground">Remind me at</span>
+                <span className="type-body-md flex-1 text-muted-foreground">Remind me at</span>
                 <input
                   type="time"
                   value={settings.moodReminderTime}
                   onChange={(e) => set("moodReminderTime", e.target.value)}
-                  className="h-10 rounded-[10px] bg-secondary px-3 text-[15px] font-semibold tabular-nums"
+                  className="type-action h-10 rounded-[10px] bg-secondary px-3 tabular-nums"
                 />
               </label>
               <AddToCalendar
@@ -335,7 +335,7 @@ function SettingsPage() {
           />
         </Group>
 
-        <p className="mt-6 text-center text-[12px] text-muted-foreground">iKAN preview</p>
+        <p className="type-label-md mt-6 text-center text-muted-foreground">iKAN preview</p>
 
         {/* On success the account no longer exists, so there is nowhere to go back to - the
             person lands on the sign-in screen, which is the only honest destination. */}
@@ -437,7 +437,7 @@ function HealthConnectRows({ onMessage }: { onMessage: (m: string) => void }) {
       disabled={h.busy}
       onClick={onClick}
       className={cn(
-        "inline-flex h-9 shrink-0 items-center rounded-full px-4 text-[13px] font-semibold disabled:opacity-50",
+        "type-body-sm font-semibold inline-flex h-9 shrink-0 items-center rounded-full px-4 disabled:opacity-50",
         filled ? "bg-foreground text-background" : "border border-foreground/15",
       )}
     >
@@ -458,7 +458,7 @@ function HealthConnectRows({ onMessage }: { onMessage: (m: string) => void }) {
             : "Sleep, steps and heart rate, in the iKAN Android app (coming soon)"
         }
       >
-        <span className="inline-flex h-9 shrink-0 items-center rounded-full bg-secondary px-4 text-[13px] font-semibold text-muted-foreground">
+        <span className="type-body-sm font-semibold inline-flex h-9 shrink-0 items-center rounded-full bg-secondary px-4 text-muted-foreground">
           Soon
         </span>
       </Row>
@@ -523,7 +523,7 @@ function ActivityRow({ onMessage }: { onMessage: (m: string) => void }) {
         label="Activity"
         sub="Steps, sleep and heart rate from Health Connect, in the iKAN Android app"
       >
-        <span className="inline-flex h-9 shrink-0 items-center rounded-full bg-secondary px-4 text-[13px] font-semibold text-muted-foreground">
+        <span className="type-body-sm font-semibold inline-flex h-9 shrink-0 items-center rounded-full bg-secondary px-4 text-muted-foreground">
           In app
         </span>
       </Row>
@@ -676,7 +676,7 @@ function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
               onClick={async () => {
                 if (await installApp()) onMessage("iKAN is on your home screen");
               }}
-              className="inline-flex h-9 shrink-0 items-center rounded-full bg-foreground px-4 text-[13px] font-semibold text-background"
+              className="type-body-sm font-semibold inline-flex h-9 shrink-0 items-center rounded-full bg-foreground px-4 text-background"
             >
               Install
             </button>
@@ -692,8 +692,8 @@ function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
 function Group({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
   return (
     <section className="mt-6">
-      <h2 className="px-4 text-[14px] font-semibold text-[var(--accent-strong)]">{title}</h2>
-      {note ? <p className="px-4 text-[12px] text-muted-foreground">{note}</p> : null}
+      <h2 className="type-body-md font-semibold px-4 text-[var(--accent-strong)]">{title}</h2>
+      {note ? <p className="type-label-md px-4 text-muted-foreground">{note}</p> : null}
       <div className="mt-1">{children}</div>
     </section>
   );
@@ -716,7 +716,7 @@ function Row({
         <Icon className="h-5 w-5" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[16px]">{label}</span>
+        <span className="type-body-lg block">{label}</span>
         <span className="type-body-sm block text-muted-foreground">{sub}</span>
       </span>
       {children}
@@ -754,7 +754,7 @@ function ActionRow({
         <Icon className="h-5 w-5" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className={cn("block text-[16px]", danger && "text-on-error-container")}>
+        <span className={cn("type-body-lg block", danger && "text-on-error-container")}>
           {label}
         </span>
         <span className="type-body-sm block text-muted-foreground">{sub}</span>
@@ -781,7 +781,7 @@ function LinkRow({
         <Icon className="h-5 w-5" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[16px]">{label}</span>
+        <span className="type-body-lg block">{label}</span>
         <span className="type-body-sm block text-muted-foreground">{sub}</span>
       </span>
       <ChevronRight className="h-5 w-5 text-muted-foreground" />
@@ -816,14 +816,14 @@ function SyncRow() {
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[16px]">Your data</span>
+        <span className="type-body-lg block">Your data</span>
         <span className="type-body-sm block text-muted-foreground">{text}</span>
       </span>
       {status.state === "error" ? (
         <button
           type="button"
           onClick={syncNow}
-          className="h-9 rounded-full border border-foreground/20 px-3 text-[13px] font-semibold"
+          className="type-body-sm font-semibold h-9 rounded-full border border-foreground/20 px-3"
         >
           Try again
         </button>

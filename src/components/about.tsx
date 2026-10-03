@@ -25,7 +25,7 @@ export function Group({
 
 /** A heading inside a group. */
 export function SubHead({ children }: { children: ReactNode }) {
-  return <h3 className="mb-2 mt-5 text-[15px] font-semibold">{children}</h3>;
+  return <h3 className="type-action mb-2 mt-5">{children}</h3>;
 }
 
 /* Theme tints for tiles and icons: calm, mind, rest, alert. */
@@ -103,9 +103,9 @@ export function ImportantNote({ text, className }: { text: string; className?: s
         <ShieldAlert className="h-5 w-5" />
       </span>
       <div className="min-w-0">
-        <h2 className="text-[15px] font-semibold">Good to know</h2>
+        <h2 className="type-action">Good to know</h2>
         <p className="type-label-lg mt-1 text-foreground/80">{text}</p>
-        <Link to="/support" className="mt-2 inline-block text-[14px] font-semibold underline">
+        <Link to="/support" className="type-body-md font-semibold mt-2 inline-block underline">
           Need help now?
         </Link>
       </div>
@@ -177,7 +177,7 @@ export function BeforeYouStart({
           );
         })}
       </ul>
-      <label className="mt-5 flex cursor-pointer items-center gap-3 text-[15px]">
+      <label className="type-action mt-5 flex cursor-pointer items-center gap-3">
         <input
           type="checkbox"
           checked={agreed}

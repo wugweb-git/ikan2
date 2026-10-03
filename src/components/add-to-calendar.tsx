@@ -51,7 +51,7 @@ export function AddToCalendar({
           className={cn("flex min-h-14 w-full items-center gap-4 px-4 py-2 text-left", className)}
         >
           <CalendarPlus className="h-5 w-5 shrink-0" />
-          <span className="flex-1 text-[15px] font-medium">{label}</span>
+          <span className="type-action font-medium flex-1">{label}</span>
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </button>
       ) : (
@@ -59,7 +59,7 @@ export function AddToCalendar({
           type="button"
           onClick={() => setOpen(true)}
           className={cn(
-            "inline-flex h-11 items-center justify-center gap-2 rounded-full border border-current/20 px-4 text-[14px] font-semibold",
+            "type-body-md font-semibold inline-flex h-11 items-center justify-center gap-2 rounded-full border border-current/20 px-4",
             className,
           )}
         >
@@ -77,22 +77,22 @@ export function AddToCalendar({
       >
         <div className="rounded-[20px] bg-secondary p-4">
           <p className="font-semibold">{event.title}</p>
-          <p className="mt-0.5 text-[14px] text-muted-foreground">{when}</p>
+          <p className="type-body-md mt-0.5 text-muted-foreground">{when}</p>
           {time ? (
             <label className="mt-3 flex items-center justify-between gap-3">
-              <span className="text-[14px]">Time</span>
+              <span className="type-body-md">Time</span>
               <input
                 type="time"
                 required
                 value={at}
                 onChange={(e) => setAt(e.target.value)}
                 aria-invalid={!validTime}
-                className="h-10 rounded-[10px] bg-background px-3 text-[15px] font-semibold tabular-nums"
+                className="type-action h-10 rounded-[10px] bg-background px-3 tabular-nums"
               />
             </label>
           ) : null}
           {!validTime ? (
-            <p role="alert" className="mt-2 text-[13px] text-error">
+            <p role="alert" className="type-body-sm mt-2 text-error">
               Pick a time for the reminder.
             </p>
           ) : null}
@@ -115,8 +115,8 @@ export function AddToCalendar({
           >
             <GoogleCalendarMark />
             <span className="flex-1">
-              <span className="block text-[15px] font-semibold">Google Calendar</span>
-              <span className="block text-[13px] text-muted-foreground">
+              <span className="type-action block">Google Calendar</span>
+              <span className="type-body-sm block text-muted-foreground">
                 Opens a ready-made event to save
               </span>
             </span>
@@ -137,15 +137,15 @@ export function AddToCalendar({
               <CalendarDays className="h-5 w-5" />
             </span>
             <span className="flex-1">
-              <span className="block text-[15px] font-semibold">Phone calendar</span>
-              <span className="block text-[13px] text-muted-foreground">
+              <span className="type-action block">Phone calendar</span>
+              <span className="type-body-sm block text-muted-foreground">
                 Apple, Samsung, Outlook and others
               </span>
             </span>
             <ChevronRight className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
-        <p role="status" className="mt-3 min-h-5 text-center text-[13px] text-muted-foreground">
+        <p role="status" className="type-body-sm mt-3 min-h-5 text-center text-muted-foreground">
           {added ?? "Your calendar reminds you, even when iKAN is closed."}
         </p>
       </BottomSheet>

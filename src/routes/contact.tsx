@@ -91,14 +91,14 @@ function ContactPage() {
                 <a
                   key={b.label}
                   href={b.action}
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-on-error-container px-4 text-[14px] font-semibold text-error-container"
+                  className="type-body-md font-semibold inline-flex h-10 items-center gap-2 rounded-full bg-on-error-container px-4 text-error-container"
                 >
                   <Phone className="h-4 w-4" /> {b.label}
                 </a>
               ))}
               <Link
                 to="/support"
-                className="inline-flex h-10 items-center rounded-full border border-on-error-container/30 px-4 text-[14px] font-semibold"
+                className="type-body-md font-semibold inline-flex h-10 items-center rounded-full border border-on-error-container/30 px-4"
               >
                 More helplines
               </Link>
@@ -112,17 +112,17 @@ function ContactPage() {
           <li key={m.title}>
             <a href={m.action} className="block h-full rounded-[20px] bg-secondary p-4">
               {m.icon === "phone" ? <Phone className="h-5 w-5" /> : <Mail className="h-5 w-5" />}
-              <p className="mt-3 text-[15px] font-semibold">{m.title}</p>
+              <p className="type-action mt-3">{m.title}</p>
               <p className="type-label-md mt-0.5 text-muted-foreground">{m.description}</p>
-              <p className="mt-2 break-all text-[13px] font-semibold">{m.value}</p>
+              <p className="type-body-sm font-semibold mt-2 break-all">{m.value}</p>
             </a>
           </li>
         ))}
       </ul>
 
       <section className="mx-5 mt-8">
-        <h2 className="font-display text-[20px] font-semibold">{c.formTitle}</h2>
-        <p className="mt-1 text-[14px] text-muted-foreground">{c.formSubtitle}</p>
+        <h2 className="type-title-lg font-semibold">{c.formTitle}</h2>
+        <p className="type-body-md mt-1 text-muted-foreground">{c.formSubtitle}</p>
         {sent ? (
           <div className="mt-4 overflow-hidden rounded-[24px] bg-[#DFF0E8] text-[#173D2F]">
             <div className="h-24">
@@ -163,7 +163,7 @@ function ContactPage() {
               error={show("subject")}
             />
             <label className="block">
-              <span className="mb-1.5 flex justify-between text-[13px] font-medium text-muted-foreground">
+              <span className="type-body-sm font-medium mb-1.5 flex justify-between text-muted-foreground">
                 Message
                 <span className="tabular-nums">{message.length}/2000</span>
               </span>
@@ -176,7 +176,7 @@ function ContactPage() {
                 className={`w-full resize-none rounded-[16px] border bg-secondary px-4 py-3 text-[16px] outline-none focus:border-foreground/60 focus:bg-background ${show("message") ? "border-error" : "border-transparent"}`}
               />
               {show("message") ? (
-                <span role="alert" className="mt-1.5 block text-[13px] text-error">
+                <span role="alert" className="type-body-sm mt-1.5 block text-error">
                   {show("message")}
                 </span>
               ) : null}
@@ -189,7 +189,7 @@ function ContactPage() {
       <Link to="/faq" className="mx-5 mt-8 block rounded-[24px] border border-foreground/10 p-5">
         <p className="font-display text-[17px] font-semibold">{c.faqCard.title}</p>
         <p className="type-label-lg mt-1 text-muted-foreground">{c.faqCard.description}</p>
-        <span className="mt-3 inline-block text-[14px] font-semibold underline">
+        <span className="type-body-md font-semibold mt-3 inline-block underline">
           {c.faqCard.buttonText}
         </span>
       </Link>

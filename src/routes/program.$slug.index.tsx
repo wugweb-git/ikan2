@@ -125,9 +125,7 @@ function ProgrammePage() {
           <IconButton label="Back" onClick={() => navigate({ to: "/program" })}>
             <ArrowLeft className="h-6 w-6" />
           </IconButton>
-          <p className="flex-1 truncate px-2 font-display text-[20px] font-semibold">
-            {programme.name}
-          </p>
+          <p className="type-title-lg font-semibold flex-1 truncate px-2">{programme.name}</p>
         </div>
 
         <header className="relative h-56 overflow-hidden">
@@ -153,18 +151,18 @@ function ProgrammePage() {
           <span className="grid h-14 w-14 place-items-center rounded-[18px] border-4 border-background bg-[var(--accent-container)] text-[var(--on-accent-container)]">
             <Sparkles className="h-7 w-7" />
           </span>
-          <p className="mt-5 text-[14px] font-medium text-[var(--accent-strong)]">Equip program</p>
+          <p className="type-label-lg mt-5 text-[var(--accent-strong)]">Equip program</p>
           <h1 className="mt-1 font-display text-[30px] font-semibold leading-9">
             {programme.name}
           </h1>
           <div className="mt-4 flex flex-wrap gap-2">
-            <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
+            <span className="type-body-md inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3">
               <CalendarDays className="h-4 w-4" /> {dayCount(programme)} days
             </span>
-            <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
+            <span className="type-body-md inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3">
               <Clock3 className="h-4 w-4" /> 5–10 min a day
             </span>
-            <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
+            <span className="type-body-md inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3">
               <Gauge className="h-4 w-4" /> {level}
             </span>
             {runs.length || started ? (
@@ -174,7 +172,7 @@ function ProgrammePage() {
                     to="/history/program/$slug"
                     params={{ slug }}
                     className={cn(
-                      "inline-flex h-8 items-center gap-1.5 rounded-full bg-[var(--accent-container)] pl-3 pr-2 text-[14px] font-semibold text-[var(--on-accent-container)]",
+                      "type-body-md font-semibold inline-flex h-8 items-center gap-1.5 rounded-full bg-[var(--accent-container)] pl-3 pr-2 text-[var(--on-accent-container)]",
                       stateLayer,
                     )}
                   >
@@ -188,7 +186,7 @@ function ProgrammePage() {
                     to="/diaries/$slug"
                     params={{ slug }}
                     className={cn(
-                      "inline-flex h-8 items-center gap-1.5 rounded-full bg-foreground/[0.06] pl-3 pr-2 text-[14px] font-semibold",
+                      "type-body-md font-semibold inline-flex h-8 items-center gap-1.5 rounded-full bg-foreground/[0.06] pl-3 pr-2",
                       stateLayer,
                     )}
                   >
@@ -206,8 +204,8 @@ function ProgrammePage() {
           <div className="mt-6 px-4">
             <section className="rounded-[28px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
               <div className="flex items-baseline justify-between gap-3">
-                <p className="text-[13px] font-semibold">Up next</p>
-                <p className="text-[13px] font-medium">About {minutesOf(today)} min</p>
+                <p className="type-body-sm font-semibold">Up next</p>
+                <p className="type-body-sm font-medium">About {minutesOf(today)} min</p>
               </div>
               <p className="mt-1 font-display text-[26px] font-semibold leading-8 tabular-nums">
                 {today.day === 0 ? "Onboarding" : `Day ${today.day}`}
@@ -229,17 +227,17 @@ function ProgrammePage() {
                 }}
               />
               {shown.length ? (
-                <ol className="mt-4 space-y-1.5 text-[15px]">
+                <ol className="type-action mt-4 space-y-1.5">
                   {shown.map((t, i) => (
                     <li key={i} className="flex items-center gap-3">
-                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-background/60 text-[12px] font-semibold tabular-nums">
+                      <span className="type-label-md font-semibold grid h-6 w-6 shrink-0 place-items-center rounded-full bg-background/60 tabular-nums">
                         {i + 1}
                       </span>
                       <span className="truncate">{t}</span>
                     </li>
                   ))}
                   {uniqueActivities.length > shown.length ? (
-                    <li className="pl-9 text-[14px] opacity-80">
+                    <li className="type-body-md pl-9 opacity-80">
                       and {uniqueActivities.length - shown.length} more
                     </li>
                   ) : null}
@@ -297,7 +295,7 @@ function ProgrammePage() {
                     <p className="text-[15px] font-medium leading-5">{u.title}</p>
                     <p className="type-body-sm text-muted-foreground">{focusOf(programme, i)}</p>
                   </div>
-                  <p className="shrink-0 text-right text-[12px] tabular-nums text-muted-foreground">
+                  <p className="type-label-md shrink-0 text-right tabular-nums text-muted-foreground">
                     {range}
                   </p>
                 </li>
@@ -321,7 +319,7 @@ function ProgrammePage() {
             )}
           >
             <LifeBuoy className="h-6 w-6" />
-            <span className="flex-1 text-[16px] font-medium">Get support now</span>
+            <span className="type-body-lg font-medium flex-1">Get support now</span>
             <ChevronRight className="h-5 w-5" />
           </Link>
         </div>
@@ -329,7 +327,7 @@ function ProgrammePage() {
         <div className="sticky bottom-[88px] z-20 mt-6 bg-gradient-to-t from-background via-background to-transparent px-4 pb-3 pt-6">
           {started && today ? (
             <Button
-              className="h-14 w-full text-[16px]"
+              className="type-body-lg h-14 w-full"
               icon={<Play className="h-5 w-5" />}
               onClick={openToday}
             >
@@ -337,7 +335,7 @@ function ProgrammePage() {
             </Button>
           ) : (
             <Button
-              className="h-14 w-full text-[16px]"
+              className="type-body-lg h-14 w-full"
               icon={<Play className="h-5 w-5" />}
               onClick={before.request}
             >
@@ -411,7 +409,7 @@ function DayGrid({
 }) {
   return (
     <section className="mt-3 rounded-[20px] bg-background p-3">
-      <p className="px-1 text-[13px] tabular-nums text-muted-foreground">
+      <p className="type-body-sm px-1 tabular-nums text-muted-foreground">
         {daysDoneOf(programme, completed)} of {dayCount(programme)} days done
       </p>
       <ol className="mt-2 grid grid-cols-7 gap-y-2">
@@ -421,7 +419,7 @@ function DayGrid({
           const cell = (
             <span
               className={cn(
-                "mx-auto grid h-10 w-10 place-items-center rounded-full text-[14px] font-medium tabular-nums",
+                "type-label-lg mx-auto grid h-10 w-10 place-items-center rounded-full tabular-nums",
                 done && "bg-foreground text-background",
                 open && "border-2 border-[var(--accent)] font-semibold text-foreground",
                 !done && !open && "text-muted-foreground/60",
@@ -457,8 +455,8 @@ function DayGrid({
 function Tools({ programme, reached }: { programme: Programme; reached: number }) {
   return (
     <section className="mt-8">
-      <h2 className="font-display text-[16px] font-semibold">Tools</h2>
-      <p className="mt-1 text-[14px] text-muted-foreground">
+      <h2 className="type-title-md">Tools</h2>
+      <p className="type-body-md mt-1 text-muted-foreground">
         Open these any time once you reach them.
       </p>
       <ul className="-mx-4 mt-1">
@@ -473,14 +471,16 @@ function Tools({ programme, reached }: { programme: Programme; reached: number }
                   className={cn("flex min-h-14 items-center gap-4 px-4", stateLayer)}
                 >
                   <Wrench className="h-6 w-6" />
-                  <span className="flex-1 text-[16px]">{t.title}</span>
+                  <span className="type-body-lg flex-1">{t.title}</span>
                   <ChevronRight className="h-5 w-5 text-muted-foreground" />
                 </Link>
               ) : (
                 <p className="flex min-h-14 items-center gap-4 px-4 text-muted-foreground">
                   <Lock className="h-5 w-5" />
-                  <span className="flex-1 text-[16px]">{t.title}</span>
-                  <span className="text-[13px]">{t.day === 0 ? "Onboarding" : `Day ${t.day}`}</span>
+                  <span className="type-body-lg flex-1">{t.title}</span>
+                  <span className="type-body-sm">
+                    {t.day === 0 ? "Onboarding" : `Day ${t.day}`}
+                  </span>
                 </p>
               )}
             </li>

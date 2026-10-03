@@ -375,7 +375,7 @@ function SkyHeader({
       <div className="relative flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <p
-            className="flex min-h-5 flex-wrap items-center gap-x-3 text-[13px] font-medium"
+            className="type-body-sm font-medium flex min-h-5 flex-wrap items-center gap-x-3"
             style={{ color: s.muted }}
           >
             <span>
@@ -402,7 +402,7 @@ function SkyHeader({
           <h1 className="mt-1 font-display text-[30px] font-semibold leading-9 tracking-[-0.01em]">
             {greeting}
           </h1>
-          <p className="mt-1 min-h-5 text-[14px]" style={{ color: s.muted }}>
+          <p className="type-body-md mt-1 min-h-5" style={{ color: s.muted }}>
             {subline}
           </p>
         </div>
@@ -454,7 +454,7 @@ function AboutYouPrompt() {
         <UserRoundPen className="h-5 w-5" />
       </span>
       <Link to="/welcome" search={{ step: "about" }} className="min-w-0 flex-1">
-        <span className="block text-[15px] font-semibold">Finish your profile</span>
+        <span className="type-action block">Finish your profile</span>
         <span className="type-body-sm block text-muted-foreground">
           Date of birth, city and a few details, so suggestions fit you.
         </span>
@@ -500,8 +500,8 @@ function HealthCard() {
       <section className="mx-4 rounded-[24px] bg-secondary p-4">
         <div className="flex items-center gap-2">
           <Watch className="h-5 w-5" />
-          <h2 className="flex-1 font-display text-[16px] font-semibold">Your last 7 days</h2>
-          <Link to="/settings" className="text-[13px] font-semibold text-muted-foreground">
+          <h2 className="type-title-md flex-1">Your last 7 days</h2>
+          <Link to="/settings" className="type-body-sm font-semibold text-muted-foreground">
             Health Connect
           </Link>
         </div>
@@ -509,7 +509,7 @@ function HealthCard() {
           {tiles.map((t) => (
             <div key={t.l} className="rounded-[16px] bg-background p-3">
               <p className="font-display text-[18px] font-semibold tabular-nums">{t.v}</p>
-              <p className="text-[12px] text-muted-foreground">{t.l}</p>
+              <p className="type-label-md text-muted-foreground">{t.l}</p>
             </div>
           ))}
         </div>
@@ -529,8 +529,8 @@ function HealthCard() {
         <Watch className="h-5 w-5" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[15px] font-semibold">Add sleep and steps</span>
-        <span className="block text-[13px] text-muted-foreground">
+        <span className="type-action block">Add sleep and steps</span>
+        <span className="type-body-sm block text-muted-foreground">
           Connect Health Connect to see them next to your score
         </span>
       </span>
@@ -609,7 +609,7 @@ function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
   if (!loggedToday) {
     return (
       <section className="mx-4 rounded-[28px] bg-foreground p-5 text-background">
-        <p className="text-[13px] opacity-70">Today’s check-in</p>
+        <p className="type-body-sm opacity-70">Today’s check-in</p>
         <p className="mt-1 font-display text-[22px] font-semibold leading-7">
           How are you feeling?
         </p>
@@ -632,7 +632,9 @@ function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
             </Link>
           ))}
         </div>
-        <p className="mt-3 text-[12px] opacity-60">Tap one to start. It takes about 30 seconds.</p>
+        <p className="type-label-md mt-3 opacity-60">
+          Tap one to start. It takes about 30 seconds.
+        </p>
       </section>
     );
   }
@@ -658,7 +660,7 @@ function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-display text-[19px] font-semibold">You’re done for today</span>
-        <span className="mt-0.5 block text-[14px]">Check-in logged. See you tomorrow.</span>
+        <span className="type-body-md mt-0.5 block">Check-in logged. See you tomorrow.</span>
       </span>
     </section>
   );
@@ -701,19 +703,19 @@ function NextStep({
           <Illustration art={art} />
         ) : null}
         <div className="absolute inset-0 bg-gradient-to-t from-foreground to-transparent" />
-        <span className="absolute left-5 top-4 rounded-full bg-black/45 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur">
+        <span className="type-label-md font-semibold absolute left-5 top-4 rounded-full bg-black/45 px-2.5 py-1 text-white backdrop-blur">
           {label}
         </span>
       </div>
       <div className="px-5 pb-5">
         <p className="font-display text-[21px] font-semibold leading-7">{title}</p>
-        <p className="mt-1 text-[13px] opacity-70">{meta}</p>
+        <p className="type-body-sm mt-1 opacity-70">{meta}</p>
         {progress !== undefined ? (
           <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/15">
             <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
           </div>
         ) : null}
-        <span className="mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-background px-5 text-[15px] font-semibold text-foreground">
+        <span className="type-action mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-background px-5 text-foreground">
           <Play className="h-4 w-4" /> {cta}
         </span>
       </div>
@@ -742,13 +744,13 @@ function Section({
           {action ? (
             <Link
               to={action.to}
-              className="shrink-0 text-[14px] font-semibold text-muted-foreground hover:text-foreground"
+              className="type-body-md font-semibold shrink-0 text-muted-foreground hover:text-foreground"
             >
               {action.label}
             </Link>
           ) : null}
         </div>
-        {note ? <p className="mt-0.5 text-[13px] text-muted-foreground">{note}</p> : null}
+        {note ? <p className="type-body-sm mt-0.5 text-muted-foreground">{note}</p> : null}
       </div>
       {children}
     </section>
@@ -813,11 +815,11 @@ function ScoreCard({
         </span>
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[13px] text-muted-foreground">iKAN Score</span>
+        <span className="type-body-sm block text-muted-foreground">iKAN Score</span>
         <span className="block font-display text-[19px] font-semibold leading-6">
           {band ? band.label : hydrated ? "Starts with your first check-in" : ""}
         </span>
-        <span className="mt-0.5 block text-[13px] text-muted-foreground">
+        <span className="type-body-sm mt-0.5 block text-muted-foreground">
           {score === null
             ? "Mood, assessments and programs all count"
             : change === null
@@ -878,8 +880,10 @@ function Recommended({ data, hydrated }: { data: Data; hydrated: boolean }) {
             <img src={p.cover} alt="" className="absolute inset-0 h-full w-full object-cover" />
             <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
             <span className="absolute inset-x-0 bottom-0 p-4">
-              <span className="block text-[12px] font-semibold opacity-80">{dayCount(p)} days</span>
-              <span className="block font-display text-[20px] font-semibold">{p.name}</span>
+              <span className="type-label-md font-semibold block opacity-80">
+                {dayCount(p)} days
+              </span>
+              <span className="type-title-lg font-semibold block">{p.name}</span>
               {p.source.description ? (
                 <span className="type-label-md mt-0.5 line-clamp-2 opacity-85">
                   {p.source.description}
@@ -925,10 +929,8 @@ function YourPrograms({ data, hydrated }: { data: Data; hydrated: boolean }) {
                   />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-baseline justify-between gap-2">
-                      <span className="truncate font-display text-[16px] font-semibold">
-                        {p.name}
-                      </span>
-                      <span className="text-[12px] tabular-nums text-muted-foreground">
+                      <span className="type-title-md truncate">{p.name}</span>
+                      <span className="type-label-md tabular-nums text-muted-foreground">
                         {done} of {dayCount(p)} days
                       </span>
                     </span>
@@ -955,7 +957,7 @@ function YourPrograms({ data, hydrated }: { data: Data; hydrated: boolean }) {
             >
               <img src={p.cover} alt="" className="h-[112px] w-full rounded-[20px] object-cover" />
               <span className="mt-2 block font-display text-[15px] font-semibold">{p.name}</span>
-              <span className="block text-[12px] text-muted-foreground">{dayCount(p)} days</span>
+              <span className="type-label-md block text-muted-foreground">{dayCount(p)} days</span>
             </Link>
           ))}
         </div>
@@ -1015,7 +1017,7 @@ function ThisWeek({ data, hydrated }: { data: Data; hydrated: boolean }) {
             );
           })}
         </div>
-        <p className="mt-3 flex items-center gap-2 text-[13px] text-muted-foreground">
+        <p className="type-body-sm mt-3 flex items-center gap-2 text-muted-foreground">
           {run > 0 ? <Flame className="h-4 w-4 text-[#C4552E]" /> : null}
           {run > 0
             ? `${run}-day run, ${logged} of 7 days logged`
@@ -1052,7 +1054,7 @@ function Library() {
             </span>
             <span className="flex flex-1 flex-col p-3">
               <span className="line-clamp-3 text-[15px] font-semibold leading-5">{r.title}</span>
-              <span className="mt-auto flex items-center gap-2 pt-2 text-[12px] text-muted-foreground">
+              <span className="type-label-md mt-auto flex items-center gap-2 pt-2 text-muted-foreground">
                 <span className="rounded-full bg-background px-2 py-0.5 font-medium">
                   {r.category}
                 </span>
@@ -1098,8 +1100,8 @@ function RecentResults({ data, hydrated }: { data: Data; hydrated: boolean }) {
                     they are scores already recorded, and each carries its band on the right. */}
                 <ChartNoAxesColumn className="h-5 w-5 shrink-0 text-muted-foreground" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[15px] font-medium">{a.title}</span>
-                  <DateText className="text-[12px] text-muted-foreground">
+                  <span className="type-action font-medium block truncate">{a.title}</span>
+                  <DateText className="type-label-md text-muted-foreground">
                     {new Date(r.completedAt).toLocaleDateString("en-IN", {
                       day: "numeric",
                       month: "short",
@@ -1113,7 +1115,7 @@ function RecentResults({ data, hydrated }: { data: Data; hydrated: boolean }) {
                     severity={head.band.severity}
                   />
                 ) : (
-                  <span className="text-[12px] text-muted-foreground">5 scores</span>
+                  <span className="type-label-md text-muted-foreground">5 scores</span>
                 )}
               </Link>
             </li>
@@ -1144,7 +1146,7 @@ function ReassessPrompt({ data, hydrated }: { data: Data; hydrated: boolean }) {
         <span className="mt-3 flex items-center gap-2">
           <Link
             to="/assessments"
-            className="inline-flex h-9 items-center rounded-full bg-foreground px-4 text-[13px] font-semibold text-background"
+            className="type-body-sm font-semibold inline-flex h-9 items-center rounded-full bg-foreground px-4 text-background"
           >
             Choose an assessment
           </Link>
@@ -1154,7 +1156,7 @@ function ReassessPrompt({ data, hydrated }: { data: Data; hydrated: boolean }) {
               dismissReassess();
               setHidden(true);
             }}
-            className="h-9 rounded-full px-3 text-[13px] font-medium text-muted-foreground"
+            className="type-body-sm font-medium h-9 rounded-full px-3 text-muted-foreground"
           >
             Not now
           </button>
@@ -1190,7 +1192,7 @@ function CurrentProgram({ data, hydrated }: { data: Data; hydrated: boolean }) {
   const pct = Math.round((done / dayCount(cur.p)) * 100);
   return (
     <section className="px-4">
-      <p className="mb-2 text-[13px] font-semibold text-muted-foreground">Your program</p>
+      <p className="type-body-sm font-semibold mb-2 text-muted-foreground">Your program</p>
       <div className="hero-card">
         <img src={cur.p.cover} alt="" className="hero-media" />
         <div className="hero-veil" />
@@ -1201,7 +1203,7 @@ function CurrentProgram({ data, hydrated }: { data: Data; hydrated: boolean }) {
               <h2 className="mt-2 font-display text-[26px] font-bold tracking-[-0.02em]">
                 {cur.p.name}
               </h2>
-              <p className="mt-1 text-[13px] opacity-75">
+              <p className="type-body-sm mt-1 opacity-75">
                 {cur.next === 0 ? "Onboarding" : `Day ${cur.next} · ${cur.day!.title}`} · {done} of{" "}
                 {dayCount(cur.p)} days done
               </p>
@@ -1218,21 +1220,21 @@ function CurrentProgram({ data, hydrated }: { data: Data; hydrated: boolean }) {
           <div className="hero-track mt-4">
             <i style={{ width: `${pct}%` }} />
           </div>
-          <p className="mt-3 text-[14px] opacity-85">
+          <p className="type-body-md mt-3 opacity-85">
             Ready for your next session? Takes about {Math.max(5, minutesOf(cur.day!))} minutes.
           </p>
           <div className="mt-4 flex gap-2">
             <Link
               to="/program/$slug/day/$day"
               params={{ slug: cur.p.slug, day: String(cur.next) }}
-              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-background text-[14px] font-semibold text-foreground transition-transform active:scale-[.97]"
+              className="type-body-md font-semibold inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-background text-foreground transition-transform active:scale-[.97]"
             >
               <Play className="h-4 w-4" /> Start session
             </Link>
             <Link
               to="/program/$slug"
               params={{ slug: cur.p.slug }}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/25 px-4 text-[14px] font-semibold hover:bg-white/10"
+              className="type-body-md font-semibold inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/25 px-4 hover:bg-white/10"
             >
               <CalendarCheck className="h-4 w-4" /> Progress
             </Link>
@@ -1289,7 +1291,7 @@ function ActivityRow({ title, meta, progress }: { title: string; meta: string; p
       </span>
       <span className="min-w-0">
         <span className="block truncate font-display text-[15px] font-semibold">{title}</span>
-        <span className="mt-0.5 block truncate text-[13px] text-muted-foreground">{meta}</span>
+        <span className="type-body-sm mt-0.5 block truncate text-muted-foreground">{meta}</span>
       </span>
       <span className="grid h-9 w-9 place-items-center rounded-full bg-foreground text-background">
         {progress > 0 ? <Play className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
@@ -1351,7 +1353,7 @@ function Offerings({ data, hydrated }: { data: Data; hydrated: boolean }) {
               </span>
               <span className="min-w-0">
                 <span className="block font-display text-[15px] font-semibold">{o.label}</span>
-                <span className="mt-0.5 block text-[13px] text-muted-foreground">{o.meta}</span>
+                <span className="type-body-sm mt-0.5 block text-muted-foreground">{o.meta}</span>
               </span>
             </Link>
           );
@@ -1375,14 +1377,14 @@ function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
     <section className="surface mx-4 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[13px] font-semibold text-muted-foreground">Today’s check-in</p>
+          <p className="type-body-sm font-semibold text-muted-foreground">Today’s check-in</p>
           <h2 className="mt-1 font-display text-[17px] font-semibold">How are you feeling?</h2>
         </div>
-        <span className="rounded-full bg-secondary px-2.5 py-1 text-[12px] text-muted-foreground">
+        <span className="type-label-md rounded-full bg-secondary px-2.5 py-1 text-muted-foreground">
           {logged.length ? `${logged.length} today` : "40 sec"}
         </span>
       </div>
-      <p className="mt-1 text-[13px] text-muted-foreground">
+      <p className="type-body-sm mt-1 text-muted-foreground">
         Mood, sleep, stress and pain in a few quick taps.
       </p>
       <div className="mt-4 grid grid-cols-5 gap-2">
@@ -1403,7 +1405,7 @@ function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
       </div>
       <Link
         to="/journal"
-        className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-foreground text-[14px] font-semibold text-background transition-transform active:scale-[.98]"
+        className="type-body-md font-semibold mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-foreground text-background transition-transform active:scale-[.98]"
       >
         <Plus className="h-4 w-4" /> {logged.length ? "Add another check-in" : "Log today’s mood"}
       </Link>
@@ -1419,9 +1421,9 @@ function SupportCard({ city }: { city: string }) {
           <Heart className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <p className="text-[12px] font-semibold text-on-error-container">Support</p>
-          <h2 className="font-display text-[16px] font-semibold">Let’s talk about it</h2>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">
+          <p className="type-label-md font-semibold text-on-error-container">Support</p>
+          <h2 className="type-title-md">Let’s talk about it</h2>
+          <p className="type-body-sm mt-0.5 text-muted-foreground">
             {consultants.length} consultants{city ? ` for you in ${city}` : ""}, with video, call
             and chat sessions.
           </p>
@@ -1429,7 +1431,7 @@ function SupportCard({ city }: { city: string }) {
       </div>
       <Link
         to="/consult"
-        className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-on-error-container text-[14px] font-semibold text-error-container transition-transform active:scale-[.98]"
+        className="type-body-md font-semibold mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-on-error-container text-error-container transition-transform active:scale-[.98]"
       >
         <CalendarDays className="h-4 w-4" /> Book a consultation
       </Link>

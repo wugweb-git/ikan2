@@ -84,7 +84,7 @@ export function StatusDot({
   className?: string | undefined;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-[13px]", className)}>
+    <span className={cn("type-body-sm inline-flex items-center gap-1.5", className)}>
       <span
         className="h-2.5 w-2.5 shrink-0 rounded-full"
         style={{ background: color }}

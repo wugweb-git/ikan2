@@ -72,7 +72,7 @@ export function Disclosure({
       >
         {leading}
         <span className="min-w-0 flex-1">{title}</span>
-        {meta ? <span className="shrink-0 text-[13px] text-muted-foreground">{meta}</span> : null}
+        {meta ? <span className="type-body-sm shrink-0 text-muted-foreground">{meta}</span> : null}
         <Chevron
           className={cn(
             "h-5 w-5 shrink-0 text-muted-foreground transition-transform",

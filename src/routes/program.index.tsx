@@ -43,7 +43,7 @@ function ProgramsPage() {
           </Link>
         </div>
         <h1 className="type-headline-lg">Programs</h1>
-        <p className="mt-1 text-[15px] text-muted-foreground">
+        <p className="type-action mt-1 text-muted-foreground">
           Short daily sessions, one skill at a time.
         </p>
       </header>
@@ -55,15 +55,15 @@ function ProgramsPage() {
         ))}
       </ul>
       <section className="mt-8 px-4">
-        <h2 className="font-display text-[16px] font-semibold">Coming soon</h2>
+        <h2 className="type-title-md">Coming soon</h2>
         <ul className="mt-2">
           {upcoming.map((u) => (
             <li
               key={u.name}
-              className="flex min-h-14 items-center justify-between rounded-[16px] border border-dashed border-foreground/20 px-4 text-[16px] text-muted-foreground"
+              className="type-body-lg flex min-h-14 items-center justify-between rounded-[16px] border border-dashed border-foreground/20 px-4 text-muted-foreground"
             >
               {u.name}
-              <span className="text-[13px]">Soon</span>
+              <span className="type-body-sm">Soon</span>
             </li>
           ))}
         </ul>
@@ -101,13 +101,13 @@ function ProgrammeCard({ programme }: { programme: Programme }) {
                   style={{ width: `${(done / total) * 100}%` }}
                 />
               </div>
-              <p className="mt-2 flex items-center justify-between text-[13px] font-medium text-[var(--accent-strong)]">
+              <p className="type-body-sm font-medium mt-2 flex items-center justify-between text-[var(--accent-strong)]">
                 {done < total ? `Continue with day ${nextDay}` : "All days done"}
                 <ChevronRight className="h-4 w-4" />
               </p>
             </>
           ) : (
-            <p className="flex items-center justify-between text-[13px] text-muted-foreground">
+            <p className="type-body-sm flex items-center justify-between text-muted-foreground">
               <span>
                 {total} days, {src.meta.level.charAt(0).toUpperCase() + src.meta.level.slice(1)}
               </span>

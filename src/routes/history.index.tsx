@@ -81,7 +81,7 @@ function HistoryPage() {
         />
         <header className="px-4 pb-1">
           <h1 className="type-headline-lg">My history</h1>
-          <p className="mt-1 text-[15px] text-muted-foreground">
+          <p className="type-action mt-1 text-muted-foreground">
             Your assessments, programs and journal, in one place
           </p>
         </header>
@@ -89,7 +89,7 @@ function HistoryPage() {
         <section className="mx-4 mt-5 overflow-hidden rounded-[28px] bg-foreground text-background">
           <div className="flex items-center gap-4 p-5">
             <div className="min-w-0 flex-1">
-              <p className="text-[13px] opacity-70">This week</p>
+              <p className="type-body-sm opacity-70">This week</p>
               <p className="mt-1 font-display text-[22px] font-semibold leading-7">
                 {week.length === 0
                   ? "A fresh week"
@@ -180,8 +180,8 @@ function HistoryPage() {
             >
               <t.icon className="h-5 w-5 shrink-0" />
               <span className="min-w-0 flex-1">
-                <span className="block text-[14px] font-semibold">{t.label}</span>
-                <span className="block text-[12px] text-muted-foreground">{t.sub}</span>
+                <span className="type-body-md font-semibold block">{t.label}</span>
+                <span className="type-label-md block text-muted-foreground">{t.sub}</span>
               </span>
               <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
             </Link>
@@ -203,7 +203,7 @@ function HistoryPage() {
                 aria-selected={on}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  "inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5 text-[14px] font-medium transition-colors",
+                  "type-label-lg inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5 transition-colors",
                   stateLayer,
                   on
                     ? "border-transparent bg-[var(--accent-container)] text-[var(--on-accent-container)]"
@@ -224,7 +224,7 @@ function HistoryPage() {
             action={
               <Link
                 to="/journal"
-                className="inline-flex h-11 items-center rounded-full bg-foreground px-5 text-[14px] font-semibold text-background"
+                className="type-body-md font-semibold inline-flex h-11 items-center rounded-full bg-foreground px-5 text-background"
               >
                 Log today’s mood
               </Link>
@@ -236,7 +236,7 @@ function HistoryPage() {
           <div className="mt-2 px-4">
             {groups.map((g) => (
               <section key={g.label} className="mt-4">
-                <h2 className="text-[13px] font-semibold text-muted-foreground">{g.label}</h2>
+                <h2 className="type-body-sm font-semibold text-muted-foreground">{g.label}</h2>
                 <ol className="relative mt-2 space-y-1 before:absolute before:bottom-4 before:left-[22px] before:top-4 before:w-px before:bg-foreground/10">
                   {g.items.map((e) => (
                     <li key={e.id}>
@@ -268,7 +268,7 @@ function Stat({
     <div className="rounded-[20px] p-3" style={{ background: meta.soft, color: meta.color }}>
       <Icon className="h-5 w-5" />
       <p className="mt-2 font-display text-[24px] font-bold leading-7 tabular-nums">{value}</p>
-      <p className="text-[12px] font-medium">{label}</p>
+      <p className="type-label-md">{label}</p>
     </div>
   );
 }
@@ -289,7 +289,7 @@ function EventRow({ e }: { e: ActivityEvent }) {
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-2">
-          <span className="truncate text-[15px] font-semibold">{e.title}</span>
+          <span className="type-action truncate">{e.title}</span>
           {e.tone ? (
             <span
               className="h-2 w-2 shrink-0 rounded-full"
@@ -297,9 +297,9 @@ function EventRow({ e }: { e: ActivityEvent }) {
             />
           ) : null}
         </span>
-        <span className="line-clamp-1 text-[13px] text-muted-foreground">{e.detail}</span>
+        <span className="type-body-sm line-clamp-1 text-muted-foreground">{e.detail}</span>
       </span>
-      <span className="text-[12px] tabular-nums text-muted-foreground">
+      <span className="type-label-md tabular-nums text-muted-foreground">
         {new Date(e.at).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}
       </span>
       <ChevronRight className="h-4 w-4 text-muted-foreground" />

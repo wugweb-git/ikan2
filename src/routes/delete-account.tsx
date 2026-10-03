@@ -98,7 +98,7 @@ function DeleteAccountPage() {
 
         {signedIn ? (
           <div className="mt-8 rounded-[20px] border border-foreground/15 p-5">
-            <p className="flex items-center gap-2 text-[15px] font-semibold">
+            <p className="type-action flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" aria-hidden="true" />
               Signed in as {user?.email ?? user?.phone ?? "your account"}
             </p>
@@ -108,7 +108,7 @@ function DeleteAccountPage() {
             <div className="mt-3">
               <TextField label="Confirm" value={confirm} onChange={setConfirm} />
             </div>
-            {error ? <p className="mt-3 text-[14px] text-error">{error}</p> : null}
+            {error ? <p className="type-body-md mt-3 text-error">{error}</p> : null}
             <Button
               className="mt-4"
               variant="filled"
@@ -120,7 +120,7 @@ function DeleteAccountPage() {
           </div>
         ) : (
           <div className="mt-8 rounded-[20px] border border-foreground/15 p-5">
-            <p className="text-[15px] font-semibold">Sign in to delete your account</p>
+            <p className="type-action">Sign in to delete your account</p>
             <p className="mt-2 text-[14px] leading-6 text-muted-foreground">
               We ask you to sign in so that only you can delete your account. If you can no longer
               sign in, email{" "}

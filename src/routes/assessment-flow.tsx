@@ -151,7 +151,7 @@ function AssessmentFlowPage() {
             <p className="min-w-0 flex-1 truncate px-2 font-display text-[18px] font-semibold">
               {a.name}
             </p>
-            <p className="px-4 text-[14px] tabular-nums text-muted-foreground" aria-live="polite">
+            <p className="type-body-md px-4 tabular-nums text-muted-foreground" aria-live="polite">
               {index + 1} of {total}
             </p>
           </div>
@@ -162,14 +162,14 @@ function AssessmentFlowPage() {
 
         <main className="flex-1 px-4 pb-36 pt-6">
           {resumed ? (
-            <p className="mb-5 rounded-[12px] bg-[var(--accent-container)] px-4 py-3 text-[14px] text-[var(--on-accent-container)]">
+            <p className="type-body-md mb-5 rounded-[12px] bg-[var(--accent-container)] px-4 py-3 text-[var(--on-accent-container)]">
               Picking up where you left off.
             </p>
           ) : null}
 
           <div key={question.id} className="animate-fade">
             {partLabel ? (
-              <p className="text-[14px] font-medium text-[var(--accent-strong)]">{partLabel}</p>
+              <p className="type-label-lg text-[var(--accent-strong)]">{partLabel}</p>
             ) : null}
             {scale.prompt ? (
               <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{scale.prompt}</p>

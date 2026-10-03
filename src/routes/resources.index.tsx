@@ -107,7 +107,7 @@ function ResourcesPage() {
       <div style={accentStyle("calm")}>
         <header className="safe-top px-4 pb-1">
           <h1 className="type-headline-lg">Resources</h1>
-          <p className="mt-1 text-[15px] text-muted-foreground">
+          <p className="type-action mt-1 text-muted-foreground">
             Articles and guides to support your mental health journey
           </p>
         </header>
@@ -128,7 +128,7 @@ function ResourcesPage() {
                   <Illustration art={r.art} className="absolute inset-0" />
                   <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-5">
-                    <span className="inline-flex h-6 items-center gap-1.5 rounded-full bg-white/20 px-2.5 text-[12px] font-semibold backdrop-blur">
+                    <span className="type-label-md font-semibold inline-flex h-6 items-center gap-1.5 rounded-full bg-white/20 px-2.5 backdrop-blur">
                       {(() => {
                         const Icon = mediumIcon[mediumOf(r)];
                         return <Icon className="h-3.5 w-3.5" />;
@@ -138,7 +138,7 @@ function ResourcesPage() {
                     <h2 className="mt-2 line-clamp-3 font-display text-[20px] font-semibold leading-6">
                       {r.title}
                     </h2>
-                    <span className="mt-2 flex items-center gap-3 text-[13px] opacity-85">
+                    <span className="type-body-sm mt-2 flex items-center gap-3 opacity-85">
                       <span className="inline-flex items-center gap-1.5">
                         <CalendarDays className="h-3.5 w-3.5" /> {dateLabel(r.date)}
                       </span>
@@ -176,7 +176,7 @@ function ResourcesPage() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search the library"
                 aria-label="Search the library"
-                className="h-full min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-muted-foreground"
+                className="type-body-md h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
               />
               <button
                 type="button"
@@ -221,7 +221,7 @@ function ResourcesPage() {
                       aria-selected={on}
                       onClick={() => setFilter(f)}
                       className={cn(
-                        "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[8px] border px-3.5 text-[14px] font-medium transition-colors",
+                        "type-label-lg inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[8px] border px-3.5 transition-colors",
                         stateLayer,
                         on
                           ? "border-transparent bg-[var(--accent-container)] text-[var(--on-accent-container)]"
@@ -231,7 +231,7 @@ function ResourcesPage() {
                       {f === "Saved" ? <Bookmark className="h-4 w-4" /> : null}
                       {Icon ? <Icon className="h-4 w-4" /> : null}
                       {f}
-                      {count ? <span className="text-[12px] opacity-70">{count}</span> : null}
+                      {count ? <span className="type-label-md opacity-70">{count}</span> : null}
                     </button>
                   );
                 })}
@@ -240,7 +240,7 @@ function ResourcesPage() {
           )}
         </div>
 
-        <p className="mt-4 px-4 text-[13px] text-muted-foreground">
+        <p className="type-body-sm mt-4 px-4 text-muted-foreground">
           {shown.length} {shown.length === 1 ? "resource" : "resources"}
         </p>
 
@@ -257,7 +257,7 @@ function ResourcesPage() {
                     ? "Nothing saved yet"
                     : (nothingYet[filter] ?? "Nothing here yet")}
               </p>
-              <p className="mt-1 text-[14px] text-muted-foreground">
+              <p className="type-body-md mt-1 text-muted-foreground">
                 {q
                   ? "Try another word, like sleep or stress."
                   : filter === "Saved"
@@ -289,7 +289,7 @@ function ResourcesPage() {
                         <Illustration art={r.art} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[12px] font-semibold text-[var(--accent-strong)]">
+                        <span className="type-label-md font-semibold block text-[var(--accent-strong)]">
                           {r.category}
                           {/* opened already. A check, not the word: "Read" now names a type in
                            * the filter row above, and the eyebrow would say it twice over. */}
@@ -309,7 +309,7 @@ function ResourcesPage() {
                         </h3>
                         {/* What it is and how long it takes. The date is on the featured card and
                          * on the article itself; a third item here wrapped onto two lines. */}
-                        <span className="mt-1 flex items-center gap-3 text-[12px] whitespace-nowrap text-muted-foreground">
+                        <span className="type-label-md mt-1 flex items-center gap-3 whitespace-nowrap text-muted-foreground">
                           <span className="inline-flex items-center gap-1.5">
                             {(() => {
                               const Icon = mediumIcon[mediumOf(r)];

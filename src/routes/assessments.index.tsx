@@ -29,7 +29,7 @@ function AssessmentListPage() {
         <header className="safe-top flex items-start gap-2 px-4 pb-1">
           <div className="min-w-0 flex-1">
             <h1 className="type-headline-lg">Assessments</h1>
-            <p className="mt-1 text-[15px] text-muted-foreground">
+            <p className="type-action mt-1 text-muted-foreground">
               Answer a few questions and see where you stand today.
             </p>
           </div>
@@ -84,9 +84,9 @@ function AssessmentCard({ assessment: a }: { assessment: Assessment }) {
         <Icon className="h-6 w-6" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[13px] font-medium text-[var(--accent-strong)]">{a.name}</span>
+        <span className="type-body-sm font-medium block text-[var(--accent-strong)]">{a.name}</span>
         <span className="block font-display text-[17px] font-semibold leading-6">{a.title}</span>
-        <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
+        <span className="type-body-sm mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <ListChecks className="h-3.5 w-3.5" aria-hidden="true" /> {a.questions.length} questions
           </span>
@@ -100,7 +100,7 @@ function AssessmentCard({ assessment: a }: { assessment: Assessment }) {
           ) : null}
         </span>
         {latest && !head ? (
-          <span className="mt-2 block text-[13px] font-medium">Result saved</span>
+          <span className="type-body-sm font-medium mt-2 block">Result saved</span>
         ) : null}
       </span>
       <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />

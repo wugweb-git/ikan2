@@ -238,7 +238,7 @@ export function Fab({
       aria-label={extended ? undefined : label}
       className={cn(
         "motion-press inline-flex h-14 items-center justify-center gap-2 rounded-full bg-foreground text-background shadow-dock",
-        extended ? "px-5 text-[15px] font-semibold" : "w-14",
+        extended ? "type-action px-5" : "w-14",
         stateLayer,
         className,
       )}
@@ -351,7 +351,7 @@ export function Segmented({
             aria-checked={on}
             onClick={() => onChange(o)}
             className={cn(
-              "flex min-h-12 items-center justify-center gap-2 rounded-[14px] border px-3 py-2 text-[15px] font-semibold transition-colors",
+              "type-action flex min-h-12 items-center justify-center gap-2 rounded-[14px] border px-3 py-2 transition-colors",
               stateLayer,
               on
                 ? "border-transparent bg-[var(--accent-strong)] text-background"
@@ -495,7 +495,7 @@ export function QuickPicks({
   if (!items.length) return null;
   return (
     <div className="mt-3">
-      <p className="text-[12px] text-muted-foreground">{title}</p>
+      <p className="type-label-md text-muted-foreground">{title}</p>
       <div className="mt-1.5 flex flex-wrap gap-2">
         {items.map((it) => (
           <button
@@ -506,7 +506,7 @@ export function QuickPicks({
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onPick(it.value)}
             className={cn(
-              "inline-flex min-h-9 max-w-full items-center rounded-full px-3 py-1.5 text-left text-[13px] font-medium",
+              "type-body-sm font-medium inline-flex min-h-9 max-w-full items-center rounded-full px-3 py-1.5 text-left",
               stateLayer,
               selected === it.value
                 ? "bg-foreground text-background"
@@ -648,7 +648,7 @@ export function Snackbar({ message }: { message: SnackMessage }) {
       aria-live="polite"
       className="animate-fade pointer-events-none fixed inset-x-0 bottom-[96px] z-50 flex justify-center px-4"
     >
-      <p className="w-full max-w-sm rounded-[8px] bg-foreground px-4 py-3.5 text-[14px] text-background shadow-lg">
+      <p className="type-body-md w-full max-w-sm rounded-[8px] bg-foreground px-4 py-3.5 text-background shadow-lg">
         {shown.text}
       </p>
     </div>

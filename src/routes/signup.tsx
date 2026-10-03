@@ -127,7 +127,7 @@ function SignupPage() {
               <li
                 key={c.label}
                 className={cn(
-                  "inline-flex h-7 items-center gap-1 rounded-full px-2.5 text-[12px] font-medium transition-colors",
+                  "type-label-md inline-flex h-7 items-center gap-1 rounded-full px-2.5 transition-colors",
                   c.ok ? "bg-[#DDF1E5] text-[#1E6644]" : "bg-secondary text-muted-foreground",
                 )}
               >
@@ -158,7 +158,7 @@ function SignupPage() {
             </span>
           </label>
           {agreeError ? (
-            <p role="alert" className="mt-1.5 text-[13px] text-error">
+            <p role="alert" className="type-body-sm mt-1.5 text-error">
               {agreeError}
             </p>
           ) : null}
@@ -166,7 +166,7 @@ function SignupPage() {
         <PrimaryButton busy={busy}>Create account</PrimaryButton>
       </form>
       <SocialButtons onError={setError} />
-      <p className="mt-4 text-center text-[15px]">
+      <p className="type-action mt-4 text-center">
         Already have an account?{" "}
         <Link to="/login" className="font-semibold underline">
           Sign in

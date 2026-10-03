@@ -91,8 +91,8 @@ function ConsultantPage() {
             <Avatar text={initials(c.name)} hue={c.hue} size={88} photo={c.photo} />
             <div className="min-w-0">
               <h1 className="font-display text-[24px] font-semibold leading-7">{c.name}</h1>
-              <p className="mt-1 text-[14px] opacity-80">{c.credentials}</p>
-              <p className="mt-2 inline-flex items-center gap-1 text-[14px] font-semibold">
+              <p className="type-body-md mt-1 opacity-80">{c.credentials}</p>
+              <p className="type-body-md font-semibold mt-2 inline-flex items-center gap-1">
                 <Star className="h-4 w-4 fill-[#E3A008] text-[#E3A008]" /> {c.rating}
                 <span className="font-normal opacity-75">({c.reviews} reviews)</span>
               </p>
@@ -106,27 +106,27 @@ function ConsultantPage() {
         </header>
 
         <section className="px-4 pt-5">
-          <p className="text-[13px] font-semibold text-muted-foreground">{c.role}</p>
+          <p className="type-body-sm font-semibold text-muted-foreground">{c.role}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {c.formats.map((f) => {
               const Icon = formatIcon[f] ?? Monitor;
               return (
                 <span
                   key={f}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-[8px] border border-foreground/15 px-3 text-[13px]"
+                  className="type-body-sm inline-flex h-8 items-center gap-1.5 rounded-[8px] border border-foreground/15 px-3"
                 >
                   <Icon className="h-4 w-4" /> {f}
                 </span>
               );
             })}
           </div>
-          <p className="mt-3 flex items-center gap-2 text-[14px]">
+          <p className="type-body-md mt-3 flex items-center gap-2">
             <Languages className="h-4 w-4 text-muted-foreground" /> {c.languages.join(", ")}
           </p>
         </section>
 
         <section className="mt-7">
-          <h2 className="px-4 font-display text-[16px] font-semibold">Concerns I can help with</h2>
+          <h2 className="type-title-md px-4">Concerns I can help with</h2>
           <div className="no-scrollbar mt-3 flex snap-x gap-3 overflow-x-auto px-4 pb-1">
             {c.concerns.map((q) => (
               <figure
@@ -141,12 +141,12 @@ function ConsultantPage() {
         </section>
 
         <section className="mt-7 px-4">
-          <h2 className="font-display text-[16px] font-semibold">I offer therapy for</h2>
+          <h2 className="type-title-md">I offer therapy for</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {c.therapyFor.map((t) => (
               <span
                 key={t}
-                className="rounded-[8px] bg-[var(--accent-container)] px-3 py-1.5 text-[13px] text-[var(--on-accent-container)]"
+                className="type-body-sm rounded-[8px] bg-[var(--accent-container)] px-3 py-1.5 text-[var(--on-accent-container)]"
               >
                 {t}
               </span>
@@ -155,18 +155,18 @@ function ConsultantPage() {
         </section>
 
         <section className="mt-7 px-4">
-          <h2 className="font-display text-[16px] font-semibold">About</h2>
+          <h2 className="type-title-md">About</h2>
           <p className="mt-2 text-[15px] leading-6 text-muted-foreground">{c.about}</p>
         </section>
 
         {c.approaches.length ? (
           <section className="mt-7 px-4">
-            <h2 className="font-display text-[16px] font-semibold">Approaches</h2>
+            <h2 className="type-title-md">Approaches</h2>
             <ul className="mt-3 space-y-2">
               {c.approaches.map((a) => (
                 <li
                   key={a}
-                  className="flex items-center gap-3 rounded-[14px] bg-secondary px-4 py-3 text-[15px]"
+                  className="type-action flex items-center gap-3 rounded-[14px] bg-secondary px-4 py-3"
                 >
                   <Sparkles className="h-4 w-4 shrink-0 text-[var(--accent-strong)]" /> {a}
                 </li>
@@ -177,7 +177,7 @@ function ConsultantPage() {
 
         {c.qualifications.length ? (
           <section className="mt-7 px-4">
-            <h2 className="font-display text-[16px] font-semibold">Qualifications</h2>
+            <h2 className="type-title-md">Qualifications</h2>
             <ul className="mt-3 space-y-2">
               {c.qualifications.map((q) => (
                 <li key={q} className="flex items-start gap-3 text-[15px] leading-6">
@@ -190,9 +190,9 @@ function ConsultantPage() {
 
         {c.review ? (
           <section className="mt-7 px-4">
-            <h2 className="font-display text-[16px] font-semibold">Reviews ({c.reviews})</h2>
+            <h2 className="type-title-md">Reviews ({c.reviews})</h2>
             <figure className="mt-3 rounded-[20px] border border-foreground/10 p-4">
-              <div className="flex items-center gap-2 text-[13px]">
+              <div className="type-body-sm flex items-center gap-2">
                 <span className="flex" aria-label={`${c.review.rating} out of 5`}>
                   {[0, 1, 2, 3, 4].map((i) => (
                     <Star
@@ -209,7 +209,7 @@ function ConsultantPage() {
                 {c.review.verified ? <span className="text-muted-foreground">Verified</span> : null}
               </div>
               <blockquote className="mt-2 text-[15px] leading-6">{c.review.text}</blockquote>
-              <figcaption className="mt-2 flex items-center gap-1.5 text-[12px] text-muted-foreground">
+              <figcaption className="type-label-md mt-2 flex items-center gap-1.5 text-muted-foreground">
                 <ThumbsUp className="h-3.5 w-3.5" /> Helpful ({c.review.helpful})
               </figcaption>
             </figure>
@@ -218,7 +218,7 @@ function ConsultantPage() {
 
         {c.faq ? (
           <section className="mt-7 px-4">
-            <h2 className="font-display text-[16px] font-semibold">Frequently asked</h2>
+            <h2 className="type-title-md">Frequently asked</h2>
             <Disclosure tone="filled" radius={20} title={c.faq.q} className="mt-3">
               <p className="text-[15px] leading-6 text-muted-foreground">{c.faq.a}</p>
             </Disclosure>
@@ -235,7 +235,7 @@ function Fact({ icon: Icon, value, label }: { icon: LucideIcon; value: string; l
   return (
     <div className="rounded-[16px] bg-background/70 px-2 py-3">
       <Icon className="mx-auto h-5 w-5" />
-      <p className="mt-1 truncate text-[14px] font-semibold">{value}</p>
+      <p className="type-body-md font-semibold mt-1 truncate">{value}</p>
       <p className="text-[11px] opacity-70">{label}</p>
     </div>
   );
@@ -272,7 +272,7 @@ function Booking({ c }: { c: Consultant }) {
 
   return (
     <section id="book" className="mx-4 mt-8 rounded-[28px] border border-foreground/10 p-4">
-      <h2 className="font-display text-[20px] font-semibold">Book appointment</h2>
+      <h2 className="type-title-lg font-semibold">Book appointment</h2>
 
       {mine.length > 0 ? (
         <ul className="mt-3 space-y-2">
@@ -282,7 +282,7 @@ function Booking({ c }: { c: Consultant }) {
               className="flex items-center gap-3 rounded-[16px] bg-[var(--accent-container)] p-3 text-[var(--on-accent-container)]"
             >
               <CalendarCheck className="h-5 w-5 shrink-0" />
-              <span className="min-w-0 flex-1 text-[14px]">
+              <span className="type-body-md min-w-0 flex-1">
                 <span className="block font-semibold">Requested</span>
                 {new Date(b.startsAt).toLocaleString("en-IN", {
                   weekday: "short",
@@ -296,7 +296,7 @@ function Booking({ c }: { c: Consultant }) {
               <button
                 type="button"
                 onClick={() => cancel(b.id)}
-                className={cn("h-9 rounded-full px-3 text-[13px] font-semibold", stateLayer)}
+                className={cn("type-body-sm font-semibold h-9 rounded-full px-3", stateLayer)}
               >
                 Cancel
               </button>
@@ -305,7 +305,7 @@ function Booking({ c }: { c: Consultant }) {
         </ul>
       ) : null}
 
-      <p className="mt-4 text-[13px] font-semibold text-muted-foreground">Session type</p>
+      <p className="type-body-sm font-semibold mt-4 text-muted-foreground">Session type</p>
       <div
         className={cn("mt-2 grid gap-2", c.sessions.length === 4 ? "grid-cols-2" : "grid-cols-3")}
         role="radiogroup"
@@ -328,14 +328,14 @@ function Booking({ c }: { c: Consultant }) {
               )}
             >
               <Icon className="h-5 w-5" />
-              <span className="text-[13px] font-medium">{s.mode}</span>
-              <span className="text-[13px] font-semibold">{rupees(s.price)}</span>
+              <span className="type-body-sm font-medium">{s.mode}</span>
+              <span className="type-body-sm font-semibold">{rupees(s.price)}</span>
             </button>
           );
         })}
       </div>
 
-      <p className="mt-5 text-[13px] font-semibold text-muted-foreground">Date</p>
+      <p className="type-body-sm font-semibold mt-5 text-muted-foreground">Date</p>
       <div
         className="no-scrollbar -mx-4 mt-2 flex gap-2 overflow-x-auto px-4"
         role="radiogroup"
@@ -360,7 +360,7 @@ function Booking({ c }: { c: Consultant }) {
                 on ? "bg-[var(--accent-strong)] text-background" : "bg-secondary",
               )}
             >
-              <span className="text-[12px] opacity-80">
+              <span className="type-label-md opacity-80">
                 {offset === 0 ? "Today" : d.toLocaleDateString("en-IN", { weekday: "short" })}
               </span>
               <span className="font-display text-[18px] font-semibold">{d.getDate()}</span>
@@ -369,7 +369,7 @@ function Booking({ c }: { c: Consultant }) {
         })}
       </div>
 
-      <p className="mt-5 text-[13px] font-semibold text-muted-foreground">Time</p>
+      <p className="type-body-sm font-semibold mt-5 text-muted-foreground">Time</p>
       {openHours.length ? (
         <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup" aria-label="Time">
           {openHours.map((h) => {
@@ -382,7 +382,7 @@ function Booking({ c }: { c: Consultant }) {
                 aria-checked={on}
                 onClick={() => setHour(h)}
                 className={cn(
-                  "h-11 rounded-[12px] border text-[14px] font-medium tabular-nums transition-colors",
+                  "type-label-lg h-11 rounded-[12px] border tabular-nums transition-colors",
                   stateLayer,
                   on
                     ? "border-transparent bg-[var(--accent-container)] text-[var(--on-accent-container)]"
@@ -395,14 +395,14 @@ function Booking({ c }: { c: Consultant }) {
           })}
         </div>
       ) : (
-        <p className="mt-2 rounded-[12px] bg-secondary px-4 py-3 text-[14px] text-muted-foreground">
+        <p className="type-body-md mt-2 rounded-[12px] bg-secondary px-4 py-3 text-muted-foreground">
           No times left on this day. Pick another date.
         </p>
       )}
 
       <div className="mt-5 flex items-center justify-between border-t border-foreground/10 pt-4">
         <span>
-          <span className="block text-[12px] text-muted-foreground">Session fee</span>
+          <span className="type-label-md block text-muted-foreground">Session fee</span>
           <span className="font-display text-[22px] font-semibold">{rupees(price)}</span>
         </span>
         <Button disabled={hour === null} onClick={() => setConfirming(true)}>
@@ -445,7 +445,7 @@ function Booking({ c }: { c: Consultant }) {
             <div className="mt-3 flex flex-col gap-2">
               <Link
                 to="/history"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-foreground text-[15px] font-semibold text-background"
+                className="type-action inline-flex h-12 items-center justify-center rounded-full bg-foreground text-background"
               >
                 See my history
               </Link>
@@ -466,7 +466,7 @@ function Booking({ c }: { c: Consultant }) {
               <Avatar text={initials(c.name)} hue={c.hue} size={48} photo={c.photo} />
               <div className="min-w-0">
                 <p className="font-semibold">{c.name}</p>
-                <p className="text-[14px] text-muted-foreground">
+                <p className="type-body-md text-muted-foreground">
                   {day.toLocaleDateString("en-IN", {
                     weekday: "long",
                     day: "numeric",
@@ -474,7 +474,7 @@ function Booking({ c }: { c: Consultant }) {
                   })}
                   , {hour !== null ? hourLabel(hour) : ""}
                 </p>
-                <p className="text-[14px] text-muted-foreground">
+                <p className="type-body-md text-muted-foreground">
                   {mode} session, {rupees(price)}
                 </p>
               </div>

@@ -33,7 +33,7 @@ function LegalPage() {
             to="/legal/$slug"
             params={{ slug: s }}
             className={cn(
-              "inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5 text-[14px] font-medium",
+              "type-label-lg inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5",
               s === slug
                 ? "border-transparent bg-foreground text-background"
                 : "border-foreground/20",

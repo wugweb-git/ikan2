@@ -78,7 +78,7 @@ function AssessmentArchivePage() {
           </span>
           <div className="min-w-0">
             <h1 className="font-display text-[24px] font-semibold leading-7">{a.title}</h1>
-            <p className="text-[13px] text-muted-foreground">{a.instrument}</p>
+            <p className="type-body-sm text-muted-foreground">{a.instrument}</p>
           </div>
         </header>
 
@@ -91,7 +91,7 @@ function AssessmentArchivePage() {
           ].map((x) => (
             <div key={x.l} className="px-1">
               <p className="font-display text-[17px] font-bold leading-6 tabular-nums">{x.v}</p>
-              <p className="text-[12px] text-muted-foreground">{x.l}</p>
+              <p className="type-label-md text-muted-foreground">{x.l}</p>
             </div>
           ))}
         </section>
@@ -116,17 +116,17 @@ function AssessmentArchivePage() {
             className="mx-4 mt-4 rounded-[28px] p-5"
             style={{ ...bandStyle(latest.head.band), background: "var(--tone-container)" }}
           >
-            <p className="text-[13px] font-medium text-[var(--tone)]">
+            <p className="type-body-sm font-medium text-[var(--tone)]">
               Latest · {latest.head.score.label}
             </p>
             <p className="mt-1 font-display text-[30px] font-bold leading-9 text-[var(--tone)]">
               {latest.head.band.label}
             </p>
-            <p className="mt-1 text-[13px] font-medium text-[var(--tone)]">
+            <p className="type-body-sm font-medium mt-1 text-[var(--tone)]">
               {severityContent[latest.head.band.severity].label} ·{" "}
               {severityContent[latest.head.band.severity].description}
             </p>
-            <p className="text-[15px] tabular-nums">{valueText(latest.head)}</p>
+            <p className="type-action tabular-nums">{valueText(latest.head)}</p>
             <div className="mt-4">
               <RangeBar result={latest.head} large />
             </div>
@@ -136,7 +136,7 @@ function AssessmentArchivePage() {
 
         {a.headline && scored.length >= 2 ? (
           <section className="mx-4 mt-4 rounded-[24px] bg-secondary p-4">
-            <h2 className="font-display text-[16px] font-semibold">Over time</h2>
+            <h2 className="type-title-md">Over time</h2>
             <Trend
               points={[...scored].reverse()}
               className="mt-2 rounded-[12px] bg-background px-3 py-2"
@@ -167,10 +167,8 @@ function AssessmentArchivePage() {
                     }
                     title={
                       <>
-                        <DateText className="text-[15px] font-semibold">
-                          {date(r.completedAt)}
-                        </DateText>
-                        <span className="block text-[12px] text-muted-foreground">
+                        <DateText className="type-action">{date(r.completedAt)}</DateText>
+                        <span className="type-label-md block text-muted-foreground">
                           {i === 0 ? "Latest" : `${scored.length - i} of ${scored.length}`}
                           {head ? ` · ${valueText(head)}` : ` · ${scores.length} scores`}
                         </span>
@@ -180,9 +178,9 @@ function AssessmentArchivePage() {
                     {scores.map((s) => (
                       <div key={s.score.id}>
                         <div className="flex items-start gap-3">
-                          <p className="min-w-0 flex-1 text-[14px] font-medium">
+                          <p className="type-label-lg min-w-0 flex-1">
                             {s.score.label}
-                            <span className="block text-[12px] font-normal text-muted-foreground tabular-nums">
+                            <span className="type-label-md font-normal block text-muted-foreground tabular-nums">
                               {valueText(s)}
                             </span>
                           </p>
@@ -202,7 +200,7 @@ function AssessmentArchivePage() {
                     <Link
                       to="/assessments/$slug/result/$id"
                       params={{ slug, id: r.id }}
-                      className="inline-block text-[14px] font-semibold text-[var(--accent-strong)] underline"
+                      className="type-body-md font-semibold inline-block text-[var(--accent-strong)] underline"
                     >
                       Open full result
                     </Link>
@@ -237,7 +235,7 @@ function AssessmentArchivePage() {
             >
               Retake assessment
             </Button>
-            <p className="mt-2 text-center text-[13px] text-muted-foreground">
+            <p className="type-body-sm mt-2 text-center text-muted-foreground">
               {retake.due
                 ? `It’s been ${retake.days} days since your last result. A good time to see how things have changed.`
                 : `Best retaken every ${RETAKE_AFTER_DAYS} days. Next suggested from ${retake.from!.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}.`}
@@ -260,7 +258,7 @@ function Change({ now, before }: { now: ScoreResult; before: ScoreResult }) {
   const better = now.profile.direction === "better" ? diff > 0 : diff < 0;
   const Icon = diff > 0 ? TrendingUp : TrendingDown;
   return (
-    <p className="mt-4 flex items-center gap-2 text-[14px]">
+    <p className="type-body-md mt-4 flex items-center gap-2">
       {same ? null : <Icon className="h-4 w-4 shrink-0" />}
       {same ? "Same as" : better ? "Better than" : "Worse than"} last time: {before.band!.label},{" "}
       {valueText(before)}

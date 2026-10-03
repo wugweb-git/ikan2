@@ -50,13 +50,11 @@ export function EntryCard({
           {mood.emoji}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="font-display text-[16px] font-semibold">
+          <p className="type-title-md">
             {mood.label}{" "}
-            <span className="font-sans text-[13px] font-normal text-muted-foreground">
-              {e.mood_rating}/5
-            </span>
+            <span className="type-body-sm font-sans text-muted-foreground">{e.mood_rating}/5</span>
           </p>
-          <p className="text-[13px] text-muted-foreground">
+          <p className="type-body-sm text-muted-foreground">
             {showDate
               ? `${when.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}, `
               : ""}
@@ -104,7 +102,7 @@ export function EntryCard({
 
 function Chip({ children }: { children: string }) {
   return (
-    <span className="inline-flex h-7 items-center rounded-[8px] bg-secondary px-2.5 text-[13px]">
+    <span className="type-body-sm inline-flex h-7 items-center rounded-[8px] bg-secondary px-2.5">
       {children}
     </span>
   );

@@ -53,11 +53,11 @@ export function BlockHeader({
         >
           {icons[id]}
         </span>
-        <p className="text-[13px] font-semibold tabular-nums text-[var(--accent-strong)]">
+        <p className="type-body-sm font-semibold tabular-nums text-[var(--accent-strong)]">
           Step {step} of {of}
         </p>
         {followUp ? (
-          <span className="ml-auto rounded-full bg-background px-2.5 py-1 text-[12px] font-medium">
+          <span className="type-label-md ml-auto rounded-full bg-background px-2.5 py-1">
             About your pain
           </span>
         ) : null}
@@ -65,7 +65,7 @@ export function BlockHeader({
       <h3 className="mt-3 font-display text-[21px] font-semibold leading-7 text-balance">
         {question}
       </h3>
-      <p className="mt-1 text-[14px] text-muted-foreground">{subtitle}</p>
+      <p className="type-body-md mt-1 text-muted-foreground">{subtitle}</p>
     </div>
   );
 }
@@ -121,7 +121,7 @@ export function EmojiScaleBlock({
         })}
       </div>
       {note ? (
-        <p className="mt-3 flex items-center gap-1.5 text-[13px] text-[var(--accent-strong)]">
+        <p className="type-body-sm mt-3 flex items-center gap-1.5 text-[var(--accent-strong)]">
           <Moon className="h-4 w-4" aria-hidden="true" />
           {note}
         </p>
@@ -156,7 +156,7 @@ export function YesNoBlock({
             <span className="text-[30px] leading-none" aria-hidden="true">
               {o.emoji}
             </span>
-            <span className="text-[16px] font-semibold">{o.label}</span>
+            <span className="type-body-lg font-semibold">{o.label}</span>
           </button>
         );
       })}
@@ -206,7 +206,7 @@ export function TagsBlock({
               aria-pressed={on}
               onClick={() => onChange(on ? value.filter((x) => x !== t.id) : [...value, t.id])}
               className={cn(
-                "inline-flex h-10 items-center gap-1.5 rounded-full border px-3.5 text-[14px] font-medium transition-colors",
+                "type-label-lg inline-flex h-10 items-center gap-1.5 rounded-full border px-3.5 transition-colors",
                 stateLayer,
                 on
                   ? "border-transparent bg-[var(--accent-container)] text-[var(--on-accent-container)]"
@@ -223,7 +223,7 @@ export function TagsBlock({
           );
         })}
       </div>
-      <p className="mt-2 text-[12px] text-muted-foreground" aria-live="polite">
+      <p className="type-label-md mt-2 text-muted-foreground" aria-live="polite">
         {value.length ? `${value.length} picked` : "Pick any that apply"}
       </p>
     </div>

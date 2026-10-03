@@ -19,9 +19,9 @@ export type ChipTone = "neutral" | "solid" | "outline" | "accent" | "success" | 
 export type ChipSize = "sm" | "md" | "lg";
 
 const sizes: Record<ChipSize, string> = {
-  sm: "h-7 gap-1 px-3 text-[12px]",
-  md: "h-8 gap-1.5 px-3 text-[13px]",
-  lg: "h-9 gap-1.5 px-4 text-[13px]",
+  sm: "type-label-md h-7 gap-1 px-3",
+  md: "type-body-sm h-8 gap-1.5 px-3",
+  lg: "type-body-sm h-9 gap-1.5 px-4",
 };
 
 /** Unselected look. The selected look is always `solid`, as it is on every screen today. */

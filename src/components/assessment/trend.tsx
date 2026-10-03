@@ -46,7 +46,7 @@ export function Trend({ points, className }: { points: Point[]; className?: stri
           />
         ))}
       </svg>
-      <p className="text-[12px] text-muted-foreground">
+      <p className="type-label-md text-muted-foreground">
         {better ? "Higher is better" : "Lower is better"}
       </p>
     </div>

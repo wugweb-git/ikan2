@@ -46,13 +46,13 @@ function AssessmentHistoryPage() {
             <p className="font-display text-[22px] font-bold tabular-nums">
               {hydrated ? `${taken}/${assessments.length}` : "—"}
             </p>
-            <p className="text-[12px] text-muted-foreground">Assessments taken</p>
+            <p className="type-label-md text-muted-foreground">Assessments taken</p>
           </div>
           <div>
             <p className="font-display text-[22px] font-bold tabular-nums">
               {hydrated ? total : "—"}
             </p>
-            <p className="text-[12px] text-muted-foreground">Results in total</p>
+            <p className="type-label-md text-muted-foreground">Results in total</p>
           </div>
         </section>
 
@@ -79,13 +79,13 @@ function AssessmentHistoryPage() {
                       <Icon className="h-5 w-5" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[13px] font-medium text-[var(--accent-strong)]">
+                      <span className="type-body-sm font-medium block text-[var(--accent-strong)]">
                         {a.name}
                       </span>
                       <span className="block font-display text-[17px] font-semibold leading-6">
                         {a.title}
                       </span>
-                      <span className="block text-[13px] text-muted-foreground">
+                      <span className="type-body-sm block text-muted-foreground">
                         {latest ? (
                           <>
                             {results.length} {results.length === 1 ? "result" : "results"} ·{" "}
@@ -100,7 +100,7 @@ function AssessmentHistoryPage() {
                   </span>
                   {latest ? (
                     <span className="flex items-center gap-3 border-t border-background px-4 py-3">
-                      <span className="flex-1 text-[13px] text-muted-foreground">Latest</span>
+                      <span className="type-body-sm flex-1 text-muted-foreground">Latest</span>
                       {latest.head?.band ? (
                         <BandChip
                           label={latest.head.band.label}
@@ -108,7 +108,7 @@ function AssessmentHistoryPage() {
                           severity={latest.head.band.severity}
                         />
                       ) : (
-                        <span className="text-[13px]">{a.scores.length} scores</span>
+                        <span className="type-body-sm">{a.scores.length} scores</span>
                       )}
                     </span>
                   ) : null}

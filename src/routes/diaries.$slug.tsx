@@ -68,19 +68,19 @@ function DiaryPage() {
             className="absolute inset-0 h-full w-full object-cover opacity-20"
           />
           <div className="relative">
-            <p className="flex items-center gap-2 text-[13px] opacity-75">
+            <p className="type-body-sm flex items-center gap-2 opacity-75">
               <BookOpen className="h-4 w-4" /> Learning diary
             </p>
             <h1 className="mt-1 font-display text-[26px] font-semibold leading-8">{p.name}</h1>
             {hydrated && j.startedAt ? (
-              <p className="mt-0.5 text-[13px] opacity-70">
+              <p className="type-body-sm mt-0.5 opacity-70">
                 <DateText>
                   {shortDate(j.startedAt)}
                   {j.finishedAt ? ` to ${shortDate(j.finishedAt)}` : ", in progress"}
                 </DateText>
               </p>
             ) : null}
-            <div className="mt-4 flex flex-wrap gap-2 text-[13px] font-semibold">
+            <div className="type-body-sm font-semibold mt-4 flex flex-wrap gap-2">
               <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/15 px-3">
                 <Check className="h-4 w-4" /> {hydrated ? j.daysDone : 0}/{j.totalDays} days
               </span>
@@ -118,7 +118,7 @@ function DiaryPage() {
           ) : hydrated ? (
             <div className="mt-3 rounded-[20px] border border-foreground/10 p-10 text-center">
               <BookOpen className="mx-auto h-8 w-8 text-muted-foreground" />
-              <p className="mt-3 text-[15px] text-muted-foreground">No program activity yet.</p>
+              <p className="type-action mt-3 text-muted-foreground">No program activity yet.</p>
             </div>
           ) : null}
         </section>

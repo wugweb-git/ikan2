@@ -102,7 +102,7 @@ function ConsultPage() {
       <div style={accentStyle("night")}>
         <header className="safe-top px-4 pb-1">
           <h1 className="type-headline-lg">Find your consultant</h1>
-          <p className="mt-1 text-[15px] text-muted-foreground">
+          <p className="type-action mt-1 text-muted-foreground">
             Connect with experienced mental health professionals who understand your needs.
           </p>
         </header>
@@ -123,11 +123,9 @@ function ConsultPage() {
               photo={upcomingWith.photo}
             />
             <span className="min-w-0 flex-1">
-              <span className="block text-[12px] opacity-75">Upcoming session</span>
-              <span className="block truncate font-display text-[16px] font-semibold">
-                {upcomingWith.name}
-              </span>
-              <span className="mt-0.5 flex items-center gap-1.5 text-[13px] opacity-85">
+              <span className="type-label-md block opacity-75">Upcoming session</span>
+              <span className="type-title-md block truncate">{upcomingWith.name}</span>
+              <span className="type-body-sm mt-0.5 flex items-center gap-1.5 opacity-85">
                 <CalendarClock className="h-4 w-4" />
                 {new Date(upcoming.startsAt).toLocaleString("en-IN", {
                   weekday: "short",
@@ -172,7 +170,7 @@ function ConsultPage() {
           <Chips label="Availability" options={when} value={time} onChange={setTime} />
         </div>
 
-        <p className="mt-4 px-4 text-[13px] text-muted-foreground">
+        <p className="type-body-sm mt-4 px-4 text-muted-foreground">
           {list.length} {list.length === 1 ? "consultant" : "consultants"} found
         </p>
 
@@ -222,7 +220,7 @@ function Chips<T extends string>({
             aria-checked={on}
             onClick={() => onChange(o)}
             className={cn(
-              "inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5 text-[14px] font-medium transition-colors",
+              "type-label-lg inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5 transition-colors",
               stateLayer,
               on
                 ? "border-transparent bg-[var(--accent-container)] text-[var(--on-accent-container)]"
@@ -251,13 +249,13 @@ function ConsultantCard({ c, recommended }: { c: Consultant; recommended: boolea
         <Avatar text={initials(c.name)} hue={c.hue} size={64} photo={c.photo} />
         <div className="min-w-0 flex-1">
           {recommended ? (
-            <span className="mb-1 inline-flex h-6 items-center gap-1 rounded-full bg-[var(--accent-container)] px-2 text-[12px] font-semibold text-[var(--on-accent-container)]">
+            <span className="type-label-md font-semibold mb-1 inline-flex h-6 items-center gap-1 rounded-full bg-[var(--accent-container)] px-2 text-[var(--on-accent-container)]">
               <BadgeCheck className="h-3.5 w-3.5" /> Recommended
             </span>
           ) : null}
           <p className="font-display text-[17px] font-semibold leading-6">{c.name}</p>
-          <p className="text-[13px] text-muted-foreground">{c.credentials}</p>
-          <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">
+          <p className="type-body-sm text-muted-foreground">{c.credentials}</p>
+          <p className="type-body-sm mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
             <span className="inline-flex items-center gap-1 font-semibold">
               <Star className="h-3.5 w-3.5 fill-[#E3A008] text-[#E3A008]" /> {c.rating}
               <span className="font-normal text-muted-foreground">({c.reviews})</span>
@@ -265,29 +263,29 @@ function ConsultantCard({ c, recommended }: { c: Consultant; recommended: boolea
             <span className="text-muted-foreground">{c.role}</span>
             <span className="text-muted-foreground">{c.years}+ yrs</span>
           </p>
-          <p className="mt-0.5 flex items-center gap-1 text-[13px] text-muted-foreground">
+          <p className="type-body-sm mt-0.5 flex items-center gap-1 text-muted-foreground">
             <MapPin className="h-3.5 w-3.5" /> {c.city}
           </p>
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {c.specializes.map((s) => (
-          <span key={s} className="rounded-[8px] bg-secondary px-2.5 py-1 text-[12px]">
+          <span key={s} className="type-label-md rounded-[8px] bg-secondary px-2.5 py-1">
             {s}
           </span>
         ))}
       </div>
       <div className="mt-3 flex items-center gap-3 border-t border-foreground/10 pt-3">
         <span className="min-w-0 flex-1">
-          <span className="block text-[12px] text-muted-foreground">From</span>
+          <span className="type-label-md block text-muted-foreground">From</span>
           <span className="block font-display text-[17px] font-semibold">
             {rupees(fromPrice(c))}
           </span>
         </span>
-        <span className="inline-flex items-center gap-1.5 text-[13px] text-[var(--accent-strong)]">
+        <span className="type-body-sm inline-flex items-center gap-1.5 text-[var(--accent-strong)]">
           <Clock3 className="h-4 w-4" /> {nextLabel(c)}
         </span>
-        <span className="inline-flex h-10 items-center rounded-full bg-foreground px-4 text-[14px] font-semibold text-background">
+        <span className="type-body-md font-semibold inline-flex h-10 items-center rounded-full bg-foreground px-4 text-background">
           Book
         </span>
       </div>

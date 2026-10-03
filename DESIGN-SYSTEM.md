@@ -147,31 +147,37 @@ presents as a phone on a canvas, which is the product's own idea of itself.
 
 ## The gap between the scale and the screens
 
-The scale is enforced for content and freehand for app chrome:
+Closed, mostly. The scale went from decorative to load-bearing on 3 October 2026:
 
-- `type-*` roles: **8 uses**, in 3 files (the article renderer, the assessment UI, delete-account).
-- Arbitrary `text-[Npx]`: **869 uses**, across **23 distinct sizes** — 10, 11, 12, 13, 14, 15,
-  16, 17, 18, 19, 20, 21, 22, 24, 26, 28, 30, 32, 34, 40, 44, 57, 60.
-- `h1` is drawn at 7 different sizes across 36 route-level headings (32, 30, 28, 26, 24, 22,
-  and 3 with no size at all).
-- `h2` is drawn at 8 (16, 18, 13, 22, 26, 20, 17, 15).
+|                        | Before |   After |
+| ---------------------- | -----: | ------: |
+| `type-*` role uses     |      8 | **551** |
+| arbitrary `text-[Npx]` |    869 | **299** |
 
-13px, 15px, 17px, 19px, 21px and 26px have no role. Either they should, or they should round to
-one that exists.
+613 call sites migrated by `scripts/migrate-type-roles.mjs`, in two passes:
 
-Until 3 October 2026 this was worse than drift: Tailwind emits a utility only where it sees one
-used, so `type-headline-lg`, `type-body-lg`, `type-body-md` and `type-label-md` were **absent
-from the compiled stylesheet entirely** — typing them did nothing, silently. `@source inline()`
-in `src/styles.css` now forces all 80 utilities out, so a name either works or does not exist.
+- **85 provably identical** — size, line-height, weight and family already matched the role,
+  so the swap changes nothing that renders (75 exact, 10 as `role font-x` where only the
+  weight differed).
+- **528 gained a line-height.** These set a size and no leading, so their line-height was
+  inherited from whatever ancestor happened to set one — accidental rather than designed.
+  The role supplies the intended value. This is a real rendering change, and the point of
+  having a scale at all.
 
-## Two open decisions, written down rather than fixed
+### What is deliberately left
 
-**The column narrows at 1024px instead of widening.** 100% → 36rem → 30rem. That is right for a
-phone app rendered in a desktop browser, and it is what iKAN is: a Capacitor shell around a PWA.
-But it means the layout never uses desktop width for anything. If any part of iKAN is meant to
-be _read_ on a laptop — long articles, the legal pages — that part wants its own wider treatment.
-Worth deciding deliberately rather than inheriting.
+**248 sites**, because each needs a decision rather than a regex:
 
-**Title L (22) and Headline S (24) are 2px and one weight apart.** Two roles that close are hard
-to choose between and nearly indistinguishable in use. Both are currently used, so neither has
-been removed, but if one were dropped the scale would be easier to hold in the head.
+| Count | Case                                    | The question                                          |
+| ----: | --------------------------------------- | ----------------------------------------------------- |
+|    42 | sans 15px, line-height 24               | Action is 15/22. Is 24 intentional, or drift from 22? |
+|    26 | display 18px                            | No role at 18. Between Title M (16) and Title L (20)  |
+|    22 | display 17px                            | Card titles. Body XL is 17 but sans, not display      |
+|    20 | display 22px                            | Title L moved to 20; these did not follow             |
+|    17 | sans 11px                               | Below Label M (12). A Label S would cover it          |
+|    15 | relative leading (`leading-tight` etc.) | Resolves against font-size, so no fixed role matches  |
+|    11 | explicit `tracking-*`                   | The call site overrides the role's own tracking       |
+|    95 | assorted line-height mismatches         | Mostly 16/24 and 12/20 — one or the other is wrong    |
+
+Run `node scripts/migrate-type-roles.mjs` for the current breakdown. The script is the
+triage tool, not a one-off.

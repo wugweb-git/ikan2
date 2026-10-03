@@ -117,7 +117,7 @@ function NotificationsPage() {
                 aria-selected={on}
                 onClick={() => setTab(t.id)}
                 className={cn(
-                  "inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5 text-[14px] font-medium transition-colors",
+                  "type-label-lg inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5 transition-colors",
                   stateLayer,
                   on ? "border-transparent bg-foreground text-background" : "border-foreground/20",
                 )}
@@ -168,12 +168,12 @@ function NotificationsPage() {
                     )}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[14px]">{e.title}</span>
-                    <span className="block truncate text-[12px] text-muted-foreground">
+                    <span className="type-body-md block truncate">{e.title}</span>
+                    <span className="type-label-md block truncate text-muted-foreground">
                       {e.detail}
                     </span>
                   </span>
-                  <span className="text-[12px] tabular-nums text-muted-foreground">
+                  <span className="type-label-md tabular-nums text-muted-foreground">
                     {ago(e.at)}
                   </span>
                 </Link>
@@ -197,7 +197,7 @@ function Tier({
 }) {
   return (
     <section className="mt-6">
-      <h2 className="px-4 font-display text-[16px] font-semibold">{title}</h2>
+      <h2 className="type-title-md px-4">{title}</h2>
       <p className="px-4 text-[12px] leading-5 text-muted-foreground">{note}</p>
       <div className="mx-4 mt-2 overflow-hidden rounded-[20px] border border-foreground/10 [&>*+*]:border-t [&>*+*]:border-foreground/10">
         {children}
@@ -233,7 +233,7 @@ function NoticeRow({ n, fresh, strong }: { n: Notice; fresh: boolean; strong?: b
         <span className="type-body-sm mt-0.5 block text-muted-foreground">{n.body}</span>
       </span>
       <span className="flex flex-col items-end gap-2">
-        <span className="text-[12px] tabular-nums text-muted-foreground">{ago(n.at)}</span>
+        <span className="type-label-md tabular-nums text-muted-foreground">{ago(n.at)}</span>
         {fresh ? (
           <span
             className="h-2.5 w-2.5 rounded-full bg-[var(--accent-strong)]"

@@ -69,7 +69,7 @@ function JournalPage() {
 
         {nights.length ? (
           <section className="px-4 pt-2">
-            <h2 className="font-display text-[16px] font-semibold">Sleep Diary</h2>
+            <h2 className="type-title-md">Sleep Diary</h2>
             <div className="mt-3 rounded-[16px] bg-[var(--accent-container)] p-4 text-[var(--on-accent-container)]">
               <div
                 className="flex h-40 items-end gap-1.5"
@@ -94,7 +94,7 @@ function JournalPage() {
                   </div>
                 ))}
               </div>
-              <p className="mt-3 text-[13px]">
+              <p className="type-body-sm mt-3">
                 Darker bar: time asleep. Lighter bar: time in bed. By day.
               </p>
             </div>
@@ -104,8 +104,8 @@ function JournalPage() {
                 .reverse()
                 .map(({ day, m }) => (
                   <li key={day} className="flex min-h-14 items-center justify-between px-4">
-                    <span className="text-[16px]">{day === 0 ? "Onboarding" : `Day ${day}`}</span>
-                    <span className="text-[14px] tabular-nums text-muted-foreground">
+                    <span className="type-body-lg">{day === 0 ? "Onboarding" : `Day ${day}`}</span>
+                    <span className="type-body-md tabular-nums text-muted-foreground">
                       {formatDuration(m!.asleep)} asleep, {m!.efficiency}%
                     </span>
                   </li>
@@ -116,7 +116,7 @@ function JournalPage() {
 
         {Object.keys(state.tracker).length ? (
           <section className="mt-6 px-4">
-            <h2 className="font-display text-[16px] font-semibold">Tracking</h2>
+            <h2 className="type-title-md">Tracking</h2>
             <ul className="mt-3 space-y-4">
               {entries("habits").map((h) => {
                 const days = Object.keys(state.tracker)
@@ -124,7 +124,7 @@ function JournalPage() {
                   .sort((a, b) => a - b);
                 return (
                   <li key={h.id}>
-                    <p className="text-[16px]">{String(Object.values(h.values)[0] ?? "")}</p>
+                    <p className="type-body-lg">{String(Object.values(h.values)[0] ?? "")}</p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {days.map((d) => (
                         <span
@@ -167,15 +167,15 @@ function JournalPage() {
           return (
             <section key={collection} className="mt-6 px-4">
               <div className="flex items-baseline justify-between">
-                <h2 className="font-display text-[16px] font-semibold">{title}</h2>
-                <span className="text-[14px] tabular-nums text-muted-foreground">
+                <h2 className="type-title-md">{title}</h2>
+                <span className="type-body-md tabular-nums text-muted-foreground">
                   {list.length}
                 </span>
               </div>
               <ul className="mt-3 space-y-3">
                 {list.map((e) => (
                   <li key={e.id} className="rounded-[16px] bg-secondary p-4">
-                    <p className="text-[12px] text-muted-foreground">Day {e.day}</p>
+                    <p className="type-label-md text-muted-foreground">Day {e.day}</p>
                     <dl className="mt-1 space-y-2">
                       {Object.entries(e.values).map(([k, v]) => {
                         if (v === null || v === "" || v === undefined) return null;
@@ -185,7 +185,7 @@ function JournalPage() {
                         return (
                           <div key={k}>
                             {f?.label ? (
-                              <dt className="text-[12px] text-muted-foreground">{f.label}</dt>
+                              <dt className="type-label-md text-muted-foreground">{f.label}</dt>
                             ) : null}
                             <dd className="whitespace-pre-line text-[15px] leading-6">{shown}</dd>
                           </div>

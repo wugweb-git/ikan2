@@ -94,7 +94,7 @@ function ScorePage() {
         />
         <header className="px-4">
           <h1 className="type-headline-lg">iKAN Score</h1>
-          <p className="mt-1 text-[15px] text-muted-foreground">
+          <p className="type-action mt-1 text-muted-foreground">
             {firstEvent
               ? `One number over everything you have logged since ${new Date(firstEvent.at).toLocaleDateString("en-IN", { day: "numeric", month: "long" })}`
               : "Your Collective Wellness Index"}
@@ -107,9 +107,9 @@ function ScorePage() {
             <ScoreRing score={score} />
             {band ? (
               <>
-                <p className="mt-3 font-display text-[24px] font-semibold">{band.label}</p>
+                <p className="type-headline-sm mt-3">{band.label}</p>
                 <p
-                  className="mt-2 inline-flex h-7 items-center rounded-full px-3 text-[13px] font-semibold"
+                  className="type-body-sm font-semibold mt-2 inline-flex h-7 items-center rounded-full px-3"
                   style={{ background: "rgba(255,255,255,.14)" }}
                 >
                   {change === null
@@ -213,7 +213,7 @@ function ScorePage() {
         <SectionTitle>What moved it</SectionTitle>
         <section className="mx-4 overflow-hidden rounded-[24px] border border-foreground/10">
           {present.length === 0 && hydrated ? (
-            <p className="p-4 text-[14px] text-muted-foreground">Nothing has been logged yet.</p>
+            <p className="type-body-md p-4 text-muted-foreground">Nothing has been logged yet.</p>
           ) : null}
           {present.map((p) => {
             const pts = Math.round(((p.value! - 50) * p.weight) / data.totalWeight);
@@ -235,8 +235,8 @@ function ScorePage() {
                     style={{ background: meta.color }}
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[15px] font-medium">{p.label}</span>
-                    <span className="block truncate text-[13px] text-muted-foreground">
+                    <span className="type-action font-medium block">{p.label}</span>
+                    <span className="type-body-sm block truncate text-muted-foreground">
                       {p.detail}
                     </span>
                   </span>
@@ -282,10 +282,10 @@ function ScorePage() {
                 >
                   <span className="h-2.5 w-2.5 shrink-0 rounded-full border-2 border-foreground/30" />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[15px] font-medium">
+                    <span className="type-action font-medium block">
                       {d.assessment!.name} unfinished · held
                     </span>
-                    <span className="block text-[13px] text-muted-foreground">
+                    <span className="type-body-sm block text-muted-foreground">
                       {d.answered} of {d.assessment!.questions.length} answered, tap to finish
                     </span>
                   </span>
@@ -321,8 +321,8 @@ function ScorePage() {
                     <Icon className="h-5 w-5" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[15px] font-medium">{p.label}</span>
-                    <span className="block truncate text-[13px] text-muted-foreground">
+                    <span className="type-action font-medium block">{p.label}</span>
+                    <span className="type-body-sm block truncate text-muted-foreground">
                       {hydrated ? p.detail : ""}
                     </span>
                   </span>
@@ -350,10 +350,10 @@ function ScorePage() {
           above show what changed and when.
         </p>
         <div className="mx-4 mt-4 flex flex-wrap gap-2">
-          <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-secondary px-3 text-[13px]">
+          <span className="type-body-sm inline-flex h-8 items-center gap-1.5 rounded-full bg-secondary px-3">
             <ShieldCheck className="h-4 w-4" /> Never shared
           </span>
-          <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-secondary px-3 text-[13px]">
+          <span className="type-body-sm inline-flex h-8 items-center gap-1.5 rounded-full bg-secondary px-3">
             <HardDrive className="h-4 w-4" /> Stored on this device
           </span>
         </div>
@@ -363,14 +363,14 @@ function ScorePage() {
 }
 
 function SectionTitle({ children }: { children: string }) {
-  return <h2 className="mx-4 mb-3 mt-8 font-display text-[16px] font-semibold">{children}</h2>;
+  return <h2 className="type-title-md mx-4 mb-3 mt-8">{children}</h2>;
 }
 
 function Mini({ value, label }: { value: number | null; label: string }) {
   return (
     <div>
       <p className="font-display text-[22px] font-semibold tabular-nums">{value ?? "—"}</p>
-      <p className="text-[12px] text-muted-foreground">{label}</p>
+      <p className="type-label-md text-muted-foreground">{label}</p>
     </div>
   );
 }
@@ -470,7 +470,7 @@ function Lane({
 }) {
   return (
     <div className="flex items-center gap-2 py-1.5">
-      <span className="flex w-[104px] shrink-0 items-center gap-1.5 text-[12px] text-muted-foreground">
+      <span className="type-label-md flex w-[104px] shrink-0 items-center gap-1.5 text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {label}
       </span>
       <span className="flex flex-1 items-end gap-[2px]">{children}</span>
@@ -519,7 +519,7 @@ function ScoreRing({ score }: { score: number | null }) {
           <p className="font-display text-[60px] font-bold leading-none tabular-nums">
             {score ?? "—"}
           </p>
-          <p className="mt-1 text-[13px] opacity-70">
+          <p className="type-body-sm mt-1 opacity-70">
             {band ? `${band.label} · of 100` : "of 100"}
           </p>
         </div>

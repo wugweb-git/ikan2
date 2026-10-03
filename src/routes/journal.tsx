@@ -93,7 +93,9 @@ function JournalPage() {
             <History className="h-6 w-6" />
           </Link>
           <h1 className="type-headline-md">Journal</h1>
-          <p className="text-[14px] text-muted-foreground">Track how you feel, one day at a time</p>
+          <p className="type-body-md text-muted-foreground">
+            Track how you feel, one day at a time
+          </p>
         </header>
 
         <section className="mt-4 grid grid-cols-2 gap-2 px-4">
@@ -107,8 +109,8 @@ function JournalPage() {
 
         <section className="mx-4 mt-2 rounded-[20px] bg-foreground/[0.035] px-4 py-3">
           <div className="flex items-baseline justify-between">
-            <h2 className="font-display text-[16px] font-semibold">14-day mood</h2>
-            <p className="text-[14px] tabular-nums text-muted-foreground">
+            <h2 className="type-title-md">14-day mood</h2>
+            <p className="type-body-md tabular-nums text-muted-foreground">
               {hydrated && average !== null ? `Avg ${average.toFixed(1)}/5` : "No entries yet"}
             </p>
           </div>
@@ -159,8 +161,8 @@ function Stat({ emoji, label, value }: { emoji: string; label: string; value: nu
         {emoji}
       </span>
       <span>
-        <span className="block text-[12px] text-muted-foreground">{label}</span>
-        <span className="block font-display text-[20px] font-semibold tabular-nums">
+        <span className="type-label-md block text-muted-foreground">{label}</span>
+        <span className="type-title-lg font-semibold block tabular-nums">
           {value} {value === 1 ? "day" : "days"}
         </span>
       </span>
@@ -292,11 +294,11 @@ function CheckIn({
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[var(--accent-strong)] text-background">
           <Check className="h-7 w-7" strokeWidth={3} />
         </span>
-        <p className="mt-4 font-display text-[20px] font-semibold">Check-in saved</p>
-        <p className="mt-2 text-[15px]" aria-label="What you logged">
+        <p className="type-title-lg font-semibold mt-4">Check-in saved</p>
+        <p className="type-action mt-2" aria-label="What you logged">
           {summaryOf(saved)}
         </p>
-        <p className="mt-1 text-[13px] opacity-80">
+        <p className="type-body-sm mt-1 opacity-80">
           {countToday} {countToday === 1 ? "entry" : "entries"} logged today
         </p>
         <Button
@@ -407,7 +409,7 @@ function CheckIn({
       </div>
 
       {current.required && !hasValue ? (
-        <p className="mt-4 text-center text-[13px] text-muted-foreground" role="status">
+        <p className="type-body-sm mt-4 text-center text-muted-foreground" role="status">
           Pick one to continue
         </p>
       ) : null}

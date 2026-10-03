@@ -43,7 +43,7 @@ export function ErrorState({
       <p className="mt-2 font-display text-[17px] font-semibold">
         {offline && title === "That didn't load" ? "You're offline" : title}
       </p>
-      <p className="mt-1 text-[14px] text-muted-foreground">
+      <p className="type-body-md mt-1 text-muted-foreground">
         {children ??
           (offline
             ? "Your work is saved on this device and will sync when you're back."
@@ -53,7 +53,7 @@ export function ErrorState({
         <button
           type="button"
           onClick={onRetry}
-          className="motion-press mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-foreground px-5 text-[14px] font-semibold text-background"
+          className="type-body-md font-semibold motion-press mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-foreground px-5 text-background"
         >
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
           {retryLabel}
@@ -77,7 +77,7 @@ export function ErrorLine({
     <p
       role="alert"
       className={cn(
-        "motion-error flex items-center justify-center gap-2 py-6 text-center text-[14px] text-error",
+        "type-body-md motion-error flex items-center justify-center gap-2 py-6 text-center text-error",
         className,
       )}
     >

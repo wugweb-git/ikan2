@@ -94,7 +94,7 @@ function LoginPage() {
             <Link
               to="/forgot-password"
               search={email ? { email } : {}}
-              className="text-[14px] font-semibold hover:underline"
+              className="type-body-md font-semibold hover:underline"
             >
               Forgot password?
             </Link>
@@ -103,7 +103,7 @@ function LoginPage() {
         <PrimaryButton busy={busy}>Sign in</PrimaryButton>
       </form>
       <SocialButtons onError={setError} />
-      <p className="mt-4 text-center text-[15px]">
+      <p className="type-action mt-4 text-center">
         New to iKAN?{" "}
         <Link
           to="/signup"

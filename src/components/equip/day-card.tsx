@@ -36,10 +36,10 @@ export function DayCard({
       bodyClassName="space-y-2 border-t border-foreground/10 px-4 py-3"
       title={
         <>
-          <span className="block text-[15px] font-semibold">
+          <span className="type-action block">
             {day === 0 ? "Onboarding" : `Day ${day} · ${title}`}
           </span>
-          <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px] text-muted-foreground">
+          <span className="type-label-md mt-0.5 flex flex-wrap items-center gap-x-2 text-muted-foreground">
             {at ? <DateText>{shortDate(at)}</DateText> : <span>Completed</span>}
             {seconds ? (
               <span className="inline-flex items-center gap-1">
@@ -58,8 +58,8 @@ export function DayCard({
       }
     >
       {feedback ? (
-        <div className="rounded-[14px] border border-foreground/10 px-3.5 py-2.5 text-[14px]">
-          <p className="text-[12px] font-semibold text-muted-foreground">How the session went</p>
+        <div className="type-body-md rounded-[14px] border border-foreground/10 px-3.5 py-2.5">
+          <p className="type-label-md font-semibold text-muted-foreground">How the session went</p>
           <p className="mt-1">
             {feedback.helpful ? `Helpful: ${feedback.helpful} of 5` : null}
             {feedback.helpful && feel ? " · " : null}
@@ -71,7 +71,7 @@ export function DayCard({
       {responses.length ? (
         responses.map((r, i) => (
           <div key={i} className="rounded-[14px] bg-secondary px-3.5 py-2.5">
-            <p className="flex items-center gap-2 text-[12px] font-semibold text-muted-foreground">
+            <p className="type-label-md font-semibold flex items-center gap-2 text-muted-foreground">
               <FileText className="h-3.5 w-3.5 shrink-0" /> {r.title}
             </p>
             <ul className="mt-1 space-y-1">
@@ -84,7 +84,7 @@ export function DayCard({
           </div>
         ))
       ) : (
-        <p className="text-[14px] text-muted-foreground">
+        <p className="type-body-md text-muted-foreground">
           Lessons only, nothing to write this day.
         </p>
       )}

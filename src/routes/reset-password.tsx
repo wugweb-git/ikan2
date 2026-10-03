@@ -36,7 +36,7 @@ function ResetPage() {
       >
         <Link
           to="/forgot-password"
-          className="flex h-14 w-full items-center justify-center rounded-full bg-foreground text-[16px] font-semibold text-background"
+          className="type-body-lg font-semibold flex h-14 w-full items-center justify-center rounded-full bg-foreground text-background"
         >
           Send a new link
         </Link>

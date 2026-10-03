@@ -57,7 +57,12 @@ let touched = 0;
 
 for (const file of files) {
   const before = readFileSync(file, "utf8");
-  const after = before.replace(/"([^"]*text-\[(\d+)px\][^"]*)"/g, (whole, cls, sizeStr) => {
+  /* Only match something that is unmistakably a class list: class-safe characters only, no
+   * newline, and none of { } $ = ; ? which would mean the match has run out of one string
+   * and into neighbouring JSX. An earlier, looser pattern spanned from a closing quote to
+   * the next opening one and corrupted a file. */
+  const CLASS_STR = /"((?:[A-Za-z0-9 _:/.%#,()[\]-])*text-\[(\d+)px\](?:[A-Za-z0-9 _:/.%#,()[\]-])*)"/g;
+  const after = before.replace(CLASS_STR, (whole, cls, sizeStr) => {
     const size = Number(sizeStr);
     const toks = cls.split(/\s+/).filter(Boolean);
     if (toks.some((t) => t.startsWith("tracking-"))) { tally.skipped++; bump("explicit tracking"); return whole; }

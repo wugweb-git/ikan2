@@ -55,7 +55,7 @@ function FaqPage() {
               aria-selected={on}
               onClick={() => setCategory(c.id)}
               className={cn(
-                "inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5 text-[14px] font-medium",
+                "type-label-lg inline-flex h-9 shrink-0 items-center rounded-[8px] border px-3.5",
                 on ? "border-transparent bg-foreground text-background" : "border-foreground/20",
               )}
             >
@@ -66,7 +66,7 @@ function FaqPage() {
       </div>
 
       {groups.length === 0 ? (
-        <p className="mx-5 mt-8 text-center text-[15px] text-muted-foreground">{f.noResultsText}</p>
+        <p className="type-action mx-5 mt-8 text-center text-muted-foreground">{f.noResultsText}</p>
       ) : (
         groups.map((g) => (
           <section key={g.id} className="mt-7 px-5">
@@ -93,7 +93,7 @@ function FaqPage() {
         <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{f.ctaDescription}</p>
         <Link
           to="/contact"
-          className="mt-4 inline-flex h-11 items-center rounded-full bg-foreground px-5 text-[15px] font-semibold text-background"
+          className="type-action mt-4 inline-flex h-11 items-center rounded-full bg-foreground px-5 text-background"
         >
           {f.ctaButtonText}
         </Link>

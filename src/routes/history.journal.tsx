@@ -123,7 +123,7 @@ function JournalHistoryPage() {
             ].map((x) => (
               <div key={x.l}>
                 <p className="font-display text-[22px] font-bold tabular-nums">{x.v}</p>
-                <p className="text-[12px] text-muted-foreground">{x.l}</p>
+                <p className="type-label-md text-muted-foreground">{x.l}</p>
               </div>
             ))}
           </div>
@@ -136,7 +136,7 @@ function JournalHistoryPage() {
               ] as const
             ).map(([label, scale, v]) => (
               <div key={label} className="rounded-[20px] border border-foreground/10 p-3">
-                <p className="text-[12px] text-muted-foreground">{label}</p>
+                <p className="type-label-md text-muted-foreground">{label}</p>
                 <p className="mt-1 flex items-baseline gap-1.5">
                   <span className="text-[22px] leading-none" aria-hidden="true">
                     {v !== null ? scale[Math.round(v) - 1]?.emoji : "·"}
@@ -144,7 +144,7 @@ function JournalHistoryPage() {
                   <span className="font-display text-[17px] font-semibold tabular-nums">
                     {v !== null ? v.toFixed(1) : "—"}
                   </span>
-                  <span className="text-[12px] text-muted-foreground">/5</span>
+                  <span className="type-label-md text-muted-foreground">/5</span>
                 </p>
               </div>
             ))}
@@ -155,7 +155,7 @@ function JournalHistoryPage() {
         <section className="mx-4 mt-4 rounded-[24px] border border-foreground/10 p-4">
           <div className="flex items-baseline justify-between">
             <h2 className="font-display text-[17px] font-semibold">Last 30 days</h2>
-            <p className="text-[12px] text-muted-foreground">daily average, 1 to 5</p>
+            <p className="type-label-md text-muted-foreground">daily average, 1 to 5</p>
           </div>
           <div className="mt-3 space-y-3">
             {(
@@ -174,8 +174,8 @@ function JournalHistoryPage() {
             ))}
             <div>
               <div className="flex items-baseline justify-between">
-                <p className="text-[13px] font-medium">Pain</p>
-                <p className="text-[12px] text-muted-foreground">darker = more impact</p>
+                <p className="type-body-sm font-medium">Pain</p>
+                <p className="type-label-md text-muted-foreground">darker = more impact</p>
               </div>
               <div
                 className="mt-1.5 grid gap-[3px]"
@@ -222,7 +222,7 @@ function JournalHistoryPage() {
               <p className="font-display text-[17px] font-semibold">
                 {monthLabel(cursor.y, cursor.m)}
               </p>
-              <p className="text-[12px] text-muted-foreground">
+              <p className="type-label-md text-muted-foreground">
                 {hydrated
                   ? `${inMonth.length} ${inMonth.length === 1 ? "check-in" : "check-ins"}`
                   : ""}
@@ -258,7 +258,7 @@ function JournalHistoryPage() {
                     month: "long",
                   })}${pained ? ", pain logged" : ""}`}
                   className={cn(
-                    "relative flex aspect-square flex-col items-center justify-center rounded-[12px] text-[12px] transition-colors disabled:opacity-30",
+                    "type-label-md relative flex aspect-square flex-col items-center justify-center rounded-[12px] transition-colors disabled:opacity-30",
                     stateLayer,
                     on
                       ? "bg-foreground text-background"
@@ -304,7 +304,7 @@ function JournalHistoryPage() {
               ))}
             </ul>
           ) : hydrated ? (
-            <p className="mt-3 rounded-[20px] border border-dashed border-foreground/20 p-5 text-center text-[15px] text-muted-foreground">
+            <p className="type-action mt-3 rounded-[20px] border border-dashed border-foreground/20 p-5 text-center text-muted-foreground">
               Nothing logged this day.
             </p>
           ) : null}
@@ -328,14 +328,12 @@ function JournalHistoryPage() {
                       {m.mood !== null ? moodScale[Math.round(m.mood) - 1]?.emoji : "·"}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block font-display text-[16px] font-semibold">
-                        {m.label}
-                      </span>
-                      <span className="block text-[13px] text-muted-foreground">
+                      <span className="type-title-md block">{m.label}</span>
+                      <span className="type-body-sm block text-muted-foreground">
                         {m.count} {m.count === 1 ? "check-in" : "check-ins"}
                         {m.pain ? ` · pain on ${m.pain} ${m.pain === 1 ? "day" : "days"}` : ""}
                       </span>
-                      <span className="mt-2 flex flex-wrap gap-1.5 text-[12px]">
+                      <span className="type-label-md mt-2 flex flex-wrap gap-1.5">
                         {(
                           [
                             ["Mood", m.mood],
@@ -415,8 +413,8 @@ function TrendLine({
   return (
     <div>
       <div className="flex items-baseline justify-between">
-        <p className="text-[13px] font-medium">{label}</p>
-        <p className="text-[12px] text-muted-foreground">
+        <p className="type-body-sm font-medium">{label}</p>
+        <p className="type-label-md text-muted-foreground">
           {latest !== undefined
             ? `latest ${scale[Math.round(latest) - 1]?.emoji ?? ""} ${latest.toFixed(1)}`
             : "no answers yet"}

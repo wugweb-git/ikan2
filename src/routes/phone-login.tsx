@@ -101,7 +101,7 @@ function PhoneLoginPage() {
         >
           <FormError message={error} />
           <label className="block">
-            <span className="mb-1.5 block text-[13px] font-medium text-muted-foreground">
+            <span className="type-body-sm font-medium mb-1.5 block text-muted-foreground">
               6-digit code
             </span>
             <input
@@ -120,7 +120,7 @@ function PhoneLoginPage() {
             />
           </label>
           <PrimaryButton busy={busy}>Verify and continue</PrimaryButton>
-          <div className="flex items-center justify-between text-[14px]">
+          <div className="type-body-md flex items-center justify-between">
             <button
               type="button"
               onClick={() => {
@@ -142,13 +142,13 @@ function PhoneLoginPage() {
           </div>
         </form>
       )}
-      <div className="my-4 flex items-center gap-3 text-[13px] text-muted-foreground">
+      <div className="type-body-sm my-4 flex items-center gap-3 text-muted-foreground">
         <span className="h-px flex-1 bg-foreground/10" /> or{" "}
         <span className="h-px flex-1 bg-foreground/10" />
       </div>
       <Link
         to="/login"
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 text-[15px] font-semibold"
+        className="type-action flex h-12 w-full items-center justify-center gap-2 rounded-full border border-foreground/15"
       >
         <Mail className="h-5 w-5" /> Sign in with email
       </Link>

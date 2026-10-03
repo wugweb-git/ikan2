@@ -106,7 +106,7 @@ function ProgramHistoryPage() {
               <p className="mt-2 font-display text-[22px] font-bold leading-7 tabular-nums">
                 {t.value}
               </p>
-              <p className="text-[12px] text-muted-foreground">{t.label}</p>
+              <p className="type-label-md text-muted-foreground">{t.label}</p>
             </div>
           );
         })}
@@ -145,16 +145,16 @@ function ProgramHistoryPage() {
                   </span>
                   {finished ? (
                     <>
-                      <span className="mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-[var(--accent-container)] px-2.5 py-0.5 text-[12px] font-semibold text-[var(--on-accent-container)]">
+                      <span className="type-label-md font-semibold mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-[var(--accent-container)] px-2.5 py-0.5 text-[var(--on-accent-container)]">
                         <Trophy className="h-3.5 w-3.5" /> Completed{" "}
                         {runs.length > 1 ? `${runs.length} times` : "once"}
                       </span>
-                      <span className="mt-1.5 text-[12px] text-muted-foreground">
+                      <span className="type-label-md mt-1.5 text-muted-foreground">
                         <DateText>
                           Last finished {last?.finishedAt ? shortDate(last.finishedAt) : ""}
                         </DateText>
                       </span>
-                      <span className="mt-auto flex flex-wrap gap-x-3 gap-y-1 pt-2 text-[12px] text-muted-foreground">
+                      <span className="type-label-md mt-auto flex flex-wrap gap-x-3 gap-y-1 pt-2 text-muted-foreground">
                         <span className="inline-flex items-center gap-1">
                           <CalendarCheck className="h-3.5 w-3.5" /> {days} days
                         </span>
@@ -170,10 +170,10 @@ function ProgramHistoryPage() {
                     </>
                   ) : (
                     <>
-                      <span className="mt-1 text-[13px] text-muted-foreground">
+                      <span className="type-body-sm mt-1 text-muted-foreground">
                         Not completed yet
                       </span>
-                      <span className="mt-auto pt-2 text-[12px] text-muted-foreground">
+                      <span className="type-label-md mt-auto pt-2 text-muted-foreground">
                         {dayCount(p)} days. Each finished run stacks up here.
                       </span>
                     </>

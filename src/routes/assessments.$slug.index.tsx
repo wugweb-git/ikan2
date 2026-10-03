@@ -127,13 +127,13 @@ function AssessmentDetailPage() {
           <span className="grid h-14 w-14 place-items-center rounded-[18px] border-4 border-background bg-[var(--accent-container)] text-[var(--on-accent-container)]">
             <Icon className="h-7 w-7" />
           </span>
-          <p className="mt-5 text-[14px] font-medium text-[var(--accent-strong)]">{a.name}</p>
+          <p className="type-label-lg mt-5 text-[var(--accent-strong)]">{a.name}</p>
           <h1 className="type-headline-md mt-1">{a.title}</h1>
           <div className="mt-4 flex flex-wrap gap-2">
-            <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
+            <span className="type-body-md inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3">
               <ListChecks className="h-4 w-4" /> {a.questions.length} questions
             </span>
-            <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
+            <span className="type-body-md inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3">
               <Clock3 className="h-4 w-4" /> About {a.minutes} min
             </span>
             {hydrated && past.length ? (
@@ -141,7 +141,7 @@ function AssessmentDetailPage() {
                 to="/history/assessments/$slug"
                 params={{ slug }}
                 className={cn(
-                  "inline-flex h-8 items-center gap-1.5 rounded-full bg-[var(--accent-container)] pl-3 pr-2 text-[14px] font-semibold text-[var(--on-accent-container)]",
+                  "type-body-md font-semibold inline-flex h-8 items-center gap-1.5 rounded-full bg-[var(--accent-container)] pl-3 pr-2 text-[var(--on-accent-container)]",
                   stateLayer,
                 )}
               >
@@ -181,19 +181,19 @@ function AssessmentDetailPage() {
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block text-[15px] font-medium leading-6">{sc.label}</span>
-                    <span className="block text-[13px] text-muted-foreground">
+                    <span className="type-body-sm block text-muted-foreground">
                       {sc.instrument}, {formatValue(pr, pr.min)} to {pr.max}
                       {pr.direction === "better" ? ", higher is better" : ""}
                     </span>
                   </span>
-                  <span className="text-[13px] text-muted-foreground">
+                  <span className="type-body-sm text-muted-foreground">
                     {pr.bands.length} levels
                   </span>
                 </li>
               );
             })}
           </ul>
-          <p className="mt-2 text-[13px] text-muted-foreground">{a.instrument}</p>
+          <p className="type-body-sm mt-2 text-muted-foreground">{a.instrument}</p>
         </Group>
 
         <Group title="How it works">
@@ -211,7 +211,7 @@ function AssessmentDetailPage() {
                   {a.scales[k]!.options.map((o) => (
                     <span
                       key={o.text}
-                      className="rounded-[8px] bg-secondary px-3 py-1.5 text-[13px]"
+                      className="type-body-sm rounded-[8px] bg-secondary px-3 py-1.5"
                     >
                       {optionLabel(o.text)}
                     </span>
@@ -231,7 +231,7 @@ function AssessmentDetailPage() {
             {about.youllSee.paragraphs
               .filter((t) => !/:$/.test(t))
               .map((t) => (
-                <p key={t} className="mt-3 text-[15px] font-medium">
+                <p key={t} className="type-action font-medium mt-3">
                   {t}
                 </p>
               ))}

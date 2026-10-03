@@ -51,7 +51,7 @@ function AboutPage() {
       </div>
 
       <section className="mt-8 px-5">
-        <p className="text-[13px] font-semibold text-[#2B634D]">{a.story.label}</p>
+        <p className="type-body-sm font-semibold text-[#2B634D]">{a.story.label}</p>
         <h2 className="type-headline-sm mt-1">{unmark(a.story.heading)}</h2>
         <div className="mt-3 space-y-4 text-[16px] leading-7 text-foreground/85">
           {a.story.paragraphs.map((p) => (
@@ -70,7 +70,7 @@ function AboutPage() {
                 : "rounded-[24px] bg-[#DFF0E8] p-5 text-[#173D2F]"
             }
           >
-            <p className="text-[13px] font-semibold opacity-75">{m.label}</p>
+            <p className="type-body-sm font-semibold opacity-75">{m.label}</p>
             <p className="type-title-lg font-semibold mt-1">{m.title}</p>
             <p className="mt-2 text-[15px] leading-6 opacity-85">{m.description}</p>
           </div>
@@ -85,7 +85,7 @@ function AboutPage() {
             return (
               <div key={v.title} className="rounded-[20px] bg-secondary p-4">
                 <Icon className="h-6 w-6" />
-                <p className="mt-3 font-display text-[16px] font-semibold">{v.title}</p>
+                <p className="type-title-md mt-3">{v.title}</p>
                 <p className="type-body-sm mt-1 text-muted-foreground">{v.description}</p>
               </div>
             );
@@ -110,7 +110,7 @@ function AboutPage() {
                 </span>
                 <span className="pb-2">
                   <span className="block font-display text-[17px] font-semibold">{s.title}</span>
-                  <span className="block text-[14px] font-medium text-[#2B634D]">{s.tagline}</span>
+                  <span className="type-label-lg block text-[#2B634D]">{s.tagline}</span>
                   <span className="mt-1 block text-[15px] leading-6 text-muted-foreground">
                     {s.description}
                   </span>
@@ -121,7 +121,7 @@ function AboutPage() {
         </ol>
         <Link
           to="/assessments"
-          className="mt-4 flex h-12 items-center justify-center rounded-full bg-foreground text-[15px] font-semibold text-background"
+          className="type-action mt-4 flex h-12 items-center justify-center rounded-full bg-foreground text-background"
         >
           Get started
         </Link>
@@ -140,7 +140,7 @@ function AboutPage() {
               </div>
               <div className="p-4">
                 <p className="font-display text-[17px] font-semibold">{g.title}</p>
-                <p className="text-[14px] font-medium text-[#2B634D]">{g.tagline}</p>
+                <p className="type-label-lg text-[#2B634D]">{g.tagline}</p>
                 <p className="mt-2 text-[14px] leading-6 text-muted-foreground">{g.description}</p>
               </div>
             </div>
@@ -163,7 +163,7 @@ function AboutPage() {
                 />
                 <div>
                   <p className="font-display text-[17px] font-semibold">{f.name}</p>
-                  <p className="text-[13px] text-muted-foreground">{f.role}</p>
+                  <p className="type-body-sm text-muted-foreground">{f.role}</p>
                 </div>
               </div>
               <p className="mt-3 text-[14px] leading-6 text-foreground/85">{f.bio}</p>
