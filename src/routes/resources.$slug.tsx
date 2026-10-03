@@ -25,6 +25,8 @@ import {
   getResource,
   getResourceBySlug,
   lengthLabel,
+  mediumIcon,
+  mediumLabel,
   mediumOf,
   resources,
   slugOf,
@@ -151,6 +153,13 @@ function ArticlePage() {
               <CalendarDays className="h-4 w-4" /> {dateLabel(r.date)}
             </span>
             <span className="inline-flex items-center gap-1.5">
+              {(() => {
+                const Icon = mediumIcon[mediumOf(r)];
+                return <Icon className="h-4 w-4" />;
+              })()}
+              {mediumLabel(r)}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
               <Clock3 className="h-4 w-4" /> {lengthLabel(r)}
             </span>
           </p>
@@ -216,6 +225,13 @@ function ArticlePage() {
                         <span className="mt-2 flex items-center gap-2 text-[12px] text-muted-foreground">
                           <span className="rounded-full bg-background px-2 py-0.5 font-medium">
                             {m.category}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            {(() => {
+                              const Icon = mediumIcon[mediumOf(m)];
+                              return <Icon className="h-3.5 w-3.5" />;
+                            })()}
+                            {mediumLabel(m)}
                           </span>
                           <span className="inline-flex items-center gap-1">
                             <Clock3 className="h-3.5 w-3.5" /> {lengthLabel(m)}

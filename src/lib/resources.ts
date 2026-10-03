@@ -106,6 +106,7 @@ export const resources: Resource[] = [
     title: "Five Minutes That Can Change How You Handle Stress",
     category: "Stress",
     date: "2026-10-03",
+    /* 4:19. */
     minutes: 4,
     source: {
       name: "NHS Every Mind Matters",
@@ -163,6 +164,7 @@ export const resources: Resource[] = [
     title: "What Happens When Stress Takes Over?",
     category: "Stress",
     date: "2026-10-03",
+    /* 10:27. */
     minutes: 10,
     source: {
       name: "National Institute of Mental Health",
@@ -182,7 +184,8 @@ export const resources: Resource[] = [
     title: "Practical Ways to Manage Stress and Anxiety",
     category: "Stress",
     date: "2026-10-03",
-    minutes: 3,
+    /* 0:25. */
+    minutes: 1,
     source: {
       name: "National Institute of Mental Health",
       /* This one has no page of its own on nimh.nih.gov - it lives on NIMH's YouTube channel -
@@ -211,7 +214,8 @@ export const resources: Resource[] = [
     },
     category: "Stress",
     date: "2026-10-03",
-    minutes: 4,
+    /* 6:34. */
+    minutes: 7,
     art: "mood",
     medium: "video",
     src: "https://www.youtube.com/watch?v=3cXGt2d1RyQ",
@@ -392,12 +396,23 @@ export const resources: Resource[] = [
 
 export const mediumOf = (r: Resource): Medium => r.medium ?? "article";
 
-const verb: Record<Medium, string> = { article: "read", video: "watch", audio: "listen" };
+const verb: Record<Medium, string> = { article: "Read", video: "Watch", audio: "Listen" };
 const done: Record<Medium, string> = { article: "Read", video: "Watched", audio: "Listened" };
 const plural: Record<Medium, string> = { article: "articles", video: "videos", audio: "audio" };
 
-/** "5 min read", "12 min watch", "18 min listen" */
-export const lengthLabel = (r: Resource) => `${r.minutes} min ${verb[mediumOf(r)]}`;
+/** How long it takes. The medium is shown beside it with its own icon, not folded in here. */
+export const lengthLabel = (r: Resource) => `${r.minutes} min`;
+
+/** "Read", "Watch", "Listen" - what you do with it, next to its icon. */
+export const mediumLabel = (r: Resource) => verb[mediumOf(r)];
+
+/** One line about where someone got to, or nothing. Never shown next to the done check: a
+ * resource is either finished or it is part way through, not both. */
+export const progressLabel = (r: Resource, played: Played | undefined) => {
+  if (!played?.of || played.done) return null;
+  const left = Math.max(1, Math.round((played.of - played.at) / 60));
+  return played.at < 20 ? "Started" : `${left} min left`;
+};
 
 /** The badge on something already opened: Read, Watched, Listened. */
 export const doneLabel = (r: Resource) => done[mediumOf(r)];
