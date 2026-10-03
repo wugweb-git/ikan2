@@ -1,5 +1,5 @@
 import { useRef, useState, type SyntheticEvent } from "react";
-import { Pause, Play } from "lucide-react";
+import { ArrowUpRight, Pause, Play } from "lucide-react";
 import { stateLayer } from "@/components/equip/m3";
 import { cn } from "@/lib/utils";
 
@@ -102,6 +102,12 @@ const label = {
   spotify: "Listen on Spotify",
 } as const;
 
+const openLabel = {
+  youtube: "Watch on YouTube",
+  vimeo: "Watch on Vimeo",
+  spotify: "Listen on Spotify",
+} as const;
+
 const note = {
   youtube: "Loads from YouTube when you press play.",
   vimeo: "Loads from Vimeo when you press play.",
@@ -111,6 +117,7 @@ const note = {
 export function MediaPlayer({
   src,
   kind,
+  embeddable = true,
   poster,
   className,
   title,
@@ -120,6 +127,8 @@ export function MediaPlayer({
 }: {
   src: string;
   kind: "video" | "audio";
+  /** false when the provider forbids embedding: the card opens the service in a new tab */
+  embeddable?: boolean;
   /** the piece's own artwork: a video still, an episode cover, an mp3's embedded art */
   poster?: string;
   className?: string;
@@ -150,6 +159,47 @@ export function MediaPlayer({
       source.provider === "spotify"
         ? { height: source.height }
         : { aspectRatio: "16 / 9" as const };
+    /* Some owners forbid embedding. Showing their iframe anyway renders a black "Video
+     * unavailable" box, so the card becomes a door to the service instead of a broken player. */
+    if (!embeddable) {
+      return (
+        <div className={cn("relative", className)} style={box}>
+          <a
+            href={src}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "group relative block h-full w-full overflow-hidden rounded-[20px] bg-secondary text-left",
+              poster && "text-white",
+              stateLayer,
+            )}
+          >
+            {poster ? (
+              <>
+                <img src={poster} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/15" />
+              </>
+            ) : null}
+            <span className="absolute inset-0 grid place-items-center">
+              <span className="grid h-16 w-16 place-items-center rounded-full bg-white text-foreground shadow-lg transition-transform duration-200 group-hover:scale-105 group-active:scale-95">
+                <ArrowUpRight className="h-7 w-7" />
+              </span>
+            </span>
+            <span className="absolute inset-x-0 bottom-0 block px-4 pb-3.5">
+              <span className="block text-[15px] font-semibold">{openLabel[source.provider]}</span>
+              <span
+                className={cn(
+                  "mt-0.5 block text-[12px] leading-4",
+                  poster ? "text-white/85" : "text-muted-foreground",
+                )}
+              >
+                {`${source.provider === "spotify" ? "Spotify" : source.provider === "vimeo" ? "Vimeo" : "YouTube"} does not allow this one to play here. Opens in a new tab.`}
+              </span>
+            </span>
+          </a>
+        </div>
+      );
+    }
     if (!playing) {
       /* The embed's own height is Spotify's, and it is tall. The placeholder does not need it:
        * before anyone presses play there is nothing to show but the artwork and a button. */
@@ -331,7 +381,10 @@ function AudioPlayer({ src, poster, className, startAt, onProgress, onEnded }: F
         onClick={toggle}
         aria-label={playing ? "Pause" : "Play"}
         className={cn(
-          "group relative grid aspect-[16/10] w-full place-items-center overflow-hidden",
+          "group relative grid w-full place-items-center overflow-hidden",
+          /* With artwork the panel is a picture to look at. Without, it is just a button, and a
+           * 16:10 box of empty grey for one button is a lot of nothing. */
+          poster ? "aspect-[16/10]" : "py-8",
           poster && "text-white",
         )}
       >

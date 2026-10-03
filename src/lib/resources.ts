@@ -76,6 +76,10 @@ export type Resource = {
    * provider and committed, never requested at render: the whole point of the placeholder is
    * that nothing reaches YouTube or Spotify until somebody presses play. */
   poster?: string;
+  /** false when the owner has disabled embedding, so the card opens the service instead of
+   * showing its "Video unavailable" box. Checked against the provider's oEmbed, which answers
+   * 401 for a video that may not be embedded. */
+  embeddable?: boolean;
   /* Where a shared piece came from. Kept as fields rather than a line of italics at the bottom
    * of the prose, because it is metadata: who made it, what it costs, what language it is in,
    * what licence it carries, and a link back to the publisher's own page for it. */
@@ -194,34 +198,47 @@ export const resources: Resource[] = [
     poster: "/resources/poster-great-practices.jpg",
   },
   {
+    /* id unchanged on purpose: it keys this piece's body in articles.json and anyone's saved
+     * and opened state. Only the source, the media and the title have been replaced. */
     id: "resource-can-we-talk",
-    title: "Can We Talk About Mental Health?",
-    category: "Mental Health",
-    date: "2026-10-03",
-    minutes: 2,
+    title: "How to cope with anxiety \u2013 a relaxation technique",
     source: {
-      name: "SAMHSA",
-      url: "https://www.samhsa.gov/mental-health/children-and-families/coping-resources/multimedia",
-      cost: "Free for public use",
-      language: "English, with Spanish versions available",
-      note: "U.S. Department of Health & Human Services.",
+      name: "NHS",
+      url: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/mental-wellbeing-audio-guides/",
+      cost: "Free",
+      language: "English",
+      note: "The second of the NHS mental wellbeing audio guides.",
     },
+    category: "Stress",
+    date: "2026-10-03",
+    minutes: 4,
     art: "mood",
+    medium: "video",
+    src: "https://www.youtube.com/watch?v=3cXGt2d1RyQ",
+    poster: "/resources/poster-cope-with-anxiety.jpg",
+    /* The NHS has turned embedding off for this one: YouTube's oEmbed answers 401 and the
+     * iframe renders "Playback on other websites has been disabled by the video owner". */
+    embeddable: false,
   },
   {
     id: "resource-not-always-visible",
-    title: "Mental Health Isn't Always Visible",
-    category: "Mental Health",
-    date: "2026-10-03",
-    minutes: 2,
+    title: "Being Kind to Yourself",
     source: {
-      name: "SAMHSA",
-      url: "https://www.samhsa.gov/mental-health/serious-mental-illness/treatment-works/multimedia",
-      cost: "Free for public use",
-      language: "English, with Spanish versions available",
-      note: "U.S. Department of Health & Human Services.",
+      name: "World Health Organization",
+      url: "https://tdr.who.int/home/our-work/global-engagement/9789240003927",
+      cost: "Free",
+      language: "English",
+      note: "From \u201cDoing What Matters in Times of Stress\u201d.",
     },
+    category: "Stress",
+    date: "2026-10-03",
+    /* 7:45, from the file. */
+    minutes: 8,
     art: "checkup",
+    medium: "audio",
+    /* Pulled out of terrance.who.int and into the repo, like the other audio, so it is not one
+     * moved file away from going silent and the service worker can cache it. 7.1 MB. */
+    src: "/resources/being-kind-to-yourself.mp3",
   },
   {
     id: "resource-india-numbers",

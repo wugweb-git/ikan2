@@ -159,6 +159,7 @@ function ArticlePage() {
             <MediaPlayer
               src={r.src}
               kind={mediumOf(r) === "audio" ? "audio" : "video"}
+              {...(r.embeddable === false ? { embeddable: false } : {})}
               {...(r.poster ? { poster: r.poster } : {})}
               title={r.title}
               className="mt-6"
