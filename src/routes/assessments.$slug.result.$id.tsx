@@ -306,7 +306,7 @@ function ResultBody({
                     ) : null}
                     <span className="block font-display text-[17px] font-semibold">{p.name}</span>
                     {p.source.description ? (
-                      <span className="mt-1 line-clamp-2 text-[13px] leading-5 text-muted-foreground">
+                      <span className="type-body-sm mt-1 line-clamp-2 text-muted-foreground">
                         {p.source.description}
                       </span>
                     ) : null}
@@ -385,9 +385,7 @@ function HeadlineCard({ r }: { r: ScoreResult }) {
       <p className="text-[14px] font-medium text-[var(--tone)]">
         {r.score.label}, {r.score.instrument}
       </p>
-      <p className="mt-1 font-display text-[34px] font-bold leading-10 text-[var(--tone)]">
-        {band.label}
-      </p>
+      <p className="type-display-sm font-bold mt-1 text-[var(--tone)]">{band.label}</p>
       <SeverityLine severity={band.severity} />
       <p className="mt-1 text-[15px] tabular-nums">
         <span className="font-semibold">{valueText(r)}</span>
@@ -433,7 +431,7 @@ function ScoreRow({ r }: { r: ScoreResult }) {
         <RangeBar result={r} />
       </div>
       {r.band?.interpretation ? (
-        <p className="mt-3 text-[14px] leading-5 text-muted-foreground">{r.band.interpretation}</p>
+        <p className="type-label-lg mt-3 text-muted-foreground">{r.band.interpretation}</p>
       ) : null}
     </div>
   );

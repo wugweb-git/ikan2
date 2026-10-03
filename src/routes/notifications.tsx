@@ -103,7 +103,7 @@ function NotificationsPage() {
           }
         />
         <header className="px-4">
-          <h1 className="font-display text-[32px] font-semibold leading-10">Notifications</h1>
+          <h1 className="type-headline-lg">Notifications</h1>
         </header>
 
         <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto px-4" role="tablist">
@@ -230,7 +230,7 @@ function NoticeRow({ n, fresh, strong }: { n: Notice; fresh: boolean; strong?: b
         >
           {n.title}
         </span>
-        <span className="mt-0.5 block text-[13px] leading-5 text-muted-foreground">{n.body}</span>
+        <span className="type-body-sm mt-0.5 block text-muted-foreground">{n.body}</span>
       </span>
       <span className="flex flex-col items-end gap-2">
         <span className="text-[12px] tabular-nums text-muted-foreground">{ago(n.at)}</span>

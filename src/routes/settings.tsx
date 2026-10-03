@@ -164,7 +164,7 @@ function SettingsPage() {
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-[16px]">Signed in</span>
-              <span className="block truncate text-[13px] leading-5 text-muted-foreground">
+              <span className="type-body-sm block truncate text-muted-foreground">
                 {user?.email ?? ""}
               </span>
             </span>
@@ -717,7 +717,7 @@ function Row({
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-[16px]">{label}</span>
-        <span className="block text-[13px] leading-5 text-muted-foreground">{sub}</span>
+        <span className="type-body-sm block text-muted-foreground">{sub}</span>
       </span>
       {children}
     </div>
@@ -757,7 +757,7 @@ function ActionRow({
         <span className={cn("block text-[16px]", danger && "text-on-error-container")}>
           {label}
         </span>
-        <span className="block text-[13px] leading-5 text-muted-foreground">{sub}</span>
+        <span className="type-body-sm block text-muted-foreground">{sub}</span>
       </span>
       <ChevronRight className="h-5 w-5 text-muted-foreground" />
     </button>
@@ -782,7 +782,7 @@ function LinkRow({
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-[16px]">{label}</span>
-        <span className="block text-[13px] leading-5 text-muted-foreground">{sub}</span>
+        <span className="type-body-sm block text-muted-foreground">{sub}</span>
       </span>
       <ChevronRight className="h-5 w-5 text-muted-foreground" />
     </Link>
@@ -817,7 +817,7 @@ function SyncRow() {
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-[16px]">Your data</span>
-        <span className="block text-[13px] leading-5 text-muted-foreground">{text}</span>
+        <span className="type-body-sm block text-muted-foreground">{text}</span>
       </span>
       {status.state === "error" ? (
         <button
@@ -920,7 +920,7 @@ function ConnectedAccounts({ onMessage }: { onMessage: (m: string) => void }) {
         );
       })}
       {sole ? (
-        <p className="px-4 pb-3 text-[13px] leading-5 text-muted-foreground">
+        <p className="type-body-sm px-4 pb-3 text-muted-foreground">
           Connecting one of these is also a second way to sign in, which is worth having if you ever
           lose access to the first.
         </p>

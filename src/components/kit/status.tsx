@@ -109,7 +109,7 @@ export function FieldError({
   return (
     <span
       role="alert"
-      className={cn("motion-error mt-1 block px-1 text-[12px] leading-4 text-error", className)}
+      className={cn("type-label-md motion-error mt-1 block px-1 text-error", className)}
     >
       {children}
     </span>

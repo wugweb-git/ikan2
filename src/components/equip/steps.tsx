@@ -111,9 +111,7 @@ function BlockText({
           </span>
         ) : null}
         {headline ? (
-          <p className="text-[14px] font-semibold leading-5 text-[var(--accent-strong)]">
-            {block.title}
-          </p>
+          <p className="type-label-lg font-semibold text-[var(--accent-strong)]">{block.title}</p>
         ) : (
           <h2 className="font-display text-[26px] font-semibold leading-8 tracking-[-0.01em] text-balance">
             {block.title}
@@ -197,7 +195,7 @@ function LessonStep({
             >
               <p className="font-display text-[18px] font-semibold leading-6">{c.title}</p>
               {c.text?.filter(Boolean).map((t) => (
-                <p key={t} className="mt-0.5 text-[14px] leading-5 opacity-80">
+                <p key={t} className="type-label-lg mt-0.5 opacity-80">
                   {t}
                 </p>
               ))}
@@ -222,7 +220,7 @@ function LessonStep({
                     <li
                       key={it}
                       className={cn(
-                        "rounded-full px-3 py-1.5 text-[14px] leading-5",
+                        "type-label-lg rounded-full px-3 py-1.5",
                         i % 2 === 0 ? "bg-background/70" : "bg-secondary",
                       )}
                     >
@@ -231,7 +229,7 @@ function LessonStep({
                   ))}
                 </ul>
               ) : null}
-              {c.footer ? <p className="mt-3 text-[14px] leading-5">{c.footer}</p> : null}
+              {c.footer ? <p className="type-label-lg mt-3">{c.footer}</p> : null}
             </section>
           ))}
         </div>
@@ -705,7 +703,7 @@ function StatementsStep({
               key={s}
               className="flex min-h-48 flex-col justify-between rounded-[16px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]"
             >
-              <p className="font-display text-[20px] font-semibold leading-7">{s}</p>
+              <p className="type-title-lg font-semibold">{s}</p>
               <div className="mt-6">
                 <Segmented
                   label={s}
@@ -813,7 +811,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
                 onClick={() => setQ(i)}
                 className="flex min-h-10 w-full items-center justify-between gap-4 px-4 py-1.5 text-left"
               >
-                <span className="text-[14px] leading-5 text-muted-foreground">
+                <span className="type-label-lg text-muted-foreground">
                   {qq.label.replace(/\s*\(1-5, 5 being best\)/, "")}
                 </span>
                 <span className="shrink-0 text-[14px] font-semibold tabular-nums">
@@ -868,10 +866,7 @@ function DiaryStep({ ctx, rows }: { ctx: StepCtx; rows: string[] }) {
           {q + 1} of {questions.length}
         </p>
       </div>
-      <h2
-        key={question.key}
-        className="animate-fade mt-2 font-display text-[28px] font-semibold leading-9 text-balance"
-      >
+      <h2 key={question.key} className="type-headline-md animate-fade mt-2 text-balance">
         {question.label}
       </h2>
       <div className="mt-6">

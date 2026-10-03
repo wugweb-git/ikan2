@@ -114,9 +114,7 @@ export function PhoneField({
             error ? "border-error" : "border-foreground/50 focus-within:border-foreground",
           )}
         >
-          <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">
-            {label}
-          </span>
+          <span className="type-label-md block px-4 pt-2 text-muted-foreground">{label}</span>
           <div className="flex h-10 items-center px-4 pb-1">
             {select}
             {input}

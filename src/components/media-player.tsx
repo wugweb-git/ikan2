@@ -189,7 +189,7 @@ export function MediaPlayer({
               <span className="block text-[15px] font-semibold">{openLabel[source.provider]}</span>
               <span
                 className={cn(
-                  "mt-0.5 block text-[12px] leading-4",
+                  "type-label-md mt-0.5 block",
                   poster ? "text-white/85" : "text-muted-foreground",
                 )}
               >
@@ -231,7 +231,7 @@ export function MediaPlayer({
               <span className="block text-[15px] font-semibold">{label[source.provider]}</span>
               <span
                 className={cn(
-                  "mt-0.5 block text-[12px] leading-4",
+                  "type-label-md mt-0.5 block",
                   poster ? "text-white/85" : "text-muted-foreground",
                 )}
               >

@@ -28,7 +28,7 @@ function AssessmentListPage() {
       <div style={accentStyle("mind")}>
         <header className="safe-top flex items-start gap-2 px-4 pb-1">
           <div className="min-w-0 flex-1">
-            <h1 className="font-display text-[32px] font-semibold leading-10">Assessments</h1>
+            <h1 className="type-headline-lg">Assessments</h1>
             <p className="mt-1 text-[15px] text-muted-foreground">
               Answer a few questions and see where you stand today.
             </p>

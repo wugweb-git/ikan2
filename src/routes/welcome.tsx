@@ -141,9 +141,7 @@ function WelcomePage() {
         ) : step === 1 ? (
           <main className="flex flex-1 flex-col px-4 pb-8">
             <p className="text-[14px] font-medium text-[var(--accent-strong)]">Step 2 of {STEPS}</p>
-            <h1 className="mt-1 font-display text-[28px] font-semibold leading-9">
-              What brings you here?
-            </h1>
+            <h1 className="type-headline-md mt-1">What brings you here?</h1>
             <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
               Pick the one that fits best. You can explore everything later.
             </p>
@@ -176,9 +174,7 @@ function WelcomePage() {
         ) : assessment && reason ? (
           <main className="flex flex-1 flex-col px-4 pb-8">
             <p className="text-[14px] font-medium text-[var(--accent-strong)]">Step 4 of {STEPS}</p>
-            <h1 className="mt-1 font-display text-[28px] font-semibold leading-9">
-              Start with a short check
-            </h1>
+            <h1 className="type-headline-md mt-1">Start with a short check</h1>
             <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
               It shows where you are today and which program fits. It’s a screening, not a
               diagnosis.
@@ -510,7 +506,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
   return (
     <main className="flex flex-1 flex-col px-4 pb-8">
       <p className="text-[14px] font-medium text-[var(--accent-strong)]">Step 3 of {STEPS}</p>
-      <h1 className="mt-1 font-display text-[28px] font-semibold leading-9">Make iKAN yours</h1>
+      <h1 className="type-headline-md mt-1">Make iKAN yours</h1>
       <p className="mt-2 text-[15px] leading-6 text-muted-foreground">
         Allow what’s useful to you. Each one is optional and you can change it any time in Settings.
       </p>
@@ -526,9 +522,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold">{r.title}</span>
-                <span className="mt-0.5 block text-[13px] leading-5 text-muted-foreground">
-                  {r.body}
-                </span>
+                <span className="type-body-sm mt-0.5 block text-muted-foreground">{r.body}</span>
               </span>
               <button
                 type="button"
@@ -565,7 +559,7 @@ function Permissions({ onDone }: { onDone: () => void }) {
           );
         })}
       </ul>
-      <p className="mt-3 text-[13px] leading-5 text-muted-foreground">
+      <p className="type-body-sm mt-3 text-muted-foreground">
         Health Connect and Google Fit sync come with the installed Android app.
       </p>
       {message ? (

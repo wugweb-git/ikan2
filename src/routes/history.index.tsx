@@ -80,7 +80,7 @@ function HistoryPage() {
           }
         />
         <header className="px-4 pb-1">
-          <h1 className="font-display text-[32px] font-semibold leading-10">My history</h1>
+          <h1 className="type-headline-lg">My history</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">
             Your assessments, programs and journal, in one place
           </p>
@@ -95,7 +95,7 @@ function HistoryPage() {
                   ? "A fresh week"
                   : `${week.length} ${week.length === 1 ? "thing" : "things"} done`}
               </p>
-              <p className="mt-1 text-[14px] leading-5 opacity-80">
+              <p className="type-label-lg mt-1 opacity-80">
                 {weekAvg !== null
                   ? `Average mood ${weekAvg.toFixed(1)}/5 across ${weekMood.length} check-ins.`
                   : "Log a check-in to see your weekly mood."}

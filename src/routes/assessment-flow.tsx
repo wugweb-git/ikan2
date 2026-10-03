@@ -174,9 +174,7 @@ function AssessmentFlowPage() {
             {scale.prompt ? (
               <p className="mt-1 text-[15px] leading-6 text-muted-foreground">{scale.prompt}</p>
             ) : null}
-            <h1 className="mt-2 font-display text-[24px] font-semibold leading-8">
-              {question.text}
-            </h1>
+            <h1 className="type-headline-sm mt-2">{question.text}</h1>
 
             <div
               role="radiogroup"

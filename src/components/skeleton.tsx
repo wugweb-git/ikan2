@@ -90,7 +90,7 @@ function StateScreen({
             <span className="block text-[14px] font-semibold text-on-error-container">
               Need help now?
             </span>
-            <span className="block text-[13px] leading-5 text-muted-foreground">
+            <span className="type-body-sm block text-muted-foreground">
               Free, confidential helplines are open right now.
             </span>
           </span>

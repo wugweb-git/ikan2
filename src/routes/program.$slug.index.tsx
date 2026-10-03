@@ -251,7 +251,7 @@ function ProgrammePage() {
 
         {/* progress band (or what's inside, before starting) */}
         <section className="mt-10 bg-foreground/[0.035] px-4 pb-8 pt-7">
-          <h2 className="font-display text-[20px] font-semibold leading-7">
+          <h2 className="type-title-lg font-semibold">
             {started ? "Your progress" : "What’s inside"}
           </h2>
           {started ? (
@@ -295,9 +295,7 @@ function ProgrammePage() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-[15px] font-medium leading-5">{u.title}</p>
-                    <p className="text-[13px] leading-5 text-muted-foreground">
-                      {focusOf(programme, i)}
-                    </p>
+                    <p className="type-body-sm text-muted-foreground">{focusOf(programme, i)}</p>
                   </div>
                   <p className="shrink-0 text-right text-[12px] tabular-nums text-muted-foreground">
                     {range}

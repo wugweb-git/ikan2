@@ -101,9 +101,7 @@ function ConsultPage() {
     <IkanShell>
       <div style={accentStyle("night")}>
         <header className="safe-top px-4 pb-1">
-          <h1 className="font-display text-[32px] font-semibold leading-10">
-            Find your consultant
-          </h1>
+          <h1 className="type-headline-lg">Find your consultant</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">
             Connect with experienced mental health professionals who understand your needs.
           </p>
@@ -148,7 +146,7 @@ function ConsultPage() {
         {latestAssessment ? (
           <div className="mx-4 mt-4 flex gap-3 rounded-[20px] bg-[var(--accent-container)] p-4 text-[var(--on-accent-container)]">
             <Sparkles className="mt-0.5 h-5 w-5 shrink-0" />
-            <p className="text-[14px] leading-5">
+            <p className="type-label-lg">
               Based on your latest {latestAssessment.name.toLowerCase()} assessment, consultants who
               work with {areas.join(" or ").toLowerCase()} are shown first.
             </p>
@@ -162,7 +160,7 @@ function ConsultPage() {
             )}
           >
             <Sparkles className="h-5 w-5 shrink-0 text-[var(--accent-strong)]" />
-            <span className="flex-1 text-[14px] leading-5">
+            <span className="type-label-lg flex-1">
               Take an assessment and we’ll show the consultants who fit first.
             </span>
             <ChevronRight className="h-5 w-5 text-muted-foreground" />

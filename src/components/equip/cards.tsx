@@ -332,7 +332,7 @@ function Values({ entry, fields }: { entry: Entry | { values: EntryValues }; fie
         const v = display(f, entry.values[f.key]);
         return v ? (
           <div key={f.key}>
-            {f.label ? <dt className="text-[12px] leading-4 opacity-70">{f.label}</dt> : null}
+            {f.label ? <dt className="type-label-md opacity-70">{f.label}</dt> : null}
             <dd className="mt-0.5 whitespace-pre-line text-[16px] leading-6">{v}</dd>
           </div>
         ) : null;
@@ -400,9 +400,7 @@ function EmptyCards({
   return (
     <div className="flex flex-col items-center rounded-[16px] border border-dashed border-foreground/25 px-6 py-8 text-center">
       <p className="text-[16px] font-medium">No entries yet</p>
-      {help ? (
-        <p className="mt-1.5 max-w-72 text-[14px] leading-5 text-muted-foreground">{help}</p>
-      ) : null}
+      {help ? <p className="type-label-lg mt-1.5 max-w-72 text-muted-foreground">{help}</p> : null}
       {canAdd ? (
         <Button
           variant="tonal"

@@ -42,7 +42,7 @@ function ProgramsPage() {
             <NotebookPen className="h-6 w-6" />
           </Link>
         </div>
-        <h1 className="font-display text-[32px] font-semibold leading-10">Programs</h1>
+        <h1 className="type-headline-lg">Programs</h1>
         <p className="mt-1 text-[15px] text-muted-foreground">
           Short daily sessions, one skill at a time.
         </p>
@@ -88,11 +88,9 @@ function ProgrammeCard({ programme }: { programme: Programme }) {
     >
       <img src={programme.cover} alt="" className="w-[112px] shrink-0 object-cover" />
       <div className="flex min-w-0 flex-1 flex-col p-4">
-        <p className="font-display text-[20px] font-semibold leading-7">{programme.name}</p>
+        <p className="type-title-lg font-semibold">{programme.name}</p>
         {src.description ? (
-          <p className="mt-1 line-clamp-2 text-[14px] leading-5 text-muted-foreground">
-            {src.description}
-          </p>
+          <p className="type-label-lg mt-1 line-clamp-2 text-muted-foreground">{src.description}</p>
         ) : null}
         <div className="mt-auto pt-3">
           {started ? (

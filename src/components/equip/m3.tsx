@@ -99,9 +99,7 @@ export function TopAppBar({
     >
       {leading}
       <div className="min-w-0 flex-1 px-2">
-        {title ? (
-          <p className="truncate font-display text-[20px] font-semibold leading-7">{title}</p>
-        ) : null}
+        {title ? <p className="type-title-lg font-semibold truncate">{title}</p> : null}
         {subtitle ? (
           <p className="truncate text-[13px] leading-4 text-muted-foreground">{subtitle}</p>
         ) : null}
@@ -438,9 +436,7 @@ export function TextField({
         )}
       >
         {label ? (
-          <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">
-            {label}
-          </span>
+          <span className="type-label-md block px-4 pt-2 text-muted-foreground">{label}</span>
         ) : null}
         {multiline ? (
           <textarea {...common} rows={rows ?? 3} />
@@ -468,7 +464,7 @@ function FieldMessage({
 }) {
   if (!error && !hint && !count) return null;
   return (
-    <span className="mt-1 flex gap-3 px-4 text-[12px] leading-4">
+    <span className="type-label-md mt-1 flex gap-3 px-4">
       <span
         role={error ? "alert" : undefined}
         className={cn("flex-1", error ? "text-error" : "text-muted-foreground")}
@@ -549,7 +545,7 @@ export function SelectField({
           error ? "border-error" : "border-foreground/50 focus-within:border-foreground",
         )}
       >
-        <span className="block px-4 pt-2 text-[12px] leading-4 text-muted-foreground">{label}</span>
+        <span className="type-label-md block px-4 pt-2 text-muted-foreground">{label}</span>
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}

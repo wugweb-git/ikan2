@@ -128,7 +128,7 @@ function AssessmentDetailPage() {
             <Icon className="h-7 w-7" />
           </span>
           <p className="mt-5 text-[14px] font-medium text-[var(--accent-strong)]">{a.name}</p>
-          <h1 className="mt-1 font-display text-[28px] font-semibold leading-9">{a.title}</h1>
+          <h1 className="type-headline-md mt-1">{a.title}</h1>
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-foreground/20 px-3 text-[14px]">
               <ListChecks className="h-4 w-4" /> {a.questions.length} questions

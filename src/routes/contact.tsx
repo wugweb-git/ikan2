@@ -76,7 +76,7 @@ function ContactPage() {
   return (
     <InfoShell>
       <header className="px-5">
-        <h1 className="font-display text-[32px] font-semibold leading-10">{c.heroTitle}</h1>
+        <h1 className="type-headline-lg">{c.heroTitle}</h1>
         <p className="mt-2 text-[16px] leading-6 text-muted-foreground">{c.heroSubtitle}</p>
       </header>
 
@@ -85,7 +85,7 @@ function ContactPage() {
           <ShieldAlert className="mt-0.5 h-6 w-6 shrink-0" />
           <div>
             <p className="font-display text-[18px] font-semibold">{c.crisisCard.title}</p>
-            <p className="mt-1 text-[14px] leading-5">{c.crisisCard.description}</p>
+            <p className="type-label-lg mt-1">{c.crisisCard.description}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {c.crisisCard.buttons.map((b) => (
                 <a
@@ -113,7 +113,7 @@ function ContactPage() {
             <a href={m.action} className="block h-full rounded-[20px] bg-secondary p-4">
               {m.icon === "phone" ? <Phone className="h-5 w-5" /> : <Mail className="h-5 w-5" />}
               <p className="mt-3 text-[15px] font-semibold">{m.title}</p>
-              <p className="mt-0.5 text-[12px] leading-4 text-muted-foreground">{m.description}</p>
+              <p className="type-label-md mt-0.5 text-muted-foreground">{m.description}</p>
               <p className="mt-2 break-all text-[13px] font-semibold">{m.value}</p>
             </a>
           </li>
@@ -188,7 +188,7 @@ function ContactPage() {
 
       <Link to="/faq" className="mx-5 mt-8 block rounded-[24px] border border-foreground/10 p-5">
         <p className="font-display text-[17px] font-semibold">{c.faqCard.title}</p>
-        <p className="mt-1 text-[14px] leading-5 text-muted-foreground">{c.faqCard.description}</p>
+        <p className="type-label-lg mt-1 text-muted-foreground">{c.faqCard.description}</p>
         <span className="mt-3 inline-block text-[14px] font-semibold underline">
           {c.faqCard.buttonText}
         </span>

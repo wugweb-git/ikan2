@@ -43,7 +43,7 @@ function AboutPage() {
         <h1 className="font-display text-[34px] font-semibold leading-[1.15] tracking-[-0.01em]">
           {a.hero.title}
         </h1>
-        <p className="mt-3 text-[17px] leading-7 text-muted-foreground">{a.hero.subtitle}</p>
+        <p className="type-body-xl mt-3 text-muted-foreground">{a.hero.subtitle}</p>
       </header>
 
       <div className="mx-5 mt-6 h-44 overflow-hidden rounded-[28px]">
@@ -52,9 +52,7 @@ function AboutPage() {
 
       <section className="mt-8 px-5">
         <p className="text-[13px] font-semibold text-[#2B634D]">{a.story.label}</p>
-        <h2 className="mt-1 font-display text-[24px] font-semibold leading-8">
-          {unmark(a.story.heading)}
-        </h2>
+        <h2 className="type-headline-sm mt-1">{unmark(a.story.heading)}</h2>
         <div className="mt-3 space-y-4 text-[16px] leading-7 text-foreground/85">
           {a.story.paragraphs.map((p) => (
             <p key={p.slice(0, 20)}>{unmark(p)}</p>
@@ -73,7 +71,7 @@ function AboutPage() {
             }
           >
             <p className="text-[13px] font-semibold opacity-75">{m.label}</p>
-            <p className="mt-1 font-display text-[20px] font-semibold leading-7">{m.title}</p>
+            <p className="type-title-lg font-semibold mt-1">{m.title}</p>
             <p className="mt-2 text-[15px] leading-6 opacity-85">{m.description}</p>
           </div>
         ))}
@@ -88,7 +86,7 @@ function AboutPage() {
               <div key={v.title} className="rounded-[20px] bg-secondary p-4">
                 <Icon className="h-6 w-6" />
                 <p className="mt-3 font-display text-[16px] font-semibold">{v.title}</p>
-                <p className="mt-1 text-[13px] leading-5 text-muted-foreground">{v.description}</p>
+                <p className="type-body-sm mt-1 text-muted-foreground">{v.description}</p>
               </div>
             );
           })}

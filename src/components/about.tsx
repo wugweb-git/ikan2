@@ -17,7 +17,7 @@ export function Group({
 }) {
   return (
     <section className={cn("mt-10 px-4", className)}>
-      <h2 className="font-display text-[20px] font-semibold leading-7">{title}</h2>
+      <h2 className="type-title-lg font-semibold">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>
   );
@@ -73,10 +73,10 @@ export function Bento({
             >
               <Icon className="h-5 w-5" />
             </span>
-            {t.label ? <p className="mt-3 text-[14px] font-semibold leading-5">{t.label}</p> : null}
+            {t.label ? <p className="type-label-lg font-semibold mt-3">{t.label}</p> : null}
             <p
               className={cn(
-                "text-[14px] leading-5",
+                "type-label-lg",
                 t.label ? "mt-1 text-muted-foreground" : "mt-3 font-medium",
               )}
             >
@@ -104,7 +104,7 @@ export function ImportantNote({ text, className }: { text: string; className?: s
       </span>
       <div className="min-w-0">
         <h2 className="text-[15px] font-semibold">Good to know</h2>
-        <p className="mt-1 text-[14px] leading-5 text-foreground/80">{text}</p>
+        <p className="type-label-lg mt-1 text-foreground/80">{text}</p>
         <Link to="/support" className="mt-2 inline-block text-[14px] font-semibold underline">
           Need help now?
         </Link>

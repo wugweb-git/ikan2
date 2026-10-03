@@ -455,7 +455,7 @@ function AboutYouPrompt() {
       </span>
       <Link to="/welcome" search={{ step: "about" }} className="min-w-0 flex-1">
         <span className="block text-[15px] font-semibold">Finish your profile</span>
-        <span className="block text-[13px] leading-5 text-muted-foreground">
+        <span className="type-body-sm block text-muted-foreground">
           Date of birth, city and a few details, so suggestions fit you.
         </span>
       </Link>
@@ -582,7 +582,7 @@ function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
           <span className="block font-display text-[19px] font-semibold leading-6">
             You don’t have to carry this alone
           </span>
-          <span className="mt-1 block text-[14px] leading-5">
+          <span className="type-label-lg mt-1 block">
             Free, confidential helplines are open right now.
           </span>
         </span>
@@ -862,7 +862,7 @@ function Recommended({ data, hydrated }: { data: Data; hydrated: boolean }) {
               <span className="block font-display text-[17px] font-semibold leading-6">
                 Talk to a professional
               </span>
-              <span className="mt-1 block text-[13px] leading-5 opacity-80">
+              <span className="type-body-sm mt-1 block opacity-80">
                 Therapists and counselors you can book this week.
               </span>
             </span>
@@ -881,7 +881,7 @@ function Recommended({ data, hydrated }: { data: Data; hydrated: boolean }) {
               <span className="block text-[12px] font-semibold opacity-80">{dayCount(p)} days</span>
               <span className="block font-display text-[20px] font-semibold">{p.name}</span>
               {p.source.description ? (
-                <span className="mt-0.5 line-clamp-2 text-[12px] leading-4 opacity-85">
+                <span className="type-label-md mt-0.5 line-clamp-2 opacity-85">
                   {p.source.description}
                 </span>
               ) : null}
@@ -1138,7 +1138,7 @@ function ReassessPrompt({ data, hydrated }: { data: Data; hydrated: boolean }) {
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-display text-[15px] font-semibold">Ready for a re-check?</span>
-        <span className="mt-0.5 block text-[13px] leading-5 text-muted-foreground">
+        <span className="type-body-sm mt-0.5 block text-muted-foreground">
           {reassessCopy[reason]}
         </span>
         <span className="mt-3 flex items-center gap-2">

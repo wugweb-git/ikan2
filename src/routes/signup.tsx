@@ -137,7 +137,7 @@ function SignupPage() {
           </ul>
         </div>
         <div>
-          <label className="flex cursor-pointer items-start gap-3 text-[14px] leading-5">
+          <label className="type-label-lg flex cursor-pointer items-start gap-3">
             <input
               type="checkbox"
               checked={agreed}

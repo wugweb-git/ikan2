@@ -93,7 +93,7 @@ function ScorePage() {
           }
         />
         <header className="px-4">
-          <h1 className="font-display text-[32px] font-semibold leading-10">iKAN Score</h1>
+          <h1 className="type-headline-lg">iKAN Score</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">
             {firstEvent
               ? `One number over everything you have logged since ${new Date(firstEvent.at).toLocaleDateString("en-IN", { day: "numeric", month: "long" })}`
@@ -124,7 +124,7 @@ function ScorePage() {
                 <p className="mt-3 font-display text-[22px] font-semibold">
                   Your score starts here
                 </p>
-                <p className="mt-1 max-w-[260px] text-[14px] leading-5 opacity-80">
+                <p className="type-label-lg mt-1 max-w-[260px] opacity-80">
                   Log a mood check-in, take an assessment or finish a program day.
                 </p>
               </>
@@ -162,7 +162,7 @@ function ScorePage() {
                 ))}
               </div>
             </div>
-            <p className="mt-3 text-[14px] leading-5">
+            <p className="type-label-lg mt-3">
               {band.label} spans {band.min} to {band.max}.
               {nextBand
                 ? ` You are ${nextBand.min - score} ${nextBand.min - score === 1 ? "point" : "points"} from ${nextBand.label}.`
@@ -199,7 +199,7 @@ function ScorePage() {
               </div>
             </>
           ) : (
-            <p className="text-[14px] leading-5 text-muted-foreground">
+            <p className="type-label-lg text-muted-foreground">
               Your score is saved each day you open iKAN. The chart appears from your second day.
             </p>
           )}
@@ -257,7 +257,7 @@ function ScorePage() {
                   />
                 </button>
                 {on ? (
-                  <div className="px-4 pb-4 pl-[38px] text-[13px] leading-5 text-muted-foreground">
+                  <div className="type-body-sm px-4 pb-4 pl-[38px] text-muted-foreground">
                     Scores {Math.round(p.value!)} of 100 and carries{" "}
                     {Math.round((p.weight / data.totalWeight) * 100)}% of your score, so it moves
                     the total by {pts > 0 ? `+${pts}` : pts} against a middle reading of 50.{" "}
@@ -450,7 +450,7 @@ function OneAxis({
         <span>{short(days[14]!)}</span>
         <span>Today</span>
       </div>
-      <p className="mt-3 text-[13px] leading-5 text-muted-foreground">
+      <p className="type-body-sm mt-3 text-muted-foreground">
         {hydrated
           ? `In the last 30 days: ${counts.mood} days with a check-in, ${counts.program} program days and ${counts.assess} assessments.`
           : ""}

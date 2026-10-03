@@ -218,7 +218,7 @@ function ResultPage() {
                 </DateText>
               </p>
             ) : null}
-            <h1 className="mt-1 font-display text-[28px] font-semibold leading-9">{p.name}</h1>
+            <h1 className="type-headline-md mt-1">{p.name}</h1>
             <p className="mt-1 flex flex-wrap gap-x-3 text-[14px] text-muted-foreground">
               <span>{sum.totalDays} days</span>
               {sum.seconds ? <span>{formatSeconds(sum.seconds)} spent</span> : null}
@@ -231,7 +231,7 @@ function ResultPage() {
           {/* headline card */}
           <section className="mx-4 mt-5 rounded-[28px] bg-[var(--accent-container)] p-5 text-[var(--on-accent-container)]">
             <p className="text-[14px] font-medium">Equip program result</p>
-            <p className="mt-1 font-display text-[34px] font-bold leading-10">
+            <p className="type-display-sm font-bold mt-1">
               {j.finished
                 ? "Completed"
                 : `${Math.round((sum.daysDone / sum.totalDays) * 100)}% done`}
@@ -336,9 +336,7 @@ function ResultPage() {
                       {u.done}/{u.total}
                     </span>
                   </div>
-                  {u.focus ? (
-                    <p className="text-[13px] leading-5 text-muted-foreground">{u.focus}</p>
-                  ) : null}
+                  {u.focus ? <p className="type-body-sm text-muted-foreground">{u.focus}</p> : null}
                 </li>
               ))}
             </ul>
@@ -660,7 +658,7 @@ function Rows({ title, rows }: { title: string; rows: Row[] }) {
                   {r.label}
                 </p>
                 {r.note && !r.wide ? (
-                  <p className="text-[13px] leading-5 text-muted-foreground">{r.note}</p>
+                  <p className="type-body-sm text-muted-foreground">{r.note}</p>
                 ) : null}
               </div>
               <p
@@ -675,7 +673,7 @@ function Rows({ title, rows }: { title: string; rows: Row[] }) {
                 {r.value}
               </p>
               {r.note && r.wide ? (
-                <p className="text-[13px] leading-5 text-muted-foreground">{r.note}</p>
+                <p className="type-body-sm text-muted-foreground">{r.note}</p>
               ) : null}
             </li>
           );

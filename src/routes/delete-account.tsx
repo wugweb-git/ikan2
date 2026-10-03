@@ -138,7 +138,7 @@ function DeleteAccountPage() {
           </div>
         )}
 
-        <p className="mt-8 text-[13px] leading-5 text-muted-foreground">
+        <p className="type-body-sm mt-8 text-muted-foreground">
           Anonymised records we are required to keep for legal or safety reasons are not linked to
           you and cannot be traced back. See the{" "}
           <Link to="/legal/$slug" params={{ slug: "privacy-policy" }} className="underline">

@@ -163,9 +163,7 @@ export function AuthLayout({
         </div>
         <main className="flex flex-1 flex-col px-6">
           <h1 className="font-display text-[26px] font-semibold leading-8">{title}</h1>
-          {subtitle ? (
-            <p className="mt-1 text-[14px] leading-5 text-muted-foreground">{subtitle}</p>
-          ) : null}
+          {subtitle ? <p className="type-label-lg mt-1 text-muted-foreground">{subtitle}</p> : null}
           <div className="mt-5">{children}</div>
           <div className="mt-auto pb-3 pt-4">
             {footer}
@@ -281,7 +279,7 @@ export function FormError({ message }: { message: string | null }) {
   return (
     <p
       role="alert"
-      className="rounded-[14px] bg-error-container px-4 py-3 text-[14px] leading-5 text-on-error-container"
+      className="type-label-lg rounded-[14px] bg-error-container px-4 py-3 text-on-error-container"
     >
       {message}
     </p>
@@ -347,7 +345,7 @@ export function TrustList() {
   return (
     <ul className="space-y-3">
       {items.map(({ icon: Icon, text }) => (
-        <li key={text} className="flex gap-3 text-[13px] leading-5 text-muted-foreground">
+        <li key={text} className="type-body-sm flex gap-3 text-muted-foreground">
           <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#2B634D]" /> {text}
         </li>
       ))}

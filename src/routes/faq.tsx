@@ -29,7 +29,7 @@ function FaqPage() {
   return (
     <InfoShell wide>
       <header className="px-5">
-        <h1 className="font-display text-[32px] font-semibold leading-10">{f.heroTitle}</h1>
+        <h1 className="type-headline-lg">{f.heroTitle}</h1>
         <p className="mt-2 text-[16px] leading-6 text-muted-foreground">{f.heroSubtitle}</p>
       </header>
 

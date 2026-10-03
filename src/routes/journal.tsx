@@ -92,7 +92,7 @@ function JournalPage() {
           >
             <History className="h-6 w-6" />
           </Link>
-          <h1 className="font-display text-[28px] font-semibold leading-9">Journal</h1>
+          <h1 className="type-headline-md">Journal</h1>
           <p className="text-[14px] text-muted-foreground">Track how you feel, one day at a time</p>
         </header>
 

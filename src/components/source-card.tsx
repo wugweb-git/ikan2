@@ -17,13 +17,9 @@ export function SourceCard({ source }: { source: NonNullable<Resource["source"]>
       </span>
       <span className="mt-1.5 flex items-start gap-3">
         <span className="min-w-0 flex-1">
-          <span className="block font-display text-[16px] leading-6 font-semibold">
-            {source.name}
-          </span>
+          <span className="type-title-md block">{source.name}</span>
           {source.note ? (
-            <span className="mt-0.5 block text-[13px] leading-5 text-muted-foreground">
-              {source.note}
-            </span>
+            <span className="type-body-sm mt-0.5 block text-muted-foreground">{source.note}</span>
           ) : null}
           {facts.length ? (
             <span className="mt-2 flex flex-wrap gap-1.5">
