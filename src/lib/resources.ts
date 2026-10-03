@@ -9,7 +9,34 @@ import { createLocalStore } from "@/lib/local-store";
  * Plus the five brief-scale posts written for the app (23 Sep 2026) and the India numbers piece
  * (3 Oct 2026, from the Notion draft). These live only here: they are not on ikanhealth.in yet. */
 
-export type ResourceCategory = "General" | "Stress" | "Sleep";
+/* The category list the old site keeps in its KV store, kept whole rather than trimmed to what
+ * today's resources happen to need. Several hold nothing yet; that is the point, the content
+ * that wants them has not been written. Order is the old store's sort_order, so an admin built
+ * later has nothing to reconcile. The library filters by type, so a category is a label on a
+ * card and a word in search. */
+export const resourceCategories = [
+  "General",
+  "Anxiety",
+  "Depression",
+  "Stress",
+  "Burnout",
+  "Sleep",
+  "Insomnia",
+  "Balance",
+  "Focus",
+  "Resilience",
+  "Motivation",
+  "Habits",
+  "Mindfulness",
+  "Energy",
+  "Relationships",
+  "Confidence",
+  "Wellness",
+  "Work-Life",
+  "Mental Health",
+] as const;
+export type ResourceCategory = (typeof resourceCategories)[number];
+
 export type Art =
   | "stress"
   | "burnout"
@@ -91,7 +118,7 @@ export const resources: Resource[] = [
   {
     id: "resource-breathing-five-minutes",
     title: "A Five-Minute Guided Breathing Exercise for Anxious Moments",
-    category: "Stress",
+    category: "Mindfulness",
     date: "2026-10-03",
     minutes: 5,
     source: {
@@ -112,7 +139,7 @@ export const resources: Resource[] = [
   {
     id: "resource-stress-performance",
     title: "Stress, Performance, and Why the Usual Advice Misses",
-    category: "Stress",
+    category: "Work-Life",
     date: "2026-10-03",
     minutes: 60,
     source: {
@@ -163,7 +190,7 @@ export const resources: Resource[] = [
   {
     id: "resource-can-we-talk",
     title: "Can We Talk About Mental Health?",
-    category: "General",
+    category: "Mental Health",
     date: "2026-10-03",
     minutes: 2,
     source: {
@@ -178,7 +205,7 @@ export const resources: Resource[] = [
   {
     id: "resource-not-always-visible",
     title: "Mental Health Isn't Always Visible",
-    category: "General",
+    category: "Mental Health",
     date: "2026-10-03",
     minutes: 2,
     source: {
@@ -193,7 +220,7 @@ export const resources: Resource[] = [
   {
     id: "resource-india-numbers",
     title: "India's Mental Health Crisis: The Numbers We Can No Longer Ignore.",
-    category: "General",
+    category: "Mental Health",
     date: "2026-10-03",
     minutes: 5,
     art: "measure",
@@ -202,7 +229,7 @@ export const resources: Resource[] = [
   {
     id: "resource-who-5",
     title: "What is the WHO-5 Well-Being Index? A Simple Guide to Measuring Mental Wellness",
-    category: "General",
+    category: "Wellness",
     date: "2026-09-23",
     minutes: 4,
     art: "wellbeing",
@@ -212,7 +239,7 @@ export const resources: Resource[] = [
     id: "resource-ngse",
     title:
       "What is the New General Self-Efficacy (NGSE) Scale? A Simple Guide to Measuring Self-Belief",
-    category: "General",
+    category: "Confidence",
     date: "2026-09-23",
     minutes: 4,
     art: "confidence",
@@ -220,7 +247,7 @@ export const resources: Resource[] = [
   {
     id: "resource-brs",
     title: "What is the Brief Resilience Scale (BRS)? A Simple Guide to the Resilience Test",
-    category: "Stress",
+    category: "Resilience",
     date: "2026-09-23",
     minutes: 4,
     art: "resilience",
@@ -229,7 +256,7 @@ export const resources: Resource[] = [
     id: "resource-gad-2",
     title:
       "What is Generalized Anxiety Disorder (GAD)-2? A Simple Guide to the Ultra-Brief Anxiety Screener",
-    category: "General",
+    category: "Anxiety",
     date: "2026-09-23",
     minutes: 3,
     art: "worry",
@@ -240,7 +267,7 @@ export const resources: Resource[] = [
     id: "resource-phq-2",
     title:
       "What is the Patient Health Questionnaire (PHQ)-2? A Simple Guide to the Ultra-Brief Depression Screener",
-    category: "General",
+    category: "Depression",
     date: "2026-09-23",
     minutes: 3,
     art: "lowmood",
@@ -250,7 +277,7 @@ export const resources: Resource[] = [
   {
     id: "de31d473-fda7-47e4-82d6-a549b02eec44",
     title: "What is the Perceived Stress Scale (PSS-10)? Understand The Stress Screening Test",
-    category: "General",
+    category: "Stress",
     date: "2026-09-10",
     minutes: 5,
     art: "stress",
@@ -261,7 +288,7 @@ export const resources: Resource[] = [
     id: "98d536d4-938b-4fbf-bc2c-f37e6d0b9409",
     title:
       "What is the Burnout Assessment Tool (BAT-23)? An easy guide to the 23-Question Burnout Test",
-    category: "General",
+    category: "Burnout",
     date: "2026-09-10",
     minutes: 5,
     art: "burnout",
@@ -270,7 +297,7 @@ export const resources: Resource[] = [
   {
     id: "1b783468-f860-433b-8009-7e7943321ac1",
     title: "What is The Workplace Stress Scale? Explained.",
-    category: "General",
+    category: "Work-Life",
     date: "2026-09-10",
     minutes: 5,
     art: "work",
@@ -280,7 +307,7 @@ export const resources: Resource[] = [
     id: "resource-1766237270444",
     title:
       "What is Generalized Anxiety Disorder (GAD)-7? A Simple Guide to the Anxiety Screening Test",
-    category: "General",
+    category: "Anxiety",
     date: "2026-09-10",
     minutes: 5,
     art: "anxiety",
@@ -289,7 +316,7 @@ export const resources: Resource[] = [
   {
     id: "a9697070-1dff-4bcc-a67d-2fbb26cc6e25",
     title: "What is Patient Health Questionnaire (PHQ)-9? A Quick Depression Screening Test",
-    category: "General",
+    category: "Depression",
     date: "2026-09-10",
     minutes: 5,
     art: "mood",
@@ -315,7 +342,7 @@ export const resources: Resource[] = [
   {
     id: "resource-1766236115968",
     title: "The Power of Measurement-Based Care",
-    category: "Stress",
+    category: "General",
     date: "2026-03-19",
     minutes: 5,
     art: "measure",
