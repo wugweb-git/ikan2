@@ -16,12 +16,13 @@ They do not read each other's **tables** — nothing in `ikan2_user_state` is us
 and iKAN holds no SQL grant on `kv_store_cc205da9` (RLS on, no policies, so the publishable key
 cannot touch it).
 
-**But iKAN is not independent of the old site.** It calls the old site's edge function,
-`make-server-cc205da9`, at runtime on two live paths — the history backfill on every sign-in,
-and the contact form — and that function reads and writes `kv_store_cc205da9` with the service
-role on iKAN's behalf. So the coupling is not only `auth.users`. It was three paths until
-28 Sep 2026: **sign-up went through that function too**, which meant deleting it would have
-stopped anyone creating an account. Section 2.1 has the detail and the current key list.
+**Since 7 Oct 2026 iKAN does not call the old site at all.** Until then it called the old edge
+function, `make-server-cc205da9`, on three live paths — sign-up, the history import on every
+sign-in, and the contact form. All three now run against iKAN's own tables (section 2.1 has the
+history), so the only thing the two apps share is `auth.users`.
+
+The dependency now runs the other way: ikanhealth.in is to send its contact and newsletter forms
+to `ikan2_contact_messages` and `ikan2_newsletter_subscribers` (section 1).
 
 This is also why the old site's "last write" above is 24 September, not 14: `activity_log:*` has
 **66 `login` rows dated after 14 Sep**, which is iKAN's own sign-ins being logged there.
@@ -126,36 +127,80 @@ create table public.ikan2_push_subscriptions (
 `last_reminded_on` is what stops a person being reminded twice in one day; the sender compares it
 against the local date in their own `time_zone`.
 
+### `ikan2_contact_messages` — Contact us, from the app and the website
+
+```sql
+create table public.ikan2_contact_messages (
+  id         uuid        primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  user_id    uuid        references auth.users(id) on delete set null,
+  name       text        not null,   -- 1–120
+  email      text        not null,   -- 3–254, looks like an address
+  subject    text        not null default 'General enquiry',  -- 1–200
+  message    text        not null,   -- 1–2000; the app's form asks for 10+, the table doesn't
+  status     text        not null default 'new',    -- new | read | replied
+  source     text        not null default 'app'     -- app | website
+);
+```
+
+**Insert only.** `anon` and `authenticated` may insert a `new` message, and a signed-in sender
+can only file it under their own `user_id`. There are no select, update or delete policies, so
+nobody reads messages through the API; only the service role sees them. Nothing notifies anyone
+when one arrives — that needs a reader (an admin view, or email from a provider).
+
+Holds the old site's two `contact_submission` rows, moved over on 7 Oct 2026 with their ids,
+dates and read status (`source = 'website'`). Both were internal tests.
+
+### `ikan2_newsletter_subscribers` — newsletter sign-ups
+
+```sql
+create table public.ikan2_newsletter_subscribers (
+  id         uuid        primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  email      text        not null,   -- unique, case-insensitively
+  name       text,
+  status     text        not null default 'active',   -- active | unsubscribed
+  source     text        not null default 'website'   -- app | website
+);
+```
+
+**Insert only**, as above. Signing up an address that is already on the list is a unique
+violation, which PostgREST returns as **409** — a form should show that as "already subscribed".
+There is no unsubscribe path through the API. Holds the old site's one `newsletter` row.
+
 ---
 
 ## 2. The old site
 
-Mostly not iKAN's, but **not inert either** — see 2.1. Documented because it shares `auth.users`,
-because iKAN depends on part of it at runtime, and because it is most of the database by volume.
+Not iKAN's. Documented because it shares `auth.users`, because iKAN used to depend on part of it
+(2.1), and because it is most of the database by volume.
 
-### 2.1 What iKAN actually uses from here
+### 2.1 What iKAN used to use from here
 
-Verified 28 September 2026: every outbound call in `src/` was enumerated, and each prefix below
-was checked against the live store by comparing its JSON field set to the TypeScript types in
-`legacy-import.ts`.
+**Nothing, since 7 Oct 2026.** `src/` no longer references `make-server-cc205da9`. It used to
+call it on three paths, each with the person's own session token:
 
-iKAN never touches these keys directly — it holds no SQL grant on the table. Everything goes
-through `make-server-cc205da9` (`verify_jwt` on), called with **the person's own session token**,
-so a person only ever pulls their own history.
+| Path               | Was                                                    | Now                                                       |
+| ------------------ | ------------------------------------------------------ | --------------------------------------------------------- |
+| **Sign-up**        | `POST /auth/signup`, then sign-in, then a resent email | `supabase.auth.signUp` against iKAN's own project         |
+| **History import** | `legacy-import.ts`, five endpoints, on every sign-in   | retired; every account's history is in `ikan2_user_state` |
+| **Contact form**   | `POST /contact/submit`                                 | insert into `ikan2_contact_messages`                      |
 
-**The live call paths — two, since sign-up was cut over:**
+**Sign-up** was hidden behind an `if (usingLovableCloud)` guard that was `const false`, so the
+branch that _looked_ live was dead and the legacy call was the real path for every email account.
+This document said on 28 Sep that it had been cut over; the code still took the legacy path
+until 7 Oct. The old route created the user unconfirmed and also wrote a profile into this
+store that iKAN never read.
 
-| Path              | Where                                       | Runs              | Old endpoints                                                                                                                  |
-| ----------------- | ------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Legacy import** | `src/lib/legacy-import.ts` (`auth.tsx:166`) | **every sign-in** | `/users/profile`, `/user/journal?limit=1000`, `/user/assessments/history`, `/user/equip/{id}/progress`, `/equip/programs/{id}` |
-| **Contact form**  | `src/routes/contact.tsx:52`                 | on submit         | `POST /contact/submit`                                                                                                         |
+**The history import** was removed once nobody depended on it. On 7 Oct, four accounts with old
+data had never signed in to iKAN; their history was written into `ikan2_user_state` by running
+the import's own transform over this store (13 rows). All nine accounts that ever had old data
+were then checked against what the import would produce. Two deliberate differences from the
+old server: progress keyed by programme slug (`progress:<uid>:sleep-tight:1`) was included,
+where the old endpoint only looked under the programme id; and a journal note stored as a
+number was saved as text.
 
-~~Sign-up~~ used to be a third, and was the dangerous one: it POSTed to `/auth/signup`, hidden
-behind an `if (usingLovableCloud)` guard that was `const false`, so the branch that _looked_ live
-was dead and the legacy call was the real path for every account. It now calls
-`supabase.auth.signUp` against iKAN's own project. The side effect is that the old function
-created users with the admin API and so confirmed their addresses itself — **6 of the 8 email
-accounts predating the change were never sent a confirmation email.**
+What the import read, for the record:
 
 **Confirmed** — these prefixes carry exactly the fields the client destructures, so the mapping
 is established, not guessed:
@@ -194,9 +239,8 @@ mirrors the old config's shape — mood as 5 rows (`mood:{id}`, 5 live) and each
 array row (`checkin_scale:<key>`, 5 live). Those values are **copied into the repo**, so the store
 is not consulted for them.
 
-**If iKAN ever moves off this project** (§6), the import is throwaway — it only backfills history
-once per account, so it retires itself once every account has signed in once. That leaves the
-contact form as the last thing needing an iKAN-owned replacement.
+The import and the contact form are both gone (above), so a move off this project (§6) no longer
+has anything of the old site's to replace.
 
 ### `kv_store_cc205da9`
 
@@ -305,19 +349,18 @@ writable by `anon` — was resolved by dropping the unused `wrappers` extension 
 
 ## 6. If you ever move iKAN to its own project
 
-The app's footprint is small: **3 tables, 83 rows, ~70 kB**, two edge functions, one storage
-bucket, and two constants in `src/lib/backend.ts`.
-
-The footprint is not the whole job, though: **iKAN also calls the old site's
-`make-server-cc205da9` for sign-up and the contact form** (§2.1). Those two have to be replaced
-before or during any move, or new accounts break the moment the old function goes.
+The app's footprint is small: **5 tables** (`ikan2_user_state`, `ikan2_health_daily`,
+`ikan2_push_subscriptions`, `ikan2_contact_messages`, `ikan2_newsletter_subscribers`), two edge
+functions, one storage bucket, and two constants in `src/lib/backend.ts`. It no longer calls the
+old site's function (§2.1), so nothing of the old site's has to move with it.
 
 The hard part is not the data, it is `auth.users`. 14 accounts, and every row keys on `user_id`:
 
 - OAuth users (Google, LinkedIn) re-link by email — they notice nothing
 - Email/password users need their hashes imported via the admin API, or one password reset
 - **User ids change unless imported deliberately**, so any copy has to remap `user_id` across
-  `ikan2_user_state`, `ikan2_health_daily`, `ikan2_push_subscriptions` and the avatar folder names
+  `ikan2_user_state`, `ikan2_health_daily`, `ikan2_push_subscriptions`, `ikan2_contact_messages`
+  and the avatar folder names
 
 Everything else is a schema file and a data copy.
 
