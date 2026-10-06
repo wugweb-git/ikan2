@@ -5,7 +5,7 @@ import { InfoShell } from "@/components/info-shell";
 import { Illustration } from "@/components/art";
 import { pageMeta } from "@/components/equip/program-header";
 import { Field, FormError, PrimaryButton } from "@/components/auth-ui";
-import { useAuth, LEGACY_ANON_KEY, LEGACY_API, displayName } from "@/lib/auth";
+import { useAuth, displayName, supabase } from "@/lib/auth";
 import { contactPage as c } from "@/lib/content";
 import * as v from "@/lib/validate";
 
@@ -49,20 +49,17 @@ function ContactPage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`${LEGACY_API}/contact/submit`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${LEGACY_ANON_KEY}`,
-        },
-        body: JSON.stringify({
+      // insert only: nobody can read messages back through the API (see the table's policy)
+      const { error: failed } = await supabase()
+        .from("ikan2_contact_messages")
+        .insert({
+          user_id: user?.id ?? null,
           name: name.trim(),
           email: email.trim(),
           subject: subject.trim() || "General enquiry",
           message: message.trim(),
-        }),
-      });
-      if (!res.ok) throw new Error((await res.text()) || "Your message didn’t send.");
+        });
+      if (failed) throw failed;
       setSent(true);
     } catch {
       setError(

@@ -3,19 +3,13 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { startCloudSync, stopCloudSync } from "@/lib/cloud-sync";
 import { claimGuestData, getScope, setScope } from "@/lib/storage-scope";
 
-import { BACKEND_KEY, BACKEND_URL, functionUrl } from "@/lib/backend";
+import { BACKEND_KEY, BACKEND_URL } from "@/lib/backend";
 import { isNativeApp, listenForNativeAuth, nativeOAuth } from "@/lib/native-auth";
 
 /* Accounts live in the iKAN Supabase project (see backend.ts). */
 
 export const SUPABASE_URL = BACKEND_URL;
 export const SUPABASE_ANON_KEY = BACKEND_KEY;
-/** the old iKan edge function (sign-up and the contact form) */
-export const LEGACY_API = functionUrl("make-server-cc205da9");
-export const LEGACY_ANON_KEY = BACKEND_KEY;
-const LEGACY_KEY = BACKEND_KEY;
-/** kept for the sign-up branch below; iKAN now uses its own Supabase project directly */
-const usingLovableCloud = false;
 
 /* "Keep me signed in": when off, the session lives only until the app is closed. */
 const REMEMBER_KEY = "ikan.remember";
@@ -88,7 +82,6 @@ export function supabase() {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        ...(usingLovableCloud ? { flowType: "pkce" as const } : {}),
         ...(typeof window !== "undefined" ? { storage: sessionStorageAdapter } : {}),
       },
     });
@@ -209,60 +202,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw new Error(friendly(error.message));
     },
     signUp: async ({ name, email, password, phone }) => {
-      if (usingLovableCloud) {
-        const { data, error } = await supabase().auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            emailRedirectTo: `${origin()}/login`,
-            data: { name: name.trim(), full_name: name.trim(), ...(phone ? { phone } : {}) },
-          },
-        });
-        if (error) throw new Error(friendly(error.message));
-        // an existing, confirmed email comes back with no identities
-        if (data.user && !data.user.identities?.length)
-          throw new Error(friendly("user_already_exists"));
-        return data.session ? "signedIn" : "confirm";
-      }
-      const res = await fetch(`${LEGACY_API}/auth/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${LEGACY_KEY}`,
+      // Created unconfirmed, so the project's "Confirm email" setting decides; Supabase sends the
+      // confirmation itself. (This used to go through the old iKan edge function, which did the
+      // same plus a profile row in the old app's store that ikan2 never reads.)
+      const { data, error } = await supabase().auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: `${origin()}/login`,
+          data: { name: name.trim(), full_name: name.trim(), ...(phone ? { phone } : {}) },
         },
-        body: JSON.stringify({
-          email: email.trim(),
-          password,
-          name: name.trim(),
-          ...(phone ? { phone } : {}),
-        }),
-      }).catch(() => {
-        throw new Error(friendly("Failed to fetch"));
       });
-      if (!res.ok) {
-        const text = await res.text();
-        let message = text;
-        try {
-          const j = JSON.parse(text) as { error?: string; message?: string };
-          message = j.error || j.message || text;
-        } catch {
-          /* plain text */
-        }
-        throw new Error(friendly(message));
-      }
-      const { error } = await supabase().auth.signInWithPassword({ email: email.trim(), password });
-      if (!error) return "signedIn";
-      if (/not confirmed/i.test(error.message)) {
-        await supabase()
-          .auth.resend({
-            type: "signup",
-            email: email.trim(),
-            options: { emailRedirectTo: `${origin()}/login` },
-          })
-          .catch(() => {});
-        return "confirm";
-      }
-      throw new Error(friendly(error.message));
+      if (error) throw new Error(friendly(error.message));
+      // an existing, confirmed email comes back with no identities
+      if (data.user && !data.user.identities?.length)
+        throw new Error(friendly("user_already_exists"));
+      return data.session ? "signedIn" : "confirm";
     },
     signInWith: async (provider) => {
       if (isNativeApp()) {
