@@ -1,7 +1,6 @@
 import { createClient, type Session, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { startCloudSync, stopCloudSync } from "@/lib/cloud-sync";
-import { importLegacyData, resetLegacyImport } from "@/lib/legacy-import";
 import { claimGuestData, getScope, setScope } from "@/lib/storage-scope";
 
 import { BACKEND_KEY, BACKEND_URL, functionUrl } from "@/lib/backend";
@@ -163,16 +162,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const { data } = await supabase().auth.getSession();
           return data.session?.access_token ?? null;
         };
-        const sync = startCloudSync(s.user.id, token);
-        // accounts already moved to Lovable Cloud carry their iKan data; only the old
-        // sign-in still needs to fetch it from the iKan app
-        if (!usingLovableCloud) void sync.finally(() => importLegacyData(s.user.id, token));
+        // history from the old iKan app was copied into ikan2_user_state on 7 Oct 2026, for every
+        // account that had any, so the account's own rows are the whole story now
+        void startCloudSync(s.user.id, token);
       }
     } else {
-      if (getScope() !== "guest") {
-        stopCloudSync();
-        resetLegacyImport();
-      }
+      if (getScope() !== "guest") stopCloudSync();
       setScope("guest");
     }
     setSession(s);
