@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { CareDisclaimer } from "@/components/care-disclaimer";
 import { ChevronRight, Clock3, History, ListChecks } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { accentStyle, stateLayer } from "@/components/equip/m3";
@@ -58,10 +59,7 @@ function AssessmentListPage() {
           ))}
         </ul>
 
-        <div className="mt-8 px-4 text-center text-[12px] leading-5 text-muted-foreground">
-          <p>These are screenings, not a diagnosis.</p>
-          <p>iKAN supports, but never replaces, care from a qualified professional.</p>
-        </div>
+        <CareDisclaimer lead="These are screenings, not a diagnosis." className="mt-8" />
       </div>
     </IkanShell>
   );

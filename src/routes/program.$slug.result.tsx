@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { CareDisclaimer } from "@/components/care-disclaimer";
 import { useEffect, useState } from "react";
 import {
   Brain,
@@ -603,10 +604,7 @@ function ResultPage() {
             </Button>
           </div>
 
-          <p className="mx-auto mt-6 max-w-xs px-4 text-center text-[12px] leading-5 text-muted-foreground">
-            A self-help program, not medical treatment. iKAN supports, but never replaces, care from
-            a qualified professional.
-          </p>
+          <CareDisclaimer lead="A self-help program, not medical treatment." className="mt-6" />
         </div>
       </div>
     </IkanShell>

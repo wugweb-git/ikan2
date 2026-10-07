@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { CareDisclaimer } from "@/components/care-disclaimer";
 import {
   Clock3,
   History,
@@ -348,10 +349,7 @@ function ResultBody({
         </Button>
       </div>
 
-      <p className="mx-auto mt-6 max-w-xs px-4 text-center text-[12px] leading-5 text-muted-foreground">
-        This is a screening, not a diagnosis. iKAN supports, but never replaces, care from a
-        qualified professional.
-      </p>
+      <CareDisclaimer lead="This is a screening, not a diagnosis." className="mt-6" />
     </div>
   );
 }

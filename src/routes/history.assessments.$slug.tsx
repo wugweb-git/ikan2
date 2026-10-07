@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { CareDisclaimer } from "@/components/care-disclaimer";
 import { ArrowLeft, LifeBuoy, TrendingDown, TrendingUp } from "lucide-react";
 import { DateText } from "@/components/date-text";
 import { IkanShell } from "@/components/ikan-shell";
@@ -83,13 +84,13 @@ function AssessmentArchivePage() {
         </header>
 
         {/* Summary */}
-        <section className="mx-4 mt-5 grid grid-cols-3 divide-x divide-background rounded-[24px] bg-secondary py-4 text-center">
+        <section className="mx-4 mt-5 grid grid-cols-3 divide-x divide-background rounded-[24px] bg-secondary py-4 text-left">
           {[
             { v: hydrated ? String(scored.length) : "—", l: "Times taken" },
             { v: first ? date(first.r.completedAt) : "—", l: "First" },
             { v: latest ? date(latest.r.completedAt) : "—", l: "Latest" },
           ].map((x) => (
-            <div key={x.l} className="px-1">
+            <div key={x.l} className="px-4">
               <p className="font-display text-[17px] font-bold leading-6 tabular-nums">{x.v}</p>
               <p className="type-label-md text-muted-foreground">{x.l}</p>
             </div>
@@ -243,10 +244,7 @@ function AssessmentArchivePage() {
           </section>
         ) : null}
 
-        <p className="mx-auto mt-6 max-w-xs px-4 text-center text-[12px] leading-5 text-muted-foreground">
-          This is a screening, not a diagnosis. iKAN supports, but never replaces, care from a
-          qualified professional.
-        </p>
+        <CareDisclaimer lead="This is a screening, not a diagnosis." className="mt-6" />
       </div>
     </IkanShell>
   );
