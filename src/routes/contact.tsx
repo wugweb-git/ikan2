@@ -7,6 +7,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { Field, FormError, PrimaryButton } from "@/components/auth-ui";
 import { useAuth, displayName, supabase } from "@/lib/auth";
 import { contactPage as c } from "@/lib/content";
+import { SocialLinks } from "@/components/social-links";
 import * as v from "@/lib/validate";
 
 export const Route = createFileRoute("/contact")({
@@ -190,6 +191,7 @@ function ContactPage() {
           {c.faqCard.buttonText}
         </span>
       </Link>
+      <SocialLinks className="mt-8" />
       <div className="h-6" />
     </InfoShell>
   );

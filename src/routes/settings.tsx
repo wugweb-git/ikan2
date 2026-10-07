@@ -61,6 +61,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { supabase, useAuth, type Provider } from "@/lib/auth";
 import { clearAllMirrored } from "@/lib/durable";
+import { SocialLinks } from "@/components/social-links";
 import { deleteAccount } from "@/lib/delete-account";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { recentAverage, useHealthConnect } from "@/lib/health-connect";
@@ -335,7 +336,7 @@ function SettingsPage() {
           />
         </Group>
 
-        <p className="type-label-md mt-6 text-center text-muted-foreground">iKAN preview</p>
+        <SocialLinks className="mt-6" />
 
         {/* On success the account no longer exists, so there is nowhere to go back to - the
             person lands on the sign-in screen, which is the only honest destination. */}
