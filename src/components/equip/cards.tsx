@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { CalendarCheck, ListChecks, NotebookPen, Pencil, Plus, Trash2 } from "lucide-react";
+import { CalendarCheck, ListChecks, NotebookPen, Pencil, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { hasWords } from "@/lib/validate";
 import { formatTime } from "@/lib/equip/metrics";
@@ -428,7 +428,7 @@ export function EntriesStep({
   view: Extract<UI, { ui: "entries" }>;
   ctx: StepCtx;
 }) {
-  const { addEntry, removeEntry, patchEntry, entries } = useProgramme(ctx.slug);
+  const { addEntry, patchEntry, entries } = useProgramme(ctx.slug);
   const list = useVisibleEntries(
     ctx.slug,
     view.collection,
@@ -471,12 +471,6 @@ export function EntriesStep({
             )}
             <IconButton label={`Edit entry ${i + 1}`} onClick={() => setEditing(e)}>
               <Pencil className="h-5 w-5" />
-            </IconButton>
-            <IconButton
-              label={`Delete entry ${i + 1}`}
-              onClick={() => removeEntry(view.collection, e.id)}
-            >
-              <Trash2 className="h-5 w-5" />
             </IconButton>
           </span>
         </div>
@@ -898,12 +892,6 @@ export function ReviewStep({
           <span className="-mr-3 flex items-center">
             <IconButton label={`Edit entry ${i + 1}`} onClick={() => setEditing(e)}>
               <Pencil className="h-5 w-5" />
-            </IconButton>
-            <IconButton
-              label={`Delete entry ${i + 1}`}
-              onClick={() => removeEntry(view.collection, e.id)}
-            >
-              <Trash2 className="h-5 w-5" />
             </IconButton>
           </span>
         </div>
