@@ -283,7 +283,7 @@
           "day": 4,
           "title": "Understanding Your Sleep (Continued)",
           "kind": "learning",
-          "declaredBlocks": 3,
+          "declaredBlocks": 2,
           "subtitle": "Observing without fixing.",
           "blocks": [
             {
@@ -2759,8 +2759,8 @@
   "name": "Sleep Tight",
   "meta": {
     "id": "68970d31-0ff3-4d73-b137-80e98228d399",
-    "days": "31 days",
-    "blocks": "155 blocks",
+    "days": "30 days",
+    "blocks": "153 blocks",
     "category": "sleep",
     "level": "beginner"
   },

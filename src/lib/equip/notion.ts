@@ -1,6 +1,15 @@
 /* ------------------------------------------------------------------ *
  * Shape of src/lib/equip/content/*.json, copied from the Notion programme pages
- * on 2026-09-13. All strings are verbatim from Notion.
+ * on 2026-09-13. The content is Notion's, with these deliberate differences - a re-import
+ * would undo them, so carry them over:
+ *  - Unburn day 13 "(Copy)" and day 20 "Journalling (ontinued)" were cleaned to "(Continued)";
+ *    the paste fragment "nit 4. Effort vs. Reward" was dropped from day 8's conclusion.
+ *  - Unburn day 8 is "Understanding the Balance" (Notion: the stale "Observation – Day 2"),
+ *    and the schedule names unit 4 "Efforts vs. Rewards", as its heading does.
+ *  - meta.days/meta.blocks and each day's declaredBlocks are the true counts; Notion's summary
+ *    lines overstate several. Days count from 1 (onboarding, day 0, is not one of them).
+ * Block numbers (`n`) are kept as Notion has them, gaps included (Unburn day 12 is 1, 2, 4):
+ * saved answers are keyed "day.n", so renumbering would detach people's answers.
  * ------------------------------------------------------------------ */
 
 export type BodyItem = { kind: "p" | "li" | "ol"; text: string };

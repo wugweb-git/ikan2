@@ -307,7 +307,7 @@
           "day": 3,
           "title": "Before Stress",
           "kind": "learning",
-          "declaredBlocks": 4,
+          "declaredBlocks": 3,
           "subtitle": "Remembering your relaxed self.",
           "blocks": [
             {
@@ -589,7 +589,7 @@
           "day": 7,
           "title": "Anatomy of Stress",
           "kind": "learning",
-          "declaredBlocks": 4,
+          "declaredBlocks": 5,
           "subtitle": "Understand what causes stress.",
           "blocks": [
             {
@@ -742,7 +742,7 @@
           "day": 8,
           "title": "Anatomy of Stress (Continued)",
           "kind": "learning",
-          "declaredBlocks": 6,
+          "declaredBlocks": 4,
           "subtitle": "Understand what causes stress.",
           "blocks": [
             {
@@ -2245,7 +2245,7 @@
           "day": 27,
           "title": "Positive Capturing (Continued)",
           "kind": "learning",
-          "declaredBlocks": 5,
+          "declaredBlocks": 6,
           "subtitle": "Gratitude.",
           "blocks": [
             {
@@ -2355,8 +2355,8 @@
   "name": "Stress Buster — stress-buster",
   "meta": {
     "id": "9117b308-ff8a-4613-90ef-007841ef0b79",
-    "days": "28 days",
-    "blocks": "116 blocks",
+    "days": "27 days",
+    "blocks": "110 blocks",
     "category": "stress",
     "level": "beginner"
   },

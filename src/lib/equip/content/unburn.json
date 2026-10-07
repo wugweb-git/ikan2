@@ -635,10 +635,10 @@
         },
         {
           "day": 8,
-          "title": "Observation – Day 2",
+          "title": "Understanding the Balance",
           "kind": "learning",
-          "declaredBlocks": 5,
-          "subtitle": "Repeat Observation.",
+          "declaredBlocks": 4,
+          "subtitle": "Efforts and Rewards.",
           "blocks": [
             {
               "n": 1,
@@ -729,7 +729,7 @@
           "day": 9,
           "title": "Efforts and Rewards",
           "kind": "learning",
-          "declaredBlocks": 5,
+          "declaredBlocks": 4,
           "subtitle": "Pause and Breathe.",
           "blocks": [
             {
@@ -973,7 +973,7 @@
           "day": 12,
           "title": "Anatomy of Burnout",
           "kind": "learning",
-          "declaredBlocks": 4,
+          "declaredBlocks": 3,
           "subtitle": "Goals and success.",
           "blocks": [
             {
@@ -1339,7 +1339,7 @@
           "day": 16,
           "title": "Reducing Weight",
           "kind": "learning",
-          "declaredBlocks": 4,
+          "declaredBlocks": 3,
           "subtitle": "Outcome Check.",
           "blocks": [
             {
@@ -2118,7 +2118,7 @@
         {
           "day": 26,
           "title": "Challenging Perfectionism",
-          "kind": "lesson",
+          "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": null,
           "blocks": [
@@ -2248,7 +2248,7 @@
         {
           "day": 27,
           "title": "Just Do It!",
-          "kind": "lesson",
+          "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": null,
           "blocks": [
@@ -2358,7 +2358,7 @@
         {
           "day": 28,
           "title": "Just Do It! (Continued)",
-          "kind": "lesson",
+          "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": null,
           "blocks": [
@@ -2411,7 +2411,7 @@
         {
           "day": 29,
           "title": "Just Do It! (Continued)",
-          "kind": "lesson",
+          "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": null,
           "blocks": [
@@ -2464,7 +2464,7 @@
         {
           "day": 30,
           "title": "Just Do It! (Continued)",
-          "kind": "lesson",
+          "kind": "learning",
           "declaredBlocks": 3,
           "subtitle": null,
           "blocks": [
@@ -2521,8 +2521,8 @@
   "name": "Unburn — burnout-reset",
   "meta": {
     "id": "416feb50-e73f-4898-a996-f8a4695a708e",
-    "days": "31 days",
-    "blocks": "111 blocks",
+    "days": "30 days",
+    "blocks": "110 blocks",
     "category": "burnout",
     "level": "intermediate"
   },
@@ -2545,7 +2545,7 @@
     },
     {
       "Days": "9–14",
-      "Unit": "Effort vs. Reward",
+      "Unit": "Efforts vs. Rewards",
       "Focus": "Logging effort, checking alignment with your goals"
     },
     {
