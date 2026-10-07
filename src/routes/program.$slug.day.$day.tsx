@@ -14,6 +14,7 @@ import {
 } from "@/components/equip/m3";
 import { StepView } from "@/components/equip/steps";
 import { diaryRows, getDay, getProgramme } from "@/lib/equip/programs";
+import { sealProgramme } from "@/lib/equip/seal";
 import { useProgramme } from "@/lib/equip/store";
 import { track } from "@/lib/analytics";
 
@@ -129,6 +130,8 @@ function Player({ slug, dayNumber }: { slug: string; dayNumber: number }) {
       (d) => d.day === day.day || state.completed.includes(d.day),
     );
     if (allDone) {
+      // completing the last day archived the run; freeze its result now, at the moment it finished
+      sealProgramme(programme);
       track("programme_complete", { programme: slug, days: programme.days.length });
       void navigate({ to: "/program/$slug/result", params: { slug }, search: { done: true } });
       return;

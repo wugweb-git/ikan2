@@ -45,7 +45,8 @@ import { cn } from "@/lib/utils";
 import { journeyOf, latestRun, relatedAssessment, runParam } from "@/lib/equip/journey";
 import { formatDuration } from "@/lib/equip/metrics";
 import { dayCount, getProgramme, programmes } from "@/lib/equip/programs";
-import { useProgramme } from "@/lib/equip/store";
+import { sealProgramme } from "@/lib/equip/seal";
+import { useProgramme, type ArchivedRun } from "@/lib/equip/store";
 import { demoRun } from "@/lib/equip/demo";
 import {
   programmeHighlights,
@@ -92,9 +93,15 @@ function ResultPage() {
   // right after the last day the programme has already reset, so show the latest finished run
   const real = latestRun(p, useProgramme(slug).state, run);
   const state = demo ? demoRun(p, run ?? 0) : real;
-  const j = journeyOf(p, state);
-  const sum = programmeSummary(p, state);
-  const highlights = programmeHighlights(p, state);
+  // a finished run is shown from the snapshot taken when it was finished, never recomputed
+  const snap = (state as Partial<ArchivedRun>).snapshot;
+  const j = snap?.journey ?? journeyOf(p, state);
+  const sum = snap?.summary ?? programmeSummary(p, state);
+  const highlights = snap ? snap.highlights : programmeHighlights(p, state);
+  // finished runs from before snapshots existed, or synced without one, are sealed on first view
+  useEffect(() => {
+    if (!demo) sealProgramme(p);
+  }, [p, demo]);
   const [celebrate, setCelebrate] = useState(Boolean(done));
   const related = getAssessment(relatedAssessment[slug] ?? "");
   const article =

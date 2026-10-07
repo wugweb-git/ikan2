@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from "react";
+import type { Journey } from "./journey";
 import type { DiaryEntry } from "./metrics";
+import type { Highlights, Summary } from "./summary";
 import type { EntryValues } from "./types";
 import { onScopeChange, reportWrite, scopedKey } from "@/lib/storage-scope";
 
@@ -16,9 +18,23 @@ export type SessionFeedback = {
   at: string;
 };
 
+/** What a finished run's result screen showed, frozen when the run was finished. A finished
+ * programme is a record: it is shown from this, never recomputed, so later changes to the
+ * programme's content or the summary code can't rewrite anyone's past result. */
+export type RunSnapshot = {
+  /** when the snapshot was taken */
+  at: string;
+  journey: Journey;
+  summary: Summary;
+  highlights: Highlights | null;
+};
+
 /** A finished run, kept whole so history, results and diaries can show it after the programme
  * goes back to its default state. */
-export type ArchivedRun = Omit<ProgrammeState, "runs"> & { archivedAt: string };
+export type ArchivedRun = Omit<ProgrammeState, "runs"> & {
+  archivedAt: string;
+  snapshot?: RunSnapshot;
+};
 
 export type ProgrammeState = {
   /** finished runs, newest first */
@@ -144,9 +160,20 @@ export const diaryQualityOn = (date: string) =>
     .filter((e) => e.quality !== undefined && e.savedAt && localDay(e.savedAt) === date)
     .sort((a, b) => b.savedAt!.localeCompare(a.savedAt!))[0]?.quality;
 
-/** Change a programme's state outside React; used by the import from the old iKan app. */
+/** Change a programme's state outside React. */
 export const updateProgramme = (slug: string, fn: (s: ProgrammeState) => ProgrammeState) =>
   write(slug, fn(read(slug)));
+
+/** Give every finished run that has no snapshot yet its snapshot. Only ever adds one: a run that
+ * already has a snapshot keeps it for good. Writes nothing when there is nothing to seal. */
+export function sealRuns(slug: string, snapshotOf: (run: ArchivedRun) => RunSnapshot) {
+  const s = read(slug);
+  if (!s.runs?.some((r) => !r.snapshot)) return;
+  write(slug, {
+    ...s,
+    runs: s.runs.map((r) => (r.snapshot ? r : { ...r, snapshot: snapshotOf(r) })),
+  });
+}
 
 const newId = () => `e-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 

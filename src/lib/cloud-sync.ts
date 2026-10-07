@@ -114,7 +114,7 @@ const byId = <T extends { id: string }>(local: T[] = [], remote: T[] = []) => {
 };
 
 /** Both the device and the account changed the same store: keep everything from both. */
-function merge(name: string, local: unknown, remote: unknown): unknown {
+export function merge(name: string, local: unknown, remote: unknown): unknown {
   const l = (local ?? {}) as Obj;
   const r = (remote ?? {}) as Obj;
   if (name === "journal.v1") return { entries: byId(l["entries"] as never, r["entries"] as never) };
@@ -167,9 +167,25 @@ function merge(name: string, local: unknown, remote: unknown): unknown {
     const tracker: Record<string, Obj> = {};
     for (const k of new Set([...Object.keys(lt), ...Object.keys(rt)]))
       tracker[k] = { ...rt[k], ...lt[k] };
+    // Finished runs from both sides, one per archivedAt, newest first. They used to be taken
+    // whole from one side, so a device with an older list dropped runs finished on the other.
+    // A finished run is a record: the copy holding a snapshot wins, and an existing snapshot
+    // is never replaced.
+    type Run = Obj & { archivedAt: string; snapshot?: unknown };
+    const runs = new Map<string, Run>();
+    for (const run of [
+      ...((r["runs"] as Run[] | undefined) ?? []),
+      ...((l["runs"] as Run[] | undefined) ?? []),
+    ]) {
+      const have = runs.get(run.archivedAt);
+      if (!have || (!have.snapshot && run.snapshot)) runs.set(run.archivedAt, run);
+    }
     return {
       ...r,
       ...l,
+      ...(runs.size
+        ? { runs: [...runs.values()].sort((a, b) => b.archivedAt.localeCompare(a.archivedAt)) }
+        : {}),
       completed: [
         ...new Set([
           ...((r["completed"] as number[]) ?? []),

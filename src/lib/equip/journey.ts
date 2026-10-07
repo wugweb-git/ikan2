@@ -174,7 +174,11 @@ export type Run = Journey & { state: ProgrammeState };
 /** Finished runs of a programme, newest first. A run still in progress is never part of history. */
 export function completedRuns(p: Programme, s: ProgrammeState): Run[] {
   const current = journeyOf(p, s);
-  const archived = (s.runs ?? []).map((r) => ({ ...journeyOf(p, r), state: r }));
+  // a finished run's numbers come from the snapshot taken when it was finished
+  const archived = (s.runs ?? []).map((r) => ({
+    ...(r.snapshot?.journey ?? journeyOf(p, r)),
+    state: r,
+  }));
   return [...(current.finished ? [{ ...current, state: s }] : []), ...archived];
 }
 
