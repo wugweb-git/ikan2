@@ -18,7 +18,7 @@ export function EntryCard({
   showDate,
 }: {
   entry: JournalEntry;
-  onDelete?: () => void;
+  onDelete?: (() => void) | undefined;
   showDate?: boolean;
 }) {
   const mood = moodScale[e.mood_rating - 1]!;
