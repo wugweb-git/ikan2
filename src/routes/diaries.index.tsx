@@ -5,7 +5,7 @@ import { accentStyle, IconButton, stateLayer, TopAppBar } from "@/components/equ
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
-import { journeyOf, latestRun } from "@/lib/equip/journey";
+import { latestRun, runJourney } from "@/lib/equip/journey";
 import { programmes, upcoming } from "@/lib/equip/programs";
 import { useProgramme, type ProgrammeState } from "@/lib/equip/store";
 
@@ -38,7 +38,7 @@ function DiariesPage() {
 
       <ul className="mt-2 space-y-3 px-4">
         {programmes.map((p) => {
-          const j = journeyOf(p, latestRun(p, states[p.slug]!));
+          const j = runJourney(p, latestRun(p, states[p.slug]!));
           return (
             <li key={p.slug} style={accentStyle(p.accent)}>
               <Link

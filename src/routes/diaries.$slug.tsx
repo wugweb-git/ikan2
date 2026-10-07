@@ -6,7 +6,7 @@ import { DayCard } from "@/components/equip/day-card";
 import { accentStyle, IconButton, TopAppBar } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { dayResponses, journeyOf, latestRun, runParam, shortDate } from "@/lib/equip/journey";
+import { dayResponses, latestRun, runJourney, runParam, shortDate } from "@/lib/equip/journey";
 import { getProgramme } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 
@@ -37,7 +37,7 @@ function DiaryPage() {
   const { run } = Route.useSearch();
   const state = latestRun(p, useProgramme(slug).state, run);
 
-  const j = journeyOf(p, state);
+  const j = runJourney(p, state);
   const doneDays = hydrated ? p.days.filter((d) => state.completed.includes(d.day)) : [];
   const duration =
     j.startedAt && j.finishedAt

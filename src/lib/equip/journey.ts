@@ -1,5 +1,5 @@
 import type { Programme } from "./types";
-import type { ProgrammeState } from "./store";
+import type { ArchivedRun, ProgrammeState } from "./store";
 
 /* What a person has done in one programme: the numbers behind Equip result and history, and the
  * day-by-day answers behind the Learning diary. Mirrors the old app's EquipProgramCompletion
@@ -171,14 +171,16 @@ export const relatedAssessment: Record<string, string> = {
 
 export type Run = Journey & { state: ProgrammeState };
 
+/** A run's journey: a finished run's comes from the snapshot taken when it was finished, never
+ * recomputed; a run in progress is computed live. */
+export const runJourney = (p: Programme, s: ProgrammeState): Journey =>
+  (s as Partial<ArchivedRun>).snapshot?.journey ?? journeyOf(p, s);
+
 /** Finished runs of a programme, newest first. A run still in progress is never part of history. */
 export function completedRuns(p: Programme, s: ProgrammeState): Run[] {
   const current = journeyOf(p, s);
   // a finished run's numbers come from the snapshot taken when it was finished
-  const archived = (s.runs ?? []).map((r) => ({
-    ...(r.snapshot?.journey ?? journeyOf(p, r)),
-    state: r,
-  }));
+  const archived = (s.runs ?? []).map((r) => ({ ...runJourney(p, r), state: r }));
   return [...(current.finished ? [{ ...current, state: s }] : []), ...archived];
 }
 

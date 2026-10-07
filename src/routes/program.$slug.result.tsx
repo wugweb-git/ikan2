@@ -42,7 +42,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { formatSeconds } from "@/hooks/use-active-time";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
-import { journeyOf, latestRun, relatedAssessment, runParam } from "@/lib/equip/journey";
+import { latestRun, relatedAssessment, runJourney, runParam } from "@/lib/equip/journey";
 import { formatDuration } from "@/lib/equip/metrics";
 import { dayCount, getProgramme, programmes } from "@/lib/equip/programs";
 import { sealProgramme } from "@/lib/equip/seal";
@@ -95,7 +95,7 @@ function ResultPage() {
   const state = demo ? demoRun(p, run ?? 0) : real;
   // a finished run is shown from the snapshot taken when it was finished, never recomputed
   const snap = (state as Partial<ArchivedRun>).snapshot;
-  const j = snap?.journey ?? journeyOf(p, state);
+  const j = runJourney(p, state);
   const sum = snap?.summary ?? programmeSummary(p, state);
   const highlights = snap ? snap.highlights : programmeHighlights(p, state);
   // finished runs from before snapshots existed, or synced without one, are sealed on first view
