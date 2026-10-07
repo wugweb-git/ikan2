@@ -1,5 +1,3 @@
-import { Trash2 } from "lucide-react";
-import { IconButton } from "@/components/equip/m3";
 import {
   contextTags,
   energyScale,
@@ -11,16 +9,9 @@ import {
   type JournalEntry,
 } from "@/lib/journal";
 
-/** One journal check-in: mood, then sleep, stress and pain, the note and the tags. */
-export function EntryCard({
-  entry: e,
-  onDelete,
-  showDate,
-}: {
-  entry: JournalEntry;
-  onDelete?: () => void;
-  showDate?: boolean;
-}) {
+/** One journal check-in: mood, then sleep, stress and pain, the note and the tags. Read-only:
+ * a saved check-in is a record and can't be changed or deleted. */
+export function EntryCard({ entry: e, showDate }: { entry: JournalEntry; showDate?: boolean }) {
   const mood = moodScale[e.mood_rating - 1]!;
   const at = <T,>(scale: T[], v: number | undefined) => (v ? scale[v - 1] : undefined);
   const sleep = at(sleepScale, e.sleep_rating);
@@ -61,11 +52,6 @@ export function EntryCard({
             {when.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}
           </p>
         </div>
-        {onDelete ? (
-          <IconButton label="Delete entry" onClick={onDelete} className="text-muted-foreground">
-            <Trash2 className="h-5 w-5" />
-          </IconButton>
-        ) : null}
       </div>
       {cells.length ? (
         <dl
