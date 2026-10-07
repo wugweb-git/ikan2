@@ -34,6 +34,7 @@ const arts: Art[] = [
   "overload",
   "toolkit",
   "unwind",
+  "gap",
 ];
 
 export const AllIllustrations: Story = {

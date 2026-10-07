@@ -29,6 +29,7 @@ const palettes: Record<Art, [string, string, string]> = {
   overload: ["#FCEAE6", "#F0A99B", "#9E3621"],
   toolkit: ["#F6ECEA", "#DDB4AE", "#8B4A42"],
   unwind: ["#E4F0EF", "#9CC9C4", "#275E58"],
+  gap: ["#EEEBE3", "#C9BFA5", "#4F5A3A"],
 };
 
 export function Illustration({ art, className }: { art: Art; className?: string }) {
@@ -476,6 +477,26 @@ export function Illustration({ art, className }: { art: Art; className?: string 
                 />
                 {tall ? <circle cx={x} cy="56" r="10" fill={ink} /> : null}
               </g>
+            );
+          })}
+        </g>
+      ) : null}
+      {art === "gap" ? (
+        /* a crowd of people who need care, and the few of them who get it */
+        <g>
+          {Array.from({ length: 50 }, (_, i) => {
+            const col = i % 10;
+            const row = Math.floor(i / 10);
+            const reached = [3, 16, 22, 27, 38, 41, 45].includes(i);
+            return (
+              <circle
+                key={i}
+                cx={52 + col * 24}
+                cy={52 + row * 24}
+                r={reached ? 8 : 6}
+                fill={ink}
+                fillOpacity={reached ? 0.95 : 0.18}
+              />
             );
           })}
         </g>

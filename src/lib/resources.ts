@@ -59,7 +59,8 @@ export type Art =
   | "pressure"
   | "overload"
   | "toolkit"
-  | "unwind";
+  | "unwind"
+  | "gap";
 
 /* What a resource is to be done with. Everything in the library is an article today; video and
  * audio are modelled here so adding one is a data change, not a rebuild. A resource with no
@@ -261,6 +262,14 @@ export const resources: Resource[] = [
     minutes: 5,
     art: "report",
     featured: true,
+  },
+  {
+    id: "resource-india-open-data",
+    title: "Mental Health in India",
+    category: "General",
+    date: "2026-10-07",
+    minutes: 5,
+    art: "gap",
   },
   {
     id: "resource-who-5",
