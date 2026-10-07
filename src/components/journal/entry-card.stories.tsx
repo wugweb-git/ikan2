@@ -27,6 +27,7 @@ export const WithPain: Story = {
       freehand_text_content: "Back ache after the long drive.",
       context_tags: ["work", "health"],
     },
+    onDelete: () => {},
   },
 };
 

@@ -10,7 +10,14 @@ import {
   TagsBlock,
   YesNoBlock,
 } from "@/components/journal/blocks";
-import { accentStyle, Button, stateLayer, TextField } from "@/components/equip/m3";
+import {
+  accentStyle,
+  Button,
+  Snackbar,
+  stateLayer,
+  TextField,
+  useSnack,
+} from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { cn } from "@/lib/utils";
 import {
@@ -54,6 +61,7 @@ function JournalPage() {
   const hydrated = useHydrated();
   const { mood: preset } = Route.useSearch();
   const journal = useJournal();
+  const snack = useSnack();
   const today = new Date();
   const todayKey = dayKey(today);
 
@@ -128,12 +136,26 @@ function JournalPage() {
             <ul className="mt-4 space-y-3">
               {entries.map((e) => (
                 <li key={e.id}>
-                  <EntryCard entry={e} />
+                  <EntryCard
+                    entry={e}
+                    // a check-in can be deleted on the day it was made; once the day is over it's a record
+                    onDelete={
+                      e.date === todayKey
+                        ? () => {
+                            // re-checked at the tap, in case the page stayed open past midnight
+                            if (e.date !== dayKey(new Date())) return;
+                            journal.remove(e.id);
+                            snack.show("Entry deleted");
+                          }
+                        : undefined
+                    }
+                  />
                 </li>
               ))}
             </ul>
           ) : null}
         </section>
+        <Snackbar message={snack.message} />
       </div>
     </IkanShell>
   );
