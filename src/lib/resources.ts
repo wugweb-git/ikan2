@@ -110,7 +110,7 @@ export type Resource = {
   assessmentRole?: "explains" | "next";
 };
 
-export const resources: Resource[] = [
+const library: Resource[] = [
   {
     id: "resource-five-minutes-stress",
     title: "Five Minutes That Can Change How You Handle Stress",
@@ -270,6 +270,7 @@ export const resources: Resource[] = [
     date: "2026-10-07",
     minutes: 5,
     art: "gap",
+    featured: true,
   },
   {
     id: "resource-who-5",
@@ -411,6 +412,11 @@ export const resources: Resource[] = [
     art: "routine",
   },
 ];
+
+/** Newest first, everywhere a list of resources is shown, so a new piece is never buried under
+ * older ones because of where it was written in the file. Same-day pieces keep their order above
+ * (the sort is stable). */
+export const resources: Resource[] = [...library].sort((a, b) => b.date.localeCompare(a.date));
 
 export const mediumOf = (r: Resource): Medium => r.medium ?? "article";
 
