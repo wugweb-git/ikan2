@@ -38,8 +38,9 @@ const typeMeta: Record<
   resource: { label: "Reading", icon: BookOpen, color: "#7A5A12", soft: "#FBEFD2" },
 };
 
-/** My history covers the three things people come back to: assessments, programs and the journal. */
-const HISTORY_TYPES: ActivityType[] = ["assessment", "program", "mood"];
+/** My history covers what people come back to: assessments, programs, the journal, and the
+ * resources they have read, watched or listened to. */
+const HISTORY_TYPES: ActivityType[] = ["assessment", "program", "mood", "resource"];
 const filters: ("all" | ActivityType)[] = ["all", ...HISTORY_TYPES];
 
 function HistoryPage() {

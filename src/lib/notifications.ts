@@ -5,6 +5,7 @@ import { getConsultant, hourLabel } from "@/lib/consultants";
 import { getProgramme } from "@/lib/equip/programs";
 import { dayKey } from "@/lib/journal";
 import { useSettings } from "@/lib/profile";
+import { mediumOf, resources, slugOf, useResourceStore } from "@/lib/resources";
 import {
   useEverything,
   useWellnessSnapshots,
@@ -24,7 +25,7 @@ export type Notice = {
   title: string;
   body: string;
   at: string;
-  icon: "assessment" | "mood" | "health" | "consult" | "score" | "program";
+  icon: "assessment" | "mood" | "health" | "consult" | "score" | "program" | "resource";
   link:
     | { to: "/assessment-flow"; search: { id: string } }
     | { to: "/journal" }
@@ -32,7 +33,8 @@ export type Notice = {
     | { to: "/consult/$id"; params: { id: string } }
     | { to: "/wellness" }
     | { to: "/assessments/$slug"; params: { slug: string } }
-    | { to: "/program/$slug"; params: { slug: string } };
+    | { to: "/program/$slug"; params: { slug: string } }
+    | { to: "/resources/$slug"; params: { slug: string } };
 };
 
 const readStore = createLocalStore<{ read: string[] }>("ikan.notifications.v1", { read: [] });
@@ -44,6 +46,7 @@ export function useNotifications() {
   const { settings } = useSettings();
   const snapshots = useWellnessSnapshots();
   const { read } = readStore.use();
+  const reading = useResourceStore();
   const now = new Date();
   const notices: Notice[] = [];
 
@@ -171,6 +174,27 @@ export function useNotifications() {
       at: r.completedAt,
       icon: "program",
       link: { to: "/program/$slug", params: { slug: p.slug } },
+    });
+  }
+
+  /* Changed: something new in the library, for two weeks after it is published and until it is
+   * finished. Only the three newest, so a batch published on one day does not fill the page. */
+  let fresh = 0;
+  for (const r of resources) {
+    if (fresh >= 3) break;
+    const published = new Date(`${r.date}T00:00:00`);
+    if (now.getTime() - published.getTime() > 14 * 24 * HOUR || published > now) continue;
+    if (reading.progressOf(r)?.done) continue;
+    const verb = { article: "read", video: "watch", audio: "listen to" }[mediumOf(r)];
+    fresh += 1;
+    notices.push({
+      id: `resource-${r.id}`,
+      tier: "changed",
+      title: `New to ${verb}: ${r.title}`,
+      body: `${r.category} · ${r.minutes} min`,
+      at: published.toISOString(),
+      icon: "resource",
+      link: { to: "/resources/$slug", params: { slug: slugOf(r) } },
     });
   }
 

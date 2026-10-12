@@ -1033,11 +1033,14 @@ function ThisWeek({ data, hydrated }: { data: Data; hydrated: boolean }) {
 function Library() {
   const hydrated = useHydrated();
   const store = useResourceStore();
-  /* The same pick as the Resources carousel: the newest piece first, then the featured ones. */
-  const picks: Resource[] = [resources[0]!, ...resources.slice(1).filter((r) => r.featured)].slice(
-    0,
-    5,
-  );
+  /* The same pick as the Resources carousel - the newest piece first, then the featured ones -
+   * less anything already finished: Home offers what is left to read. My history keeps the rest. */
+  const unfinished = resources.filter((r) => !(hydrated && store.progressOf(r)?.done));
+  const picks: Resource[] = [
+    ...unfinished.slice(0, 1),
+    ...unfinished.slice(1).filter((r) => r.featured),
+  ].slice(0, 5);
+  if (!picks.length) return null;
   return (
     <Section title="From the library" action={{ label: "See all", to: "/resources" }}>
       <div className="no-scrollbar flex snap-x scroll-px-4 items-stretch gap-3 overflow-x-auto px-4 pb-1">

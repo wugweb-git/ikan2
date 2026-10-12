@@ -16,7 +16,7 @@
  * Listing (resources.ts)
  *   - title: Title Case, no full stop at the end (a ? is fine).
  *   - every piece has a body in articles.json, with an author and a standfirst (`description`).
- *   - an article's `minutes` is its word count / 150, rounded up: generous, because plenty of
+ *   - an article's `minutes` is its word count before Sources / 150, rounded up: generous, because plenty of
  *     people read slowly. Video and audio give their running time instead.
  *   - reported, not failed (content is the author's): a standfirst that does not end a sentence
  *     or runs past 220 characters.
@@ -89,7 +89,10 @@ for (const r of resources) {
     if (d.length > 220) note(where, `standfirst is ${d.length} characters (aim for 220 or less)`);
   }
   if (mediumOf(r) === "article") {
-    const want = Math.max(1, Math.ceil(text(a.html).length / 150));
+    const want = Math.max(
+      1,
+      Math.ceil(text(a.html.split('<section class="sources">')[0]!).length / 150),
+    );
     if (r.minutes !== want)
       fail(where, `says ${r.minutes} min; at 150 words a minute it is ${want}`);
   } else if (!r.src) fail(where, `a ${mediumOf(r)} piece with no src`);

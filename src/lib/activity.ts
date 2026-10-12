@@ -6,7 +6,7 @@ import { getConsultant, useBookings } from "@/lib/consultants";
 import { dayCount, daysDoneOf, programmes } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 import { addDays, dayKey, moodScale, useJournal } from "@/lib/journal";
-import { getResource, useResourceStore } from "@/lib/resources";
+import { getResource, slugOf, useResourceStore } from "@/lib/resources";
 
 export type ActivityType = "assessment" | "mood" | "program" | "consult" | "resource";
 
@@ -24,7 +24,8 @@ export type ActivityEvent = {
     | { to: "/program/$slug"; params: { slug: string } }
     | { to: "/program/$slug/result"; params: { slug: string } }
     | { to: "/consult/$id"; params: { id: string } }
-    | { to: "/resources" };
+    | { to: "/resources" }
+    | { to: "/resources/$slug"; params: { slug: string } };
 };
 
 /* ---------- iKAN Score ----------
@@ -145,16 +146,25 @@ export function useEverything() {
       link: { to: "/consult/$id", params: { id: c.id } },
     });
   }
-  for (const [id, at] of Object.entries(reading.opened)) {
+  /* Finished pieces only: an article read to its end, a video or audio played to its end.
+   * Opening one is not reading it. Video and audio keep no finish time, so they use when they
+   * were opened. */
+  for (const id of new Set([
+    ...Object.keys(reading.read ?? {}),
+    ...Object.keys(reading.played ?? {}),
+  ])) {
     const r = getResource(id);
-    if (!r) continue;
+    const done = r ? reading.progressOf(r) : null;
+    if (!r || !done?.done) continue;
+    const at = reading.read?.[id] ?? reading.opened[id];
+    if (!at) continue;
     events.push({
       id: `read-${id}`,
       type: "resource",
       at,
-      title: "Read an article",
+      title: done.label,
       detail: r.title,
-      link: { to: "/resources" },
+      link: { to: "/resources/$slug", params: { slug: slugOf(r) } },
     });
   }
   events.sort((x, y) => y.at.localeCompare(x.at));
@@ -249,7 +259,7 @@ export function useEverything() {
   /* History and archives hold finished things only: completed assessments, journal check-ins and
    * programmes whose every day is done. Days of a programme still running stay with the programme. */
   const archive: ActivityEvent[] = events.filter(
-    (e) => e.type === "assessment" || e.type === "mood",
+    (e) => e.type === "assessment" || e.type === "mood" || e.type === "resource",
   );
   for (const p of programmes) {
     for (const [ri, s] of (programmeStates[p.slug]!.runs ?? []).entries()) {

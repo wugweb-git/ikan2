@@ -35,6 +35,7 @@ const noticeIcon: Record<Notice["icon"], { icon: LucideIcon; color: string; soft
   consult: { icon: CalendarCheck, color: "#2F5580", soft: "#E3ECF8" },
   score: { icon: HeartPulse, color: "#2B634D", soft: "#DFF0E8" },
   program: { icon: Sparkles, color: "#2B634D", soft: "#DFF0E8" },
+  resource: { icon: BookOpen, color: "#7A5A12", soft: "#FBEFD2" },
 };
 
 const eventIcon: Record<ActivityEvent["type"], LucideIcon> = {

@@ -267,7 +267,7 @@ const library: Resource[] = [
     title: "India’s Mental Health Crisis: The Numbers We Can No Longer Ignore",
     category: "General",
     date: "2026-10-03",
-    minutes: 7,
+    minutes: 6,
     art: "report",
     featured: true,
   },
@@ -276,7 +276,7 @@ const library: Resource[] = [
     title: "The People Who Run the Payroll Are Paying More Than They Realise",
     category: "Work-Life",
     date: "2026-10-12",
-    minutes: 6,
+    minutes: 5,
     art: "iceberg",
   },
   {
@@ -284,7 +284,7 @@ const library: Resource[] = [
     title: "A Country’s Development Depends on the Health of Its People",
     category: "General",
     date: "2026-10-12",
-    minutes: 8,
+    minutes: 7,
     art: "growth",
   },
   {
@@ -292,7 +292,7 @@ const library: Resource[] = [
     title: "Mental Health in India",
     category: "General",
     date: "2026-10-07",
-    minutes: 8,
+    minutes: 6,
     art: "gap",
     featured: true,
   },
@@ -557,7 +557,12 @@ export function useResourceStore() {
     markPlayed: (id: string, at: number, of: number) =>
       store.update((s) => ({
         ...s,
-        played: { ...s.played, [id]: { at, of, done: of > 0 && at >= of - 3 } },
+        /* finished stays finished: playing it again from the start must not take back
+         * "Watched", the row's pill, its place in My history or its absence from Home */
+        played: {
+          ...s.played,
+          [id]: { at, of, done: Boolean(s.played?.[id]?.done) || (of > 0 && at >= of - 3) },
+        },
       })),
   };
 }

@@ -123,14 +123,23 @@ function ArticlePage() {
   useEffect(() => {
     const el = end.current;
     if (!isArticle || !el || typeof IntersectionObserver === "undefined") return;
+    /* The end has to stay in view for a moment: on a tall screen a very short piece shows its
+     * end on first paint, and that alone is not reading it. */
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const seen = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        store.markRead(id);
-        seen.disconnect();
-      }
+      const visible = entries.some((e) => e.isIntersecting);
+      clearTimeout(timer);
+      if (visible)
+        timer = setTimeout(() => {
+          store.markRead(id);
+          seen.disconnect();
+        }, 1500);
     });
     seen.observe(el);
-    return () => seen.disconnect();
+    return () => {
+      clearTimeout(timer);
+      seen.disconnect();
+    };
   }, [id, isArticle]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -262,7 +271,7 @@ function ArticlePage() {
           ) : null}
 
           {sources ? (
-            <div className="prose-ikan mt-10" dangerouslySetInnerHTML={{ __html: sources }} />
+            <div className="prose-ikan" dangerouslySetInnerHTML={{ __html: sources }} />
           ) : null}
 
           {/* The article ends here: what follows is a tinted footer, so people can tell the
