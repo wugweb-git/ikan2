@@ -698,8 +698,8 @@ export const assessments: Assessment[] = [
     ],
     headline: "balance-total",
     recommends: {
-      "Fairly Low": ["stress-buster"],
-      Moderate: ["stress-buster"],
+      "Fairly Low": ["productivity-reset", "stress-buster"],
+      Moderate: ["stress-buster", "productivity-reset"],
       Severe: ["stress-buster"],
       "Potentially Dangerous": ["stress-buster"],
     },
@@ -775,7 +775,7 @@ export const assessments: Assessment[] = [
     ],
     headline: "bat-overall",
     recommends: {
-      Normal: ["stress-buster"],
+      Normal: ["stress-buster", "productivity-reset"],
       High: ["unburn", "sleep-tight", "stress-buster"],
     },
   },

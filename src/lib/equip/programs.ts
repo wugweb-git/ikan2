@@ -1,7 +1,7 @@
 import sleepCover from "@/assets/equip-sleep-tight.jpg";
 import unburnCover from "@/assets/res-burnout.jpg";
 import stressCover from "@/assets/res-anxiety.jpg";
-import productivityCover from "@/assets/program-cover.jpg";
+import productivityCover from "@/assets/equip-productivity-reset.jpg";
 import sleepJson from "./content/sleep-tight.json";
 import unburnJson from "./content/unburn.json";
 import stressJson from "./content/stress-buster.json";
@@ -526,14 +526,14 @@ const screenTimeFields = [
   field("Most used app"),
   field("Time on that app"),
   field("Times picked up"),
-  field("TV / streaming"),
+  field("Streaming time"),
 ];
 const screenTimeExample = {
   total_phone_time: "4 h 30 m",
   most_used_app: "Instagram",
   time_on_that_app: "1 h 20 m",
   times_picked_up: "85",
-  tv_streaming: "1 h",
+  streaming_time: "1 h",
 };
 
 const productivityOverrides: Overrides = {
@@ -560,14 +560,7 @@ const productivityOverrides: Overrides = {
     fields: [
       field("Time", "time"),
       field("What was happening", "longtext"),
-      field("What I felt", "select", [
-        "Bored",
-        "Stuck",
-        "Anxious",
-        "Tired",
-        "Waiting",
-        "Just habit",
-      ]),
+      field("Feeling", "select", ["Bored", "Stuck", "Anxious", "Tired", "Waiting", "Just habit"]),
     ],
     scope: "all",
   }),
@@ -578,7 +571,7 @@ const productivityOverrides: Overrides = {
     fields: [
       field("Going into today?", "yesno", ["Yes", "No"]),
       field("Difficulty", "select", ["Easy", "Neutral", "Hard"]),
-      field("Priority", "select", ["⭐", "⭐⭐", "⭐⭐⭐"]),
+      field("Priority", "select", ["Low", "Medium", "High"]),
     ],
     addFields: [prTask],
     scope: "all",

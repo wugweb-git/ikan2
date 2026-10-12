@@ -429,7 +429,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "A good frog is important (⭐⭐ or ⭐⭐⭐), hard enough that you'd normally delay it, and doable in one sitting."
+                  "text": "A good frog is important (Medium or High priority), hard enough that you'd normally delay it, and doable in one sitting."
                 },
                 {
                   "kind": "p",
@@ -458,7 +458,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Pick a Hard task with ⭐⭐ or ⭐⭐⭐. If none are Hard, pick the one you most want to avoid."
+                  "text": "Pick a Hard task with Medium or High priority. If none are Hard, pick the one you most want to avoid."
                 }
               ],
               "notes": [],
@@ -626,7 +626,7 @@
               "body": [
                 {
                   "kind": "p",
-                  "text": "Before you start: choose one task (your frog, or a ⭐⭐⭐ task), put your phone in another room or switch on a blocker, close every tab you don't need, and tell the people around you you're unavailable for the hour."
+                  "text": "Before you start: choose one task (your frog, or a High-priority task), put your phone in another room or switch on a blocker, close every tab you don't need, and tell the people around you you're unavailable for the hour."
                 },
                 {
                   "kind": "p",
