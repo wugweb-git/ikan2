@@ -60,7 +60,9 @@ export type Art =
   | "overload"
   | "toolkit"
   | "unwind"
-  | "gap";
+  | "gap"
+  | "iceberg"
+  | "growth";
 
 /* What a resource is to be done with. Everything in the library is an article today; video and
  * audio are modelled here so adding one is a data change, not a rebuild. A resource with no
@@ -262,6 +264,22 @@ const library: Resource[] = [
     minutes: 5,
     art: "report",
     featured: true,
+  },
+  {
+    id: "resource-payroll-hidden-cost",
+    title: "The People Who Run the Payroll Are Paying More Than They Realise",
+    category: "Work-Life",
+    date: "2026-10-12",
+    minutes: 4,
+    art: "iceberg",
+  },
+  {
+    id: "resource-country-development",
+    title: "A Country’s Development Depends on the Health of Its People",
+    category: "General",
+    date: "2026-10-12",
+    minutes: 5,
+    art: "growth",
   },
   {
     id: "resource-india-open-data",

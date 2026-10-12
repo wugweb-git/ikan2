@@ -1296,6 +1296,9 @@ html.reduce-motion *::after {
   .prose-ikan a {
     text-decoration: underline;
     text-underline-offset: 3px;
+    /* a source URL printed as its own link text can have no break point at all, and would
+     * otherwise push the whole page sideways on a phone */
+    overflow-wrap: anywhere;
   }
 }
 /* Score tables read badly in three squeezed columns on a phone, so each row becomes its own
@@ -1360,6 +1363,44 @@ html.reduce-motion *::after {
   margin: 0;
   font-size: inherit;
   font-weight: inherit;
+}
+
+/* A data table (class="data-table") is not a score table: each row is still a card, but its
+ * first cell is the row's name and every other cell carries its own column name above it, from
+ * data-label, since the header row is hidden on these too. */
+.prose-ikan table.data-table tbody tr:first-child {
+  /* a data table has a real <thead>, so its first body row is data, not a header to hide */
+  display: block;
+}
+.prose-ikan table.data-table td:first-child {
+  /* title-md */
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--foreground);
+}
+.prose-ikan table.data-table td:first-child::before {
+  content: none;
+}
+.prose-ikan table.data-table td + td {
+  /* body-md */
+  margin-top: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+  letter-spacing: normal;
+  color: inherit;
+}
+.prose-ikan table.data-table td + td::before {
+  /* label-md */
+  content: attr(data-label);
+  display: block;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted-foreground);
 }
 
 /* The report card in the India numbers piece: the draft's own infographic, used as it is. It is

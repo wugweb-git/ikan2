@@ -30,6 +30,8 @@ const palettes: Record<Art, [string, string, string]> = {
   toolkit: ["#F6ECEA", "#DDB4AE", "#8B4A42"],
   unwind: ["#E4F0EF", "#9CC9C4", "#275E58"],
   gap: ["#EEEBE3", "#C9BFA5", "#4F5A3A"],
+  iceberg: ["#E3EDF4", "#9FBFD6", "#244F6E"],
+  growth: ["#F3EEDF", "#D8C58E", "#6B5418"],
 };
 
 export function Illustration({ art, className }: { art: Art; className?: string }) {
@@ -479,6 +481,57 @@ export function Illustration({ art, className }: { art: Art; className?: string 
               </g>
             );
           })}
+        </g>
+      ) : null}
+      {art === "iceberg" ? (
+        /* the small part of the cost that shows, and the far larger part under the waterline */
+        <g>
+          <path d="M146 96 L 160 70 L 176 96 Z" fill={ink} fillOpacity="0.9" />
+          <path
+            d="M128 104 L 192 104 L 226 150 L 196 182 L 122 182 L 96 146 Z"
+            fill={ink}
+            fillOpacity="0.28"
+          />
+          <path
+            d="M24 100 C 64 92, 96 108, 136 100 S 208 92, 248 100 S 288 108, 300 100"
+            fill="none"
+            stroke={ink}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeOpacity="0.7"
+          />
+        </g>
+      ) : null}
+      {art === "growth" ? (
+        /* people, and the line that rises with them */
+        <g>
+          {[0, 1, 2, 3, 4, 5].map((i) => {
+            const x = 58 + i * 41;
+            const n = i + 1;
+            return (
+              <g key={i}>
+                {Array.from({ length: n }, (_, j) => (
+                  <circle
+                    key={j}
+                    cx={x}
+                    cy={170 - j * 20}
+                    r="7"
+                    fill={ink}
+                    fillOpacity={0.35 + i * 0.1}
+                  />
+                ))}
+              </g>
+            );
+          })}
+          <path
+            d="M50 150 C 120 140, 190 104, 270 50"
+            fill="none"
+            stroke={ink}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray="4 8"
+            strokeOpacity="0.8"
+          />
         </g>
       ) : null}
       {art === "gap" ? (
