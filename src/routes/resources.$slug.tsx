@@ -15,6 +15,10 @@ import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { MediaPlayer } from "@/components/media-player";
 import { SourceCard } from "@/components/source-card";
+import { getProgramme } from "@/lib/equip/programs";
+import { dayKey, useJournal } from "@/lib/journal";
+import { MoodCheckinCard, SupportCard } from "@/routes/index";
+import { ProgrammeCard } from "@/routes/program.index";
 import { accentStyle, IconButton, stateLayer } from "@/components/equip/m3";
 import { jsonLd, pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -96,6 +100,13 @@ function ArticlePage() {
   const saved = hydrated && store.isSaved(id);
   const played = hydrated ? store.playedOf(id) : undefined;
   const assessment = r.assessment ? getAssessment(r.assessment) : undefined;
+  const programme = r.programme ? getProgramme(r.programme) : undefined;
+  const journal = useJournal();
+  const loggedToday = journal.entries.filter((e) => e.date === dayKey(new Date())).length;
+  /* Sources close the article, after the External section, so the body is split where they start. */
+  const cut = article ? article.html.indexOf('<section class="sources">') : -1;
+  const body = article ? (cut < 0 ? article.html : article.html.slice(0, cut)) : "";
+  const sources = article && cut >= 0 ? article.html.slice(cut) : "";
   const more = resources
     .filter((x) => x.id !== id && (x.category === r.category || x.art === r.art))
     .slice(0, 3);
@@ -179,24 +190,60 @@ function ArticlePage() {
 
           {/* A media piece's body is a written article about the thing, not a transcript and
            * not the publisher's show notes, so it carries no heading of its own. */}
-          {article ? (
+          {body ? (
             <div
               className={cn("prose-ikan", r.src ? "mt-7" : "mt-6")}
-              dangerouslySetInnerHTML={{ __html: article.html }}
+              dangerouslySetInnerHTML={{ __html: body }}
             />
           ) : null}
 
           {r.source ? <SourceCard source={r.source} /> : null}
 
-          {assessment ? (
-            <StackedAssessmentCard
-              assessment={assessment}
-              label={
-                r.assessmentRole === "next"
-                  ? "The fuller test this article points to"
-                  : "The test this article explains"
-              }
-            />
+          {/* External: where the article can send someone inside iKAN, each through the card that
+           * place already uses. Which ones a piece shows is set on the resource, never guessed. */}
+          {assessment || programme || r.journal || r.consult ? (
+            <section aria-label="External">
+              {assessment ? (
+                <StackedAssessmentCard
+                  assessment={assessment}
+                  label={
+                    r.assessmentRole === "next"
+                      ? "The fuller test this article points to"
+                      : "The test this article explains"
+                  }
+                />
+              ) : null}
+              {programme ? (
+                <div className="mt-10">
+                  <p className="type-body-sm font-semibold text-[var(--accent-strong)]">
+                    A programme that works on this
+                  </p>
+                  <div className="mt-3">
+                    <ProgrammeCard programme={programme} />
+                  </div>
+                </div>
+              ) : null}
+              {r.journal ? (
+                <div className="mt-10">
+                  <p className="type-body-sm font-semibold text-[var(--accent-strong)]">
+                    Keep track of how you feel
+                  </p>
+                  <MoodCheckinCard loggedToday={loggedToday} className="mt-3" />
+                </div>
+              ) : null}
+              {r.consult ? (
+                <div className="mt-10">
+                  <p className="type-body-sm font-semibold text-[var(--accent-strong)]">
+                    Talk it through with someone
+                  </p>
+                  <SupportCard city="" className="mt-3" />
+                </div>
+              ) : null}
+            </section>
+          ) : null}
+
+          {sources ? (
+            <div className="prose-ikan mt-10" dangerouslySetInnerHTML={{ __html: sources }} />
           ) : null}
 
           {/* The article ends here: what follows is a tinted footer, so people can tell the

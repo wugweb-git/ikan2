@@ -1371,15 +1371,26 @@ function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
   const risk = latest && latestA ? riskEndorsed(latestA, latest.answers) : false;
   const todayAsks = !risk && !data.drafts[0] && logged.length === 0;
   if (todayAsks) return null;
+  return <MoodCheckinCard loggedToday={logged.length} />;
+}
+
+/** The card itself, also shown at the end of a resource (the External section). */
+export function MoodCheckinCard({
+  loggedToday,
+  className = "mx-4",
+}: {
+  loggedToday: number;
+  className?: string | undefined;
+}) {
   return (
-    <section className="surface mx-4 p-4">
+    <section className={cn("surface p-4", className)}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="type-body-sm font-semibold text-muted-foreground">Today’s check-in</p>
           <h2 className="type-subhead mt-1">How are you feeling?</h2>
         </div>
         <span className="type-label-md rounded-full bg-secondary px-2.5 py-1 text-muted-foreground">
-          {logged.length ? `${logged.length} today` : "40 sec"}
+          {loggedToday ? `${loggedToday} today` : "40 sec"}
         </span>
       </div>
       <p className="type-body-sm mt-1 text-muted-foreground">
@@ -1405,15 +1416,21 @@ function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
         to="/journal"
         className="type-body-md font-semibold mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-foreground text-background transition-transform active:scale-[.98]"
       >
-        <Plus className="h-4 w-4" /> {logged.length ? "Add another check-in" : "Log today’s mood"}
+        <Plus className="h-4 w-4" /> {loggedToday ? "Add another check-in" : "Log today’s mood"}
       </Link>
     </section>
   );
 }
 
-function SupportCard({ city }: { city: string }) {
+export function SupportCard({
+  city,
+  className = "mx-4",
+}: {
+  city: string;
+  className?: string | undefined;
+}) {
   return (
-    <section className="mx-4 rounded-[22px] border border-error/20 bg-error/5 p-4">
+    <section className={cn("rounded-[22px] border border-error/20 bg-error/5 p-4", className)}>
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
         <span className="grid h-10 w-10 place-items-center rounded-xl bg-background text-on-error-container">
           <Heart className="h-5 w-5" />

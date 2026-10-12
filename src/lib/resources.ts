@@ -105,6 +105,12 @@ export type Resource = {
     note?: string;
   };
   featured?: boolean;
+  /** the Equip programme (its slug) that works on what this piece is about */
+  programme?: "stress-buster" | "unburn" | "sleep-tight";
+  /** show the mood journal section: for pieces about tracking or noticing how you feel */
+  journal?: boolean;
+  /** show the consult section: for pieces where talking to a professional is the next step */
+  consult?: boolean;
   /** the iKAN assessment this article explains */
   assessment?: string;
   /** how the article relates to that assessment: it explains it, or it points at it as the
@@ -261,7 +267,7 @@ const library: Resource[] = [
     title: "India’s Mental Health Crisis: The Numbers We Can No Longer Ignore",
     category: "General",
     date: "2026-10-03",
-    minutes: 5,
+    minutes: 7,
     art: "report",
     featured: true,
   },
@@ -270,7 +276,7 @@ const library: Resource[] = [
     title: "The People Who Run the Payroll Are Paying More Than They Realise",
     category: "Work-Life",
     date: "2026-10-12",
-    minutes: 4,
+    minutes: 6,
     art: "iceberg",
   },
   {
@@ -278,7 +284,7 @@ const library: Resource[] = [
     title: "A Country’s Development Depends on the Health of Its People",
     category: "General",
     date: "2026-10-12",
-    minutes: 5,
+    minutes: 8,
     art: "growth",
   },
   {
@@ -286,7 +292,7 @@ const library: Resource[] = [
     title: "Mental Health in India",
     category: "General",
     date: "2026-10-07",
-    minutes: 5,
+    minutes: 8,
     art: "gap",
     featured: true,
   },
@@ -295,7 +301,7 @@ const library: Resource[] = [
     title: "What Is the WHO-5 Well-Being Index? A Simple Guide to Measuring Mental Wellness",
     category: "Wellness",
     date: "2026-09-23",
-    minutes: 4,
+    minutes: 5,
     art: "wellbeing",
     featured: true,
     assessment: "unsure-or-general-concern",
@@ -315,7 +321,7 @@ const library: Resource[] = [
     title: "What Is the Brief Resilience Scale (BRS)? A Simple Guide to the Resilience Test",
     category: "Resilience",
     date: "2026-09-23",
-    minutes: 4,
+    minutes: 5,
     art: "resilience",
     assessment: "unsure-or-general-concern",
   },
@@ -325,7 +331,7 @@ const library: Resource[] = [
       "What Is Generalized Anxiety Disorder (GAD)-2? A Simple Guide to the Ultra-Brief Anxiety Screener",
     category: "Anxiety",
     date: "2026-09-23",
-    minutes: 3,
+    minutes: 4,
     art: "worry",
     assessment: "feeling-overwhelmed-and-anxious",
     assessmentRole: "next",
@@ -336,7 +342,7 @@ const library: Resource[] = [
       "What Is the Patient Health Questionnaire (PHQ)-2? A Simple Guide to the Ultra-Brief Depression Screener",
     category: "Depression",
     date: "2026-09-23",
-    minutes: 3,
+    minutes: 4,
     art: "lowmood",
     assessment: "feeling-depressed-and-hopeless",
     assessmentRole: "next",
@@ -346,7 +352,7 @@ const library: Resource[] = [
     title: "What Is the Perceived Stress Scale (PSS-10)? Understand the Stress Screening Test",
     category: "Stress",
     date: "2026-09-10",
-    minutes: 5,
+    minutes: 4,
     art: "stress",
     featured: true,
     assessment: "feeling-worried-and-stressed",
@@ -357,7 +363,7 @@ const library: Resource[] = [
       "What Is the Burnout Assessment Tool (BAT-23)? An Easy Guide to the 23-Question Burnout Test",
     category: "Burnout",
     date: "2026-09-10",
-    minutes: 5,
+    minutes: 4,
     art: "burnout",
     assessment: "feeling-drained-and-burned-out",
   },
@@ -376,7 +382,7 @@ const library: Resource[] = [
       "What Is Generalized Anxiety Disorder (GAD)-7? A Simple Guide to the Anxiety Screening Test",
     category: "Anxiety",
     date: "2026-09-10",
-    minutes: 5,
+    minutes: 4,
     art: "anxiety",
     assessment: "feeling-overwhelmed-and-anxious",
   },
@@ -385,7 +391,7 @@ const library: Resource[] = [
     title: "What Is Patient Health Questionnaire (PHQ)-9? A Quick Depression Screening Test",
     category: "Depression",
     date: "2026-09-10",
-    minutes: 5,
+    minutes: 4,
     art: "mood",
     assessment: "feeling-depressed-and-hopeless",
   },
@@ -394,7 +400,7 @@ const library: Resource[] = [
     title: "What Is the Sleep Condition Indicator (SCI)? Wake Up to Better Sleep",
     category: "Sleep",
     date: "2026-09-10",
-    minutes: 5,
+    minutes: 4,
     art: "sleep",
     assessment: "struggling-with-quality-sleep",
   },
@@ -403,7 +409,7 @@ const library: Resource[] = [
     title: "The Late Night Tax: How Bad Sleep Impacts Your Long-Term Health",
     category: "Sleep",
     date: "2026-04-01",
-    minutes: 5,
+    minutes: 1,
     art: "night",
   },
   {
@@ -411,7 +417,7 @@ const library: Resource[] = [
     title: "The Power of Measurement-Based Care",
     category: "General",
     date: "2026-03-19",
-    minutes: 5,
+    minutes: 3,
     art: "measure",
     featured: true,
   },
@@ -429,7 +435,7 @@ const library: Resource[] = [
     title: "Prioritizing Mental Wellness: The Importance of Routine Mental Health Check-Ups",
     category: "General",
     date: "2026-03-11",
-    minutes: 5,
+    minutes: 4,
     art: "routine",
   },
 ];

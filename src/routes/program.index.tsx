@@ -72,7 +72,7 @@ function ProgramsPage() {
   );
 }
 
-function ProgrammeCard({ programme }: { programme: Programme }) {
+export function ProgrammeCard({ programme }: { programme: Programme }) {
   const { state, nextDay } = useProgramme(programme.slug);
   const total = dayCount(programme);
   const done = daysDoneOf(programme, state.completed);

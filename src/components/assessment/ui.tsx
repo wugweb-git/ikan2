@@ -209,9 +209,7 @@ export function StackedAssessmentCard({
           <span className="type-body-sm font-medium mt-3 block text-[var(--accent-strong)]">
             {assessment.name}
           </span>
-          <span className="type-title-md mt-0.5 block text-[19px] leading-6">
-            {assessment.title}
-          </span>
+          <span className="type-title-lg mt-0.5 block">{assessment.title}</span>
           <span className="type-body-sm mt-2 flex items-center justify-between gap-3 text-muted-foreground">
             <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="inline-flex items-center gap-1">
