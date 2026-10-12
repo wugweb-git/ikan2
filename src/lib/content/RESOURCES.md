@@ -59,6 +59,22 @@ line in `type-label-md`, muted. Two views of it:
 - Saved is a filled bookmark in the accent, unsaved an outline.
 - The carousel and Home both open on the newest piece, then the featured ones.
 
+## Sections of the article page: names, labels, layout
+
+| Section                 | Element          | Scroll name (`id`) | Accessible name                                    | Width                                                                                 | Stacking                                                        |
+| ----------------------- | ---------------- | ------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Whole page              | `article`        | —                  | from the title (`aria-labelledby="article-title"`) | page column: 100% on phones, 36rem from 640px, 38rem from 1024px, 100% when installed | in page flow                                                    |
+| Cover                   | `header`         | `cover`            | "Cover"; Back and Save buttons named               | column width, 240px tall                                                              | flow; the buttons sit over it                                   |
+| Article (title to body) | `div`            | `article`          | —                                                  | column width, 20px side padding                                                       | `relative`, pulled 32px up over the cover with 28px rounded top |
+| Title                   | `h1`             | `article-title`    | its text                                           | column                                                                                | —                                                               |
+| Body                    | `div.prose-ikan` | `article-body`     | —                                                  | column                                                                                | —                                                               |
+| Source                  | `section`        | `source`           | "Source"                                           | column                                                                                | —                                                               |
+| External                | `section`        | `external`         | "Related in iKAN"                                  | column                                                                                | —                                                               |
+| Sources                 | `section`        | `sources`          | "Sources"                                          | column                                                                                | —                                                               |
+| Keep reading            | `section`        | `keep-reading`     | its heading (`keep-reading-title`)                 | full column (bleeds past the padding)                                                 | —                                                               |
+| Bottom navigation       | `nav`            | —                  | "Main navigation"                                  | up to the app column                                                                  | fixed, `z-index: 50`                                            |
+| More sheet              | dialog           | —                  | "More"                                             | app column                                                                            | fixed, `z-index: 40`                                            |
+
 ## The article body (`.prose-ikan`, from `articles.json`)
 
 | Part                                  | Markup                                                                                                                                                                                           | Style                                                                                                                                                                                                                 |

@@ -189,8 +189,8 @@ function ArticlePage() {
 
   return (
     <IkanShell wide>
-      <article style={accentStyle("calm")}>
-        <header className="relative">
+      <article style={accentStyle("calm")} aria-labelledby="article-title">
+        <header id="cover" className="relative" aria-label="Cover">
           <div className="h-60 overflow-hidden">
             <Illustration art={r.art} />
           </div>
@@ -216,9 +216,11 @@ function ArticlePage() {
           </div>
         </header>
 
-        <div className="relative -mt-8 rounded-t-[28px] bg-background px-5 pt-6">
+        <div id="article" className="relative -mt-8 rounded-t-[28px] bg-background px-5 pt-6">
           <p className="type-body-sm font-semibold text-[var(--accent-strong)]">{r.category}</p>
-          <h1 className="type-headline-md mt-1 text-balance">{r.title}</h1>
+          <h1 id="article-title" className="type-headline-md mt-1 text-balance">
+            {r.title}
+          </h1>
           {article?.description ? (
             /* the standfirst: display face, full contrast, so it reads as part of the title
              * group rather than as the first paragraph of the article */
@@ -269,18 +271,23 @@ function ArticlePage() {
           {body ? (
             <div
               ref={text}
+              id="article-body"
               className={cn("prose-ikan", r.src ? "mt-7" : "mt-6")}
               dangerouslySetInnerHTML={{ __html: body }}
             />
           ) : null}
           <div ref={end} aria-hidden="true" />
 
-          {r.source ? <SourceCard source={r.source} /> : null}
+          {r.source ? (
+            <section id="source" aria-label="Source">
+              <SourceCard source={r.source} />
+            </section>
+          ) : null}
 
           {/* External: where the article can send someone inside iKAN, each through the card that
            * place already uses. Which ones a piece shows is set on the resource, never guessed. */}
           {assessment || programme || r.journal || r.consult ? (
-            <section aria-label="External">
+            <section id="external" aria-label="Related in iKAN">
               {assessment ? (
                 <StackedAssessmentCard
                   assessment={assessment}
@@ -321,14 +328,22 @@ function ArticlePage() {
           ) : null}
 
           {sources ? (
-            <div className="prose-ikan" dangerouslySetInnerHTML={{ __html: sources }} />
+            <section id="sources" aria-label="Sources">
+              <div className="prose-ikan" dangerouslySetInnerHTML={{ __html: sources }} />
+            </section>
           ) : null}
 
           {/* The article ends here: what follows is a tinted footer, so people can tell the
            * reading from the suggestions after it. */}
           {more.length ? (
-            <section className="-mx-5 mt-12 rounded-t-[28px] border-t border-foreground/10 bg-secondary/50 px-5 pb-8 pt-7">
-              <h2 className="type-title-lg">Keep reading</h2>
+            <section
+              id="keep-reading"
+              aria-labelledby="keep-reading-title"
+              className="-mx-5 mt-12 rounded-t-[28px] border-t border-foreground/10 bg-secondary/50 px-5 pb-8 pt-7"
+            >
+              <h2 id="keep-reading-title" className="type-title-lg">
+                Keep reading
+              </h2>
               <ul className="mt-2">
                 {more.map((m) => (
                   <ResourceRow
