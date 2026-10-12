@@ -26,19 +26,33 @@ looks like the rest without anyone choosing a font size.
 | Source of a video or audio piece       | `resource.source`                                               | `SourceCard`: 20px secondary card, `type-title-md` name                                 |
 | Keep reading                           | same category or cover                                          | `type-title-lg` heading; each item is `ResourceRow`, the same row as the Resources list |
 
-## A resource in a list (`ResourceRow`, `src/routes/resources.index.tsx`)
+## A resource on a card: row and block (`src/routes/resources.index.tsx`)
 
-The Resources list and Keep reading both use it. Cover (84px, 16px corners), category eyebrow
-(`type-label-md` semibold, accent strong), title, then one meta line in `type-label-md`, muted:
+Every card that lists a resource has the same schema: a cover, the category eyebrow
+(`type-label-md` semibold, accent strong), the title (15/20 semibold), then `ResourceMeta`, one
+line in `type-label-md`, muted. Two views of it:
 
-| State                   | Meta line                                                |
-| ----------------------- | -------------------------------------------------------- |
-| Not started             | date · type (Read / Watch / Listen) · length             |
-| Part way (video, audio) | date · type · **time left** (accent)                     |
-| Finished                | date · **✓ Read / Watched / Listened** (accent) · length |
+| View                                                     | Where                        | Cover                                                                                                               |
+| -------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Row (`ResourceRow`, stacked beside the cover, with save) | Resources list, Keep reading | 84px square, 16px corners                                                                                           |
+| Block (cover on top, 240px wide)                         | Home, From the library       | 132px tall, 20px card                                                                                               |
+| Featured (text over the cover)                           | Resources carousel           | full card; the first card carries a top-left "Latest" or "Featured" badge, beside its category, never instead of it |
 
-An article is finished when its end comes into view (`markRead`), not when it is opened; video
-and audio report it from the player. This year's dates drop the year so the line fits a phone.
+`ResourceMeta`, the one meta line, never wraps:
+
+| State                   | Meta line                                                            |
+| ----------------------- | -------------------------------------------------------------------- |
+| Not started             | 📅 date · type (Read / Watch / Listen) · length                      |
+| Part way (video, audio) | 📅 date · type · **time left** in an accent pill                     |
+| Finished                | 📅 date · **✓ Read / Watched / Listened** in an accent pill · length |
+
+- Dates are `cardDate`: **12 Oct '26** on every card (fixed month names, so September is "Sep").
+- On a narrow phone the type word gives way with an ellipsis, down to its icon; the date and the
+  length always show in full.
+- An article is finished when its end comes into view (`markRead`); files and YouTube embeds
+  report how far they have played (`markPlayed`).
+- Saved is a filled bookmark in the accent, unsaved an outline.
+- The carousel and Home both open on the newest piece, then the featured ones.
 
 ## The article body (`.prose-ikan`, from `articles.json`)
 

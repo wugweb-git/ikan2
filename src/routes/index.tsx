@@ -43,6 +43,7 @@ import {
 import { headlineOf, recommendationsFor, riskEndorsed, scoreAll } from "@/lib/assessment/scoring";
 import { dayCount, daysDoneOf, getProgramme, minutesOf, programmes } from "@/lib/equip/programs";
 import { consultants } from "@/lib/consultants";
+import { ResourceMeta } from "@/routes/resources.index";
 import { addDays, dayKey, moodScale } from "@/lib/journal";
 import { useNotifications } from "@/lib/notifications";
 import {
@@ -64,6 +65,7 @@ import {
   mediumOf,
   resources,
   slugOf,
+  useResourceStore,
   type Resource,
 } from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
@@ -1029,10 +1031,13 @@ function ThisWeek({ data, hydrated }: { data: Data; hydrated: boolean }) {
 }
 
 function Library() {
-  const picks: Resource[] = [
-    ...resources.filter((r) => covers[r.id]),
-    ...resources.filter((r) => !covers[r.id] && r.featured),
-  ].slice(0, 5);
+  const hydrated = useHydrated();
+  const store = useResourceStore();
+  /* The same pick as the Resources carousel: the newest piece first, then the featured ones. */
+  const picks: Resource[] = [resources[0]!, ...resources.slice(1).filter((r) => r.featured)].slice(
+    0,
+    5,
+  );
   return (
     <Section title="From the library" action={{ label: "See all", to: "/resources" }}>
       <div className="no-scrollbar flex snap-x scroll-px-4 items-stretch gap-3 overflow-x-auto px-4 pb-1">
@@ -1041,6 +1046,7 @@ function Library() {
             key={r.id}
             to="/resources/$slug"
             params={{ slug: slugOf(r) }}
+            style={accentStyle("calm")}
             className="flex w-[240px] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] bg-secondary"
           >
             <span className="block h-[132px] overflow-hidden">
@@ -1050,23 +1056,20 @@ function Library() {
                 <Illustration art={r.art} />
               )}
             </span>
+            {/* The block view of a resource: the same eyebrow, title and meta line as its row
+             * in the Resources list, stacked under a bigger cover. */}
             <span className="flex flex-1 flex-col p-3">
-              <span className="line-clamp-3 text-[15px] font-semibold leading-5">{r.title}</span>
-              <span className="type-label-md mt-auto flex items-center gap-2 pt-2 text-muted-foreground">
-                <span className="rounded-full bg-background px-2 py-0.5 font-medium">
-                  {r.category}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  {(() => {
-                    const Icon = mediumIcon[mediumOf(r)];
-                    return <Icon className="h-3.5 w-3.5" aria-hidden="true" />;
-                  })()}
-                  {mediumLabel(r)}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <Clock3 className="h-3.5 w-3.5" aria-hidden="true" /> {lengthLabel(r)}
-                </span>
+              <span className="type-label-md font-semibold block text-[var(--accent-strong)]">
+                {r.category}
               </span>
+              <span className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">
+                {r.title}
+              </span>
+              <ResourceMeta
+                r={r}
+                progress={hydrated ? store.progressOf(r) : null}
+                className="mt-auto pt-2"
+              />
             </span>
           </Link>
         ))}

@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import {
   ArrowLeft,
   Bookmark,
-  BookmarkCheck,
   CalendarDays,
   ChevronRight,
   Clock3,
@@ -155,7 +154,7 @@ function ArticlePage() {
               className="bg-background/85 backdrop-blur"
             >
               {saved ? (
-                <BookmarkCheck className="h-5 w-5 text-[var(--accent-strong)]" />
+                <Bookmark className="h-5 w-5 fill-current text-[var(--accent-strong)]" />
               ) : (
                 <Bookmark className="h-5 w-5" />
               )}

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bookmark, BookmarkCheck, CalendarDays, Check, Clock3, Search, X } from "lucide-react";
+import { Bookmark, CalendarDays, Check, Clock3, Search, Sparkles, Star, X } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
 import { accentStyle, IconButton, Snackbar, stateLayer, useSnack } from "@/components/equip/m3";
@@ -14,6 +14,7 @@ import {
   mediumLabel,
   mediumOf,
   progressLabel,
+  cardDate,
   resources,
   slugOf,
   useResourceStore,
@@ -53,22 +54,6 @@ export const Route = createFileRoute("/resources/")({
     ),
   component: ResourcesPage,
 });
-
-/* A row has less room than the featured card, so this year's dates drop the year. */
-const rowDate = (d: string) => {
-  const date = new Date(`${d}T00:00:00`);
-  return date.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    ...(date.getFullYear() === new Date().getFullYear() ? {} : { year: "numeric" }),
-  });
-};
-const dateLabel = (d: string) =>
-  new Date(`${d}T00:00:00`).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
 
 function ResourcesPage() {
   const hydrated = useHydrated();
@@ -138,20 +123,32 @@ function ResourcesPage() {
                 >
                   <Illustration art={r.art} className="absolute inset-0" />
                   <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                  {/* Why the first card is first, in its own corner: the newest piece is "Latest",
+                   * a hand-picked one "Featured". The category stays where it always is. */}
+                  {i === 0 ? (
+                    <span className="type-label-md font-semibold absolute left-4 top-4 inline-flex h-7 items-center gap-1.5 rounded-full bg-white px-3 text-foreground shadow-sm">
+                      {r.featured ? (
+                        <Star className="h-3.5 w-3.5" aria-hidden="true" />
+                      ) : (
+                        <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                      )}
+                      {r.featured ? "Featured" : "Latest"}
+                    </span>
+                  ) : null}
                   <div className="absolute inset-x-0 bottom-0 p-5">
                     <span className="type-label-md font-semibold inline-flex h-6 items-center gap-1.5 rounded-full bg-white/20 px-2.5 backdrop-blur">
                       {(() => {
                         const Icon = mediumIcon[mediumOf(r)];
                         return <Icon className="h-3.5 w-3.5" />;
                       })()}
-                      {i === 0 ? (r.featured ? "Featured story" : "Latest") : r.category}
+                      {r.category}
                     </span>
                     <h2 className="mt-2 line-clamp-3 font-display text-[20px] font-semibold leading-6">
                       {r.title}
                     </h2>
                     <span className="type-body-sm mt-2 flex items-center gap-3 opacity-85">
                       <span className="inline-flex items-center gap-1.5">
-                        <CalendarDays className="h-3.5 w-3.5" /> {dateLabel(r.date)}
+                        <CalendarDays className="h-3.5 w-3.5" /> {cardDate(r.date)}
                       </span>
                       {/* what it is, then how long it takes: two facts, two icons */}
                       <span className="inline-flex items-center gap-1.5">
@@ -328,37 +325,7 @@ export function ResourceRow({
               {r.category}
             </span>
             <h3 className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">{r.title}</h3>
-            {/* What it is, how long it takes (or how far you are) and when it was published. On
-             * a narrow phone the date wraps to its own line rather than squeezing the others. */}
-            <span className="type-label-md mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 whitespace-nowrap text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5">
-                <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" /> {rowDate(r.date)}
-              </span>
-              {/* finished: the check replaces the type ("Read", not "Read ✓ Read") */}
-              {progress?.done ? (
-                <span className="inline-flex items-center gap-1.5 font-medium text-[var(--accent-strong)]">
-                  <Check className="h-3.5 w-3.5" aria-hidden="true" /> {progress.label}
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5">
-                  {(() => {
-                    const Icon = mediumIcon[mediumOf(r)];
-                    return <Icon className="h-3.5 w-3.5" />;
-                  })()}
-                  {mediumLabel(r)}
-                </span>
-              )}
-              {/* part way: how much is left replaces the length */}
-              <span
-                className={cn(
-                  "inline-flex items-center gap-1.5",
-                  progress && !progress.done && "font-medium text-[var(--accent-strong)]",
-                )}
-              >
-                <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />{" "}
-                {progress && !progress.done ? progress.label : lengthLabel(r)}
-              </span>
-            </span>
+            <ResourceMeta r={r} progress={progress} className="mt-1" />
           </span>
         </Link>
         <IconButton
@@ -366,12 +333,66 @@ export function ResourceRow({
           onClick={() => onToggleSave(r)}
         >
           {saved ? (
-            <BookmarkCheck className="h-5 w-5 text-[var(--accent-strong)]" />
+            <Bookmark className="h-5 w-5 fill-current text-[var(--accent-strong)]" />
           ) : (
             <Bookmark className="h-5 w-5 text-muted-foreground" />
           )}
         </IconButton>
       </div>
     </li>
+  );
+}
+
+/** A resource's meta line, shared by the row and the block card on Home: date, type and
+ * length, or progress in their place, on one line. On a narrow phone the type word gives way
+ * with an ellipsis, since its icon says the same; the length always shows in full. See
+ * src/lib/content/RESOURCES.md. */
+export function ResourceMeta({
+  r,
+  progress,
+  className,
+}: {
+  r: Resource;
+  progress: { label: string; done: boolean } | null;
+  className?: string | undefined;
+}) {
+  return (
+    <span
+      className={cn(
+        "type-label-md flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap text-muted-foreground [&>span]:shrink-0 [&>span:nth-child(2)]:min-w-0 [&>span:nth-child(2)]:shrink [&>span:nth-child(2)]:overflow-hidden [&_svg]:shrink-0",
+        className,
+      )}
+    >
+      <span className="inline-flex items-center gap-1">
+        <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" /> {cardDate(r.date)}
+      </span>
+      {/* finished: the check replaces the type ("Read", not "Read ✓ Read") */}
+      {progress?.done ? (
+        <span className="inline-flex h-5 items-center gap-1 rounded-full bg-[var(--accent-container)] px-2 font-semibold text-[var(--on-accent-container)]">
+          <Check className="h-3.5 w-3.5" aria-hidden="true" strokeWidth={2.5} />
+          <span className="truncate">{progress.label}</span>
+        </span>
+      ) : (
+        <span className="inline-flex items-center gap-1">
+          {(() => {
+            const Icon = mediumIcon[mediumOf(r)];
+            return <Icon className="h-3.5 w-3.5" />;
+          })()}
+          <span className="truncate">{mediumLabel(r)}</span>
+        </span>
+      )}
+      {/* part way: how much is left replaces the length */}
+      <span
+        className={cn(
+          "inline-flex items-center gap-1",
+          progress &&
+            !progress.done &&
+            "h-5 gap-1 rounded-full bg-[var(--accent-container)] px-2 font-semibold text-[var(--on-accent-container)]",
+        )}
+      >
+        <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+        {progress && !progress.done ? progress.label : lengthLabel(r)}
+      </span>
+    </span>
   );
 }

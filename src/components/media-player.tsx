@@ -1,4 +1,4 @@
-import { useRef, useState, type SyntheticEvent } from "react";
+import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import { ArrowUpRight, Pause, Play } from "lucide-react";
 import { stateLayer } from "@/components/equip/m3";
 import { cn } from "@/lib/utils";
@@ -136,10 +136,10 @@ export function MediaPlayer({
   title?: string;
   /** resume point in seconds, from the last time this was played */
   startAt?: number;
-  /** files only: how far through, as it plays */
+  /** how far through, as it plays: files, and YouTube embeds (which report it by message) */
   onProgress?: (at: number, of: number) => void;
   /** for Equip: a watch or listen block that completes when the thing has been played. Files
-   * only - an embed plays inside the other service and never tells us it finished. */
+   * only - an embed's end is reported through onProgress, not here. */
   onEnded?: () => void;
 }) {
   const source = parseSource(src);
@@ -153,6 +153,49 @@ export function MediaPlayer({
     shown.current = src;
     setPlaying(false);
   }
+
+  /* A YouTube embed tells the page how far it has played if the page asks: with enablejsapi on,
+   * posting "listening" to the frame makes it send infoDelivery messages carrying currentTime
+   * and duration. That is what lets a video show "Watched" like a file does. Nothing is sent
+   * until someone has pressed play, since the frame does not exist before that. */
+  const frame = useRef<HTMLIFrameElement>(null);
+  const youtube = source.kind === "embed" && source.provider === "youtube";
+  useEffect(() => {
+    if (!youtube || !playing || !onProgress) return;
+    let of = 0;
+    let last = -1;
+    const onMessage = (e: MessageEvent) => {
+      if (!/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin)) return;
+      let data: { event?: string; info?: { currentTime?: number; duration?: number } };
+      try {
+        data = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
+      } catch {
+        return;
+      }
+      const info = data?.info;
+      if (!info) return;
+      if (typeof info.duration === "number" && info.duration > 0) of = info.duration;
+      const at = info.currentTime;
+      /* every few seconds is plenty for a resume point, and keeps writes down */
+      if (typeof at === "number" && of > 0 && (Math.abs(at - last) >= 5 || at >= of - 3)) {
+        last = at;
+        onProgress(at, of);
+      }
+    };
+    const listen = () =>
+      frame.current?.contentWindow?.postMessage(
+        JSON.stringify({ event: "listening", id: "ikan", channel: "widget" }),
+        "*",
+      );
+    window.addEventListener("message", onMessage);
+    const el = frame.current;
+    el?.addEventListener("load", listen);
+    listen();
+    return () => {
+      window.removeEventListener("message", onMessage);
+      el?.removeEventListener("load", listen);
+    };
+  }, [youtube, playing]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (source.kind === "embed") {
     const box =
@@ -245,7 +288,12 @@ export function MediaPlayer({
     return (
       <div className={cn("overflow-hidden rounded-[20px] bg-black", className)} style={box}>
         <iframe
-          src={source.url}
+          ref={frame}
+          src={
+            youtube && typeof window !== "undefined"
+              ? `${source.url}&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`
+              : source.url
+          }
           title={title ?? label[source.provider]}
           className="h-full w-full border-0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"

@@ -483,6 +483,15 @@ export const libraryLabel = () => {
   return parts.length === 1 ? `${parts[0]} and guides` : parts.join(" \u00b7 ");
 };
 
+/** A resource's date on a card: "12 Oct '26". One format on every card that lists resources. */
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export const cardDate = (d: string) => {
+  /* A fixed list, not toLocaleDateString: browsers write September as "Sept", one letter longer
+   * than every other month, which was enough to push a row's meta line past a phone's width. */
+  const date = new Date(`${d}T00:00:00`);
+  return `${date.getDate()} ${months[date.getMonth()]} '${String(date.getFullYear()).slice(2)}`;
+};
+
 export const getResource = (id: string) => resources.find((r) => r.id === id);
 
 /** Readable URL name for an article, from its title: /resources/<slug>. */
