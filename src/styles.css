@@ -1290,6 +1290,12 @@ html.reduce-motion *::after {
      * otherwise push the whole page sideways on a phone */
     overflow-wrap: anywhere;
   }
+  /* A link to another resource is part of the content: the accent green for the words and the
+   * underline, no arrow, and it opens in the app. */
+  .prose-ikan a[href^="/resources/"]:not([target]) {
+    color: var(--accent-strong, var(--foreground));
+    text-decoration-color: currentColor;
+  }
   /* House rule (kit/link.tsx): a link that leaves iKAN ends in an arrow and opens in a new tab,
    * because in the installed app leaving means a browser opening over the top of it. */
   .prose-ikan a[target="_blank"]::after {
