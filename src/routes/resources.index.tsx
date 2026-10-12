@@ -270,80 +270,92 @@ function ResourcesPage() {
           </div>
         ) : (
           <ul className="mt-2 px-4">
-            {shown.map((r) => {
-              const saved = hydrated && store.isSaved(r.id);
-              /* One signal per card. Part way through, it says how much is left; finished, it
-               * is a check. Never both: they said different things about the same resource. */
-              const read = hydrated && Boolean(store.opened[r.id]);
-              const progress = hydrated ? progressLabel(r, store.playedOf(r.id)) : null;
-              return (
-                <li key={r.id} className="border-b border-foreground/10 last:border-0">
-                  <div className="flex items-center gap-3 py-3">
-                    <Link
-                      to="/resources/$slug"
-                      params={{ slug: slugOf(r) }}
-                      className={cn(
-                        "flex min-w-0 flex-1 items-center gap-3 rounded-[16px] text-left",
-                        stateLayer,
-                      )}
-                    >
-                      <span className="h-[84px] w-[84px] shrink-0 overflow-hidden rounded-[16px]">
-                        <Illustration art={r.art} />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="type-label-md font-semibold block text-[var(--accent-strong)]">
-                          {r.category}
-                          {/* opened already. A check, not the word: "Read" now names a type in
-                           * the filter row above, and the eyebrow would say it twice over. */}
-                          {progress ? (
-                            <span className="ml-1.5 font-normal text-muted-foreground">
-                              {progress}
-                            </span>
-                          ) : read ? (
-                            <span className="ml-1.5 inline-flex items-center align-middle text-muted-foreground">
-                              <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                              <span className="sr-only">{doneLabel(r)}</span>
-                            </span>
-                          ) : null}
-                        </span>
-                        <h3 className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">
-                          {r.title}
-                        </h3>
-                        {/* What it is and how long it takes. The date is on the featured card and
-                         * on the article itself; a third item here wrapped onto two lines. */}
-                        <span className="type-label-md mt-1 flex items-center gap-3 whitespace-nowrap text-muted-foreground">
-                          <span className="inline-flex items-center gap-1.5">
-                            {(() => {
-                              const Icon = mediumIcon[mediumOf(r)];
-                              return <Icon className="h-3.5 w-3.5" />;
-                            })()}
-                            {mediumLabel(r)}
-                          </span>
-                          <span className="inline-flex items-center gap-1.5">
-                            <Clock3 className="h-3.5 w-3.5" /> {lengthLabel(r)}
-                          </span>
-                        </span>
-                      </span>
-                    </Link>
-                    <IconButton
-                      label={saved ? "Remove from saved" : "Save for later"}
-                      onClick={() => toggle(r)}
-                    >
-                      {saved ? (
-                        <BookmarkCheck className="h-5 w-5 text-[var(--accent-strong)]" />
-                      ) : (
-                        <Bookmark className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </IconButton>
-                  </div>
-                </li>
-              );
-            })}
+            {shown.map((r) => (
+              <ResourceRow key={r.id} r={r} hydrated={hydrated} onToggleSave={toggle} />
+            ))}
           </ul>
         )}
 
         <Snackbar message={snack.message} />
       </div>
     </IkanShell>
+  );
+}
+
+/** One resource in a list: cover, category, title, type and length, and save. The library
+ * list and an article's Keep reading both use it, so a resource looks the same wherever it is
+ * listed. */
+export function ResourceRow({
+  r,
+  hydrated,
+  onToggleSave,
+}: {
+  r: Resource;
+  hydrated: boolean;
+  onToggleSave: (r: Resource) => void;
+}) {
+  const store = useResourceStore();
+  const saved = hydrated && store.isSaved(r.id);
+  /* One signal per card. Part way through, it says how much is left; finished, it
+   * is a check. Never both: they said different things about the same resource. */
+  const read = hydrated && Boolean(store.opened[r.id]);
+  const progress = hydrated ? progressLabel(r, store.playedOf(r.id)) : null;
+  return (
+    <li className="border-b border-foreground/10 last:border-0">
+      <div className="flex items-center gap-3 py-3">
+        <Link
+          to="/resources/$slug"
+          params={{ slug: slugOf(r) }}
+          className={cn(
+            "flex min-w-0 flex-1 items-center gap-3 rounded-[16px] text-left",
+            stateLayer,
+          )}
+        >
+          <span className="h-[84px] w-[84px] shrink-0 overflow-hidden rounded-[16px]">
+            <Illustration art={r.art} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="type-label-md font-semibold block text-[var(--accent-strong)]">
+              {r.category}
+              {/* opened already. A check, not the word: "Read" now names a type in
+               * the filter row above, and the eyebrow would say it twice over. */}
+              {progress ? (
+                <span className="ml-1.5 font-normal text-muted-foreground">{progress}</span>
+              ) : read ? (
+                <span className="ml-1.5 inline-flex items-center align-middle text-muted-foreground">
+                  <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="sr-only">{doneLabel(r)}</span>
+                </span>
+              ) : null}
+            </span>
+            <h3 className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">{r.title}</h3>
+            {/* What it is and how long it takes. The date is on the featured card and
+             * on the article itself; a third item here wrapped onto two lines. */}
+            <span className="type-label-md mt-1 flex items-center gap-3 whitespace-nowrap text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                {(() => {
+                  const Icon = mediumIcon[mediumOf(r)];
+                  return <Icon className="h-3.5 w-3.5" />;
+                })()}
+                {mediumLabel(r)}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Clock3 className="h-3.5 w-3.5" /> {lengthLabel(r)}
+              </span>
+            </span>
+          </span>
+        </Link>
+        <IconButton
+          label={saved ? "Remove from saved" : "Save for later"}
+          onClick={() => onToggleSave(r)}
+        >
+          {saved ? (
+            <BookmarkCheck className="h-5 w-5 text-[var(--accent-strong)]" />
+          ) : (
+            <Bookmark className="h-5 w-5 text-muted-foreground" />
+          )}
+        </IconButton>
+      </div>
+    </li>
   );
 }

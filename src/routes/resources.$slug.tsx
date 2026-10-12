@@ -19,6 +19,7 @@ import { getProgramme } from "@/lib/equip/programs";
 import { dayKey, useJournal } from "@/lib/journal";
 import { MoodCheckinCard, SupportCard } from "@/routes/index";
 import { ProgrammeCard } from "@/routes/program.index";
+import { ResourceRow } from "@/routes/resources.index";
 import { accentStyle, IconButton, stateLayer } from "@/components/equip/m3";
 import { jsonLd, pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -251,40 +252,14 @@ function ArticlePage() {
           {more.length ? (
             <section className="-mx-5 mt-12 rounded-t-[28px] border-t border-foreground/10 bg-secondary/50 px-5 pb-8 pt-7">
               <h2 className="type-title-lg">Keep reading</h2>
-              <ul className="mt-4 divide-y divide-foreground/10">
+              <ul className="mt-2">
                 {more.map((m) => (
-                  <li key={m.id}>
-                    <Link
-                      to="/resources/$slug"
-                      params={{ slug: slugOf(m) }}
-                      className={cn(
-                        "-mx-2 flex items-center gap-4 rounded-[16px] px-2 py-4",
-                        stateLayer,
-                      )}
-                    >
-                      <span className="h-20 w-20 shrink-0 overflow-hidden rounded-[16px] bg-background">
-                        <Illustration art={m.art} />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="type-title-md line-clamp-3">{m.title}</span>
-                        <span className="type-label-md mt-2 flex items-center gap-2 text-muted-foreground">
-                          <span className="rounded-full bg-background px-2 py-0.5 font-medium">
-                            {m.category}
-                          </span>
-                          <span className="inline-flex items-center gap-1">
-                            {(() => {
-                              const Icon = mediumIcon[mediumOf(m)];
-                              return <Icon className="h-3.5 w-3.5" />;
-                            })()}
-                            {mediumLabel(m)}
-                          </span>
-                          <span className="inline-flex items-center gap-1">
-                            <Clock3 className="h-3.5 w-3.5" /> {lengthLabel(m)}
-                          </span>
-                        </span>
-                      </span>
-                    </Link>
-                  </li>
+                  <ResourceRow
+                    key={m.id}
+                    r={m}
+                    hydrated={hydrated}
+                    onToggleSave={(x) => store.toggleSave(x.id)}
+                  />
                 ))}
               </ul>
             </section>
