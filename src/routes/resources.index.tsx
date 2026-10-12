@@ -78,7 +78,9 @@ function ResourcesPage() {
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
 
-  const featured = resources.filter((r) => r.featured);
+  /* The newest piece always opens the carousel, featured or not, so something new is the first
+   * thing seen; the hand-picked features follow, newest first. */
+  const featured = [resources[0]!, ...resources.slice(1).filter((r) => r.featured)];
   const q = query.trim().toLowerCase();
   const shown = resources
     .filter(
@@ -133,7 +135,7 @@ function ResourcesPage() {
                         const Icon = mediumIcon[mediumOf(r)];
                         return <Icon className="h-3.5 w-3.5" />;
                       })()}
-                      {i === 0 ? "Featured story" : r.category}
+                      {i === 0 ? (r.featured ? "Featured story" : "Latest") : r.category}
                     </span>
                     <h2 className="mt-2 line-clamp-3 font-display text-[20px] font-semibold leading-6">
                       {r.title}
