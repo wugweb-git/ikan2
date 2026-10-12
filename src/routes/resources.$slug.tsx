@@ -118,6 +118,24 @@ function ArticlePage() {
   const related = others.filter((x) => x.category === r.category || x.art === r.art);
   const more = [...related, ...others.filter((x) => !related.includes(x))].slice(0, 3);
 
+  /* Links between resources inside the text are plain HTML, so a tap would reload the whole app.
+   * They are caught here and opened through the router instead, staying in the app. Links that
+   * leave iKAN (target="_blank") and picture links are left alone. */
+  const onTextClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const a = (e.target as HTMLElement).closest("a");
+    const m = a ? /^\/resources\/([a-z0-9-]+)$/.exec(a.getAttribute("href") ?? "") : null;
+    if (!a || !m || a.target === "_blank") return;
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const to = getResourceBySlug(m[1]!);
+    track("resource_link", {
+      medium: mediumOf(r),
+      ...(namedTopics.has(r.category) ? { from: slugOf(r) } : {}),
+      ...(to && namedTopics.has(to.category) ? { to: slugOf(to) } : {}),
+    });
+    navigate({ to: "/resources/$slug", params: { slug: m[1]! } });
+  };
+
   /* What goes to analytics about reading. Which piece it was is sent only for topics that say
    * nothing about the reader's health (General, Work-Life): what someone reads about depression
    * or sleep is itself health information, so for those only the type and length go out. See
@@ -273,6 +291,7 @@ function ArticlePage() {
               ref={text}
               id="article-body"
               className={cn("prose-ikan", r.src ? "mt-7" : "mt-6")}
+              onClick={onTextClick}
               dangerouslySetInnerHTML={{ __html: body }}
             />
           ) : null}
@@ -329,7 +348,11 @@ function ArticlePage() {
 
           {sources ? (
             <section id="sources" aria-label="Sources">
-              <div className="prose-ikan" dangerouslySetInnerHTML={{ __html: sources }} />
+              <div
+                className="prose-ikan"
+                onClick={onTextClick}
+                dangerouslySetInnerHTML={{ __html: sources }}
+              />
             </section>
           ) : null}
 

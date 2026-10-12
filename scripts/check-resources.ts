@@ -38,6 +38,9 @@
  *     <table class="data-table"> with a <thead> and data-label on every cell after the first.
  *   - sources, when there are any, come last: <section class="sources"><h2>Sources</h2>, then
  *     optional h3 groups and ul lists, each item opening with <strong>Who (year).</strong>.
+ *   - a link to another resource: href="/resources/<slug>" of a resource that exists, same tab, no
+ *     arrow (it is part of the content), first mention only, at most four per article. Resources
+ *     link only to resources; app screens are reached through the External cards.
  *   - a link that leaves iKAN: target="_blank" rel="noopener noreferrer", a visually hidden
  *     "(opens in a new tab)", and words as its text, never a web address.
  */
@@ -200,6 +203,7 @@ for (const r of resources) {
       fail(where, `bullet written as a paragraph: "${inner(k).slice(0, 40)}"`);
   });
 
+  let internal = 0;
   walk(doc, (n, parent) => {
     const allowed = ALLOWED[n.tag];
     if (!allowed) return fail(where, `<${n.tag}> is not part of the vocabulary`);
@@ -235,7 +239,16 @@ for (const r of resources) {
         if (!/\(opens in a new tab\)/.test(inner(n)))
           fail(where, `external link without "(opens in a new tab)": ${href}`);
         if (looksLikeAddress(label)) fail(where, `a web address as link text: ${label}`);
-      } else if (!href.startsWith("/")) fail(where, `link to "${href}"`);
+      } else if (/^\/resources\/[a-z0-9-]+$/.test(href)) {
+        /* a link to another resource: it must exist, and it stays in the app (no new tab, so no
+         * arrow), because it is part of the content */
+        internal += 1;
+        const target = href.slice("/resources/".length);
+        if (!resources.some((x) => slugOf(x) === target))
+          fail(where, `link to a resource that does not exist: ${href}`);
+        if (target === slugOf(r)) fail(where, "a resource linking to itself");
+        if (n.attrs.target) fail(where, `link to another resource opens a new tab: ${href}`);
+      } else if (!href.startsWith("/resources/")) fail(where, `link to "${href}"`);
     }
 
     if (n.tag === "figure") {
@@ -305,6 +318,8 @@ for (const r of resources) {
       });
     }
   });
+  if (internal > 4)
+    fail(where, `${internal} links to other resources (4 at most, first mention only)`);
 }
 
 if (notes.length)
