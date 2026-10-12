@@ -400,5 +400,37 @@ export function programmeHighlights(p: Programme, s: ProgrammeState): Highlights
     return { title: "Your stress toolkit", tiles };
   }
 
+  if (p.slug === "sleep-tight") {
+    const concerns = picked(0, /primary sleep concern/i);
+    add(concerns, "signs", n(concerns, "concern", "concerns"), "about your sleep at the start");
+    const nights = Object.keys(s.diary ?? {}).length;
+    add(nights, "log", n(nights, "night", "nights"), "logged in your sleep diary");
+    add(
+      count("thoughts"),
+      "brain",
+      n(count("thoughts"), "thought", "thoughts"),
+      "tracked around bedtime",
+    );
+    add(
+      count("mind_dump"),
+      "worry",
+      n(count("mind_dump"), "mind dump", "mind dumps"),
+      "emptied before bed",
+    );
+    add(
+      count("ideas"),
+      "sparkle",
+      n(count("ideas"), "idea", "ideas"),
+      "to reduce what keeps you up",
+    );
+    add(
+      count("habits"),
+      "check",
+      n(count("habits"), "bedtime ritual", "bedtime rituals"),
+      "built into your nights",
+    );
+    return { title: "Your sleep toolkit", tiles };
+  }
+
   return null;
 }
