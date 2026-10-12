@@ -27,6 +27,15 @@ export type RunSnapshot = {
   journey: Journey;
   summary: Summary;
   highlights: Highlights | null;
+  /** the learning diary as it read when the run finished: each day's title and every question
+   * with its answer, in the words the person saw. Later edits to the programme never reach it. */
+  diary?: FrozenDiaryDay[];
+};
+
+export type FrozenDiaryDay = {
+  day: number;
+  title: string;
+  responses: { title: string; lines: string[] }[];
 };
 
 /** A finished run, kept whole so history, results and diaries can show it after the programme
@@ -164,14 +173,21 @@ export const diaryQualityOn = (date: string) =>
 export const updateProgramme = (slug: string, fn: (s: ProgrammeState) => ProgrammeState) =>
   write(slug, fn(read(slug)));
 
-/** Give every finished run that has no snapshot yet its snapshot. Only ever adds one: a run that
- * already has a snapshot keeps it for good. Writes nothing when there is nothing to seal. */
+/** Give every finished run that has no snapshot yet its snapshot. Only ever adds: a run that
+ * already has a snapshot keeps it for good, and one sealed before diaries were frozen gains only
+ * its diary (its result is not recomputed). Writes nothing when there is nothing to seal. */
 export function sealRuns(slug: string, snapshotOf: (run: ArchivedRun) => RunSnapshot) {
   const s = read(slug);
-  if (!s.runs?.some((r) => !r.snapshot)) return;
+  if (!s.runs?.some((r) => !r.snapshot || !r.snapshot.diary)) return;
   write(slug, {
     ...s,
-    runs: s.runs.map((r) => (r.snapshot ? r : { ...r, snapshot: snapshotOf(r) })),
+    runs: s.runs.map((r) =>
+      !r.snapshot
+        ? { ...r, snapshot: snapshotOf(r) }
+        : r.snapshot.diary
+          ? r
+          : { ...r, snapshot: { ...r.snapshot, diary: snapshotOf(r).diary! } },
+    ),
   });
 }
 

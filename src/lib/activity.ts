@@ -120,13 +120,21 @@ export function useEverything() {
     const current = programmeStates[p.slug]!;
     // the run in progress and every finished run
     for (const [ri, s] of [current, ...(current.runs ?? [])].entries()) {
-      for (const [day, at] of Object.entries(s.completedAt ?? {})) {
+      const stamps = Object.entries(s.completedAt ?? {});
+      /* A finished run counts against the length it had when it finished, from its snapshot */
+      const total =
+        (s as { snapshot?: { journey?: { totalDays?: number } } }).snapshot?.journey?.totalDays ??
+        dayCount(p);
+      for (const [day, at] of stamps) {
+        /* how many days were done at the time of this one, not today: each line in the feed
+         * keeps the count it had when it happened (1, 2, 3 ... rather than today's total) */
+        const doneThen = stamps.filter(([, t]) => t <= at).map(([d]) => Number(d));
         events.push({
           id: `${p.slug}-${ri}-${day}`,
           type: "program",
           at,
           title: `${p.name} · Day ${day}`,
-          detail: `Day complete · ${daysDoneOf(p, s.completed)} of ${dayCount(p)} done`,
+          detail: `Day complete · ${daysDoneOf(p, doneThen)} of ${total} done`,
           link: { to: "/program/$slug", params: { slug: p.slug } },
         });
       }

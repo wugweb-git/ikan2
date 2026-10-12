@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, BookOpen, Check, Clock, FileText } from "lucide-react";
 import { DateText } from "@/components/date-text";
@@ -7,6 +8,8 @@ import { accentStyle, IconButton, TopAppBar } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { dayResponses, latestRun, runJourney, runParam, shortDate } from "@/lib/equip/journey";
+import { sealProgramme } from "@/lib/equip/seal";
+import type { RunSnapshot } from "@/lib/equip/store";
 import { getProgramme } from "@/lib/equip/programs";
 import { useProgramme } from "@/lib/equip/store";
 
@@ -37,8 +40,21 @@ function DiaryPage() {
   const { run } = Route.useSearch();
   const state = latestRun(p, useProgramme(slug).state, run);
 
+  // finished runs whose diary is not frozen yet are frozen on first view, as the result page does
+  useEffect(() => {
+    sealProgramme(p);
+  }, [p]);
+
   const j = runJourney(p, state);
-  const doneDays = hydrated ? p.days.filter((d) => state.completed.includes(d.day)) : [];
+  /* A finished run shows the diary frozen when it finished, in the words the person saw; only a
+   * run in progress reads the live programme. */
+  const frozen = (state as { snapshot?: RunSnapshot }).snapshot?.diary;
+  const doneDays = hydrated
+    ? (frozen ??
+      p.days
+        .filter((d) => state.completed.includes(d.day))
+        .map((d) => ({ day: d.day, title: d.title, responses: dayResponses(p, state, d.day) })))
+    : [];
   const duration =
     j.startedAt && j.finishedAt
       ? Math.max(
@@ -108,7 +124,7 @@ function DiaryPage() {
                     title={d.title}
                     day={d.day}
                     at={state.completedAt?.[String(d.day)]}
-                    responses={dayResponses(p, state, d.day)}
+                    responses={d.responses}
                     seconds={state.time?.[String(d.day)]?.total}
                     feedback={state.feedback?.[String(d.day)]}
                   />

@@ -179,7 +179,10 @@ export function merge(name: string, local: unknown, remote: unknown): unknown {
       ...((l["runs"] as Run[] | undefined) ?? []),
     ]) {
       const have = runs.get(run.archivedAt);
-      if (!have || (!have.snapshot && run.snapshot)) runs.set(run.archivedAt, run);
+      const frozen = (r?: Run) => Boolean((r?.snapshot as { diary?: unknown } | undefined)?.diary);
+      // the copy with a snapshot wins; between two snapshots, the one holding the frozen diary
+      if (!have || (!have.snapshot && run.snapshot) || (!frozen(have) && frozen(run)))
+        runs.set(run.archivedAt, run);
     }
     return {
       ...r,
