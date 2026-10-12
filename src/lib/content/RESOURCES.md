@@ -45,7 +45,11 @@ looks like the rest without anyone choosing a font size.
 ## External: links into the app (`src/routes/resources.$slug.tsx`)
 
 After the article body and before Sources, with no heading of its own. Which sections a piece
-shows is set on the resource by the editors, never guessed; for now only assessments are set. Each uses the card that place already uses, with a
+shows is set on the resource by the editors, never guessed; for now only assessments are set.
+
+**Deferred:** the programme, journal and consult sections are meant to be filled by the
+recommendation engine (it worked in the old iKAN and does not yet in ikan2). Until it is fixed
+they stay off; the fields and cards are wired so that only the source of the choice changes. Each uses the card that place already uses, with a
 `type-body-sm` semibold accent label above it.
 
 | Section         | Set by                                     | Card (reused as is)                            | Label                                                                       |
