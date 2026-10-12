@@ -1300,6 +1300,21 @@ html.reduce-motion *::after {
      * otherwise push the whole page sideways on a phone */
     overflow-wrap: anywhere;
   }
+  /* House rule (kit/link.tsx): a link that leaves iKAN ends in an arrow and opens in a new tab,
+   * because in the installed app leaving means a browser opening over the top of it. */
+  .prose-ikan a[target="_blank"]::after {
+    content: "";
+    display: inline-block;
+    width: 0.85em;
+    height: 0.85em;
+    margin-left: 0.1em;
+    vertical-align: -0.05em;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h10v10'/%3E%3Cpath d='M7 17 17 7'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h10v10'/%3E%3Cpath d='M7 17 17 7'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
 }
 /* Score tables read badly in three squeezed columns on a phone, so each row becomes its own
  * block: the score, then the band it falls in, then what to do about it. Every table in the
@@ -1549,6 +1564,11 @@ html.reduce-motion *::after {
 .prose-ikan .sources h3 + ul,
 .prose-ikan .sources h3 + ol {
   margin-top: 6px;
+}
+.prose-ikan .sources li,
+.prose-ikan .sources p {
+  /* references read as references: italic, like a bibliography */
+  font-style: italic;
 }
 .prose-ikan .sources li + li {
   margin-top: 6px;
