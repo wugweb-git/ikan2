@@ -5,14 +5,11 @@ import {
   ArrowUpRight,
   MapPin,
   CloudSun,
-  Clock3,
   UserRoundPen,
   X,
   Bell,
-  CalendarDays,
   ChartNoAxesColumn,
   Heart,
-  Plus,
   Smile,
   Sparkles,
   CalendarCheck,
@@ -43,7 +40,9 @@ import {
 import { headlineOf, recommendationsFor, riskEndorsed, scoreAll } from "@/lib/assessment/scoring";
 import { dayCount, daysDoneOf, getProgramme, minutesOf, programmes } from "@/lib/equip/programs";
 import { consultants } from "@/lib/consultants";
-import { ResourceMeta } from "@/routes/resources.index";
+import { ResourceMeta } from "@/components/resource-card";
+import { MoodCheckinCard } from "@/components/mood-checkin-card";
+import { SupportCard } from "@/components/support-card";
 import { addDays, dayKey, moodScale } from "@/lib/journal";
 import { useNotifications } from "@/lib/notifications";
 import {
@@ -58,16 +57,7 @@ import { checkMoodReminder, refreshWeather, useDevice, weatherWord } from "@/lib
 import { syncMoodReminder } from "@/lib/local-reminders";
 import { enableNativePush, nativePushSupported } from "@/lib/native-push";
 import { autoSyncHealthConnect, recentAverage, useHealthConnect } from "@/lib/health-connect";
-import {
-  lengthLabel,
-  mediumIcon,
-  mediumLabel,
-  mediumOf,
-  resources,
-  slugOf,
-  useResourceStore,
-  type Resource,
-} from "@/lib/resources";
+import { resources, slugOf, useResourceStore, type Resource } from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
 import resBurnout from "@/assets/res-burnout.jpg";
 import resSleep from "@/assets/res-sleep.jpg";
@@ -1378,84 +1368,4 @@ function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
   const todayAsks = !risk && !data.drafts[0] && logged.length === 0;
   if (todayAsks) return null;
   return <MoodCheckinCard loggedToday={logged.length} />;
-}
-
-/** The card itself, also shown at the end of a resource (the External section). */
-export function MoodCheckinCard({
-  loggedToday,
-  className = "mx-4",
-}: {
-  loggedToday: number;
-  className?: string | undefined;
-}) {
-  return (
-    <section className={cn("surface p-4", className)}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="type-body-sm font-semibold text-muted-foreground">Today’s check-in</p>
-          <h2 className="type-subhead mt-1">How are you feeling?</h2>
-        </div>
-        <span className="type-label-md rounded-full bg-secondary px-2.5 py-1 text-muted-foreground">
-          {loggedToday ? `${loggedToday} today` : "40 sec"}
-        </span>
-      </div>
-      <p className="type-body-sm mt-1 text-muted-foreground">
-        Mood, sleep, stress and pain in a few quick taps.
-      </p>
-      <div className="mt-4 grid grid-cols-5 gap-2">
-        {moodScale.map((m) => (
-          <Link
-            key={m.value}
-            to="/journal"
-            search={{ mood: m.value }}
-            aria-label={m.label}
-            className="flex flex-col items-center gap-1 rounded-2xl bg-secondary py-2 transition-transform active:scale-95"
-          >
-            <span className="text-2xl leading-none" aria-hidden="true">
-              {m.emoji}
-            </span>
-            <span className="text-[11px] font-medium text-muted-foreground">{m.label}</span>
-          </Link>
-        ))}
-      </div>
-      <Link
-        to="/journal"
-        className="type-body-md font-semibold mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-foreground text-background transition-transform active:scale-[.98]"
-      >
-        <Plus className="h-4 w-4" /> {loggedToday ? "Add another check-in" : "Log today’s mood"}
-      </Link>
-    </section>
-  );
-}
-
-export function SupportCard({
-  city,
-  className = "mx-4",
-}: {
-  city: string;
-  className?: string | undefined;
-}) {
-  return (
-    <section className={cn("rounded-[22px] border border-error/20 bg-error/5 p-4", className)}>
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-background text-on-error-container">
-          <Heart className="h-5 w-5" />
-        </span>
-        <div className="min-w-0">
-          <p className="type-label-md font-semibold text-on-error-container">Support</p>
-          <h2 className="type-title-md">Let’s talk about it</h2>
-          <p className="type-body-sm mt-0.5 text-muted-foreground">
-            {consultants.length} consultants{city ? ` for you in ${city}` : ""}, with video, call
-            and chat sessions.
-          </p>
-        </div>
-      </div>
-      <Link
-        to="/consult"
-        className="type-body-md font-semibold mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-on-error-container text-error-container transition-transform active:scale-[.98]"
-      >
-        <CalendarDays className="h-4 w-4" /> Book a consultation
-      </Link>
-    </section>
-  );
 }
