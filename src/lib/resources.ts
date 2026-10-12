@@ -510,6 +510,8 @@ type State = {
   saved: string[];
   opened: Record<string, string>;
   played?: Record<string, Played>;
+  /** articles read to the end, by when: opening one is not reading it */
+  read?: Record<string, string>;
 };
 const store = createLocalStore<State>("ikan.resources.v1", { saved: [], opened: {}, played: {} });
 
@@ -526,6 +528,21 @@ export function useResourceStore() {
     markOpened: (id: string) =>
       store.update((s) => ({ ...s, opened: { ...s.opened, [id]: new Date().toISOString() } })),
     playedOf: (id: string) => state.played?.[id],
+    markRead: (id: string) =>
+      store.update((s) =>
+        s.read?.[id] ? s : { ...s, read: { ...s.read, [id]: new Date().toISOString() } },
+      ),
+    /** Where someone is with a piece, for the meta line of a row: not started, part way
+     * (video and audio, which report how far), or finished (an article read to its end, or a
+     * file played to its end). */
+    progressOf: (r: Resource): { label: string; done: boolean } | null => {
+      const played = state.played?.[r.id];
+      if (mediumOf(r) === "article")
+        return state.read?.[r.id] ? { label: doneLabel(r), done: true } : null;
+      if (played?.done) return { label: doneLabel(r), done: true };
+      const left = progressLabel(r, played);
+      return left ? { label: left, done: false } : null;
+    },
     /* Written as it plays, so coming back resumes where you stopped. The last few seconds count
      * as finished: nobody scrubs to the exact end, and "97% watched" forever is just wrong. */
     markPlayed: (id: string, at: number, of: number) =>

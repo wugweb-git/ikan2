@@ -15,16 +15,30 @@ looks like the rest without anyone choosing a font size.
 
 ## The page around the article (`src/routes/resources.$slug.tsx`)
 
-| Part                                   | Comes from                                                      | Style                                                                                                                                                  |
-| -------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Category eyebrow                       | `resource.category`                                             | `type-body-sm` semibold, accent strong                                                                                                                 |
-| Title (h1)                             | `resource.title`, Title Case, no closing full stop              | `type-headline-md`                                                                                                                                     |
-| Standfirst                             | `article.description`, one or two sentences                     | `type-title-lg` medium, muted                                                                                                                          |
-| Meta row: author, date, medium, length | `article.author`, `resource.date`, `resource.minutes`           | `type-label-lg`, muted, lucide icons                                                                                                                   |
-| Cover                                  | `resource.art`, one scene per resource, in `components/art.tsx` | `Illustration`; a webp copy at `public/resources/covers/<slug>.webp`                                                                                   |
-| Player (video, audio)                  | `resource.src`, `resource.poster`                               | `MediaPlayer`                                                                                                                                          |
-| Source of a video or audio piece       | `resource.source`                                               | `SourceCard`: 20px secondary card, `type-title-md` name                                                                                                |
-| Keep reading                           | same category or cover                                          | `type-title-lg` heading; each item is `ResourceRow`, the same row as the Resources list (accent category eyebrow, cover, title, type and length, save) |
+| Part                                   | Comes from                                                      | Style                                                                                   |
+| -------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Category eyebrow                       | `resource.category`                                             | `type-body-sm` semibold, accent strong                                                  |
+| Title (h1)                             | `resource.title`, Title Case, no closing full stop              | `type-headline-md`                                                                      |
+| Standfirst                             | `article.description`, one or two sentences                     | `type-title-lg` medium, muted                                                           |
+| Meta row: author, date, medium, length | `article.author`, `resource.date`, `resource.minutes`           | `type-label-lg`, muted, lucide icons                                                    |
+| Cover                                  | `resource.art`, one scene per resource, in `components/art.tsx` | `Illustration`; a webp copy at `public/resources/covers/<slug>.webp`                    |
+| Player (video, audio)                  | `resource.src`, `resource.poster`                               | `MediaPlayer`                                                                           |
+| Source of a video or audio piece       | `resource.source`                                               | `SourceCard`: 20px secondary card, `type-title-md` name                                 |
+| Keep reading                           | same category or cover                                          | `type-title-lg` heading; each item is `ResourceRow`, the same row as the Resources list |
+
+## A resource in a list (`ResourceRow`, `src/routes/resources.index.tsx`)
+
+The Resources list and Keep reading both use it. Cover (84px, 16px corners), category eyebrow
+(`type-label-md` semibold, accent strong), title, then one meta line in `type-label-md`, muted:
+
+| State                   | Meta line                                                |
+| ----------------------- | -------------------------------------------------------- |
+| Not started             | date · type (Read / Watch / Listen) · length             |
+| Part way (video, audio) | date · type · **time left** (accent)                     |
+| Finished                | date · **✓ Read / Watched / Listened** (accent) · length |
+
+An article is finished when its end comes into view (`markRead`), not when it is opened; video
+and audio report it from the player. This year's dates drop the year so the line fits a phone.
 
 ## The article body (`.prose-ikan`, from `articles.json`)
 

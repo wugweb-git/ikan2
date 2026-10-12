@@ -54,6 +54,15 @@ export const Route = createFileRoute("/resources/")({
   component: ResourcesPage,
 });
 
+/* A row has less room than the featured card, so this year's dates drop the year. */
+const rowDate = (d: string) => {
+  const date = new Date(`${d}T00:00:00`);
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    ...(date.getFullYear() === new Date().getFullYear() ? {} : { year: "numeric" }),
+  });
+};
 const dateLabel = (d: string) =>
   new Date(`${d}T00:00:00`).toLocaleDateString("en-IN", {
     day: "numeric",
@@ -296,10 +305,10 @@ export function ResourceRow({
 }) {
   const store = useResourceStore();
   const saved = hydrated && store.isSaved(r.id);
-  /* One signal per card. Part way through, it says how much is left; finished, it
-   * is a check. Never both: they said different things about the same resource. */
-  const read = hydrated && Boolean(store.opened[r.id]);
-  const progress = hydrated ? progressLabel(r, store.playedOf(r.id)) : null;
+  /* Where someone is with it, in the meta line where the length is: part way through it says
+   * how much is left, finished it says Read, Watched or Listened with a check. Nothing in the
+   * eyebrow, which is only the category. */
+  const progress = hydrated ? store.progressOf(r) : null;
   return (
     <li className="border-b border-foreground/10 last:border-0">
       <div className="flex items-center gap-3 py-3">
@@ -317,30 +326,37 @@ export function ResourceRow({
           <span className="min-w-0 flex-1">
             <span className="type-label-md font-semibold block text-[var(--accent-strong)]">
               {r.category}
-              {/* opened already. A check, not the word: "Read" now names a type in
-               * the filter row above, and the eyebrow would say it twice over. */}
-              {progress ? (
-                <span className="ml-1.5 font-normal text-muted-foreground">{progress}</span>
-              ) : read ? (
-                <span className="ml-1.5 inline-flex items-center align-middle text-muted-foreground">
-                  <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span className="sr-only">{doneLabel(r)}</span>
-                </span>
-              ) : null}
             </span>
             <h3 className="mt-0.5 line-clamp-2 text-[15px] font-semibold leading-5">{r.title}</h3>
-            {/* What it is and how long it takes. The date is on the featured card and
-             * on the article itself; a third item here wrapped onto two lines. */}
-            <span className="type-label-md mt-1 flex items-center gap-3 whitespace-nowrap text-muted-foreground">
+            {/* What it is, how long it takes (or how far you are) and when it was published. On
+             * a narrow phone the date wraps to its own line rather than squeezing the others. */}
+            <span className="type-label-md mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 whitespace-nowrap text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
-                {(() => {
-                  const Icon = mediumIcon[mediumOf(r)];
-                  return <Icon className="h-3.5 w-3.5" />;
-                })()}
-                {mediumLabel(r)}
+                <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" /> {rowDate(r.date)}
               </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Clock3 className="h-3.5 w-3.5" /> {lengthLabel(r)}
+              {/* finished: the check replaces the type ("Read", not "Read ✓ Read") */}
+              {progress?.done ? (
+                <span className="inline-flex items-center gap-1.5 font-medium text-[var(--accent-strong)]">
+                  <Check className="h-3.5 w-3.5" aria-hidden="true" /> {progress.label}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5">
+                  {(() => {
+                    const Icon = mediumIcon[mediumOf(r)];
+                    return <Icon className="h-3.5 w-3.5" />;
+                  })()}
+                  {mediumLabel(r)}
+                </span>
+              )}
+              {/* part way: how much is left replaces the length */}
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5",
+                  progress && !progress.done && "font-medium text-[var(--accent-strong)]",
+                )}
+              >
+                <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                {progress && !progress.done ? progress.label : lengthLabel(r)}
               </span>
             </span>
           </span>

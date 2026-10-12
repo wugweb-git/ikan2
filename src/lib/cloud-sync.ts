@@ -148,6 +148,7 @@ export function merge(name: string, local: unknown, remote: unknown): unknown {
         ...new Set([...((r["saved"] as string[]) ?? []), ...((l["saved"] as string[]) ?? [])]),
       ],
       opened: { ...(r["opened"] as Obj), ...(l["opened"] as Obj) },
+      read: { ...(r["read"] as Obj), ...(l["read"] as Obj) },
       played,
     };
   }

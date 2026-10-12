@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   ArrowLeft,
   Bookmark,
@@ -116,6 +116,24 @@ function ArticlePage() {
     store.markOpened(id);
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* An article counts as read when its last line comes into view, not when it is opened: the
+   * list says "Read" with a check, and that should mean read. Video and audio report their own
+   * progress from the player. */
+  const end = useRef<HTMLDivElement>(null);
+  const isArticle = mediumOf(r) === "article";
+  useEffect(() => {
+    const el = end.current;
+    if (!isArticle || !el || typeof IntersectionObserver === "undefined") return;
+    const seen = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        store.markRead(id);
+        seen.disconnect();
+      }
+    });
+    seen.observe(el);
+    return () => seen.disconnect();
+  }, [id, isArticle]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <IkanShell wide>
       <article style={accentStyle("calm")}>
@@ -197,6 +215,7 @@ function ArticlePage() {
               dangerouslySetInnerHTML={{ __html: body }}
             />
           ) : null}
+          <div ref={end} aria-hidden="true" />
 
           {r.source ? <SourceCard source={r.source} /> : null}
 
