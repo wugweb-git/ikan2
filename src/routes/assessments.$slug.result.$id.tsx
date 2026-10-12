@@ -25,13 +25,8 @@ import {
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { getAssessment, type Assessment, type Severity } from "@/lib/assessment/instruments";
-import {
-  headlineOf,
-  recommendationsFor,
-  riskEndorsed,
-  scoreAll,
-  type ScoreResult,
-} from "@/lib/assessment/scoring";
+import { frozen } from "@/lib/assessment/frozen";
+import type { ScoreResult } from "@/lib/assessment/scoring";
 import { useAssessmentStore, type StoredResult } from "@/lib/assessment/store";
 import { getProgramme } from "@/lib/equip/programs";
 import { useSyncStatus } from "@/lib/cloud-sync";
@@ -164,12 +159,12 @@ function ResultPage() {
 
 /** Plain-text summary for email: assessment, date, each score with its level. */
 function shareText(a: Assessment, result: StoredResult) {
-  const scores = scoreAll(a, result.answers);
+  const { scores, head } = frozen(a, result);
   return [
     `${a.title} (${a.instrument})`,
     new Date(result.completedAt).toDateString(),
     ...scores.map((s) => `${s.score.label}: ${s.band?.label ?? "not scored"}, ${valueText(s)}`),
-    headlineOf(a, scores)?.band?.interpretation ?? "",
+    head?.band?.interpretation ?? "",
     "This is a screening, not a diagnosis.",
   ]
     .filter(Boolean)
@@ -186,16 +181,12 @@ function ResultBody({
   previous: StoredResult | undefined;
 }) {
   const navigate = useNavigate();
-  const scores = scoreAll(a, result.answers);
-  const head = headlineOf(a, scores);
+  const { scores, head, risk, recommends } = frozen(a, result);
   const rest = scores.filter((s) => s !== head);
   const complete = scores.every((s) => s.value !== null);
-  const risk = riskEndorsed(a, result.answers);
   const severe = scores.some((s) => s.band?.tone === "error");
-  const programmes = recommendationsFor(a, scores)
-    .map(getProgramme)
-    .filter((p) => p !== undefined);
-  const prevHead = previous ? headlineOf(a, scoreAll(a, previous.answers)) : null;
+  const programmes = recommends.map(getProgramme).filter((p) => p !== undefined);
+  const prevHead = previous ? frozen(a, previous).head : null;
   const time = duration(result.seconds);
 
   if (!complete) {

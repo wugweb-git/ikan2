@@ -18,7 +18,8 @@ import { Trend } from "@/components/assessment/trend";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { getAssessment } from "@/lib/assessment/instruments";
-import { headlineOf, riskEndorsed, scoreAll, type ScoreResult } from "@/lib/assessment/scoring";
+import { frozen } from "@/lib/assessment/frozen";
+import type { ScoreResult } from "@/lib/assessment/scoring";
 import { useAssessmentStore } from "@/lib/assessment/store";
 import { RETAKE_AFTER_DAYS, retakeTiming } from "@/lib/assessment/reassess";
 import { Disclosure } from "@/components/kit/disclosure";
@@ -51,15 +52,15 @@ function AssessmentArchivePage() {
   const store = useAssessmentStore();
   const Icon = categoryIcon[a.category];
   const scored = (hydrated ? store.resultsFor(slug) : []).map((r) => {
-    const scores = scoreAll(a, r.answers);
-    return { r, scores, head: headlineOf(a, scores) };
+    const { scores, head, risk } = frozen(a, r);
+    return { r, scores, head, risk };
   });
   const latest = scored[0];
   const retake = retakeTiming(latest?.r);
   const previous = scored[1];
   const first = scored.at(-1);
   const severe = latest?.scores.some((s) => s.band?.tone === "error") ?? false;
-  const risk = latest ? riskEndorsed(a, latest.r.answers) : false;
+  const risk = latest?.risk ?? false;
 
   return (
     <IkanShell>

@@ -40,7 +40,7 @@ import {
   reassessDismissed,
   reassessReason,
 } from "@/lib/assessment/reassess";
-import { headlineOf, recommendationsFor, riskEndorsed, scoreAll } from "@/lib/assessment/scoring";
+import { frozen } from "@/lib/assessment/frozen";
 import { dayCount, daysDoneOf, getProgramme, minutesOf, programmes } from "@/lib/equip/programs";
 import { consultants } from "@/lib/consultants";
 import { ResourceMeta } from "@/components/resource-card";
@@ -555,7 +555,7 @@ function TodayCard({ data, hydrated }: { data: Data; hydrated: boolean }) {
 
   const latest = [...data.results].sort((a, b) => b.completedAt.localeCompare(a.completedAt))[0];
   const latestA = latest ? getAssessment(latest.slug) : undefined;
-  const risk = latest && latestA ? riskEndorsed(latestA, latest.answers) : false;
+  const risk = latest && latestA ? frozen(latestA, latest).risk : false;
   const today = dayKey(new Date());
   const loggedToday = data.journal.entries.some((e) => e.date === today);
   const draft = data.drafts[0];
@@ -841,9 +841,8 @@ function Recommended({ data, hydrated }: { data: Data; hydrated: boolean }) {
   const latest = [...data.results].sort((a, b) => b.completedAt.localeCompare(a.completedAt))[0];
   const a = latest ? getAssessment(latest.slug) : undefined;
   if (!latest || !a) return null;
-  const scores = scoreAll(a, latest.answers);
-  const head = headlineOf(a, scores);
-  const recs = recommendationsFor(a, scores)
+  const { scores, head, recommends } = frozen(a, latest);
+  const recs = recommends
     .map(getProgramme)
     .filter((p) => p !== undefined)
     .slice(0, 2);
@@ -1094,7 +1093,7 @@ function RecentResults({ data, hydrated }: { data: Data; hydrated: boolean }) {
         {recent.map((r) => {
           const a = getAssessment(r.slug);
           if (!a) return null;
-          const head = headlineOf(a, scoreAll(a, r.answers));
+          const { head } = frozen(a, r);
           return (
             <li key={r.id} className="border-b border-background last:border-0">
               <Link
@@ -1376,7 +1375,7 @@ function MoodCheckin({ data, hydrated }: { data: Data; hydrated: boolean }) {
   const logged = data.journal.entries.filter((e) => e.date === today);
   const latest = [...data.results].sort((a, b) => b.completedAt.localeCompare(a.completedAt))[0];
   const latestA = latest ? getAssessment(latest.slug) : undefined;
-  const risk = latest && latestA ? riskEndorsed(latestA, latest.answers) : false;
+  const risk = latest && latestA ? frozen(latestA, latest).risk : false;
   const todayAsks = !risk && !data.drafts[0] && logged.length === 0;
   if (todayAsks) return null;
   return <MoodCheckinCard loggedToday={logged.length} />;

@@ -1,6 +1,7 @@
 import { createLocalStore } from "@/lib/local-store";
 import { assessments, getAssessment } from "@/lib/assessment/instruments";
-import { headlineOf, percentOfRange, scoreAll } from "@/lib/assessment/scoring";
+import { frozen } from "@/lib/assessment/frozen";
+import { percentOfRange } from "@/lib/assessment/scoring";
 import { useAssessmentStore } from "@/lib/assessment/store";
 import { getConsultant, useBookings } from "@/lib/consultants";
 import { dayCount, daysDoneOf, programmes } from "@/lib/equip/programs";
@@ -92,7 +93,7 @@ export function useEverything() {
   for (const r of results) {
     const a = getAssessment(r.slug);
     if (!a) continue;
-    const head = headlineOf(a, scoreAll(a, r.answers));
+    const { head } = frozen(a, r);
     events.push({
       id: r.id,
       type: "assessment",
@@ -187,9 +188,10 @@ export function useEverything() {
         .filter((x) => x.slug === a.slug)
         .sort((x, y) => y.completedAt.localeCompare(x.completedAt))[0];
       if (!r) return null;
-      const scores = scoreAll(a, r.answers).filter((s) => s.value !== null);
+      const f = frozen(a, r);
+      const scores = f.scores.filter((s) => s.value !== null);
       if (!scores.length) return null;
-      const list = a.headline ? scores.filter((s) => s.score.id === a.headline) : scores;
+      const list = f.head ? scores.filter((s) => s === f.head) : scores;
       const vals = list.map((s) => {
         const p = percentOfRange(s.profile, s.value!);
         return (s.profile.direction === "better" ? p : 1 - p) * 100;

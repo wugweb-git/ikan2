@@ -1,4 +1,7 @@
+import { useEffect } from "react";
 import { createLocalStore, newId } from "@/lib/local-store";
+import { snapshotOf, type ResultSnapshot } from "./frozen";
+import { getAssessment } from "./instruments";
 import type { Answers } from "./scoring";
 
 export type StoredResult = {
@@ -7,8 +10,11 @@ export type StoredResult = {
   completedAt: string;
   /** active seconds from first answer to finish */
   seconds: number;
-  /** option weights before reversal, keyed by question id; scores are recomputed from these */
+  /** option weights before reversal, keyed by question id */
   answers: Answers;
+  /** the result as it was worked out when it was finished; every screen reads this, never a
+   * recomputation (see frozen.ts) */
+  snapshot?: ResultSnapshot;
 };
 
 export type Draft = { answers: Answers; index: number; seconds: number; updatedAt?: string };
@@ -28,12 +34,31 @@ export const mergeResults = (incoming: StoredResult[]) =>
     return fresh.length ? { ...s, results: [...s.results, ...fresh] } : s;
   });
 
+/** Seal results that have no snapshot yet (saved before snapshots existed, imported from the old
+ * app, or synced from a device that hadn't sealed them): frozen as they read now, once. A
+ * result's existing snapshot is never replaced. */
+export function sealResults() {
+  if (!store.read().results.some((r) => !r.snapshot)) return;
+  store.update((s) => ({
+    ...s,
+    results: s.results.map((r) => {
+      if (r.snapshot) return r;
+      const a = getAssessment(r.slug);
+      return a ? { ...r, snapshot: snapshotOf(a, r.answers) } : r;
+    }),
+  }));
+}
+
 /** Result ids are UUIDs, as in the old iKan records. */
 const resultId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : newId("r");
 
 export function useAssessmentStore() {
   const state = store.use();
+  const unsealed = state.results.some((r) => !r.snapshot && getAssessment(r.slug));
+  useEffect(() => {
+    if (unsealed) sealResults();
+  }, [unsealed]);
   return {
     results: state.results,
     drafts: state.drafts,
@@ -54,12 +79,14 @@ export function useAssessmentStore() {
         return { ...s, drafts };
       }),
     saveResult: (slug: string, answers: Answers, seconds: number) => {
+      const a = getAssessment(slug);
       const result: StoredResult = {
         id: resultId(),
         slug,
         completedAt: new Date().toISOString(),
         seconds,
         answers,
+        ...(a ? { snapshot: snapshotOf(a, answers) } : {}),
       };
       store.update((s) => {
         const { [slug]: _gone, ...drafts } = s.drafts;

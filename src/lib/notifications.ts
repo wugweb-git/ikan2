@@ -1,6 +1,6 @@
 import { createLocalStore } from "@/lib/local-store";
 import { getAssessment } from "@/lib/assessment/instruments";
-import { recommendationsFor, scoreAll } from "@/lib/assessment/scoring";
+import { frozen } from "@/lib/assessment/frozen";
 import { getConsultant, hourLabel } from "@/lib/consultants";
 import { getProgramme } from "@/lib/equip/programs";
 import { dayKey } from "@/lib/journal";
@@ -162,7 +162,7 @@ export function useNotifications() {
   )) {
     const a = getAssessment(r.slug);
     if (!a) continue;
-    const recs = recommendationsFor(a, scoreAll(a, r.answers));
+    const recs = frozen(a, r).recommends;
     const p = recs[0] ? getProgramme(recs[0]) : undefined;
     if (!p || recommended.has(p.slug)) continue;
     recommended.add(p.slug);

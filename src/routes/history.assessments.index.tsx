@@ -9,7 +9,7 @@ import { Trend } from "@/components/assessment/trend";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import { assessments } from "@/lib/assessment/instruments";
-import { headlineOf, scoreAll } from "@/lib/assessment/scoring";
+import { frozen } from "@/lib/assessment/frozen";
 import { useAssessmentStore } from "@/lib/assessment/store";
 
 /* Assessment history: one summary card for each of the seven assessments. Each opens its own
@@ -58,7 +58,7 @@ function AssessmentHistoryPage() {
           {assessments.map((a) => {
             const Icon = categoryIcon[a.category];
             const results = hydrated ? store.resultsFor(a.slug) : [];
-            const scored = results.map((r) => ({ r, head: headlineOf(a, scoreAll(a, r.answers)) }));
+            const scored = results.map((r) => ({ r, head: frozen(a, r).head }));
             const latest = scored[0];
             return (
               <li key={a.slug}>

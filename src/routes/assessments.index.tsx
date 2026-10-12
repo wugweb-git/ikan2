@@ -7,7 +7,7 @@ import { pageMeta } from "@/components/equip/program-header";
 import { BandChip, categoryIcon } from "@/components/assessment/ui";
 import { cn } from "@/lib/utils";
 import { assessments, type Assessment } from "@/lib/assessment/instruments";
-import { headlineOf, scoreAll } from "@/lib/assessment/scoring";
+import { frozen } from "@/lib/assessment/frozen";
 import { useAssessmentStore } from "@/lib/assessment/store";
 
 export const Route = createFileRoute("/assessments/")({
@@ -69,7 +69,7 @@ function AssessmentCard({ assessment: a }: { assessment: Assessment }) {
   const { resultsFor, draftFor } = useAssessmentStore();
   const latest = resultsFor(a.slug)[0];
   const draft = draftFor(a.slug);
-  const head = latest ? headlineOf(a, scoreAll(a, latest.answers)) : null;
+  const head = latest ? frozen(a, latest).head : null;
   const Icon = categoryIcon[a.category];
 
   return (

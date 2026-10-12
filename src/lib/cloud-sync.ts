@@ -119,11 +119,19 @@ export function merge(name: string, local: unknown, remote: unknown): unknown {
   const l = (local ?? {}) as Obj;
   const r = (remote ?? {}) as Obj;
   if (name === "journal.v1") return { entries: byId(l["entries"] as never, r["entries"] as never) };
-  if (name === "assessments.v1")
+  if (name === "assessments.v1") {
+    // A finished result is a record: the copy holding a snapshot wins over one without, and
+    // an existing snapshot is never replaced (see assessment/frozen.ts).
+    type Result = { id: string; snapshot?: unknown };
+    const lr = (l["results"] ?? []) as Result[];
+    const rr = (r["results"] ?? []) as Result[];
+    const sealed = new Map(rr.filter((x) => x.snapshot).map((x) => [x.id, x]));
+    const results = byId(lr, rr).map((x) => (x.snapshot ? x : (sealed.get(x.id) ?? x)));
     return {
-      results: byId(l["results"] as never, r["results"] as never),
+      results,
       drafts: { ...(r["drafts"] as Obj), ...(l["drafts"] as Obj) },
     };
+  }
   if (name === "consult.v1")
     return { bookings: byId(l["bookings"] as never, r["bookings"] as never) };
   if (name === "resources.v1") {
