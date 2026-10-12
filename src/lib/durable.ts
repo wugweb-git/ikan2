@@ -15,14 +15,29 @@ import { Capacitor } from "@capacitor/core";
 
 const active = () => Capacitor.isNativePlatform();
 
+/* Writes still on their way to native storage, and whether a wipe has started. "Clear
+ * everything" waits for the first and sets the second, so a backup write that was already in
+ * flight when the person tapped Clear cannot land after the wipe and bring the data back on
+ * the next launch. */
+const pending = new Set<Promise<unknown>>();
+let wiping = false;
+/** True from the moment "Clear everything" starts until the page reloads. */
+export const isWiping = () => wiping;
+/** Start a wipe: from here nothing is saved, to localStorage or to the native copy. */
+export const beginWipe = () => {
+  wiping = true;
+};
+
 /** Copy one saved value into native storage. Fire-and-forget: never blocks a save. */
 export function mirrorWrite(key: string, value: string) {
-  if (!active()) return;
-  void import("@capacitor/preferences")
+  if (!active() || wiping) return;
+  const write = import("@capacitor/preferences")
     .then(({ Preferences }) => Preferences.set({ key, value }))
     .catch(() => {
       /* the backup is best-effort - a failure must never fail the save itself */
     });
+  pending.add(write);
+  void write.finally(() => pending.delete(write));
 }
 
 /**
@@ -47,8 +62,14 @@ export function mirrorRemove(key: string) {
  * Awaitable, because a caller that navigates away immediately afterwards must not race it.
  */
 export async function clearAllMirrored(): Promise<void> {
-  if (!active()) return;
+  /* Hold saves while the wipe runs, so a write already on its way cannot land after it. A
+   * caller that reloads afterwards ("Clear everything") has called beginWipe and stays held;
+   * account deletion on its own page does not reload, so saving resumes once this is done. */
+  const held = wiping;
+  wiping = true;
   try {
+    if (!active()) return;
+    await Promise.allSettled([...pending]);
     const { Preferences } = await import("@capacitor/preferences");
     const { keys } = await Preferences.keys();
     await Promise.all(
@@ -56,6 +77,8 @@ export async function clearAllMirrored(): Promise<void> {
     );
   } catch {
     /* best-effort, as everywhere else in this file */
+  } finally {
+    wiping = held;
   }
 }
 

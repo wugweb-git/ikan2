@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { mirrorWrite } from "@/lib/durable";
+import { isWiping, mirrorWrite } from "@/lib/durable";
 import { getScope, onScopeChange, reportWrite, scopedKey } from "@/lib/storage-scope";
 
 /* A small localStorage-backed store, kept per signed-in account (see storage-scope).
@@ -27,6 +27,8 @@ export function createLocalStore<T extends object>(key: string, empty: T) {
   const write = (next: T, report = true) => {
     cache = next;
     cacheScope = getScope();
+    /* "Clear everything" has started: nothing may be saved back before the page reloads */
+    if (isWiping()) return;
     try {
       const json = JSON.stringify(next);
       window.localStorage.setItem(scopedKey(key), json);

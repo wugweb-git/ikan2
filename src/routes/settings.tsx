@@ -60,13 +60,13 @@ import {
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { supabase, useAuth, type Provider } from "@/lib/auth";
-import { clearAllMirrored } from "@/lib/durable";
+import { beginWipe, clearAllMirrored } from "@/lib/durable";
 import { SocialLinks } from "@/components/social-links";
 import { deleteAccount } from "@/lib/delete-account";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { recentAverage, useHealthConnect } from "@/lib/health-connect";
 import { disablePush, enablePush, pushSupported, sendTestPush } from "@/lib/push";
-import { enableNativePush, nativePushSupported } from "@/lib/native-push";
+import { disableNativePush, enableNativePush, nativePushSupported } from "@/lib/native-push";
 import { clearCloudData, syncNow, useSyncStatus } from "@/lib/cloud-sync";
 import type { LegalSlug } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -385,6 +385,8 @@ function SettingsPage() {
               className="bg-error text-on-error"
               onClick={async () => {
                 await clearCloudData().catch(() => {});
+                /* stop every save first, so nothing writes back between here and the reload */
+                beginWipe();
                 for (const k of storageKeys()) {
                   try {
                     localStorage.removeItem(k);
@@ -591,6 +593,7 @@ function PermissionsGroup({ onMessage }: { onMessage: (m: string) => void }) {
             if (!on) {
               setNotificationsOff(true);
               await disablePush().catch(() => {});
+              await disableNativePush().catch(() => {});
               return onMessage("Notifications off");
             }
             const a = notifications === "granted" ? "granted" : await requestNotifications();

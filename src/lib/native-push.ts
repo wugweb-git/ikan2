@@ -18,8 +18,21 @@ import { supabase } from "@/lib/auth";
 
 export const nativePushSupported = () => Capacitor.isNativePlatform();
 
+/* This device's FCM token, kept so the switch can delete exactly this phone's row when it is
+ * turned off. Device-level, not per account: it is the phone that is registered. */
+const TOKEN_KEY = "ikan.device.fcmToken";
+const rememberToken = (token: string | null) => {
+  try {
+    if (token) window.localStorage.setItem(TOKEN_KEY, token);
+    else window.localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    /* storage unavailable */
+  }
+};
+
 /** Save the device's FCM token against the account, so the server can reach this phone. */
 async function saveToken(token: string, prefs: { moodReminder: boolean; time: string }) {
+  rememberToken(token);
   const { data } = await supabase().auth.getSession();
   const user = data.session?.user;
   if (!user) return;
@@ -59,6 +72,9 @@ export async function enableNativePush(prefs: { moodReminder: boolean; time: str
           : (await PushNotifications.requestPermissions()).receive === "granted";
     if (!granted) return false;
 
+    /* Listeners are added for this one registration and removed when it settles, so turning the
+     * switch on again does not stack a second copy of each. */
+    const handles: { remove: () => Promise<void> }[] = [];
     await new Promise<void>((resolve) => {
       let settled = false;
       const done = () => {
@@ -69,16 +85,41 @@ export async function enableNativePush(prefs: { moodReminder: boolean; time: str
       };
       void PushNotifications.addListener("registration", (t) => {
         void saveToken(t.value, prefs).finally(done);
-      });
-      void PushNotifications.addListener("registrationError", done);
+      }).then((h) => handles.push(h));
+      void PushNotifications.addListener("registrationError", done).then((h) => handles.push(h));
       void PushNotifications.register();
       // Without google-services.json neither listener ever fires; don't hang the caller.
       setTimeout(done, 10_000);
     });
+    await Promise.all(handles.map((h) => h.remove().catch(() => {})));
     return true;
   } catch {
     return false;
   }
+}
+
+/**
+ * Stop push to this phone: delete its row so the server stops sending, and unregister from FCM.
+ * The Notifications switch calls this when it is turned off. Without it the Android app only
+ * ever turned web push off (which does not exist in its WebView), so reminders kept arriving
+ * after the person had switched them off. Turning the switch back on registers afresh.
+ */
+export async function disableNativePush() {
+  if (!nativePushSupported()) return;
+  let token: string | null = null;
+  try {
+    token = window.localStorage.getItem(TOKEN_KEY);
+  } catch {
+    /* storage unavailable */
+  }
+  if (token) await supabase().from("ikan2_push_subscriptions").delete().eq("endpoint", token);
+  try {
+    const { PushNotifications } = await import("@capacitor/push-notifications");
+    await PushNotifications.unregister();
+  } catch {
+    /* already unregistered, or push not set up on this build */
+  }
+  rememberToken(null);
 }
 
 /** Open the screen a push points at when it is tapped. Call once at startup. */
