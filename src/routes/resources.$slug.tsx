@@ -219,9 +219,7 @@ function ArticlePage() {
                         <Illustration art={m.art} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="line-clamp-3 text-[16px] font-semibold leading-[22px]">
-                          {m.title}
-                        </span>
+                        <span className="type-title-md line-clamp-3">{m.title}</span>
                         <span className="type-label-md mt-2 flex items-center gap-2 text-muted-foreground">
                           <span className="rounded-full bg-background px-2 py-0.5 font-medium">
                             {m.category}

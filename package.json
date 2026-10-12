@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint . && node scripts/check-safelist.mjs",
     "format": "prettier --write .",
+    "check:resources": "bun scripts/check-resources.ts",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
     "sitemap": "bun run scripts/gen-sitemap.ts",

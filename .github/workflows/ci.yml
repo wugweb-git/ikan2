@@ -37,6 +37,11 @@ jobs:
       - name: Lint
         run: bunx eslint .
 
+      # Every resource uses the same building blocks (headings, lists, charts, tables, sources,
+      # pictures, links), so they all render through the same styles. See the script's header.
+      - name: Resources follow the house rules
+        run: bun scripts/check-resources.ts
+
       # The build also regenerates public/sitemap.xml, so a drift between the committed sitemap
       # and what the route data would produce shows up here rather than in production.
       - name: Build

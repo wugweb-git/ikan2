@@ -11,3 +11,4 @@
 
 - Keep `/services` a public, server-rendered editorial page outside the signed-in mobile shell, so visitors and crawlers can read it without an account.
 - Keep marketing demonstrations sourced from existing assessment, programme, journal, resource, and consultant data, so published claims remain aligned with the app.
+- Write every Resources article from the shared building blocks in `src/lib/content/RESOURCES.md` (enforced by `scripts/check-resources.ts`) (headings, lists, chart cards, data tables, the sources card, pictures, outside links), and run `bun run check:resources` before pushing; CI fails on anything outside that vocabulary.

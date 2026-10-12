@@ -1,0 +1,51 @@
+# Resources: the style map
+
+Every resource (article, video, audio) is built from the same parts, and every part has one
+style. This is the map from each part to its markup and to the CSS that draws it, so a new piece
+looks like the rest without anyone choosing a font size.
+
+- **Content** lives in `src/lib/content/articles.json` (body, author, standfirst) and
+  `src/lib/resources.ts` (title, category, date, length, cover, links into the app).
+- **Styles** live in `src/styles.css` under `.prose-ikan`, and every text style there is one of
+  the app's type roles (`@utility type-*` in the same file), applied with `@apply`. No font size
+  is written by hand.
+- **The checker**, `bun run check:resources` (`scripts/check-resources.ts`), fails CI when a body
+  uses anything not in this map. Content questions (read time, standfirst) are reported for the
+  author, never changed by it.
+
+## The page around the article (`src/routes/resources.$slug.tsx`)
+
+| Part                                   | Comes from                                                      | Style                                                                 |
+| -------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Category eyebrow                       | `resource.category`                                             | `type-body-sm` semibold, accent strong                                |
+| Title (h1)                             | `resource.title`, Title Case, no closing full stop              | `type-headline-md`                                                    |
+| Standfirst                             | `article.description`, one or two sentences                     | `type-title-lg` medium, muted                                         |
+| Meta row: author, date, medium, length | `article.author`, `resource.date`, `resource.minutes`           | `type-label-lg`, muted, lucide icons                                  |
+| Cover                                  | `resource.art`, one scene per resource, in `components/art.tsx` | `Illustration`; a webp copy at `public/resources/covers/<slug>.webp`  |
+| Player (video, audio)                  | `resource.src`, `resource.poster`                               | `MediaPlayer`                                                         |
+| Source of a video or audio piece       | `resource.source`                                               | `SourceCard`: 20px secondary card, `type-title-md` name               |
+| Link to an assessment                  | `resource.assessment` (+ `assessmentRole`)                      | `StackedAssessmentCard`, as on the assessments list                   |
+| Keep reading                           | same category or cover                                          | `type-title-lg` heading, `type-title-md` titles, `type-label-md` meta |
+
+## The article body (`.prose-ikan`, from `articles.json`)
+
+| Part                                | Markup                                                                                                                                                                                           | Style                                                                                                                                                                                                                 |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Body copy                           | `<p>`                                                                                                                                                                                            | `type-body-lg` (16/26), foreground at 88%                                                                                                                                                                             |
+| Bold                                | `<strong>`                                                                                                                                                                                       | weight 650, foreground                                                                                                                                                                                                |
+| Section heading                     | `<h2>`, sentence case, no full stop                                                                                                                                                              | `type-headline-sm` (24/32)                                                                                                                                                                                            |
+| Sub-heading, only under an h2       | `<h3>`                                                                                                                                                                                           | `type-title-md` (16/24, display face)                                                                                                                                                                                 |
+| Lists                               | `<ul>` / `<ol>`; a "Label: text" item leads with `<strong>Label:</strong>`                                                                                                                       | body copy, muted markers                                                                                                                                                                                              |
+| Picture (illustration, infographic) | `<figure><a href><img src width height loading="lazy" alt></a>[<figcaption>]</figure>`                                                                                                           | full width, 16px corners; caption `type-label-md`, muted                                                                                                                                                              |
+| Graph                               | `<figure class="chart">` with `figcaption.chart-title`, `<ol>` of `li[style="--v:share"]` (`.is-key` for the row to look at) holding `.bar-label`, `.bar-value`, `.bar > i`, then `p.chart-note` | 20px secondary card; title `type-title-md`; label `type-label-lg`; value `type-action`; bar = the programme progress bar (`--accent` on `--accent-container`, `--accent-strong` for the key row); note `type-body-sm` |
+| Score table                         | `<table>` of three columns: score, band, what next                                                                                                                                               | a card per row: `type-label-md` "Score", `type-label-lg` score, `type-title-md` band, `type-body-md` next steps                                                                                                       |
+| Data table                          | `<table class="data-table">` with `<thead>`, `data-label` on every cell after the first                                                                                                          | a card per row: `type-title-md` row name, each cell `type-body-md` under its `type-label-md` column name                                                                                                              |
+| Sources (always last)               | `<section class="sources"><h2>Sources</h2>[<h3>]<ul><li><strong>Who (year).</strong> <a>Title</a>. Details.</li></ul>[<p>]</section>`                                                            | 20px secondary card like `SourceCard`; eyebrow `type-label-md` caps with the info icon; list `type-body-sm` italic, muted; lead 500 upright foreground; group heading `type-body-sm` semibold                         |
+| Link that leaves iKAN               | `<a href="https://…" target="_blank" rel="noopener noreferrer">Words<span class="sr-only"> (opens in a new tab)</span></a>`                                                                      | underlined, ends in the ↗ arrow (the `ExternalLink` rule in `kit/link.tsx`); words as the link text, never a web address                                                                                              |
+
+## Adding a resource
+
+1. Body in `articles.json` using only the parts above; listing in `resources.ts` with a new `art`
+   scene and its cover webp; `assessment` when the piece explains one of the app's assessments.
+2. Graphs are rebuilt as chart cards; only illustrations and infographics stay pictures.
+3. `bun run check:resources`, then look at it on a phone width before pushing.

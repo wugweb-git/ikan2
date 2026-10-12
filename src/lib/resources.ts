@@ -216,7 +216,7 @@ const library: Resource[] = [
     /* id unchanged on purpose: it keys this piece's body in articles.json and anyone's saved
      * and opened state. Only the source, the media and the title have been replaced. */
     id: "resource-can-we-talk",
-    title: "How to cope with anxiety \u2013 a relaxation technique",
+    title: "How to Cope With Anxiety: A Relaxation Technique",
     source: {
       name: "NHS",
       url: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/mental-wellbeing-audio-guides/",
@@ -258,7 +258,7 @@ const library: Resource[] = [
   },
   {
     id: "resource-india-numbers",
-    title: "India's Mental Health Crisis: The Numbers We Can No Longer Ignore.",
+    title: "India’s Mental Health Crisis: The Numbers We Can No Longer Ignore",
     category: "General",
     date: "2026-10-03",
     minutes: 5,
@@ -292,34 +292,37 @@ const library: Resource[] = [
   },
   {
     id: "resource-who-5",
-    title: "What is the WHO-5 Well-Being Index? A Simple Guide to Measuring Mental Wellness",
+    title: "What Is the WHO-5 Well-Being Index? A Simple Guide to Measuring Mental Wellness",
     category: "Wellness",
     date: "2026-09-23",
     minutes: 4,
     art: "wellbeing",
     featured: true,
+    assessment: "unsure-or-general-concern",
   },
   {
     id: "resource-ngse",
     title:
-      "What is the New General Self-Efficacy (NGSE) Scale? A Simple Guide to Measuring Self-Belief",
+      "What Is the New General Self-Efficacy (NGSE) Scale? A Simple Guide to Measuring Self-Belief",
     category: "Confidence",
     date: "2026-09-23",
     minutes: 4,
     art: "confidence",
+    assessment: "unsure-or-general-concern",
   },
   {
     id: "resource-brs",
-    title: "What is the Brief Resilience Scale (BRS)? A Simple Guide to the Resilience Test",
+    title: "What Is the Brief Resilience Scale (BRS)? A Simple Guide to the Resilience Test",
     category: "Resilience",
     date: "2026-09-23",
     minutes: 4,
     art: "resilience",
+    assessment: "unsure-or-general-concern",
   },
   {
     id: "resource-gad-2",
     title:
-      "What is Generalized Anxiety Disorder (GAD)-2? A Simple Guide to the Ultra-Brief Anxiety Screener",
+      "What Is Generalized Anxiety Disorder (GAD)-2? A Simple Guide to the Ultra-Brief Anxiety Screener",
     category: "Anxiety",
     date: "2026-09-23",
     minutes: 3,
@@ -330,7 +333,7 @@ const library: Resource[] = [
   {
     id: "resource-phq-2",
     title:
-      "What is the Patient Health Questionnaire (PHQ)-2? A Simple Guide to the Ultra-Brief Depression Screener",
+      "What Is the Patient Health Questionnaire (PHQ)-2? A Simple Guide to the Ultra-Brief Depression Screener",
     category: "Depression",
     date: "2026-09-23",
     minutes: 3,
@@ -340,7 +343,7 @@ const library: Resource[] = [
   },
   {
     id: "de31d473-fda7-47e4-82d6-a549b02eec44",
-    title: "What is the Perceived Stress Scale (PSS-10)? Understand The Stress Screening Test",
+    title: "What Is the Perceived Stress Scale (PSS-10)? Understand the Stress Screening Test",
     category: "Stress",
     date: "2026-09-10",
     minutes: 5,
@@ -351,7 +354,7 @@ const library: Resource[] = [
   {
     id: "98d536d4-938b-4fbf-bc2c-f37e6d0b9409",
     title:
-      "What is the Burnout Assessment Tool (BAT-23)? An easy guide to the 23-Question Burnout Test",
+      "What Is the Burnout Assessment Tool (BAT-23)? An Easy Guide to the 23-Question Burnout Test",
     category: "Burnout",
     date: "2026-09-10",
     minutes: 5,
@@ -360,7 +363,7 @@ const library: Resource[] = [
   },
   {
     id: "1b783468-f860-433b-8009-7e7943321ac1",
-    title: "What is The Workplace Stress Scale? Explained.",
+    title: "What Is the Workplace Stress Scale? Explained",
     category: "Work-Life",
     date: "2026-09-10",
     minutes: 5,
@@ -370,7 +373,7 @@ const library: Resource[] = [
   {
     id: "resource-1766237270444",
     title:
-      "What is Generalized Anxiety Disorder (GAD)-7? A Simple Guide to the Anxiety Screening Test",
+      "What Is Generalized Anxiety Disorder (GAD)-7? A Simple Guide to the Anxiety Screening Test",
     category: "Anxiety",
     date: "2026-09-10",
     minutes: 5,
@@ -379,7 +382,7 @@ const library: Resource[] = [
   },
   {
     id: "a9697070-1dff-4bcc-a67d-2fbb26cc6e25",
-    title: "What is Patient Health Questionnaire (PHQ)-9? A Quick Depression Screening Test",
+    title: "What Is Patient Health Questionnaire (PHQ)-9? A Quick Depression Screening Test",
     category: "Depression",
     date: "2026-09-10",
     minutes: 5,
@@ -388,7 +391,7 @@ const library: Resource[] = [
   },
   {
     id: "c775a1e1-a938-4aac-8519-e5ad9f8dda1f",
-    title: "What is the Sleep Condition Indicator (SCI)? Wake Up to Better Sleep.",
+    title: "What Is the Sleep Condition Indicator (SCI)? Wake Up to Better Sleep",
     category: "Sleep",
     date: "2026-09-10",
     minutes: 5,
@@ -397,7 +400,7 @@ const library: Resource[] = [
   },
   {
     id: "a5bef353-f6e5-4a22-9ae7-2d4e4a7ebd41",
-    title: "The Late Night Tax: How Bad Sleep Impacts Your Long Term Health.",
+    title: "The Late Night Tax: How Bad Sleep Impacts Your Long-Term Health",
     category: "Sleep",
     date: "2026-04-01",
     minutes: 5,
@@ -414,7 +417,7 @@ const library: Resource[] = [
   },
   {
     id: "11457137-5bba-4f45-9d0d-51d7e2a4c9c6",
-    title: "Physical Health is measured. Why should mental health be any different?",
+    title: "Physical Health Is Measured. Why Should Mental Health Be Any Different?",
     category: "General",
     date: "2026-03-11",
     minutes: 5,
@@ -423,7 +426,7 @@ const library: Resource[] = [
   },
   {
     id: "4a4ac2b7-17be-4e9e-9d8e-7d244af5aa73",
-    title: "Prioritizing Mental Wellness: The Importance of Routine Mental Health Check-Ups.",
+    title: "Prioritizing Mental Wellness: The Importance of Routine Mental Health Check-Ups",
     category: "General",
     date: "2026-03-11",
     minutes: 5,

@@ -1243,31 +1243,21 @@ html.reduce-motion *::after {
  * them) and an explicit type-* class on a prose child now wins, as it should. */
 @layer base {
   .prose-ikan {
-    /* body-lg */
-    font-size: 16px;
-    line-height: 26px;
+    @apply type-body-lg;
     color: color-mix(in oklab, var(--foreground) 88%, transparent);
   }
   .prose-ikan > * + * {
     margin-top: 1em;
   }
   .prose-ikan h2 {
-    /* headline-sm */
+    @apply type-headline-sm;
     margin-top: 1.9em;
-    font-family: var(--font-display);
-    font-size: 24px;
-    line-height: 32px;
-    font-weight: 600;
     color: var(--foreground);
   }
   .prose-ikan h3 {
-    /* title-md: same size as the body, told apart by the display face and the weight */
+    /* same size as the body, told apart by the display face and the weight */
+    @apply type-title-md;
     margin-top: 1.6em;
-    font-family: var(--font-display);
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
     color: var(--foreground);
   }
   .prose-ikan > :first-child {
@@ -1344,35 +1334,25 @@ html.reduce-motion *::after {
   padding: 0;
 }
 .prose-ikan td:first-child {
-  /* label-lg, and it says "Score" because the header row is hidden */
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 500;
+  /* it says "Score" because the header row is hidden */
+  @apply type-label-lg;
   color: var(--accent-strong, var(--foreground));
 }
 .prose-ikan td:first-child::before {
-  /* label-md: the header row is hidden, so each block says what its number is */
+  /* the header row is hidden, so each block says what its number is */
+  @apply type-label-md;
   content: "Score";
   display: block;
-  font-size: 12px;
-  line-height: 16px;
   color: var(--muted-foreground);
 }
 .prose-ikan td:nth-child(2) {
-  /* title-md */
+  @apply type-title-md;
   margin-top: 2px;
-  font-family: var(--font-display);
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
   color: var(--foreground);
 }
 .prose-ikan td:nth-child(3) {
-  /* body-md */
+  @apply type-body-md;
   margin-top: 6px;
-  font-size: 14px;
-  line-height: 21px;
 }
 .prose-ikan td h2 {
   margin: 0;
@@ -1388,33 +1368,22 @@ html.reduce-motion *::after {
   display: block;
 }
 .prose-ikan table.data-table td:first-child {
-  /* title-md */
-  font-family: var(--font-display);
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  @apply type-title-md;
   color: var(--foreground);
 }
 .prose-ikan table.data-table td:first-child::before {
   content: none;
 }
 .prose-ikan table.data-table td + td {
-  /* body-md */
+  @apply type-body-md;
   margin-top: 8px;
   font-family: inherit;
-  font-size: 14px;
-  line-height: 21px;
-  font-weight: 400;
-  letter-spacing: normal;
   color: inherit;
 }
 .prose-ikan table.data-table td + td::before {
-  /* label-md */
+  @apply type-label-md;
   content: attr(data-label);
   display: block;
-  font-size: 12px;
-  line-height: 16px;
   color: var(--muted-foreground);
 }
 
@@ -1436,21 +1405,21 @@ html.reduce-motion *::after {
   background: var(--secondary);
 }
 .prose-ikan figcaption {
-  /* label-md, and it carries the sources for the figure above it */
+  /* it carries the sources for the figure above it */
+  @apply type-label-md;
   margin-top: 10px;
-  font-size: 12px;
-  line-height: 18px;
   color: var(--muted-foreground);
 }
 
 /* A chart drawn in the article rather than pasted in as a picture, built from the same parts as
- * the programme screens: the 24px secondary card, the type roles, and the programme progress bar
+ * the programme screens: the secondary card, the type roles, and the programme progress bar
  * (a rounded --accent fill on an --accent-container track, program.index.tsx). One row per bar,
  * label and value as real text above it, so it reads on a phone and to a screen reader. Bars
  * start at zero; the row to look at is "is-key", filled in the strong accent. A single series
  * needs no legend: the title names it. */
 .prose-ikan figure.chart {
-  border-radius: 24px;
+  /* the same card as the sources card and the source card on video and audio pieces */
+  border-radius: 20px;
   background: var(--secondary);
   padding: 16px;
 }
@@ -1524,13 +1493,13 @@ html.reduce-motion *::after {
   color: var(--muted-foreground);
 }
 .prose-ikan .sources h2 {
+  /* the eyebrow of components/source-card.tsx */
+  @apply type-label-md;
   display: flex;
   align-items: center;
   gap: 6px;
   margin: 0;
   font-family: inherit;
-  font-size: 12px;
-  line-height: 16px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1548,12 +1517,10 @@ html.reduce-motion *::after {
     center / contain no-repeat;
 }
 .prose-ikan .sources h3 {
+  @apply type-body-sm;
   margin-top: 14px;
   font-family: inherit;
-  font-size: 13px;
-  line-height: 19px;
   font-weight: 600;
-  letter-spacing: normal;
   color: var(--foreground);
 }
 .prose-ikan .sources ul,
