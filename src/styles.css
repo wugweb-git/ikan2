@@ -1576,7 +1576,13 @@ html.reduce-motion *::after {
 .prose-ikan .sources p {
   margin-top: 12px;
 }
-.prose-ikan .sources strong {
+/* Each source opens with who and when, upright at 500 in full ink; the title (the link, where
+ * there is one) and the details follow in muted italic. Three steps, so a list of references
+ * scans by author rather than reading as one grey block. */
+.prose-ikan .sources li > strong:first-child,
+.prose-ikan .sources p > strong:first-child {
+  font-style: normal;
+  font-weight: 500;
   color: var(--foreground);
 }
 .prose-ikan .sources a {
