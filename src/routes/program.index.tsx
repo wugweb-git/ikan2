@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { History, NotebookPen } from "lucide-react";
-import { ProgrammeCard } from "@/components/equip/programme-card";
+import { ChevronRight, History, NotebookPen } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
-import { stateLayer } from "@/components/equip/m3";
+import { accentStyle, stateLayer } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { cn } from "@/lib/utils";
-import { programmes, upcoming } from "@/lib/equip/programs";
-import type {} from "@/lib/equip/types";
+import { dayCount, daysDoneOf, programmes, upcoming } from "@/lib/equip/programs";
+import { useProgramme } from "@/lib/equip/store";
+import type { Programme } from "@/lib/equip/types";
+import { ProgrammeCard } from "@/components/equip/programme-card";
 
 export const Route = createFileRoute("/program/")({
   head: () =>

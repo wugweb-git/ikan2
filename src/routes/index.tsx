@@ -5,11 +5,14 @@ import {
   ArrowUpRight,
   MapPin,
   CloudSun,
+  Clock3,
   UserRoundPen,
   X,
   Bell,
+  CalendarDays,
   ChartNoAxesColumn,
   Heart,
+  Plus,
   Smile,
   Sparkles,
   CalendarCheck,
@@ -57,7 +60,16 @@ import { checkMoodReminder, refreshWeather, useDevice, weatherWord } from "@/lib
 import { syncMoodReminder } from "@/lib/local-reminders";
 import { enableNativePush, nativePushSupported } from "@/lib/native-push";
 import { autoSyncHealthConnect, recentAverage, useHealthConnect } from "@/lib/health-connect";
-import { resources, slugOf, useResourceStore, type Resource } from "@/lib/resources";
+import {
+  lengthLabel,
+  mediumIcon,
+  mediumLabel,
+  mediumOf,
+  resources,
+  slugOf,
+  useResourceStore,
+  type Resource,
+} from "@/lib/resources";
 import resAnxiety from "@/assets/res-anxiety.jpg";
 import resBurnout from "@/assets/res-burnout.jpg";
 import resSleep from "@/assets/res-sleep.jpg";

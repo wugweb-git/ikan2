@@ -1,6 +1,14 @@
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
-import { ArrowLeft, Bookmark, CalendarDays, Clock3, UserRound } from "lucide-react";
+import {
+  ArrowLeft,
+  Bookmark,
+  CalendarDays,
+  ChevronRight,
+  Clock3,
+  ListChecks,
+  UserRound,
+} from "lucide-react";
 import { StackedAssessmentCard } from "@/components/assessment/ui";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
@@ -12,7 +20,7 @@ import { MoodCheckinCard } from "@/components/mood-checkin-card";
 import { SupportCard } from "@/components/support-card";
 import { ProgrammeCard } from "@/components/equip/programme-card";
 import { ResourceRow } from "@/components/resource-card";
-import { accentStyle, IconButton } from "@/components/equip/m3";
+import { accentStyle, IconButton, stateLayer } from "@/components/equip/m3";
 import { jsonLd, pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";

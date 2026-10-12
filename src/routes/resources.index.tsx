@@ -1,18 +1,19 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bookmark, CalendarDays, Clock3, Search, Sparkles, Star, X } from "lucide-react";
-import { ResourceRow } from "@/components/resource-card";
+import { Bookmark, CalendarDays, Check, Clock3, Search, Sparkles, Star, X } from "lucide-react";
 import { IkanShell } from "@/components/ikan-shell";
 import { Illustration } from "@/components/art";
-import { accentStyle, Snackbar, stateLayer, useSnack } from "@/components/equip/m3";
+import { accentStyle, IconButton, Snackbar, stateLayer, useSnack } from "@/components/equip/m3";
 import { pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import {
+  doneLabel,
   lengthLabel,
   mediumIcon,
   mediumLabel,
   mediumOf,
+  progressLabel,
   cardDate,
   resources,
   slugOf,
@@ -20,6 +21,7 @@ import {
   type Medium,
   type Resource,
 } from "@/lib/resources";
+import { ResourceRow } from "@/components/resource-card";
 
 /* The library is filtered by what a thing is, not by what it is about: there are three resource
  * types and that is the whole list. Saved sits on the end because it is a state, not a type, and
