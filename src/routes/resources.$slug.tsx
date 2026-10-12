@@ -23,6 +23,7 @@ import { accentStyle, IconButton, stateLayer } from "@/components/equip/m3";
 import { jsonLd, pageMeta } from "@/components/equip/program-header";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 import { getAssessment } from "@/lib/assessment/instruments";
 import { articles } from "@/lib/content";
 import {
@@ -83,6 +84,9 @@ export const Route = createFileRoute("/resources/$slug")({
   component: ArticlePage,
 });
 
+/** Topics whose articles can be named in analytics: they say nothing about the reader's health. */
+const namedTopics = new Set(["General", "Work-Life"]);
+
 const dateLabel = (d: string) =>
   new Date(`${d}T00:00:00`).toLocaleDateString("en-IN", {
     day: "numeric",
@@ -111,33 +115,71 @@ function ArticlePage() {
     .filter((x) => x.id !== id && (x.category === r.category || x.art === r.art))
     .slice(0, 3);
 
+  /* What goes to analytics about reading. Which piece it was is sent only for topics that say
+   * nothing about the reader's health (General, Work-Life): what someone reads about depression
+   * or sleep is itself health information, so for those only the type and length go out. See
+   * src/lib/analytics.ts. */
+  const about = {
+    medium: mediumOf(r),
+    minutes: r.minutes,
+    ...(namedTopics.has(r.category) ? { resource: slugOf(r) } : {}),
+  };
+
   useEffect(() => {
     store.markOpened(id);
+    track("resource_open", about);
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* An article counts as read when its last line comes into view, not when it is opened: the
-   * list says "Read" with a check, and that should mean read. Video and audio report their own
-   * progress from the player. */
+  /* Reading, followed down the page. An article counts as read when someone scrolls down to its
+   * end; a piece short enough to fit on one screen has nothing to scroll, so there its end has
+   * to stay in view for a moment instead (on a tall screen it shows on first paint, and that
+   * alone is not reading it). On the way, how far down the text they got - 25, 50, 75, 100% -
+   * goes to analytics once each. Video and audio report finishing from the player. */
   const end = useRef<HTMLDivElement>(null);
+  const text = useRef<HTMLDivElement>(null);
   const isArticle = mediumOf(r) === "article";
   useEffect(() => {
     const el = end.current;
-    if (!isArticle || !el || typeof IntersectionObserver === "undefined") return;
-    /* The end has to stay in view for a moment: on a tall screen a very short piece shows its
-     * end on first paint, and that alone is not reading it. */
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const wasRead = Boolean(store.read?.[id]);
+    let scrolled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let frame = 0;
+    const reached = new Set<number>();
+    const measure = () => {
+      frame = 0;
+      const box = text.current?.getBoundingClientRect();
+      if (!box || box.height <= 0) return;
+      const depth = Math.min(1, Math.max(0, (window.innerHeight - box.top) / box.height)) * 100;
+      for (const d of [25, 50, 75, 100])
+        if (depth >= d && !reached.has(d)) {
+          reached.add(d);
+          track("resource_scroll", { ...about, depth: d });
+        }
+    };
+    const onScroll = () => {
+      scrolled = true;
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    const finish = () => {
+      seen.disconnect();
+      if (!isArticle) return;
+      store.markRead(id);
+      if (!wasRead) track("resource_read", about);
+    };
     const seen = new IntersectionObserver((entries) => {
-      const visible = entries.some((e) => e.isIntersecting);
       clearTimeout(timer);
-      if (visible)
-        timer = setTimeout(() => {
-          store.markRead(id);
-          seen.disconnect();
-        }, 1500);
+      if (!entries.some((e) => e.isIntersecting)) return;
+      if (scrolled) finish();
+      else timer = setTimeout(finish, 1500);
     });
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     seen.observe(el);
+    measure();
     return () => {
       clearTimeout(timer);
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll, { capture: true });
       seen.disconnect();
     };
   }, [id, isArticle]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -211,7 +253,11 @@ function ArticlePage() {
               title={r.title}
               className="mt-6"
               {...(played?.at ? { startAt: played.at } : {})}
-              onProgress={(at, of) => store.markPlayed(id, at, of)}
+              onProgress={(at, of) => {
+                if (of > 0 && at >= of - 3 && !store.playedOf(id)?.done)
+                  track("resource_read", about);
+                store.markPlayed(id, at, of);
+              }}
             />
           ) : null}
 
@@ -219,6 +265,7 @@ function ArticlePage() {
            * not the publisher's show notes, so it carries no heading of its own. */}
           {body ? (
             <div
+              ref={text}
               className={cn("prose-ikan", r.src ? "mt-7" : "mt-6")}
               dangerouslySetInnerHTML={{ __html: body }}
             />

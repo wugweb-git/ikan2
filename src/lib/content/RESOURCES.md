@@ -49,8 +49,13 @@ line in `type-label-md`, muted. Two views of it:
 - Dates are `cardDate`: **12 Oct '26** on every card (fixed month names, so September is "Sep").
 - On a narrow phone the type word gives way with an ellipsis, down to its icon; the date and the
   length always show in full.
-- An article is finished when its end comes into view (`markRead`); files and YouTube embeds
-  report how far they have played (`markPlayed`).
+- An article is finished when someone scrolls down to its end; a piece that fits on one screen
+  when its end has stayed in view for 1.5s (`markRead`). Files and YouTube embeds report how far
+  they have played (`markPlayed`); finished stays finished.
+- Analytics (GA4, `src/lib/analytics.ts`): `resource_open`, `resource_scroll` at 25/50/75/100%
+  of the text, `resource_read` once finished, each with the medium and length. The piece itself
+  (`resource`, its slug) is sent only for General and Work-Life: what someone reads about a
+  condition is health information.
 - Saved is a filled bookmark in the accent, unsaved an outline.
 - The carousel and Home both open on the newest piece, then the featured ones.
 
