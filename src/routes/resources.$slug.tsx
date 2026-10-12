@@ -111,9 +111,11 @@ function ArticlePage() {
   const cut = article ? article.html.indexOf('<section class="sources">') : -1;
   const body = article ? (cut < 0 ? article.html : article.html.slice(0, cut)) : "";
   const sources = article && cut >= 0 ? article.html.slice(cut) : "";
-  const more = resources
-    .filter((x) => x.id !== id && (x.category === r.category || x.art === r.art))
-    .slice(0, 3);
+  /* Always three: the same topic first, then the newest of everything else to make up the
+   * number, so a piece with no neighbours in its category does not end on one suggestion. */
+  const others = resources.filter((x) => x.id !== id);
+  const related = others.filter((x) => x.category === r.category || x.art === r.art);
+  const more = [...related, ...others.filter((x) => !related.includes(x))].slice(0, 3);
 
   /* What goes to analytics about reading. Which piece it was is sent only for topics that say
    * nothing about the reader's health (General, Work-Life): what someone reads about depression
