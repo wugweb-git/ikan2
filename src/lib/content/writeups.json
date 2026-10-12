@@ -470,22 +470,44 @@
     },
     "productivity-reset": {
       "title": "Productivity Reset",
-      "description": "This 7-day challenge helps you reset focus, reduce procrastination, and rebuild productive momentum — without burnout.",
+      "description": "A 10-day guided program to sharpen your focus, stop putting things off and rebuild momentum, one manageable step at a time.",
       "category": "focus",
       "difficulty": "beginner",
-      "duration_days": "7",
-      "duration_weeks": "1",
-      "tags": ["productivity", "focus", "dopamine", "planning"],
-      "metadata.tile2_content": "yes",
-      "metadata.tile3_content": "yes",
-      "metadata.tile4_content": "yes",
-      "metadata.eligibility_point_2": "yes",
+      "duration_days": "10",
+      "duration_weeks": "2",
+      "tags": ["productivity", "focus", "planning", "habits"],
+      "metadata.tile2_content": [
+        "Daily micro-lessons (around 10 minutes)",
+        "Practical planning and focus techniques",
+        "A trigger log, a Hermit Hour and a mindful break you can keep using",
+        "A summary of your focus and screen time, start to end"
+      ],
+      "metadata.tile3_content": [
+        "Notice where your time and attention go",
+        "Plan your day and eat the frog first",
+        "Protect an hour of focus, then fine-tune it",
+        "Look back and plan the week ahead"
+      ],
+      "metadata.tile4_content": [
+        "Sharper focus. Work for longer stretches without reaching for your phone",
+        "Less putting off. Start the hard task first and see it through",
+        "A plan that holds. Organise your week around what matters most",
+        "More energy for the day. Build breaks and movement into your routine"
+      ],
       "repo_bento_what_is_title": "What is this program about?",
       "repo_bento_is_this_for_you_label": "IS THIS FOR YOU?",
       "repo_bento_eligibility_intro_fallback": "This program may be helpful if:",
       "repo_bento_how_it_works_title": "How it works",
       "repo_bento_how_it_works_subtitle": "This program works in progressive stages.",
-      "repo_bento_how_it_works_footer": "The focus is on building sustainable habits and developing practical skills you can use every day."
+      "repo_bento_how_it_works_footer": "The focus is on building sustainable habits and developing practical skills you can use every day.",
+      "metadata.tile1_content": "Busy all day but nothing important gets done? Over the next 10 days you'll see where your time really goes, learn to start the hard task first, protect an hour of real focus, and finish with a plan for the week ahead.",
+      "repo_editor_placeholder_eligibility": [
+        "Productivity Reset may be helpful if:",
+        "You're busy all day but the important things don't get done",
+        "You keep putting off tasks you know matter",
+        "You pick up your phone more often than you'd like",
+        "You want a simple routine to plan and protect your time"
+      ]
     }
   }
 }
