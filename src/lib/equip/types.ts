@@ -78,7 +78,7 @@ export type Programme = {
   name: string;
   source: NProgramme;
   cover: string;
-  accent: "night" | "ember" | "calm";
+  accent: "night" | "ember" | "calm" | "mind";
   days: Day[];
   /** exercises Notion marks "available for ever, on demand", unlocked once reached */
   tools: { day: number; n: number; title: string }[];

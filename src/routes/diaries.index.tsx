@@ -23,6 +23,7 @@ function DiariesPage() {
     "sleep-tight": useProgramme("sleep-tight").state,
     unburn: useProgramme("unburn").state,
     "stress-buster": useProgramme("stress-buster").state,
+    "productivity-reset": useProgramme("productivity-reset").state,
   };
 
   return (

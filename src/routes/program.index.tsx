@@ -55,20 +55,22 @@ function ProgramsPage() {
           </li>
         ))}
       </ul>
-      <section className="mt-8 px-4">
-        <h2 className="type-title-md">Coming soon</h2>
-        <ul className="mt-2">
-          {upcoming.map((u) => (
-            <li
-              key={u.name}
-              className="type-body-lg flex min-h-14 items-center justify-between rounded-[16px] border border-dashed border-foreground/20 px-4 text-muted-foreground"
-            >
-              {u.name}
-              <span className="type-body-sm">Soon</span>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {upcoming.length ? (
+        <section className="mt-8 px-4">
+          <h2 className="type-title-md">Coming soon</h2>
+          <ul className="mt-2">
+            {upcoming.map((u) => (
+              <li
+                key={u.name}
+                className="type-body-lg flex min-h-14 items-center justify-between rounded-[16px] border border-dashed border-foreground/20 px-4 text-muted-foreground"
+              >
+                {u.name}
+                <span className="type-body-sm">Soon</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </IkanShell>
   );
 }

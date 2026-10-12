@@ -117,6 +117,7 @@ export const storageKeys = () =>
     "ikan.equip.sleep-tight.v2",
     "ikan.equip.unburn.v2",
     "ikan.equip.stress-buster.v2",
+    "ikan.equip.productivity-reset.v2",
   ].map(scopedKey);
 
 export const legalLinks = [

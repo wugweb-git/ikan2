@@ -73,12 +73,15 @@ export function useEverything() {
   const sleep = useProgramme("sleep-tight").state;
   const unburn = useProgramme("unburn").state;
   const stress = useProgramme("stress-buster").state;
+  const productivity = useProgramme("productivity-reset").state;
   const { bookings } = useBookings();
   const reading = useResourceStore();
-  const programmeStates = { "sleep-tight": sleep, unburn, "stress-buster": stress } as Record<
-    string,
-    typeof sleep
-  >;
+  const programmeStates = {
+    "sleep-tight": sleep,
+    unburn,
+    "stress-buster": stress,
+    "productivity-reset": productivity,
+  } as Record<string, typeof sleep>;
 
   const now = new Date();
   const since = addDays(now, -29);

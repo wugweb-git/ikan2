@@ -167,6 +167,7 @@ export const relatedAssessment: Record<string, string> = {
   "sleep-tight": "struggling-with-quality-sleep",
   unburn: "feeling-drained-and-burned-out",
   "stress-buster": "feeling-worried-and-stressed",
+  "productivity-reset": "struggling-to-balance-life",
 };
 
 export type Run = Journey & { state: ProgrammeState };

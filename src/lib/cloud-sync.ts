@@ -20,6 +20,7 @@ const SYNCED = new Set([
   "equip.sleep-tight.v2",
   "equip.unburn.v2",
   "equip.stress-buster.v2",
+  "equip.productivity-reset.v2",
   "consult.v1",
   "profile.v1",
   "settings.v1",

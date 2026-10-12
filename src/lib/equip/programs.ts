@@ -1,9 +1,11 @@
 import sleepCover from "@/assets/equip-sleep-tight.jpg";
 import unburnCover from "@/assets/res-burnout.jpg";
 import stressCover from "@/assets/res-anxiety.jpg";
+import productivityCover from "@/assets/program-cover.jpg";
 import sleepJson from "./content/sleep-tight.json";
 import unburnJson from "./content/unburn.json";
 import stressJson from "./content/stress-buster.json";
+import productivityJson from "./content/productivity-reset.json";
 import {
   bulletsAfter,
   exampleCard,
@@ -516,6 +518,124 @@ const stressOverrides: Overrides = {
   "25.5": listStep("grateful"),
 };
 
+/* ---------------------------- Productivity Reset ---------------------------- */
+
+const prTask = field("Task");
+const screenTimeFields = [
+  field("Total phone time"),
+  field("Most used app"),
+  field("Time on that app"),
+  field("Times picked up"),
+  field("TV / streaming"),
+];
+const screenTimeExample = {
+  total_phone_time: "4 h 30 m",
+  most_used_app: "Instagram",
+  time_on_that_app: "1 h 20 m",
+  times_picked_up: "85",
+  tv_streaming: "1 h",
+};
+
+const productivityOverrides: Overrides = {
+  // the running task list: brought up again on Day 3 (today's tasks) and Day 8 (putting it off)
+  "1.2": (b) => ({
+    ui: "entries",
+    collection: "tasks",
+    prompt: b.prompt ?? b.title,
+    fields: [{ key: prTask.key, label: "", type: "text" }],
+    list: { initial: 3, max: 10 },
+    scope: "all",
+  }),
+  "2.1": () => ({
+    ui: "entries",
+    collection: "screen_time",
+    fields: screenTimeFields,
+    example: screenTimeExample,
+    limit: 1,
+    scope: "today",
+  }),
+  "2.3": () => ({
+    ui: "entries",
+    collection: "triggers",
+    fields: [
+      field("Time", "time"),
+      field("What was happening", "longtext"),
+      field("What I felt", "select", [
+        "Bored",
+        "Stuck",
+        "Anxious",
+        "Tired",
+        "Waiting",
+        "Just habit",
+      ]),
+    ],
+    scope: "all",
+  }),
+  "3.5": () => ({
+    ui: "review",
+    collection: "tasks",
+    prompt: "",
+    fields: [
+      field("Going into today?", "yesno", ["Yes", "No"]),
+      field("Difficulty", "select", ["Easy", "Neutral", "Hard"]),
+      field("Priority", "select", ["⭐", "⭐⭐", "⭐⭐⭐"]),
+    ],
+    addFields: [prTask],
+    scope: "all",
+  }),
+  // a Yes copies the task into the motivation map (Day 8 task 4); changing it back removes the copy
+  "8.3": () => ({
+    ui: "review",
+    collection: "tasks",
+    prompt: "",
+    fields: [field("Been putting it off?", "yesno", ["Yes", "No"])],
+    addFields: [prTask],
+    promote: { collection: "put_off", field: prTask.key, from: prTask.key, when: "Yes" },
+    scope: "all",
+  }),
+  "8.4": () => ({
+    ui: "review",
+    collection: "put_off",
+    prompt: "",
+    fields: [
+      field("Roadblock", "longtext"),
+      field("Reward", "longtext"),
+      field("Urgency", "select", ["Today", "This week", "Later"]),
+      field("Time gap", "select", ["Right away", "A few days", "Weeks or more"]),
+      field("One small first step", "longtext"),
+    ],
+    addFields: [prTask],
+    scope: "all",
+  }),
+  // Day 10 shows the Day 2 card beside the new one
+  "10.3": () => ({
+    ui: "entries",
+    collection: "screen_time",
+    fields: screenTimeFields,
+    limit: 2,
+    scope: "all",
+  }),
+  "10.6": () => ({
+    ui: "review",
+    collection: "goals",
+    prompt: "",
+    fields: [field("Moved forward?", "yesno", ["Yes", "Not yet"])],
+    seedFrom: { choiceKey: "productivity_goals", field: "goal" },
+    scope: "all",
+  }),
+  "10.8": () => ({
+    ui: "entries",
+    collection: "week_plan",
+    fields: [
+      field("Day", "select", ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]),
+      field("Time", "time"),
+      field("Task"),
+      field("Type", "select", ["Frog", "Hermit Hour", "Reset", "Other"]),
+    ],
+    scope: "all",
+  }),
+};
+
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /* ------------------------------ resolution ------------------------------ */
@@ -680,6 +800,7 @@ export const programmes: Programme[] = [
   build(sleepJson as NProgramme, sleepOverrides, sleepCover, "night"),
   build(unburnJson as NProgramme, unburnOverrides, unburnCover, "ember"),
   build(stressJson as NProgramme, stressOverrides, stressCover, "calm"),
+  build(productivityJson as NProgramme, productivityOverrides, productivityCover, "mind"),
 ];
 programmes.forEach((p) =>
   registerProgrammeDays(
@@ -689,7 +810,7 @@ programmes.forEach((p) =>
 );
 
 /** Equip programmes named in the docs whose content isn't in Notion yet. */
-export const upcoming = [{ name: "Productivity Reset" }];
+export const upcoming: { name: string }[] = [];
 
 export const getProgramme = (s: string) => programmes.find((p) => p.slug === s);
 

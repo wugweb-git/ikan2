@@ -400,6 +400,49 @@ export function programmeHighlights(p: Programme, s: ProgrammeState): Highlights
     return { title: "Your stress toolkit", tiles };
   }
 
+  if (p.slug === "productivity-reset") {
+    const num = (k: string) => (typeof s.answers[k] === "number" ? (s.answers[k] as number) : null);
+    const start = num("focus_start");
+    const end = num("focus_end");
+    if (start !== null && end !== null)
+      tiles.push({
+        icon: "scale",
+        label: `${start} → ${end}`,
+        text: "focus out of 10, Day 0 to Day 10",
+      });
+    const screens = entries("screen_time");
+    const total = (i: number) => `${screens[i]?.values["total_phone_time"] ?? ""}`.trim();
+    if (screens.length > 1 && total(0) && total(screens.length - 1))
+      tiles.push({
+        icon: "log",
+        label: `${total(0)} → ${total(screens.length - 1)}`,
+        text: "phone time a day, start to end",
+      });
+    add(
+      count("triggers"),
+      "brain",
+      n(count("triggers"), "pick-up", "pick-ups"),
+      "caught and named",
+    );
+    const frogs = ["frog_done", "frog_done_2"].filter((k) => s.answers[k] === "Yes").length;
+    add(frogs, "task", `${frogs} of 2 frogs`, "eaten first");
+    const sessions = (num("focus_sessions") ?? 0) + (num("focus_sessions_2") ?? 0);
+    add(sessions, "check", n(sessions, "focus session", "focus sessions"), "of 20 minutes");
+    add(
+      count("put_off"),
+      "goal",
+      n(count("put_off"), "put-off task", "put-off tasks"),
+      "mapped, with a first step",
+    );
+    add(
+      count("week_plan"),
+      "sparkle",
+      n(count("week_plan"), "block", "blocks"),
+      "planned for next week",
+    );
+    return { title: "Your productivity reset", tiles };
+  }
+
   if (p.slug === "sleep-tight") {
     const concerns = picked(0, /primary sleep concern/i);
     add(concerns, "signs", n(concerns, "concern", "concerns"), "about your sleep at the start");
