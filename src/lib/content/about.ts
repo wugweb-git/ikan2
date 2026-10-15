@@ -100,10 +100,8 @@ const parseTile = (text: string | undefined, fallbackTitle = ""): Section | null
 
 /** "This assessment is not a diagnosis. It's a way to …" → "Not a diagnosis or an emergency service. It's a way to …" */
 const shortImportant = (para: string | undefined, who: string) => {
-  const rest = (para ?? "")
-    .split(/(?<=\.)\s+/)
-    .slice(1)
-    .join(" ");
+  // split after each full stop; no lookbehind, which Safari before 16.4 can't parse at all
+  const rest = (para ?? "").replace(/\.\s+/g, ".\u0000").split("\u0000").slice(1).join(" ");
   const age = /18\+/.test(who) ? " For adults 18 and over." : "";
   return `A self-help check, not a diagnosis or an emergency service.${rest ? ` ${rest}` : ""}${age}`;
 };
