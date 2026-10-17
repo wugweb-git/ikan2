@@ -95,7 +95,9 @@ line in `type-label-md`, muted. Two views of it:
 ## External: links into the app (`src/routes/resources.$slug.tsx`)
 
 After the article body and before Sources, with no heading of its own. Which sections a piece
-shows is set on the resource by the editors, never guessed; for now only assessments are set.
+shows is set on the resource by the editors, never guessed; for now that is assessments, plus
+the journal card on The Pros and Pros of Tracking Your Mood, whose author asks readers to track
+their mood.
 
 **Deferred:** the programme, journal and consult sections are meant to be filled by the
 recommendation engine (it worked in the old iKAN and does not yet in ikan2). Until it is fixed
