@@ -62,7 +62,9 @@ export type Art =
   | "unwind"
   | "gap"
   | "iceberg"
-  | "growth";
+  | "growth"
+  | "earnings"
+  | "tracker";
 
 /* What a resource is to be done with. Everything in the library is an article today; video and
  * audio are modelled here so adding one is a data change, not a rebuild. A resource with no
@@ -270,6 +272,24 @@ const library: Resource[] = [
     minutes: 6,
     art: "report",
     featured: true,
+  },
+  {
+    id: "resource-personal-cost",
+    title: "Mental Health Has a Personal Cost and It Is High",
+    category: "General",
+    date: "2026-10-17",
+    minutes: 4,
+    art: "earnings",
+  },
+  {
+    id: "resource-mood-tracking",
+    title: "The Pros and Pros of Tracking Your Mood",
+    category: "Wellness",
+    date: "2026-10-17",
+    minutes: 7,
+    art: "tracker",
+    /* the author's "Ready to track your mood?" line, as the journal card */
+    journal: true,
   },
   {
     id: "resource-payroll-hidden-cost",

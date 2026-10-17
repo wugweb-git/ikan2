@@ -32,6 +32,8 @@ const palettes: Record<Art, [string, string, string]> = {
   gap: ["#EEEBE3", "#C9BFA5", "#4F5A3A"],
   iceberg: ["#E3EDF4", "#9FBFD6", "#244F6E"],
   growth: ["#F3EEDF", "#D8C58E", "#6B5418"],
+  earnings: ["#F4ECE6", "#DDB89C", "#7A3F22"],
+  tracker: ["#EAF0FB", "#A8C0EA", "#2B5197"],
 };
 
 export function Illustration({ art, className }: { art: Art; className?: string }) {
@@ -531,6 +533,72 @@ export function Illustration({ art, className }: { art: Art; className?: string 
             strokeLinecap="round"
             strokeDasharray="4 8"
             strokeOpacity="0.8"
+          />
+        </g>
+      ) : null}
+      {art === "earnings" ? (
+        /* savings that shrink, year on year, under a falling line */
+        <g>
+          {[0, 1, 2, 3, 4].map((i) => {
+            const x = 70 + i * 46;
+            const n = 6 - i;
+            return (
+              <g key={i}>
+                {Array.from({ length: n }, (_, j) => (
+                  <ellipse
+                    key={j}
+                    cx={x}
+                    cy={170 - j * 12}
+                    rx="18"
+                    ry="6"
+                    fill={ink}
+                    fillOpacity={0.85 - i * 0.12}
+                  />
+                ))}
+              </g>
+            );
+          })}
+          <path
+            d="M48 60 C 120 66, 190 92, 272 128"
+            fill="none"
+            stroke={ink}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray="4 8"
+            strokeOpacity="0.8"
+          />
+        </g>
+      ) : null}
+      {art === "tracker" ? (
+        /* a week of check-ins, and the line they draw */
+        <g>
+          {[0.45, 0.6, 0.35, 0.7, 0.8, 0.55, 0.9].map((v, i) => {
+            const x = 64 + i * 32;
+            const y = 150 - v * 90;
+            return (
+              <g key={i}>
+                <rect
+                  x={x - 11}
+                  y="160"
+                  width="22"
+                  height="22"
+                  rx="7"
+                  fill={ink}
+                  fillOpacity={0.15 + v * 0.6}
+                />
+                <circle cx={x} cy={y} r="6" fill={ink} />
+              </g>
+            );
+          })}
+          <polyline
+            points={[0.45, 0.6, 0.35, 0.7, 0.8, 0.55, 0.9]
+              .map((v, i) => `${64 + i * 32},${150 - v * 90}`)
+              .join(" ")}
+            fill="none"
+            stroke={ink}
+            strokeWidth="3"
+            strokeLinejoin="round"
+            strokeOpacity="0.7"
           />
         </g>
       ) : null}

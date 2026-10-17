@@ -37,6 +37,8 @@ const arts: Art[] = [
   "gap",
   "iceberg",
   "growth",
+  "earnings",
+  "tracker",
 ];
 
 export const AllIllustrations: Story = {
