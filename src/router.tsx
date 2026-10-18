@@ -15,7 +15,10 @@ export const getRouter = () => {
     defaultPendingComponent: PageSkeleton,
     defaultPendingMs: 200,
     defaultPendingMinMs: 300,
-    defaultErrorComponent: ({ reset }) => <ErrorScreen reset={reset} />,
+    defaultErrorComponent: ({ error, reset }) => {
+      console.error(error);
+      return <ErrorScreen reset={reset} error={error} />;
+    },
     defaultNotFoundComponent: NotFoundScreen,
   });
 

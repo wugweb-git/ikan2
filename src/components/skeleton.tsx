@@ -5,6 +5,7 @@ import { sceneInk, StateIllustration, type StateScene } from "@/components/art";
 import { IkanMark } from "@/components/ikan-mark";
 import { stateLayer } from "@/components/equip/m3";
 import { cn } from "@/lib/utils";
+import { isStaleBuildError, reloadForUpdate } from "@/lib/device";
 
 /* Loading, empty and error states shared by every screen. */
 
@@ -123,10 +124,15 @@ export function NotFoundScreen() {
   );
 }
 
-export function ErrorScreen({ reset }: { reset?: () => void }) {
+export function ErrorScreen({ reset, error }: { reset?: () => void; error?: unknown }) {
   const router = useRouter();
   const online = useOnline();
   const [retrying, setRetrying] = useState(false);
+
+  // a page left open across a deploy asked for a file that is gone: load the new build, once
+  useEffect(() => {
+    if (error && isStaleBuildError(error)) reloadForUpdate();
+  }, [error]);
 
   const retry = () => {
     setRetrying(true);
@@ -173,9 +179,26 @@ export function ErrorScreen({ reset }: { reset?: () => void }) {
       <a href="/" className={secondary}>
         Take me home
       </a>
+      {online && error ? (
+        /* what actually broke, small and quiet, so a screenshot is enough to fix it */
+        <p className="type-label-md max-w-full break-words text-muted-foreground">
+          {errorText(error)}
+        </p>
+      ) : null}
     </StateScreen>
   );
 }
+
+const errorText = (e: unknown) => {
+  if (e instanceof Error) {
+    const at = e.stack
+      ?.split("\n")
+      .find((l) => /\.js|\.tsx?/.test(l))
+      ?.trim();
+    return `${e.name}: ${e.message}${at ? ` (${at.replace(/^at\s+/, "").slice(0, 120)})` : ""}`;
+  }
+  return String(e);
+};
 
 export function useOnline() {
   const [online, setOnline] = useState(true);

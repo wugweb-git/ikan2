@@ -13,7 +13,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "../lib/auth";
 import { AuthGate } from "../components/auth-ui";
 import { ErrorScreen, NotFoundScreen, OfflineBanner } from "../components/skeleton";
-import { registerServiceWorker } from "../lib/device";
+import { recoverFromStaleBuilds, registerServiceWorker } from "../lib/device";
 import { pageView } from "@/lib/analytics";
 import { jsonLd } from "@/components/equip/program-header";
 import { restoreEvicted } from "@/lib/durable";
@@ -27,7 +27,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
-  return <ErrorScreen reset={reset} />;
+  return <ErrorScreen reset={reset} error={error} />;
 }
 
 /* One place for what search engines and link previews read. The description says what iKAN
@@ -132,7 +132,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  useEffect(() => registerServiceWorker(), []);
+  useEffect(() => {
+    registerServiceWorker();
+    recoverFromStaleBuilds();
+  }, []);
 
   /* Screen views for GA4. The router is the source of the path on purpose: its matched route
    * id is the PATTERN ("/assessments/$slug"), so the condition someone screened for never

@@ -245,6 +245,41 @@ export function registerServiceWorker() {
   });
 }
 
+/* After a deploy the built files are renamed. A page that has been open since before it (Safari
+ * keeps tabs alive for days) then asks for files that no longer exist, and the import fails:
+ * "Importing a module script failed" in Safari, "Failed to fetch dynamically imported module"
+ * elsewhere. Reload once to pick up the new build; the flag stops a loop if reloading doesn't
+ * help, and is cleared once a page has loaded cleanly for a while. */
+const RELOADED = "ikan.reloaded-for-update";
+export const isStaleBuildError = (e: unknown) =>
+  /Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module|Unable to preload CSS/i.test(
+    e instanceof Error ? e.message : String(e),
+  );
+/** Reload to the new build, once. Returns false when it has already tried. */
+export function reloadForUpdate() {
+  try {
+    if (sessionStorage.getItem(RELOADED)) return false;
+    sessionStorage.setItem(RELOADED, String(Date.now()));
+  } catch {
+    /* no storage: still reload once, the error screen shows if it comes back */
+  }
+  window.location.reload();
+  return true;
+}
+export function recoverFromStaleBuilds() {
+  if (!hasWindow()) return;
+  window.addEventListener("vite:preloadError", (event) => {
+    if (reloadForUpdate()) event.preventDefault();
+  });
+  setTimeout(() => {
+    try {
+      sessionStorage.removeItem(RELOADED);
+    } catch {
+      /* nothing to clear */
+    }
+  }, 10_000);
+}
+
 /** While the app is open: show the daily mood reminder once, after the chosen time,
  * if there is no check-in yet today. */
 export function checkMoodReminder(opts: { enabled: boolean; time: string; loggedToday: boolean }) {
