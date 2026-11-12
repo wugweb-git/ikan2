@@ -56,7 +56,13 @@ import {
   useProfile,
   useSettings,
 } from "@/lib/profile";
-import { checkMoodReminder, refreshWeather, useDevice, weatherWord } from "@/lib/device";
+import {
+  checkMoodReminder,
+  notificationAccess,
+  refreshWeather,
+  useDevice,
+  weatherWord,
+} from "@/lib/device";
 import { syncMoodReminder } from "@/lib/local-reminders";
 import { enableNativePush, nativePushSupported } from "@/lib/native-push";
 import { autoSyncHealthConnect, recentAverage, useHealthConnect } from "@/lib/health-connect";
@@ -187,7 +193,9 @@ function Home() {
     // iPhone home screen, FCM in the Android app, where Web Push does not exist.
     if (nativePushSupported()) {
       if (!device.notificationsOff) void enableNativePush(prefs);
-    } else if (Notification?.permission === "granted" && !device.notificationsOff) {
+    } else if (notificationAccess() === "granted" && !device.notificationsOff) {
+      // not `Notification?.permission`: iPhone Safari and Chrome have no Notification at all
+      // outside a home-screen app, and naming it throws, which crashed the home page
       void import("@/lib/push").then((m) => m.enablePush(prefs));
     }
     checkMoodReminder({
