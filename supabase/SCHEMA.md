@@ -198,6 +198,17 @@ and **also writes one row here**, updating `status` on approve or reject. **No p
 rows hold private verification details, so only the service role reads or writes them. Added
 19 Nov 2026 with every application already in the KV store copied in.
 
+### Alert emails on every new row
+
+`AFTER INSERT` triggers (migration `20261119140000_alert_triggers.sql`) on
+`ikan2_contact_messages`, `ikan2_newsletter_subscribers`, `ikan2_partner_applications` and
+`auth.users` post `{ kind, record }` through `pg_net` to the `ikan2-alerts` edge function, which
+emails the team an iKAN-branded alert through the ikanhealth.in mailbox (Hostinger SMTP). A contact
+row whose subject starts "Pilot enquiry" is sent as a pilot lead. Partner alerts leave out
+`answers`. The trigger functions and the secret they send (`x-cron-secret`, the same as the
+reminders cron job) live in the `private` schema, which the API cannot reach. Mail settings are
+function secrets: `SMTP_PASS`, `ALERT_TO`.
+
 ---
 
 ## 2. The old site
