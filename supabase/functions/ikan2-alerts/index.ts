@@ -1,16 +1,21 @@
 // iKAN alert emails, sent through the ikanhealth.in mailbox on Hostinger (SMTP, port 465).
 //
-// Secrets (Supabase → Edge Functions → Secrets):
-//   SMTP_HOST  smtp.hostinger.com      SMTP_PORT  465
-//   SMTP_USER  the sending address     SMTP_PASS  its mailbox password (set by the owner only)
-//   ALERT_TO   where alerts go
+// Settings: host, port, sender and recipients are not secret, so they live in DEFAULTS below and
+// a Supabase secret of the same name overrides them. The one real secret is SMTP_PASS, the
+// mailbox password, which only the owner sets (Supabase → Edge Functions → Secrets).
 //
 // Stage 1: POST { "test": true } sends one test email to ALERT_TO. Nothing else is accepted yet;
 // the table triggers (contact, pilot lead, newsletter, partner application, new user) come next.
-// The recipient is fixed by a secret, so a caller cannot use this to mail anyone else.
+// The recipients are fixed by the function, so a caller cannot use it to mail anyone else.
 import nodemailer from "npm:nodemailer@6.9.16";
 
-const env = (k: string) => Deno.env.get(k) ?? "";
+const DEFAULTS: Record<string, string> = {
+  SMTP_HOST: "smtp.hostinger.com",
+  SMTP_PORT: "465",
+  SMTP_USER: "support@ikanhealth.in",
+  ALERT_TO: "vedanshu@wugweb.com, kartikchaturvedi91@gmail.com",
+};
+const env = (k: string) => Deno.env.get(k) || DEFAULTS[k] || "";
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
