@@ -12,7 +12,7 @@ import nodemailer from "npm:nodemailer@6.9.16";
 const DEFAULTS: Record<string, string> = {
   SMTP_HOST: "smtp.hostinger.com",
   SMTP_PORT: "465",
-  SMTP_USER: "support@ikanhealth.in",
+  SMTP_USER: "vedanshu@ikanhealth.in",
   ALERT_TO: "vedanshu@wugweb.com, kartikchaturvedi91@gmail.com",
 };
 const env = (k: string) => Deno.env.get(k) || DEFAULTS[k] || "";
