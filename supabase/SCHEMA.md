@@ -9,7 +9,7 @@ The single most useful fact about this database: **two different applications sh
 
 |                                         | Built on                   | Writes to                               | Last write  |
 | --------------------------------------- | -------------------------- | --------------------------------------- | ----------- |
-| **iKAN** (this repo, app.ikanhealth.in) | TanStack Start + Capacitor | 3 `ikan2_*` tables                      | today       |
+| **iKAN** (this repo, app.ikanhealth.in) | TanStack Start + Capacitor | `ikan2_*` tables                        | today       |
 | **The old site** (ikanhealth.in)        | Vite / React, on Vercel    | `kv_store_cc205da9` + 6 `user_*` tables | 24 Sep 2026 |
 
 They do not read each other's **tables** — nothing in `ikan2_user_state` is used by the old site,
@@ -167,6 +167,36 @@ create table public.ikan2_newsletter_subscribers (
 **Insert only**, as above. Signing up an address that is already on the list is a unique
 violation, which PostgREST returns as **409** — a form should show that as "already subscribed".
 There is no unsubscribe path through the API. Holds the old site's one `newsletter` row.
+
+### `ikan2_partner_applications` — partner applications, from the website
+
+```sql
+create table public.ikan2_partner_applications (
+  id               uuid        primary key default gen_random_uuid(),
+  created_at       timestamptz not null default now(),
+  application_id   text        not null unique,  -- the old site's id: professional_application:<id>
+  name             text        not null,
+  email            text        not null,
+  phone            text,
+  category         text,                         -- therapist | psychiatrist | counsellor …
+  credentials      text,
+  location         text,
+  pincode          text,
+  years_experience integer,
+  languages        text[]      not null default '{}',
+  status           text        not null default 'pending_review',  -- pending_review | approved | rejected
+  rejection_reason text,
+  reviewed_at      timestamptz,
+  answers          jsonb       not null default '{}',  -- the whole form: { contact, verification, profile }
+  source           text        not null default 'website'
+);
+```
+
+ikanhealth.in/join/partner posts to the old site's edge function (`/public/partner-application`),
+which still keeps its KV records (approval publishes the partner into the old site's directory)
+and **also writes one row here**, updating `status` on approve or reject. **No policies at all**:
+rows hold private verification details, so only the service role reads or writes them. Added
+19 Nov 2026 with every application already in the KV store copied in.
 
 ---
 
