@@ -47,6 +47,31 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const url = new URL(request.url);
+      const pathname = url.pathname;
+
+      // Cross-repo slug aliases from ikan marketing site
+      if (pathname === "/equip-programs" || pathname === "/equip-programs/") {
+        return Response.redirect(new URL("/program", request.url), 301);
+      }
+      if (pathname.startsWith("/equip-programs/")) {
+        const target = pathname.replace(/^\/equip-programs/, "/program");
+        return Response.redirect(new URL(target + url.search, request.url), 301);
+      }
+      if (pathname === "/consultation" || pathname === "/consultation/") {
+        return Response.redirect(new URL("/consult", request.url), 301);
+      }
+      if (pathname.startsWith("/consultation/")) {
+        const target = pathname.replace(/^\/consultation/, "/consult");
+        return Response.redirect(new URL(target + url.search, request.url), 301);
+      }
+      if (pathname === "/burnout-cost-calculator" || pathname === "/burnout-cost-calculator/") {
+        return Response.redirect(new URL("https://ikanhealth.in/burnout-cost-calculator/"), 302);
+      }
+      if (pathname === "/join/partner" || pathname === "/join/partner/") {
+        return Response.redirect(new URL("https://ikanhealth.in/join/partner/"), 302);
+      }
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
