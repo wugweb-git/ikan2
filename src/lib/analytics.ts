@@ -104,6 +104,9 @@ function load() {
     window.dataLayer!.push(args);
   };
   window.gtag("js", new Date());
+  window.gtag("set", "linker", {
+    domains: ["ikanhealth.in", "app.ikanhealth.in"],
+  });
   window.gtag("config", ID, {
     send_page_view: false,
     // Tells the two apart in one property: the Android build loads this same site in a WebView.
