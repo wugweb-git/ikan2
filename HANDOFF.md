@@ -12,7 +12,7 @@ A TanStack Start app at **app.ikanhealth.in**, hosted by Lovable, with a Capacit
 that loads that same live URL. **Web changes reach installed apps without a Play release** — only
 native changes (plugins, permissions, icon, version bump) need a new bundle.
 
-- Repo: `wugweb-git/ikan2`, one branch (`main`), CI on every push
+- Repo: `wugweb-git/ikan2`, one branch (`main`). **CI is switched off** — see Open item 9
 - Backend: Supabase project `jpfvoevxegnknxoqmwye` ("Ikan - App")
 - Android: `com.ikan.wugweb`
 - Deploy: push to `main`, then publish the Lovable project — **pushing alone does not publish**
@@ -151,6 +151,18 @@ Links, live once review clears:
 
 8. **Branch protection and secret scanning** are not enabled on GitHub. A `.env` was committed
    once already.
+
+9. **Both GitHub workflows are disabled**, by hand, in the Actions UI — `state=disabled_manually`
+   on CI and Backup alike. CI last ran on **12 October** against `ac0ab2b`; the **17 commits
+   pushed since then have had no typecheck, no lint and no build**, this document's own changes
+   included. Check them with `gh api repos/wugweb-git/ikan2/actions/workflows`.
+
+   Whoever turned them off probably did it to stop the Backup workflow failing nightly on its
+   missing secrets (item 1), and took CI with it. Re-enable CI first — `gh workflow enable CI` —
+   then run the gates locally once over the backlog, because the first green run afterwards will
+   only cover the commit that triggers it. `eslint .` takes several minutes on this tree, so give
+   it room. Leave Backup off until `IKAN_DB_URL` and `BACKUP_PASSPHRASE` exist; a workflow that
+   fails every night teaches everyone to ignore it.
 
 ## Things that will bite you
 
