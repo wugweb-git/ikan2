@@ -45,6 +45,20 @@ Links, live once review clears:
     guards in `src/lib/device.ts`.
   - An older-Safari regex fix (`ac7e341`).
   - Reloading once onto a new build instead of showing the error screen (`917b122`).
+- **The type scale became load-bearing (3 Oct).** `src/styles.css` is the single stylesheet and
+  the only place sizes are defined: 17 `type-*` roles, 96 `@utility` rules, brand tokens
+  (`--brand-teal/amber/coral/slate`), error tokens and motion tokens. 710 call sites moved from
+  arbitrary `text-[Npx]` onto roles; role uses went 8 → 772. Two traps found and fixed on the way:
+  **35 of 80 utilities never compiled** because Tailwind v4 only emits a utility it sees used —
+  `@source inline(...)` safelists them now, and `npm run lint` fails if one drifts out
+  (`scripts/check-safelist.mjs`). And `.prose-ikan` sat outside `@layer base`, so unlayered CSS
+  beat every `type-*` rule regardless of specificity. Values, per-breakpoint behaviour and the
+  remaining decisions are in `DESIGN-SYSTEM.md`.
+- **A primitive kit (`src/components/kit/`).** Chips, pills, badges, disclosures, cards
+  (`cardClass()` plus the assessment/equip/resource family), empty states, charts, search field,
+  external links, error states and the brand pieces — each with states and a Storybook story.
+  Buttons gained sizes, `elevated`/`destructive` variants and a loading state in
+  `src/components/equip/m3.tsx`. Reuse these before writing a new component.
 - **Others' work on `main`:**
   - partner applications table
   - branded alert emails sent by database triggers
@@ -58,6 +72,21 @@ Links, live once review clears:
 - **Content off JSON and into Supabase tables.** Planned, not started. Snapshots carry over as
   stored, and saved-answer keys (`day.n`, block keys) stay the same.
 - **Wellness score breakdown.** Next feature, not started.
+- **The signed-in screens have never been looked at since the type migration.** 39 route files
+  changed on 3 October; 12 are public and were checked live at phone width, and the other **27 are
+  behind the sign-in gate and were never seen** — home, journal, wellness, assessments, programmes,
+  history, resources, consult, settings, profile, notifications, diaries. Typecheck and lint cannot
+  see a cramped line or a clipped card, and **there is no test suite** (no `test` script, no
+  `*.test.*` files — the only gates are typecheck, lint and build). Ten minutes signed in on a
+  phone would cover more than any of them. The Android shell loads the live URL, so this is already
+  in front of users regardless of Play.
+- **Dark mode is built but unreachable.** Every token has a dark value and renders correctly when
+  `.dark` is forced, but nothing in `src` ever sets that class, so no user can get there. Either
+  wire a toggle or follow the system preference.
+- **`claude.ai/design` is still empty.** The 31 reference stories, the types and all 96 utilities
+  are ready in `.design-sync/`, but the project (`iKAN`) was never anchored or uploaded, and
+  `.design-sync/conventions.md` is unwritten. In-repo (`DESIGN-SYSTEM.md` + Storybook) is the
+  source of truth meanwhile.
 
 ## On hold
 
@@ -142,7 +171,7 @@ regenerating `bun.lock`, and generated `src/integrations/supabase/` — which is
 and excluded from lint. Expect CI to catch its next lockfile drift; the fix is `bun install` and
 commit.
 
-**Never send `document.title` to analytics.** On assessment and programme routes the title *is*
+**Never send `document.title` to analytics.** On assessment and programme routes the title _is_
 the condition. `src/lib/analytics.ts` maps route patterns to static labels for exactly this
 reason. Same rule for any new `track()` params: a programme slug is fine, an assessment slug is
 the diagnosis.
@@ -152,6 +181,8 @@ between deploys, so "my change isn't showing" usually means an unregister-and-re
 
 ## Where the detail lives
 
+- `DESIGN-SYSTEM.md` — the 17 type roles with their values, what `.prose-ikan` sets, the three
+  breakpoints, and every size still left undecided
 - `supabase/SCHEMA.md` — both applications sharing the database, and the JSON shape of every key
   in `ikan2_user_state`, which is where iKAN's real schema lives
 - `supabase/schema.sql` — structure only, no rows

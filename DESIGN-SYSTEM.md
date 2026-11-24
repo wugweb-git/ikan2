@@ -172,14 +172,15 @@ presents as a phone on a canvas, which is the product's own idea of itself.
 
 ## The gap between the scale and the screens
 
-Closed, mostly. The scale went from decorative to load-bearing on 3 October 2026:
+Closed. The scale went from decorative to load-bearing on 3 October 2026, and the work that
+followed kept using it rather than reaching for arbitrary sizes again:
 
-|                        | Before |   After |
-| ---------------------- | -----: | ------: |
-| `type-*` role uses     |      8 | **551** |
-| arbitrary `text-[Npx]` |    869 | **299** |
+|                        | Before | 3 Oct | Now (24 Nov) |
+| ---------------------- | -----: | ----: | -----------: |
+| `type-*` role uses     |      8 |   551 |      **772** |
+| arbitrary `text-[Npx]` |    869 |   299 |      **197** |
 
-710 call sites migrated by `scripts/migrate-type-roles.mjs`, in two passes:
+710 call sites were migrated on 3 October by `scripts/migrate-type-roles.mjs`, in two passes:
 
 - **85 provably identical** — size, line-height, weight and family already matched the role,
   so the swap changes nothing that renders (75 exact, 10 as `role font-x` where only the
@@ -189,20 +190,26 @@ Closed, mostly. The scale went from decorative to load-bearing on 3 October 2026
   The role supplies the intended value. This is a real rendering change, and the point of
   having a scale at all.
 
+The three sizes left open that day — sans 15/24, display 17 and 18, display 22 — were decided
+afterwards: 22 stays as it is, and the rest were folded into the roles above.
+
 ### What is deliberately left
 
-**248 sites**, because each needs a decision rather than a regex:
+**The automated migration is exhausted.** `node scripts/migrate-type-roles.mjs` now reports
+`exact 0, weight 0, leading 0` — every remaining site needs a decision rather than a regex.
+146 of them sit in quoted class strings the script can triage; it reports the breakdown live,
+and the long tail is one-offs at sizes no role covers:
 
-| Count | Case                                    | The question                                          |
-| ----: | --------------------------------------- | ----------------------------------------------------- |
-|    42 | sans 15px, line-height 24               | Action is 15/22. Is 24 intentional, or drift from 22? |
-|    26 | display 18px                            | No role at 18. Between Title M (16) and Title L (20)  |
-|    22 | display 17px                            | Card titles. Body XL is 17 but sans, not display      |
-|    20 | display 22px                            | Title L moved to 20; these did not follow             |
-|    17 | sans 11px                               | Below Label M (12). A Label S would cover it          |
-|    15 | relative leading (`leading-tight` etc.) | Resolves against font-size, so no fixed role matches  |
-|    11 | explicit `tracking-*`                   | The call site overrides the role's own tracking       |
-|    95 | assorted line-height mismatches         | Mostly 16/24 and 12/20 — one or the other is wrong    |
+| Count | Case                                    | The question                                           |
+| ----: | --------------------------------------- | ------------------------------------------------------ |
+|    17 | sans 11px                               | Below Label M (12). A Label S would cover it           |
+|    15 | relative leading (`leading-tight` etc.) | Resolves against font-size, so no fixed role matches   |
+|    15 | sans 16px, line-height 24               | Title M is display 16/24; Body L is sans 16/26. Which? |
+|    11 | explicit `tracking-*`                   | The call site overrides the role's own tracking        |
+|    10 | sans 15px, line-height 20               | Action is 15/22. Neither 20 nor 24 matches             |
+|     8 | sans 10px                               | Smaller than anything in the scale                     |
+|     7 | display 26px                            | Between Headline S (24) and Headline M (28)            |
+|    57 | assorted sizes with no role             | display 14-44px one-offs, and line-height mismatches   |
 
-Run `node scripts/migrate-type-roles.mjs` for the current breakdown. The script is the
-triage tool, not a one-off.
+Each one is a question for a designer, not a script. Run the script for the current list before
+touching any of them — the counts move as screens are rebuilt.
