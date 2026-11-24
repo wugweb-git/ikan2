@@ -87,6 +87,13 @@ Links, live once review clears:
 
 ## Things that will bite you
 
+**Alert emails go out from here, not WordPress.** Since 19 Nov, `AFTER INSERT` triggers on the
+contact, newsletter and partner-application tables and on `auth.users` call the `ikan2-alerts` edge
+function, which emails the team an iKAN-branded alert over Hostinger SMTP (secrets `SMTP_PASS`,
+`ALERT_TO`; the trigger secret sits in the `private` schema). Details in `supabase/SCHEMA.md`. The
+old site's WordPress sync may also notify on the same rows, so a duplicate is possible; deciding
+which one stays is open in the `ikan` repo's `docs/PENDING.md`.
+
 **Articles are behind the sign-in gate.** `resources` is not in the PUBLIC allowlist in
 `src/components/auth-ui.tsx`. The article cards are real links with `Article` JSON-LD and correct
 headings — all of it invisible to crawlers until that route is made public. The sitemap lists
