@@ -1,6 +1,7 @@
 # iKAN — where things stand
 
-Last updated 28 September 2026.
+Last updated 24 November 2026. The "In flight" and numbered "Open" items below were last checked
+on 28 September; recheck them before acting on them.
 
 Read this first in a new session. It is the current state, not a history; the reasoning behind
 each change is in the commit messages, and the database is documented in `supabase/SCHEMA.md`.
@@ -28,6 +29,43 @@ different code, shares only the Supabase auth users. Do not confuse the two.
 Links, live once review clears:
 `https://play.google.com/apps/testing/com.ikan.wugweb`
 `https://play.google.com/store/apps/details?id=com.ikan.wugweb`
+
+## Shipped since 28 September
+
+- **Equip: four programmes live.** Sleep Tight, Unburn, Stress Buster and Productivity Reset
+  (rebuilt as 10 days, with its About page, cover and highlight tiles). Each one's content is in
+  `src/lib/equip/content/*.json`.
+- **Finished things are records.** Assessment results (`src/lib/assessment/frozen.ts`) and Equip
+  summaries, highlights and diaries (`src/lib/equip/seal.ts`) are stored once, when finished, and
+  never recomputed. Content edits only reach runs in progress and future runs.
+- **Resources: 28 articles**, built from the blocks in `src/lib/content/RESOURCES.md`.
+- **iPhone fixes.**
+  - The signed-in home page crashed on iPhone Safari and Chrome because `Notification` doesn't
+    exist outside a home-screen app (`fdc685e`). Never name a browser global bare; use the
+    guards in `src/lib/device.ts`.
+  - An older-Safari regex fix (`ac7e341`).
+  - Reloading once onto a new build instead of showing the error screen (`917b122`).
+- **Others' work on `main`:**
+  - partner applications table
+  - branded alert emails sent by database triggers
+  - cross-domain analytics linker, with optional Microsoft Clarity
+  - cross-repo slug routes
+
+## Pending
+
+- **Check on a real iPhone** that the signed-in home page opens in Safari and Chrome. The
+  WebKit test passed, but only on an account with no saved data.
+- **Content off JSON and into Supabase tables.** Planned, not started. Snapshots carry over as
+  stored, and saved-answer keys (`day.n`, block keys) stay the same.
+- **Wellness score breakdown.** Next feature, not started.
+
+## On hold
+
+- **Programme 5, "Read Between the Lines"** (kids, two age tracks). Waiting on answers about
+  consent and safeguarding. Don't build it until they come back.
+- **CRM: HubSpot is dropped.** FluentCRM will do that job. Don't build HubSpot exports or sync.
+- **Article "External" sections** wait on a recommendation engine. Assessment-to-programme
+  recommendations are set by hand in `src/lib/assessment/instruments.ts` for now.
 
 ## Open, in rough priority order
 
