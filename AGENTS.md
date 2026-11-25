@@ -15,3 +15,4 @@
   earlier rule to keep it public no longer applies.
 - Keep marketing demonstrations sourced from existing assessment, programme, journal, resource, and consultant data, so published claims remain aligned with the app.
 - Write every Resources article from the shared building blocks in `src/lib/content/RESOURCES.md` (enforced by `scripts/check-resources.ts`) (headings, lists, chart cards, data tables, the sources card, pictures, outside links), and run `bun run check:resources` before pushing; CI fails on anything outside that vocabulary.
+- Client assessment screens use `src/lib/assessment` rather than querying the legacy assessment configuration tables, so their restricted database access does not break public assessment flows.
