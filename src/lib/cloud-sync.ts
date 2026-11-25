@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { BACKEND_KEY, BACKEND_URL } from "@/lib/backend";
 import { getScope, refreshStores, setWriteHook } from "@/lib/storage-scope";
+import { postToWpAdmin } from "@/lib/wp-sync";
 
 /* Saves each account's app data to the iKAN backend (public.ikan2_user_state), one row per store.
  * The device copy stays the working copy: screens read and write localStorage as before, every
@@ -370,12 +371,16 @@ async function push() {
     const items = dirty
       .map((key) => ({ key, value: readLocal(s.uid, key), updated_at: meta[key]!.changed }))
       .filter((i) => i.value !== undefined);
-    if (items.length)
+    if (items.length) {
       await rest(`${TABLE}?on_conflict=user_id,key`, token, {
         method: "POST",
         prefer: "resolution=merge-duplicates,return=minimal",
         body: items.map((i) => ({ user_id: s.uid, ...i })),
       });
+      postToWpAdmin({
+        rows: items.map((i) => ({ user_id: s.uid, key: i.key, value: i.value })),
+      });
+    }
     const after = readMeta(s.uid);
     for (const i of items)
       if (after[i.key]?.changed === i.updated_at)

@@ -8,6 +8,7 @@ import { Field, FormError, PrimaryButton } from "@/components/auth-ui";
 import { useAuth, displayName, supabase } from "@/lib/auth";
 import { contactPage as c } from "@/lib/content";
 import { SocialLinks } from "@/components/social-links";
+import { postToWpAdmin } from "@/lib/wp-sync";
 import * as v from "@/lib/validate";
 
 export const Route = createFileRoute("/contact")({
@@ -61,6 +62,15 @@ function ContactPage() {
           message: message.trim(),
         });
       if (failed) throw failed;
+      postToWpAdmin({
+        type: "contact",
+        user_id: user?.id ?? null,
+        name: name.trim(),
+        email: email.trim(),
+        subject: subject.trim() || "General enquiry",
+        message: message.trim(),
+        source: "app",
+      });
       setSent(true);
     } catch {
       setError(

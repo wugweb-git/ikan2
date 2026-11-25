@@ -5,6 +5,7 @@ import { claimGuestData, getScope, setScope } from "@/lib/storage-scope";
 
 import { BACKEND_KEY, BACKEND_URL } from "@/lib/backend";
 import { isNativeApp, listenForNativeAuth, nativeOAuth } from "@/lib/native-auth";
+import { deviceMeta, postToWpAdmin } from "@/lib/wp-sync";
 
 /* Accounts live in the iKAN Supabase project (see backend.ts). */
 
@@ -158,6 +159,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // history from the old iKan app was copied into ikan2_user_state on 7 Oct 2026, for every
         // account that had any, so the account's own rows are the whole story now
         void startCloudSync(s.user.id, token);
+        const meta = (s.user.user_metadata ?? {}) as Record<string, unknown>;
+        postToWpAdmin({
+          type: "auth_login",
+          user: {
+            id: s.user.id,
+            email: s.user.email ?? "",
+            name: String(meta["full_name"] ?? meta["name"] ?? ""),
+            phone: s.user.phone ?? "",
+            provider: String(s.user.app_metadata?.provider ?? "email"),
+            created_at: s.user.created_at,
+          },
+          device: deviceMeta(),
+        });
       }
     } else {
       if (getScope() !== "guest") stopCloudSync();
@@ -217,6 +231,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // an existing, confirmed email comes back with no identities
       if (data.user && !data.user.identities?.length)
         throw new Error(friendly("user_already_exists"));
+      postToWpAdmin({
+        type: "auth_signup",
+        user: {
+          id: data.user?.id ?? "",
+          email: email.trim(),
+          name: name.trim(),
+          phone: phone ?? "",
+          provider: "email",
+          created_at: data.user?.created_at ?? new Date().toISOString(),
+        },
+        device: deviceMeta(),
+      });
       return data.session ? "signedIn" : "confirm";
     },
     signInWith: async (provider) => {
@@ -270,6 +296,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         redirectTo: `${origin()}/reset-password`,
       });
       if (error) throw new Error(friendly(error.message));
+      postToWpAdmin({
+        type: "auth_forgot_password",
+        user: { email: email.trim() },
+        device: deviceMeta(),
+      });
     },
     updatePassword: async (password) => {
       const { error } = await supabase().auth.updateUser({ password });
