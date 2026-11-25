@@ -1,6 +1,6 @@
 # iKAN — where things stand
 
-Last updated 24 November 2026. The "In flight" and numbered "Open" items below were last checked
+Last updated 25 November 2026. The "In flight" and numbered "Open" items below were last checked
 on 28 September; recheck them before acting on them.
 
 Read this first in a new session. It is the current state, not a history; the reasoning behind
@@ -12,7 +12,7 @@ A TanStack Start app at **app.ikanhealth.in**, hosted by Lovable, with a Capacit
 that loads that same live URL. **Web changes reach installed apps without a Play release** — only
 native changes (plugins, permissions, icon, version bump) need a new bundle.
 
-- Repo: `wugweb-git/ikan2`, one branch (`main`). **CI is switched off** — see Open item 9
+- Repo: `wugweb-git/ikan2`, one branch (`main`). **CI is active** (`.github/workflows/ci.yml` re-enabled 25 Nov)
 - Backend: Supabase project `jpfvoevxegnknxoqmwye` ("Ikan - App")
 - Android: `com.ikan.wugweb`
 - Deploy: push to `main`, then publish the Lovable project — **pushing alone does not publish**
@@ -69,8 +69,8 @@ Links, live once review clears:
 
 - **Check on a real iPhone** that the signed-in home page opens in Safari and Chrome. The
   WebKit test passed, but only on an account with no saved data.
-- **Content off JSON and into Supabase tables.** Planned, not started. Snapshots carry over as
-  stored, and saved-answer keys (`day.n`, block keys) stay the same.
+- **Content off JSON and into `wp-admin` (`ikan` repo).** Planned, not started. Snapshots carry
+  over as stored, and saved-answer keys (`day.n`, block keys) stay the same.
 - **Wellness score breakdown.** Next feature, not started.
 - **The signed-in screens have never been looked at since the type migration.** 39 route files
   changed on 3 October; 12 are public and were checked live at phone width, and the other **27 are
@@ -80,9 +80,8 @@ Links, live once review clears:
   `*.test.*` files — the only gates are typecheck, lint and build). Ten minutes signed in on a
   phone would cover more than any of them. The Android shell loads the live URL, so this is already
   in front of users regardless of Play.
-- **Dark mode is built but unreachable.** Every token has a dark value and renders correctly when
-  `.dark` is forced, but nothing in `src` ever sets that class, so no user can get there. Either
-  wire a toggle or follow the system preference.
+- **Dark mode is deferred.** Every token has a dark value and renders correctly when `.dark` is
+  forced, but nothing in `src` sets that class. Deferred for now.
 - **`claude.ai/design` is still empty.** The 31 reference stories, the types and all 96 utilities
   are ready in `.design-sync/`, but the project (`iKAN`) was never anchored or uploaded, and
   `.design-sync/conventions.md` is unwritten. In-repo (`DESIGN-SYSTEM.md` + Storybook) is the
@@ -152,26 +151,18 @@ Links, live once review clears:
 8. **Branch protection and secret scanning** are not enabled on GitHub. A `.env` was committed
    once already.
 
-9. **Both GitHub workflows are disabled**, by hand, in the Actions UI — `state=disabled_manually`
-   on CI and Backup alike. CI last ran on **12 October** against `ac0ab2b`; the **17 commits
-   pushed since then have had no typecheck, no lint and no build**, this document's own changes
-   included. Check them with `gh api repos/wugweb-git/ikan2/actions/workflows`.
-
-   Whoever turned them off probably did it to stop the Backup workflow failing nightly on its
-   missing secrets (item 1), and took CI with it. Re-enable CI first — `gh workflow enable CI` —
-   then run the gates locally once over the backlog, because the first green run afterwards will
-   only cover the commit that triggers it. `eslint .` takes several minutes on this tree, so give
-   it room. Leave Backup off until `IKAN_DB_URL` and `BACKUP_PASSPHRASE` exist; a workflow that
-   fails every night teaches everyone to ignore it.
+9. **Backup workflow is disabled (`state=disabled_manually`).** CI (`.github/workflows/ci.yml`)
+   was re-enabled on 25 Nov (`gh workflow enable CI`). Leave Backup off until `IKAN_DB_URL` and
+   `BACKUP_PASSPHRASE` exist; a workflow that fails every night teaches everyone to ignore it.
 
 ## Things that will bite you
 
-**Alert emails go out from here, not WordPress.** Since 19 Nov, `AFTER INSERT` triggers on the
-contact, newsletter and partner-application tables and on `auth.users` call the `ikan2-alerts` edge
-function, which emails the team an iKAN-branded alert over Hostinger SMTP (secrets `SMTP_PASS`,
-`ALERT_TO`; the trigger secret sits in the `private` schema). Details in `supabase/SCHEMA.md`. The
-old site's WordPress sync may also notify on the same rows, so a duplicate is possible; deciding
-which one stays is open in the `ikan` repo's `docs/PENDING.md`.
+**Alert emails are mapped to `wp-admin` in `ikan`, not here.** Since 19 Nov, `AFTER INSERT` triggers
+on the contact, newsletter and partner-application tables and on `auth.users` call the `ikan2-alerts`
+edge function, which emails an iKAN-branded alert over Hostinger SMTP (secrets `SMTP_PASS`,
+`ALERT_TO`; the trigger secret sits in the `private` schema). Details in `supabase/SCHEMA.md`.
+Because these alerts are mapped with `wp-admin` in the `ikan` repo, `ikan2-alerts` is redundant
+and can be disabled/dropped if `ikan` handles all of them.
 
 **Articles are behind the sign-in gate.** `resources` is not in the PUBLIC allowlist in
 `src/components/auth-ui.tsx`. The article cards are real links with `Article` JSON-LD and correct
