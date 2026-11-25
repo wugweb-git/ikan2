@@ -119,18 +119,19 @@ function load() {
   document.head.appendChild(s);
 
   if (CLARITY_ID) {
-    (function (c: any, l: any, a: any, r: any, i: any, t?: any, y?: any) {
-      c[a] =
-        c[a] ||
-        function () {
-          (c[a].q = c[a].q || []).push(arguments);
-        };
-      t = l.createElement(r);
-      t.async = 1;
-      t.src = "https://www.clarity.ms/tag/" + i;
-      y = l.getElementsByTagName(r)[0];
-      y.parentNode.insertBefore(t, y);
-    })(window, document, "clarity", "script", CLARITY_ID);
+    type ClarityFn = ((...args: unknown[]) => void) & { q?: unknown[][] };
+    const w = window as unknown as { clarity?: ClarityFn };
+    const fn: ClarityFn =
+      w.clarity ??
+      function (...args: unknown[]) {
+        (fn.q = fn.q ?? []).push(args);
+      };
+    w.clarity = fn;
+    const t = document.createElement("script");
+    t.async = true;
+    t.src = "https://www.clarity.ms/tag/" + CLARITY_ID;
+    const y = document.getElementsByTagName("script")[0];
+    y?.parentNode?.insertBefore(t, y);
   }
 }
 

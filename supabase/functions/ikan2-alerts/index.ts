@@ -139,7 +139,8 @@ function render(kind: Kind, e: Email, at: string): string {
 </body></html>`;
 }
 
-const mailto = (address: string, subject: string) => `mailto:${address}?subject=${encodeURIComponent(subject)}`;
+const mailto = (address: string, subject: string) =>
+  `mailto:${address}?subject=${encodeURIComponent(subject)}`;
 const link = (href: string, text: string) =>
   `<a href="${esc(href)}" style="color:${C.ink};text-decoration:underline;">${esc(text)}</a>`;
 
@@ -165,7 +166,9 @@ function compose(kind: Kind, r: Row): Email {
           ["From", esc(from(r.source))],
         ],
         body: { label: "What they sent", text: str(r.message) },
-        cta: address ? { label: `Reply to ${who}`, href: mailto(address, "Re: your iKAN pilot enquiry") } : undefined,
+        cta: address
+          ? { label: `Reply to ${who}`, href: mailto(address, "Re: your iKAN pilot enquiry") }
+          : undefined,
       };
     }
     case "contact": {
@@ -181,13 +184,17 @@ function compose(kind: Kind, r: Row): Email {
           ["From", esc(from(r.source))],
         ],
         body: { label: "Message", text: str(r.message) },
-        cta: address ? { label: `Reply to ${who}`, href: mailto(address, `Re: ${subject}`) } : undefined,
+        cta: address
+          ? { label: `Reply to ${who}`, href: mailto(address, `Re: ${subject}`) }
+          : undefined,
       };
     }
     case "partner_application": {
       const type = str(r.category);
       const typeLabel = type ? type.charAt(0).toUpperCase() + type.slice(1) : "";
-      const langs = Array.isArray(r.languages) ? (r.languages as unknown[]).map(str).filter(Boolean).join(", ") : "";
+      const langs = Array.isArray(r.languages)
+        ? (r.languages as unknown[]).map(str).filter(Boolean).join(", ")
+        : "";
       const years = str(r.years_experience) ? `${str(r.years_experience)} years` : "";
       const place = [str(r.location), str(r.pincode)].filter(Boolean).join(", ");
       const phone = str(r.phone);
@@ -221,7 +228,14 @@ function compose(kind: Kind, r: Row): Email {
       };
     case "new_user": {
       const p = str(r.provider);
-      const method = p === "google" ? "Google" : p === "linkedin_oidc" ? "LinkedIn" : p === "email" ? "Email and password" : p;
+      const method =
+        p === "google"
+          ? "Google"
+          : p === "linkedin_oidc"
+            ? "LinkedIn"
+            : p === "email"
+              ? "Email and password"
+              : p;
       return {
         subject: `New user: ${who}`,
         title: who || "New account",
@@ -239,9 +253,38 @@ function compose(kind: Kind, r: Row): Email {
 
 const SAMPLE = { name: "Test Person", email: "test@example.com" };
 const SAMPLES: [Kind, Row][] = [
-  ["pilot_lead", { ...SAMPLE, subject: "Pilot enquiry, Example Co, 250 people", message: "This is a sample pilot lead.\nHeadcount: 250\nEstimated annual cost: ₹1.2 crore", source: "website" }],
-  ["contact", { ...SAMPLE, subject: "General enquiry", message: "This is a sample contact message.", source: "website" }],
-  ["partner_application", { ...SAMPLE, name: "Dr Test Person", phone: "+91 98765 43210", category: "counselor", credentials: "MA Clinical Psychology", years_experience: 6, location: "Bengaluru", pincode: "560001", languages: ["English", "हिन्दी"] }],
+  [
+    "pilot_lead",
+    {
+      ...SAMPLE,
+      subject: "Pilot enquiry, Example Co, 250 people",
+      message: "This is a sample pilot lead.\nHeadcount: 250\nEstimated annual cost: ₹1.2 crore",
+      source: "website",
+    },
+  ],
+  [
+    "contact",
+    {
+      ...SAMPLE,
+      subject: "General enquiry",
+      message: "This is a sample contact message.",
+      source: "website",
+    },
+  ],
+  [
+    "partner_application",
+    {
+      ...SAMPLE,
+      name: "Dr Test Person",
+      phone: "+91 98765 43210",
+      category: "counselor",
+      credentials: "MA Clinical Psychology",
+      years_experience: 6,
+      location: "Bengaluru",
+      pincode: "560001",
+      languages: ["English", "हिन्दी"],
+    },
+  ],
   ["newsletter", { ...SAMPLE, source: "app" }],
   ["new_user", { ...SAMPLE, provider: "google" }],
 ];
@@ -276,12 +319,19 @@ async function send(kind: Kind, r: Row, test = false) {
   });
 }
 
-const KINDS = new Set<Kind>(["pilot_lead", "contact", "partner_application", "newsletter", "new_user"]);
+const KINDS = new Set<Kind>([
+  "pilot_lead",
+  "contact",
+  "partner_application",
+  "newsletter",
+  "new_user",
+]);
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
   const secret = Deno.env.get("PUSH_CRON_SECRET") ?? "";
-  if (!secret || req.headers.get("x-cron-secret") !== secret) return json({ error: "Forbidden" }, 403);
+  if (!secret || req.headers.get("x-cron-secret") !== secret)
+    return json({ error: "Forbidden" }, 403);
   const missing = ["SMTP_PASS", "ALERT_TO"].filter((k) => !env(k));
   if (missing.length) return json({ sent: false, missing }, 412);
 
@@ -289,12 +339,14 @@ Deno.serve(async (req) => {
   try {
     if (body?.test === true) {
       const out = [];
-      for (const [kind, row] of SAMPLES) out.push({ kind, response: (await send(kind, row, true)).response });
+      for (const [kind, row] of SAMPLES)
+        out.push({ kind, response: (await send(kind, row, true)).response });
       return json({ sent: true, test: true, out });
     }
     const kind = body?.kind as Kind;
     const record = body?.record as Row;
-    if (!KINDS.has(kind) || !record || typeof record !== "object") return json({ error: "Expected { kind, record }" }, 400);
+    if (!KINDS.has(kind) || !record || typeof record !== "object")
+      return json({ error: "Expected { kind, record }" }, 400);
     const info = await send(kind, record);
     return json({ sent: true, kind, response: info.response });
   } catch (e) {
