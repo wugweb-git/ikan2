@@ -212,7 +212,14 @@ export function merge(name: string, local: unknown, remote: unknown): unknown {
       tracker,
     };
   }
-  return local; // profile, settings, onboarding: the device's newer edit wins
+  if (name === "profile.v1") {
+    const out: Obj = { ...r };
+    for (const [k, val] of Object.entries(l)) {
+      if (val !== "" && val !== undefined && val !== null) out[k] = val;
+    }
+    return out;
+  }
+  return local; // settings, onboarding: the device's newer edit wins
 }
 
 /* ----------------------------- session ----------------------------- */
@@ -277,6 +284,10 @@ function flushOnReconnect() {
     schedulePush(0);
   };
   window.addEventListener("online", flush);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flush();
+  });
+  window.addEventListener("pagehide", flush);
   void import("@capacitor/core")
     .then(({ Capacitor }) => (Capacitor.isNativePlatform() ? import("@capacitor/network") : null))
     .then((mod) => {
@@ -402,3 +413,8 @@ export async function clearCloudData() {
 
 /** Retry now, e.g. from Settings after an error. */
 export const syncNow = () => void pull();
+export const flushCloudSync = () => {
+  if (!session || !cloudConfigured || !hasPending(session.uid)) return;
+  window.clearTimeout(timer);
+  void push();
+};

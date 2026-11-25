@@ -43,6 +43,7 @@ import { cn } from "@/lib/utils";
 import { useEverything } from "@/lib/activity";
 import { programmes } from "@/lib/equip/programs";
 import { useNotifications } from "@/lib/notifications";
+import { flushCloudSync } from "@/lib/cloud-sync";
 import {
   defaultProfile,
   profileInitials,
@@ -71,9 +72,10 @@ function ProfilePage() {
   useEffect(() => preloadGoogle(), []);
   const fileInput = useRef<HTMLInputElement>(null);
 
+  const editedRef = useRef(false);
   useEffect(() => {
-    if (hydrated) setDraft(profile);
-  }, [hydrated]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (hydrated && !editedRef.current) setDraft(profile);
+  }, [hydrated, profile]);
 
   const p = hydrated ? profile : defaultProfile;
   const dirty = hydrated && JSON.stringify(draft) !== JSON.stringify(profile);
@@ -92,7 +94,10 @@ function ProfilePage() {
   });
   const field = (key: keyof Profile) => ({
     value: draft[key],
-    onChange: (val: string) => setDraft((d) => ({ ...d, [key]: val })),
+    onChange: (val: string) => {
+      editedRef.current = true;
+      setDraft((d) => ({ ...d, [key]: val }));
+    },
     error: showErrors ? errors[key] : undefined,
   });
 
@@ -436,7 +441,14 @@ function ProfilePage() {
 
         {dirty ? (
           <div className="sticky bottom-[88px] z-20 mt-6 flex gap-2 bg-gradient-to-t from-background via-background to-transparent px-4 pb-3 pt-6">
-            <Button variant="outlined" className="flex-1" onClick={() => setDraft(profile)}>
+            <Button
+              variant="outlined"
+              className="flex-1"
+              onClick={() => {
+                editedRef.current = false;
+                setDraft(profile);
+              }}
+            >
               Discard
             </Button>
             <Button
@@ -453,6 +465,8 @@ function ProfilePage() {
                   email: draft.email.trim(),
                   city: draft.city.trim(),
                 });
+                editedRef.current = false;
+                flushCloudSync();
                 setShowErrors(false);
                 snack.show("Profile saved");
               }}

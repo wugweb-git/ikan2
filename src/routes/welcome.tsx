@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Bell, Check, Clock3, Footprints, ListChecks, MapPin } from "lucide-react";
 import { Illustration } from "@/components/art";
 import {
@@ -23,6 +23,7 @@ import {
   useNotificationAccess,
   type Access,
 } from "@/lib/device";
+import { flushCloudSync } from "@/lib/cloud-sync";
 import { profileInitials, useOnboarding, useProfile } from "@/lib/profile";
 import type { Art } from "@/lib/resources";
 import * as v from "@/lib/validate";
@@ -258,25 +259,33 @@ function AboutYou({
     zip: "",
     bio: "",
   });
-  const [loaded, setLoaded] = useState(false);
+  const editedRef = useRef<Set<keyof typeof draft>>(new Set());
   const [tried, setTried] = useState(false);
   useEffect(() => preloadGoogle(), []);
   useEffect(() => {
-    if (loaded) return;
     // older profiles say "Male"/"Female" and keep the PIN inside the city ("Noida, 201310")
     const gender =
       { male: "Man", female: "Woman" }[profile.gender.trim().toLowerCase()] ?? profile.gender;
     const pinInCity = profile.city.match(/[,\s]+([1-9]\d{5})\s*$/);
-    setDraft({
+    const hydratedDraft = {
       birthday: profile.birthday,
       gender: v.genders.includes(gender) ? gender : "",
       maritalStatus: profile.maritalStatus,
       city: pinInCity ? profile.city.slice(0, pinInCity.index).trim() : profile.city,
       zip: profile.zip || pinInCity?.[1] || "",
       bio: profile.bio,
-    });
-    setLoaded(true);
-  }, [profile, loaded]);
+    };
+    setDraft((prev) => ({
+      birthday: editedRef.current.has("birthday") ? prev.birthday : hydratedDraft.birthday,
+      gender: editedRef.current.has("gender") ? prev.gender : hydratedDraft.gender,
+      maritalStatus: editedRef.current.has("maritalStatus")
+        ? prev.maritalStatus
+        : hydratedDraft.maritalStatus,
+      city: editedRef.current.has("city") ? prev.city : hydratedDraft.city,
+      zip: editedRef.current.has("zip") ? prev.zip : hydratedDraft.zip,
+      bio: editedRef.current.has("bio") ? prev.bio : hydratedDraft.bio,
+    }));
+  }, [profile]);
 
   const { errors, ok } = v.validate(draft, {
     birthday: v.birthday,
@@ -286,7 +295,10 @@ function AboutYou({
     zip: v.pin,
     bio: v.maxLength(500, "this"),
   });
-  const set = (k: keyof typeof draft) => (val: string) => setDraft((d) => ({ ...d, [k]: val }));
+  const set = (k: keyof typeof draft) => (val: string) => {
+    editedRef.current.add(k);
+    setDraft((d) => ({ ...d, [k]: val }));
+  };
   const err = (k: keyof typeof draft) => (tried ? errors[k] : undefined);
   const today = new Date().toISOString().slice(0, 10);
 
@@ -356,6 +368,7 @@ function AboutYou({
           setTried(true);
           if (!ok) return;
           save({ ...draft, city: draft.city.trim(), bio: draft.bio.trim() });
+          flushCloudSync();
           onDone();
         }}
       >
