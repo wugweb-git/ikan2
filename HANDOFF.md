@@ -14,6 +14,7 @@ native changes (plugins, permissions, icon, version bump) need a new bundle.
 
 - Repo: `wugweb-git/ikan2`, one branch (`main`). **CI is active** (`.github/workflows/ci.yml` re-enabled 25 Nov)
 - Backend: Supabase project `jpfvoevxegnknxoqmwye` ("Ikan - App")
+- Fulfillment & persistence: `wp-admin` in `wugweb-git/ikan` — **`ikan2` takes requests; `wp-admin` fulfills them** (all data goes there, and all triggered emails, PDFs, etc. originate from `wp-admin`)
 - Android: `com.ikan.wugweb`
 - Deploy: push to `main`, then publish the Lovable project — **pushing alone does not publish**
 
