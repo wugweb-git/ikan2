@@ -11,7 +11,7 @@ class PermissionsRationaleActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         startActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://app.ikanhealth.in/legal/privacy-policy")),
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://ikanhealth.in/privacy-policy/")),
         )
         finish()
     }
