@@ -4,10 +4,12 @@ import { cn } from "@/lib/utils";
 /** The person's photo filling its circle; shows `children` (initials) if there is none or it fails. */
 export function ProfilePhoto({
   src,
+  alt = "Profile photo",
   className,
   children,
 }: {
   src?: string | undefined;
+  alt?: string;
   className?: string;
   children: ReactNode;
 }) {
@@ -16,7 +18,7 @@ export function ProfilePhoto({
     return (
       <img
         src={src}
-        alt=""
+        alt={alt}
         referrerPolicy="no-referrer"
         onError={() => setFailed(src)}
         className={cn("h-full w-full rounded-full object-cover", className)}

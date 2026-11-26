@@ -8,7 +8,12 @@ import { Disclosure, DisclosureGroup } from "@/components/kit/disclosure";
 import { SearchField } from "@/components/kit/search-field";
 
 export const Route = createFileRoute("/faq")({
-  head: () => pageMeta(f.heroTitle, f.heroSubtitle, "/faq"),
+  head: () =>
+    pageMeta(f.heroTitle, f.heroSubtitle, "/faq", [
+      "iKAN FAQ",
+      "mental health app privacy",
+      "how iKAN assessments work",
+    ]),
   component: FaqPage,
 });
 

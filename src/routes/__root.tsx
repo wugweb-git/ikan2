@@ -56,6 +56,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "msapplication-TileColor", content: "#151515" },
       { title: "iKAN — Mental wellness that fits your day" },
       { name: "description", content: SITE_DESCRIPTION },
+      {
+        name: "keywords",
+        content:
+          "mental health app India, mental wellness check-in, PHQ-9, GAD-7, burnout recovery, sleep programme, mood journal, online therapy India, iKAN Health",
+      },
       { name: "author", content: "iKAN" },
       { name: "robots", content: "index, follow" },
       { property: "og:site_name", content: "iKAN" },
@@ -78,6 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "alternate", type: "text/plain", href: "/llms.txt", title: "AI Context" },
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon", sizes: "any" },

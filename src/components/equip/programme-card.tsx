@@ -20,7 +20,11 @@ export function ProgrammeCard({ programme }: { programme: Programme }) {
       style={accentStyle(programme.accent)}
       className={cn("flex overflow-hidden rounded-[24px] bg-secondary", stateLayer)}
     >
-      <img src={programme.cover} alt="" className="w-[112px] shrink-0 object-cover" />
+      <img
+        src={programme.cover}
+        alt={`${programme.name} programme cover`}
+        className="w-[112px] shrink-0 object-cover"
+      />
       <div className="flex min-w-0 flex-1 flex-col p-4">
         <p className="type-title-lg">{programme.name}</p>
         {src.description ? (

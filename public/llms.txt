@@ -1,0 +1,19 @@
+# iKAN Health (app.ikanhealth.in / ikanhealth.in)
+
+> iKAN is a mental health and workplace wellbeing platform for India, combining clinically validated self-assessments, structured daily self-help programmes (iKAN Equip), mood journaling, research-backed resources, and therapist consultations.
+
+## Core Offerings
+- **Validated Assessments** (`https://app.ikanhealth.in/assessments`): Short, evidence-based screenings for depression (PHQ-9), anxiety (GAD-7), perceived stress (PSS-10), insomnia severity (ISI), workplace strain, burnout (BAT-23), and general wellbeing. Screenings are informational and not a medical diagnosis.
+- **iKAN Equip Programmes** (`https://app.ikanhealth.in/program`, `https://ikanhealth.in/equip-programs/`): Multi-day guided programmes including *Sleep Tight*, *Unburn*, *Stress Buster*, and *Productivity Reset*.
+- **Mood Journal & iKAN Wellness Score** (`https://app.ikanhealth.in/journal`, `https://app.ikanhealth.in/wellness`): Quick daily check-ins for mood, sleep, stress, and pain, aggregated into a 0–100 Collective Wellness Index.
+- **Mental Health Resources** (`https://ikanhealth.in/resources/`, `https://app.ikanhealth.in/resources`): Evidence-based guides on burnout, stress, anxiety, sleep, and workplace mental health in India.
+- **Consultations** (`https://app.ikanhealth.in/consult`): Video, call, and chat sessions with qualified psychologists and counsellors.
+- **Organisations & Burnout Cost Calculator** (`https://ikanhealth.in/org`, `https://ikanhealth.in/burnout-cost-calculator/`): Workplace mental health pilots and burnout impact estimator for HR and leadership teams.
+
+## Key Links
+- App: https://app.ikanhealth.in
+- Website: https://ikanhealth.in
+- Sitemaps: https://ikanhealth.in/sitemap_index.xml and https://app.ikanhealth.in/sitemap.xml
+- Contact: hello@ikanhealth.in
+- Privacy Policy: https://ikanhealth.in/privacy-policy/
+- Terms of Service: https://ikanhealth.in/terms/

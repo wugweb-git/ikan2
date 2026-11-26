@@ -46,13 +46,19 @@ export function ProgramHeader({
   );
 }
 
-/* Per-page title, description and link preview. Pass `path` on pages that should be findable
- * on their own (articles, assessments) so they get a canonical url; screens behind sign-in can
- * leave it out. */
-export const pageMeta = (title: string, description: string, path?: string) => ({
+/* Per-page title, description, optional canonical path and focus keywords. Pass `path` on pages
+ * that should be findable on their own (articles, assessments) so they get a canonical url;
+ * screens behind sign-in can leave it out. */
+export const pageMeta = (
+  title: string,
+  description: string,
+  path?: string,
+  keywords?: string[],
+) => ({
   meta: [
     { title: `${title} — iKAN` },
     { name: "description", content: description },
+    ...(keywords?.length ? [{ name: "keywords", content: keywords.join(", ") }] : []),
     { property: "og:site_name", content: "iKAN" },
     { property: "og:locale", content: "en_IN" },
     { property: "og:title", content: `${title} — iKAN` },
@@ -60,10 +66,12 @@ export const pageMeta = (title: string, description: string, path?: string) => (
     { property: "og:type", content: "website" },
     ...(path ? [{ property: "og:url", content: `https://app.ikanhealth.in${path}` }] : []),
     { property: "og:image", content: "https://app.ikanhealth.in/pwa-512x512.png" },
+    { property: "og:image:alt", content: `${title} — iKAN Health` },
     { name: "twitter:card", content: "summary" },
     { name: "twitter:title", content: `${title} — iKAN` },
     { name: "twitter:description", content: description },
     { name: "twitter:image", content: "https://app.ikanhealth.in/pwa-512x512.png" },
+    { name: "twitter:image:alt", content: `${title} — iKAN Health` },
   ],
   ...(path ? { links: [{ rel: "canonical", href: `https://app.ikanhealth.in${path}` }] } : {}),
 });

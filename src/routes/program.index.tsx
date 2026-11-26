@@ -11,7 +11,13 @@ import { ProgrammeCard } from "@/components/equip/programme-card";
 
 export const Route = createFileRoute("/program/")({
   head: () =>
-    pageMeta("Programs", "iKAN Equip programs for sleep, burnout and stress.", "/program"),
+    pageMeta("Programs", "iKAN Equip programs for sleep, burnout and stress.", "/program", [
+      "mental health programs",
+      "burnout recovery program",
+      "sleep improvement program",
+      "stress management exercises",
+      "iKAN Equip",
+    ]),
   component: ProgramsPage,
 });
 

@@ -12,7 +12,12 @@ import { postToWpAdmin } from "@/lib/wp-sync";
 import * as v from "@/lib/validate";
 
 export const Route = createFileRoute("/contact")({
-  head: () => pageMeta("Contact us", c.heroSubtitle, "/contact"),
+  head: () =>
+    pageMeta("Contact us", c.heroSubtitle, "/contact", [
+      "contact iKAN Health",
+      "mental health support India",
+      "workplace wellbeing pilot",
+    ]),
   component: ContactPage,
 });
 

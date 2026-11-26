@@ -16,6 +16,13 @@ export const Route = createFileRoute("/assessments/")({
       "Assessments",
       "Seven short assessments for depression, anxiety, stress, sleep, work balance, burnout and general wellbeing.",
       "/assessments",
+      [
+        "mental health assessment",
+        "PHQ-9 depression test",
+        "GAD-7 anxiety screening",
+        "burnout assessment",
+        "stress and sleep test",
+      ],
     ),
   component: AssessmentListPage,
 });

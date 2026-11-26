@@ -15,7 +15,13 @@ import { pageMeta } from "@/components/equip/program-header";
 import { aboutPage as a, unmark } from "@/lib/content";
 
 export const Route = createFileRoute("/about")({
-  head: () => pageMeta("About iKAN", a.hero.subtitle, "/about"),
+  head: () =>
+    pageMeta("About iKAN", a.hero.subtitle, "/about", [
+      "iKAN Health",
+      "mental health platform India",
+      "evidence-based mental wellness",
+      "psychologist consultation India",
+    ]),
   component: AboutPage,
 });
 
